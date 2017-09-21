@@ -3,7 +3,7 @@
 # You should not need to modify anything in this file. If you need to
 # do so, report a bug so that I can modify my installation procedure.
 
-#path 
+#path
 CONFIGFILE=config
 VERSFILE=version
 FILESEP=/
@@ -29,13 +29,13 @@ FILES = version.cmo restart.cmo lang.cmo basic.cmo myhashtbl.cmo undo.cmo \
         type_check.cmo compile.cmo interact.cmo rewrite.cmo \
         inductive.cmo poids.cmo tex.cmo logic.cmo \
 	typespoids.cmo splitting.cmo ptypes.cmo oldeduction.cmo affichage.cmo majlistes.cmo \
-	prover.cmo af2_logic.cmo new_cmd.cmo  proof_general.cmo parse_cmd.cmo main.cmo 
+	prover.cmo af2_logic.cmo new_cmd.cmo  proof_general.cmo parse_cmd.cmo main.cmo
 
 FILESO = $(FILES:.cmo=.cmx)
 
 FILESML = $(FILES:.cmo=.ml)
 
-FILESMLI = $(FILES:.cmo=.mli)
+FILESMLI = $(wildcard *.mli)
 
 ############
 
@@ -50,7 +50,7 @@ clean:
 	- rm -f *.cmo *.cmx *.cmi *.o $(TARGET) $(TARGETO)
 
 veryclean: clean
-	- rm -f version.ml
+	- rm -f version.ml .depend
 
 .SUFFIXES :
 .SUFFIXES : .mli .ml .cmi .cmx .cmo .o
@@ -61,7 +61,7 @@ veryclean: clean
 .ml.cmo:
 	$(CAMLC) $(ZFLAGS) -c $<
 
-.ml.cmx: 
+.ml.cmx:
 	$(CAMLO) $(ZFLAGS) -c $<
 
 version.ml: ../version ../config Makefile
@@ -70,15 +70,17 @@ version.ml: ../version ../config Makefile
 	echo 'let default_path = "$(DEFAULT_PATH)"' >> version.ml;\
 	echo "let delim = '$(DELIM)'" >> version.ml;\
 
-depend: 
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),veryclean)
+ifneq ($(MAKECMDGOALS),distclean)
+.depend:  $(FILESML) $(FILESMLI)
 	$(CAMLDEP) $(CAMLPREPRO) $(FILESML) $(FILESMLI) > .depend
+endif
+endif
+endif
 
 install: $(PHOXVERS)
 	cp $(PHOXVERS) $(BINDIR)/phox$(EXE)
 
 #dependencies
 include .depend
-
-
-
-
