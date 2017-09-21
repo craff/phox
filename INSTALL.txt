@@ -4,32 +4,21 @@ TO INSTALL the "PhoX Logic System" proceed as follow:
 
 1) Get and install objective-caml version 3.0* (at least 3.08) You get
    get it by ftp:
-	
+
 		site = ftp.inria.fr
 		dir = pub/lang/caml-light
 		file = ocaml-3.0.tar.gz
 
    Use gnu make (can be gmake on  BSD systems).
-		
-2) Get and install the latest version of PhoX by 
-ftp :
 
-                site = www.lama.univ-savoie.fr 
-                       or
-                site = ftp.logique.jussieu.fr 
-                dir  = pub/distrib/phox/current/ 
-                file = phox-0.xxbx.tar.gz
+2) Get and install the latest version of PhoX from
+   github https://github.com/craff/phox
 
-3) Uncompress it and detar it (using {\tt gunzip phox-0.xxbx.tar.gz; tar xvf
-  phox-0.xxbx.tar})
-
-4) Move to the directory phox-0.xxbx which has just been created.
-     
-5) Edit the file "./config", to suit you need. 
+5) Edit the file "./config", to suit you need.
 
 6) Type "make"
- 
-7) Type "make install"
+
+7) Type "(sudo) make install"
 
 8) If you want the program to look for its libraries in more than one
   directory, you can set the {\tt PHOXPATH} variable, for instance like
@@ -38,11 +27,9 @@ ftp :
 setenv PHOXPATH /usr/local/lib/phox/lib:$USERS/phox/examples
 
 9) You are strongly encouraged to use the emacs interface to PhoX.
-To install an emacs-mode, use Proof-General (release 3.3 or greatest)
-from:
+To install an emacs-mode, use Proof-General from:
 
-http://www.proofgeneral.org/~proofgen
+   https://proofgeneral.github.io/
 
-Proof-General works better with xemacs, but pre-releases 3.4 works
-reasonably well with gnu-emacs 21.
-
+and the file in emacs/ (soon, phox mode should be provided again with
+proofgeneral.
