@@ -1,0 +1,176 @@
+- générer des BNF à partir des types inductifs pour la sorie TeX
+
+- personalisation du tex-type_sugar pour certains types ...
+
+- les variables existentielles lockées devraient être considérées comme
+  des constantes par rewrite.
+
+- new_intro new_elim : une syntaxe pour décrire la règle avec deux formes
+  différentes de la flèche, l'une pour le signe thèse, par exemple |-,
+  et l'autre pour la barre horizontale, par exemple |>.
+
+- new_intro, new_elim : abréviation optionnelle (le préfixe avant le
+  premier . par défaut)
+
+- contrôler les intros automatiques dans new_intro new_elim
+
+- grouper les new_intro sur les \/ et &
+
+- intro n compter le nombre de connecteurs et pas la profondeur de
+  l'arbre
+
+- réfléchir à une syntaxe plus naturelle pour les options de rewrite.
+
+- documenter l'ordre dans lequel sont prises les équations pour le 
+  rewrite liste-de-theorèmes (ordre inverse de l'écriture,
+  éventuellement prendre l'ordre direct), et ajouter
+  la possibilité d'inclure une liste à l'intérieur d'una autre avec la
+  sémantique : on essaye d'abord toutes les réécritures du groupe avant
+  de passer à la règle suivante.
+
+- ? apply with ... to_get ... avec un nom pour la conclusion courante 
+  (pour uniformiser les noms de commandes -- à réfléchir)
+
+- intros all pour toutes les intros
+
+- un warning pour les new_intro non décroissants ou l'interdire par
+  défaut avec une option force.
+
+- intro with ... pour des suites d'existentielles et de conjonctions
+
+- passer "&" "or" en right_infix
+
+- elim doit faire au plus une règle dont la variable de prédicat
+  terminale n'occure pas dans la prémisse principale
+
+- Bugs local close symbol are ignored by function
+  using fis_close instead of can_open. Needs to get
+  access to the local field of the current goal !
+
+- Bugs in inductive types:
+   - problem with partially applied type (ex: transtive_closure)
+   - problem with errors (some name not released)
+
+- the -l option should not have the same effect for rewrite and unfold
+(in the first cases;=, unfold should not count).
+
+- ajouter la possibilité de nommer les tacticals (pas urgent, d'abord
+  améliorer celles-ci).
+  
+- ajouter une abréviation pour écrire :  by induction on n. dont le sens est
+
+    . on cherche une hypothèse de la forme D n (D type de donnée
+      inductif, cf. ci-dessous)
+
+    .  elim D n  
+      
+- Autoriser plusieurs options -p pour rewrite.
+
+- Problème entre export et new_intro cf sum.af2 dans work
+
+- Optimisation de l'unification dans le cas flex/flex pour éliminer
+  les Debruijns inutilisables et substituer l'hypophèse la plus récente
+  pour limiter les "did_matchs" inutiles dans le cas des règles
+  inversibles
+
+- Optimisation pour rewrite (eviter de chercher des règles là où il
+  n'y en à pas.
+
+- Les équations cachées sous une définition dans une hypothèse ne sont
+  pas utilisées par le raisonnement automatique.
+
+- étendre les tacticals en les autorisant à débuter par un ";;".
+  sens : s'applique à tous les buts courants.
+
+- Des options à depend pour indiquer récursivement : les théorèmes
+  utilisés dans la preuve d'un théorème donné (et pas seulement les axiomes).
+
+- option with de elim et apply ne marche qu'avec des hypothèses. Les théorèmes
+  devraient être acceptés.
+
+- finaliser les commandes Data et Inductive (en cours: 
+  - case rule déjà fait, mais preuve trop longue (OK)
+  - prévoir des options pour data (OK)
+  - règle gauche inversible (utile ?)
+  - gestion du undo et des erreurs (OK)
+  - documentation (à faire)
+
+- Faire que goal accepte le nom d'un théorème existant (pour pouvoir prouver
+  une claim sans retaper l'énoncé). En fait il faut mieux une commande
+  spécifique avec un undo spécifique pour que undo marche.
+
+- bug de phox -f qui fait que la plupart des preuves ne passe pas avec
+  un phox -f
+
+- Changer la signification du \/x:A B ou la règle d'introduction par
+  défaut du \/x:A B, de façon que le goal B apparaisse en premier, et
+  que A ?n apparaisse en hypothèse de ce goal.
+
+- Changer ajouter un "such_that" (syntaxe à définir),   \/x such_that B C
+  ayant une interprétation analogue à celle du ":" ci-dessus.
+
+- Documenter les tacticals :  fait succintement. Ajouter
+  des exemples.
+
+- Documenter les commandes d'extraction (?) : fait succintement. Ajouter
+  des exemples.
+
+- Ajouter les commandes qui ne doivent pas apparaître dans le script
+  comme fonctions emacs et dans un menu de PG (en particulier les
+  commandes de la section : "obtaining some informations on the system"
+  dans cmd_top.tex).
+
+=============================================================================
+
+FAIT:
+
+- Ajouter dans la doc prove_claim et del_proof
+
+- nommer autrement new_rewrite : new_equation
+
+- déclarer des prédicats comme "types de données" pour pouvoir
+  automatiser le typage par des règles d'introduction inversibles
+  (pas besoin de nouvelles déclarations, les options -c et -t de
+  new_intro suffisent)	
+
+- Bug sous PG : le undo ne fonctionne pas correctements sur un "save thm."
+  (introduit donc par la commande goal). Il marche correctement sur un save.
+
+- Pb des variables d'unifications instanciées à tout va par 
+  - rewrite (carrement un bug)
+  - par la preuve de conditions ...
+Remarque: fait au mieu plus ajout de lock/unlock*)
+
+- Circonscrire la fuite de mémoire sous phox, cf. fichier
+  examples/zf-2zf.phx qui demande 140 Mo de mémoire en 0.7 et 3Mo en 0.5.
+  Ajouter un repertoire test à l'archive cvs;, qui contiendrait
+  l'exemple de C. au sujet de la fuite de mémoire et d'autres exemples
+  analogues.	
+
+- elim expr with H1 then .. Hp. 
+   introduire "then" en plus de "and" et s'occuper
+  des règles ajouer (elim with "case")
+   
+- Corriger le config pour que make fonctionne sous BSD.
+
+- restart (permet de travailler correctement en mode multi-frame)
+
+- instance doit unlocker préalablement les meta-variables de son
+  argument.
+
+- rename absurd in by_absurd (avoid confusion with constant absurd).
+
+- renommer l'actuel use en prove, et remplacer use par une commande qui
+  passe le nouveau goal en second argument (documenté).
+
+- Corriger et porter le menu pour la compilation.
+
+- Corriger le make distrib pour qu'il fonctionne ailleurs que chez C. R.
+
+- Documenter lock et unlock.
+
+- Documenter la nouvelle syntaxe de elim et apply.
+
+-  hiérarchisation de cmd_proof.tex. 
+
+

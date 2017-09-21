@@ -1,0 +1,96 @@
+Sort nat.
+
+(** Basic examples *)
+
+Cst map : (nat -> nat) -> nat -> nat.
+(* map : (nat -> nat) -> nat -> nat *)
+
+print \f,x(map f x).
+(* map : (nat -> nat) -> nat -> nat *)
+
+
+(** syntax without priority *)
+Cst Infix x "inferior" y : nat -> nat -> prop.
+(* $inferior : nat -> nat -> prop *)
+print \a,b(a inferior b).
+(* $inferior : nat -> nat -> prop *)
+
+Cst Infix x "plus" y : nat -> nat -> nat.
+print \a,b(a plus b).
+(* $plus : nat -> nat -> nat *)
+
+(* this cannot be interpreted because we donnot know how to associate :
+print \a,b,c(a plus b plus c).
+Syntax Error: Waiting for ), but got plus.
+
+this cannot be interpreted because lack of priority
+print \a,b,c(a plus b inferior c).
+Syntax Error: Waiting for ), but got inferior. *)
+
+
+(** Priority, left and right association for infix notations *)
+Cst Postfix[1.5] n "!" : nat -> nat.
+
+(* $! : nat -> nat *)
+print \n (n!).
+(* $! : nat -> nat *)
+
+
+print  \n,p(n plus p!).
+
+Cst Infix[5] x "<" y : nat -> nat -> prop.
+(* $< : nat -> nat -> prop *)
+print \a,b(a < b).
+(* $< : nat -> nat -> prop *)
+
+Cst rInfix[3.5] x "+" y:nat-> nat-> nat.
+(* $+ : nat -> nat -> nat *)
+
+print \a,b,c(a + b + c).
+(* \a,b,c (a + b + c) : nat -> nat -> nat -> nat 
+a + b + c to be read as a +(b + c) -- right Infix : right first
+*)
+
+print \a,b,c (a +b < c).
+(* \a,b,c (a + b < c) : nat -> nat -> nat -> prop *)
+
+
+Cst lInfix[3.5] x "-"y : nat -> nat -> nat.
+
+print \a,b,c(a - b -c).
+(* \a,b,c (a - b - c) : nat -> nat -> nat -> nat 
+a - b - c to be read as (a - b) -c -- left Infix : left first
+*)
+
+
+print \a,b(a -b < a +b).
+(* \a,b (a - b < a + b) : nat -> nat -> prop *)
+
+(* This cannot be interpreted : two symbols have same priority
+print \a,b,c(a - b +c ).
+ Syntax Error: Waiting for ), but got +. 
+*)
+
+(* the following can be undestood (left association of "-" right of "+"), 
+but is probably confusing. *)
+print \a,b,c(a + b + c).
+(* \a,b,c (a + b + c) : nat -> nat -> nat -> nat *)
+(* is the same as : *)
+print \a,b,c((a + b) -c).
+(* \a,b,c (a + b - c) : nat -> nat -> nat -> nat *)
+
+(** More complexes examples *)
+
+Cst Infix[4.5]  x  "==" y "mod" p : nat -> nat -> nat-> nat.
+(* $== : nat -> nat -> nat -> nat *)
+print \a,b(a + b == a mod b).
+(* \a,b (a + b == a mod b) : nat -> nat -> nat *)
+
+
+Cst Prefix[4.9] "{" \P\ "in" a "/" P "}" 
+:   'a -> ('a -> prop) -> prop.
+(* ${ : 'a -> ('a -> prop) -> prop *)
+
+
+print \a \P { x in a / P x}.
+(* \a,P {x in a / P } : ?a -> prop -> prop *)

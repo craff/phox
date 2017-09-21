@@ -1,0 +1,171 @@
+Use nat with
+  N -> N
+| N0 -> N0
+| nat -> nat 
+| _.N -> _.N
+| _ -> _.N.
+Import product.
+flag auto_lvl 1.
+
+def Z' = Product N N.
+
+def R x y = fst x +.N snd y = snd x +.N fst y.
+
+Sort z = product[nat,nat].
+
+fact refl.Z  reflexive Z' R.
+trivial.
+save.
+
+fact sym.Z   symmetric Z' R.
+intros.
+unfold_hyp H1 R.
+left H.
+left H0.
+rewrite R calcul.Product.
+rewrite_hyp H1 R calcul.Product.
+intro.
+save.
+
+fact trans.Z transitive Z' R.
+intros.
+lefts H.
+lefts H0.
+lefts H1.
+rewrite_hyp H2 R calcul.Product.
+rewrite_hyp H3 R calcul.Product.
+rewrite R calcul.Product.
+prove (x +.N y1) +.N (x0 +.N y0) = (y +.N x1) +.N (x0 +.N y0).
+from x +.N y1 +.N y0 +.N x0 = y +.N x0 +.N x1 +.N y0.
+from x +.N y0 +.N (x0 +.N y1) = y +.N x0 +.N (y0 +.N x1).
+intro.
+left G;; trivial.
+save.
+
+
+Use -n quotient with
+  set -> z
+| D -> Z'
+| Q -> Z
+| _.Q -> _.Z
+.
+
+def Z0 = class (N0, N0).
+
+fact Z0.Z Z Z0.
+trivial.
+save.
+
+new_intro -i -t Z0 Z0.Z.
+
+def S' x = class (S.N (fst x), snd x).  
+
+fact total.S'.Z /\x:Z' Z (S' x).
+trivial.
+save.
+
+fact compat.S.Z Compatible S' R.
+intros.
+lefts H.
+lefts H0.
+rewrite_hyp H1 R calcul.Product.
+rewrite S' calcul.Product.
+elim equal.class.Z.
+trivial.
+trivial.
+rewrite R calcul.Product.
+intro.
+save.
+
+def S = lift S'.
+
+fact S.total.Z /\x:Z Z (S x).
+trivial +compat.S.Z.
+save S.total.Z.
+
+new_intro -t -i S S.total.Z.
+
+def P' x = class (fst x, S.N (snd x)).  
+
+fact total.P'.Z /\x:Z' Z (P' x).
+trivial.
+save.
+
+fact compat.P.Z Compatible P' R.
+intros.
+lefts H.
+lefts H0.
+rewrite_hyp H1 R calcul.Product.
+rewrite P' calcul.Product.
+elim equal.class.Z.
+trivial.
+trivial.
+rewrite R calcul.Product.
+rewrite calcul.N.
+
+intro.
+save.
+
+def P = lift P'.
+
+fact P.total.Z /\x:Z Z (P x).
+trivial +compat.P.Z.
+save P.total.Z.
+
+new_intro -t -i P P.total.Z.
+
+flag auto_lvl 1.
+
+fact SP.Z /\x:Z S (P x) = x.
+intros.
+intro.
+trivial.
+intros.
+left H.
+rename z0 x''.
+prove R x'' x'.
+left H.
+prove compat.S.Z.
+prove compat.P.Z.
+rewrite_hyp H2 H7 H9 S P calcul.Product lift.prop S' P'.
+left H0.
+rewrite_hyp H2 H11 class R calcul.N calcul.Product.
+left H2.
+left H12.
+from H12.
+apply H5 with H3.
+elim trans.Z.
+axiom H.
+elim sym.Z.
+save.
+
+
+fact PS.Z /\x:Z P (S x) = x.
+intros.
+intro.
+trivial.
+intros.
+left H.
+rename z0 x''.
+prove R x'' x'.
+left H.
+prove compat.S.Z.
+prove compat.P.Z.
+print lift.prop.
+rewrite_hyp H2 H7 H9 S P calcul.Product lift.prop S' P'.
+left H0.
+rewrite_hyp H2 H11 class R calcul.N calcul.Product.
+left H2.
+left H12.
+from H12.
+apply H5 with H3.
+elim trans.Z.
+axiom H.
+elim sym.Z.
+save.
+
+new_equation PS.Z.
+new_equation SP.Z.
+
+close_def S.
+close_def P.

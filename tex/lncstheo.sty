@@ -1,0 +1,186 @@
+% $State: Exp $ $Date: 2002/01/25 22:23:14 $ $Revision: 1.3 $
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lncstheo}
+\newif\if@envcountreset\@envcountresetfalse
+\DeclareOption{envcountreset}
+    {\@envcountresettrue}
+\ProcessOptions
+\def\@ts{\thinspace}
+% new environments and theorems
+% borrowed form the LTMP-style of Springer-Verlag
+% designed by Dr. Christoph Ender
+%
+% define the new theorem like environments
+% define a new style of environments where it is possible to define
+% the font % used as the theorem name and the fontfamily for the text.
+%
+% \newstytheorem{name}{thefont}{txtfont}{Text}[Counter]
+% \newstytheorem{name}{thefont}{txtfont}[oldname]{Text}
+%
+% #1 - name of theorem
+% #2 - theorem font
+% #3 - text font
+%
+\def\newstytheorem#1#2#3{%
+\@ifnextchar[{\che@othm{#1}{#2}{#3}}{\che@nthm{#1}{#2}{#3}}}
+%
+% #1 - name of theorem
+% #2 - theorem font
+% #3 - text font
+% #4 - text string of thorem name
+%
+\def\che@nthm#1#2#3#4{%
+\@ifnextchar[{\che@xnthm{#1}{#2}{#3}{#4}}{\che@ynthm{#1}{#2}{#3}{#4}}}
+%
+% #1 - name of theorem
+% #2 - theorem font
+% #3 - text font
+% #4 - text string of thorem name
+% #5 - add theorem counter to reset list of another counter
+%
+\def\che@xnthm#1#2#3#4[#5]{\expandafter
+\@ifdefinable\csname #1\endcsname
+{\@definecounter{#1}\if@envcountreset\@addtoreset{#1}{#5}\fi
+\expandafter\xdef\csname the#1\endcsname{
+\if@envcountreset\@thmcounter{#5}.\fi\@thmcounter{#1}}%
+\global\@namedef{#1}{\che@thm{#1}{#4}{#2}{#3}}\global
+\@namedef{end#1}{\@endtheorem}}}
+%
+% #1 - name of theorem
+% #2 - theorem font
+% #3 - text font
+% #4 - text string of thorem name
+%
+\def\che@ynthm#1#2#3#4{\expandafter\@ifdefinable\csname #1\endcsname
+{\@definecounter{#1}%
+\expandafter\xdef\csname the#1\endcsname{\@thmcounter{#1}}%
+\global\@namedef{#1}{\che@thm{#1}{#2}{#3}{#4}}\global
+\@namedef{end#1}{\@endtheorem}}}
+%
+% change oldthm if oldname in specification is '*'
+% then don't use a counter
+% #1 - countername
+% #2 - theorem font
+% #3 - text font
+% #4 - counter used
+% #5 - string containing theorem name to print
+%
+\def\che@othm#1#2#3[#4]#5{\expandafter\@ifdefinable
+\csname#1\endcsname%
+{\@@othm@{#1}{#2}{#3}{#4}{#5}\global\@namedef{end#1}{\@endtheorem}}}
+%
+\def\@@othm@#1#2#3#4#5{\if *#4{\global\@namedef{the#1}{\relax}
+\global\@namedef{#1}{\@bthm@{}{#5}{#2}{#3}}}\else
+{\global\@namedef{the#1}{\@nameuse{the#4}}% define the counter
+\global\@namedef{#1}{\che@thm{#4}{#5}{#2}{#3}}}\fi}
+%
+% new defs for theorem environment che 17-MAR-1989
+% it improves the option possible
+%
+% #1 - countername  = theorem name
+% #2 - string containing theorem name to print
+% #3 - theorem font
+% #4 - text font
+\def\che@thm#1#2#3#4{\@ifnextchar({\@athm{#1}{#2}{#3}{#4}}{%
+\@ifnextchar *{\@bthm{#1}{#2}{#3}{#4}}%
+{\@@thm{#1}{#2}{#3}{#4}}}}
+%
+% \begin{thm}(A.1)[test]      results in:
+% \end{thm}                               thm A.1 (test) ....
+% #1 - theorem
+% #2 - string of theorem name
+% #3 - font for theorem name and label
+% #4 - Text font
+% #5 - is the new label
+% #6 - optional string
+%
+\def\@athm#1#2#3#4(#5){\@ifnextchar[{%
+\@aythm{#1}{#2}{#3}{#4}{#5}}{\@axthm{#1}{#2}{#3}{#4}{#5}}}
+\def\@axthm#1#2#3#4#5{\@@locthmlab{#1}{#5}%
+\@begintheorem{#2}{#5}{#3}{#4}\ignorespaces}
+\def\@aythm#1#2#3#4#5[#6]{\@@locthmlab{#1}{#5}%
+\fuh@opargbegintheorem{#2}{#5}{#6}{#3}{#4}\ignorespaces}
+%
+% \begin{thm}*[xytest]        results in:
+% \end{thm}                               thm (xytest) ....
+% #1 - theorem
+% #2 - string of theorem name
+% #3 - font for theorem name and label
+% #4 - Text font
+% #5 - optional string
+%
+\def\@bthm@#1#2#3#4{\@ifnextchar[{\@bythm{#1}{#2}{#3}{#4}}{%
+\@bxthm{#1}{#2}{#3}{#4}}}
+\def\@bthm#1#2#3#4*{\@ifnextchar[{\@bythm{#1}{#2}{#3}{#4}}{%
+\@bxthm{#1}{#2}{#3}{#4}}}
+\def\@bxthm#1#2#3#4{\if !#1!\relax\else\@@locthmlab{#1}{}\fi
+\@@begintheorem{#2}{#3}{#4}\ignorespaces}
+\def\@bythm#1#2#3#4[#5]{%
+\@@opargbegintheorem{#2}{#3}{#4}{#5}\ignorespaces}
+%
+% define local label
+%   if no number or a user specified label occured
+%
+\def\@@locthmlab#1#2{\expandafter\def\csname the#1\endcsname{#2}
+\let\@chetempa\protect\def\protect{\noexpand\protect\noexpand}%
+\edef\@currentlabel{\csname p@#1\endcsname\csname the#1\endcsname}%
+\let\protect\@chetempa}
+%
+% #1 - counter = theorem name
+% #2 - string with name
+% #3 - font for theorem name and label
+% #4 - font for text
+\def\@@thm#1#2#3#4{\refstepcounter
+    {#1}\@ifnextchar[{\che@ythm{#1}{#2}{#3}{#4}}{%
+    \che@xthm{#1}{#2}{#3}{#4}}}
+%
+\def\che@xthm#1#2#3#4{\che@begintheorem{#2}{\csname
+the#1\endcsname}{#3}{#4}\ignorespaces}
+\def\che@ythm#1#2#3#4[#5]{\che@opargbegintheorem{#2}{\csname
+       the#1\endcsname}{#5}{#3}{#4}\ignorespaces}
+%
+% #1 - name of theorem
+% #2 - label string
+% #3 - font for name and lable
+% #4 - text fomt
+%
+\def\che@begintheorem#1#2#3#4{#4\trivlist\item[\hskip\labelsep
+#3#1\@ts #2]}
+%
+% #1 - name of theorem
+% #2 - label string
+% #3 - additonal text
+% #4 - font for name and lable
+% #5 - text fomt
+%
+\def\che@opargbegintheorem#1#2#3#4#5{#5\trivlist
+\item[\hskip\labelsep#4#1\@ts #2\ #3]}
+%
+\def\fuh@opargbegintheorem#1#2#3{\it \trivlist
+      \item[\hskip \labelsep{\bf #1\ #2\ (#3).}]}
+%
+\def\@@begintheorem#1#2#3{#3\trivlist\item[\hskip\labelsep
+#2#1]}
+\def\@@opargbegintheorem#1#2#3#4{#3\trivlist\item[\hskip\labelsep
+#2#1 #4]}
+
+\newstytheorem{theorem}{\bf}{\it}{Theorem}[chapter]
+\newstytheorem{example}{\it}{\rm}[theorem]{Example}
+\newstytheorem{proposition}{\bf}{\it}[theorem]{Proposition}
+\newstytheorem{fact}{\bf}{\it}[theorem]{Fact}
+\newstytheorem{corollary}{\bf}{\it}[theorem]{Corollary}
+\newstytheorem{lemma}{\bf}{\it}[theorem]{Lemma}
+\newstytheorem{axiom}{\bf}{\it}[theorem]{Axiom}
+\newstytheorem{definition}{\bf}{\rm}[theorem]{Definition}
+\newstytheorem{constant}{\bf}{\rm}[theorem]{Constant}
+\newstytheorem{sort}{\bf}{\rm}[theorem]{Sort}
+\newstytheorem{remark}{\it}{\rm}[*]{Remark}
+\newstytheorem{notation}{\it}{\rm}[*]{Notation}
+\newstytheorem{exercise}{\it}{\rm}[theorem]{Exercise}
+\newstytheorem{problem}{\it}{\rm}[theorem]{Problem}
+\newstytheorem{solution}{\it}{\rm}[theorem]{Solution}
+\newstytheorem{note}{\it}{\rm}[theorem]{Note}
+\newstytheorem{question}{\it}{\rm}[theorem]{Question}
+\newstytheorem{proof}{\it}{\rm}[*]{Proof}
+\def\qed{\hfill\nobreak$\vrule height 1ex width 1ex$}

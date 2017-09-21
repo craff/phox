@@ -1,0 +1,81 @@
+% $State: Exp $ $Date: 2006/01/26 19:17:16 $ $Revision: 1.18 $
+
+\documentclass[twoside,11pt,a4paper]{book}
+\usepackage{a4wide}
+\usepackage{epsfig}
+\usepackage{phox_report}
+\usepackage{fancyvrb}
+\usepackage{makeidx}
+%\usepackage{hevea}
+\usepackage{html}
+\usepackage{color}
+\pagestyle{headings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\hfuzz=11pt
+
+\title{The \AFD\ Proof checker Documentation \\
+                {\footnotesize Version 0.89}}
+\date{\today}
+\author{Christophe Raffalli \\
+        LAMA, Universit\'e de Savoie\\
+        Paul Rozi\`ere\\
+        Equipe PPS, Universit\'e Paris VII
+}
+
+
+\newcommand{\idx}[1]{\index{\tt #1}}
+\newcommand{\tdx}[1]{\index{\sl #1}}
+\def\LaTeX{LaTeX}
+
+\makeindex
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\input{intro.tex}
+
+\input{interface.tex}
+
+\input{basic.math.tex}
+
+\input{afterbasic.tex}
+
+\input{examples.tex}
+
+\input{parser.tex}
+
+\input{natural.tex}
+
+\input{module.tex}
+
+\input{inductive.tex}
+
+\input{tex.tex}
+
+\input{install.tex}
+\appendix
+
+\chapter{Commands.}\label{cmd}
+
+In this index we describe all the \AFD\ commands. The index is divided in two
+sections: the top-level commands (always accepted) and the proof commands
+(accepted only when doing a proof).
+
+\input{cmd_top.tex}
+
+\input{cmd_proof.tex}
+
+\input{flag.tex}
+
+\addtocontents{toc}{\protect\contentsline{chapter}{\protect \numberline {C}Index.}{\thepage}{appendix.C}}
+\input{doc.ind}
+
+\addtocontents{toc}{\protect\contentsline {chapter}{\protect\numberline {D}Bibliography.}{\thepage}{appendix.D}}
+\bibliography{biblio}
+\bibliographystyle{plain}
+
+\end{document}

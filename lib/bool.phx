@@ -1,0 +1,336 @@
+(* $State: Exp $ $Date: 2004/12/08 14:36:08 $ $Revision: 1.8 $ *)
+(*header 1998/09/08
+
+	title = "The boolean"
+	author = "Christophe Raffalli, Paul Roziere"
+	institute = "Paris VII, Paris XII university"
+*)
+
+flag auto_lvl 3.
+
+(** Properties of basic operations and predicates on the booleans. *)
+
+
+(*** Basic definitions. *)
+
+(*texte 
+To define the booleans, we extend the language with two
+contant symbols [ TT ] and [ FF ].
+Then the booleans are defined by the following predicate [B x] :
+*)
+
+(*definition  Booleans *)
+def B x = /\X (X True -> X False -> X x).
+tex_syntax B "{\\rm I\\hspace{-0.2em}B}".
+(*enddefinition *)
+ 
+(*** The introduction rules for $B. *)
+
+(*fact $True and $False are booleans *)
+fact True.total.B 
+	B True.
+trivial.
+save.
+
+fact False.total.B 
+	B False.
+trivial.
+save.
+
+(*endfact *)
+new_intro -i -c True True.total.B.
+new_intro -i -c False False.total.B.
+
+fact is_True.total.B
+	/\b (b -> B b). 
+intros.
+prove b = True.
+intro.
+trivial.
+trivial.
+save.
+new_intro is_True is_True.total.B.
+
+fact is_False.total.B
+	/\b (~ b -> B b). 
+intros.
+prove b = False.
+intro.
+trivial.
+trivial.
+save.
+new_intro is_False is_False.total.B.
+
+(*** Elimination rules for $B. *)
+
+fact (* Case analysis on $B *) case.B 
+	/\X /\b ((~b -> b = False -> X False) -> 
+               (b -> b = True -> X True) -> B b -> X b ).
+intros.
+elim (~b -> b = False -> X False) -> 
+               (b -> b = True -> X True) -> X b .
+elim H1.
+trivial.
+trivial.
+save.
+new_elim B case case.B.
+
+(*texte
+These theorems are added respectively as introduction and
+elimination rules for the predicate [ B ] with the given
+abbreviation (This implies for instance that #elim True.total.B# is
+equivalent to #intro True#). Moreover the last rule is invertible
+and the third rule is not necessary for completeness. 
+*)
+
+(*** Left rules for $B. *)
+
+proposition (*  $True and $False are distinct  *) True_not_False.B 
+	True != False.
+intros.
+rewrite -r H.
+intro.
+save.
+
+fact (*  The previous proposition as left rule  *) True_not_False_left.B 
+	/\X (True = False -> X).
+trivial +True_not_False.B.
+save.
+new_elim -i -n $= True_not_False True_not_False_left.B.
+
+fact (*  The previous proposition as left rule  *) False_not_True_left.B 
+	/\X (False = True -> X).
+trivial +True_not_False.B.
+save.
+new_elim -i -n $= False_not_True False_not_True_left.B.
+
+fact (*  Left rule for True  *) equal_True_left.B
+	/\X/\b ((b -> X) -> b = True -> X).
+intros.
+elim H.
+rewrite H0.
+intro.
+save.
+new_elim -i -n $= equal_True_left equal_True_left.B.
+
+fact (*  Left rule for True  *) True_equal_left.B
+	/\X/\b ((b -> X) -> True = b -> X).
+trivial +equal_True_left.B.
+save.
+new_elim -i -n $= left_True True_equal_left.B.
+
+fact (*  Left rule for False  *) equal_False_left.B
+	/\X/\b ((~b -> X) -> b = False -> X).
+intros.
+elim H.
+rewrite H0.
+trivial.
+save.
+new_elim -i -n $= equal_False_left equal_False_left.B.
+
+fact (*  Left rule for False  *) False_equal_left.B
+	/\X/\b ((~b -> X) -> False = b -> X).
+trivial +equal_False_left.B.
+save.
+new_elim -i -n $= left_False False_equal_left.B.
+
+fact (*  Left rule for $B  *) elim.B 
+	/\X/\b ((b -> b = True -> X) -> (~ b -> b = False -> X) -> B b -> X).
+intro 5.
+elim (b -> b = True -> X) -> (~ b -> b = False -> X) -> X.
+elim H1.
+trivial.
+trivial.
+save.
+new_elim -n B elim elim.B.
+
+close_def B.
+
+theorem B_is_excluded_middle.B
+	/\x (B x <-> x or ~ x).
+trivial.
+save.
+
+(*** Boolean equality. *)
+
+(*texte
+Using the previous axiom, we can prove (instuitionistically) the decidability
+of the equality on booleans.
+*)
+
+fact eq_dec.B 
+	equal.decidable B.
+auto.
+save.
+new_intro -i -t B eq_dec.B.
+
+(** Definition of functions on booleans. *)
+
+(*** if ... then ... else ... *)
+
+def (* graph of a function defined by a test *) 
+	ifP b x y z = (b & z = x) or (~ b & z = y).
+
+Local lemma (*  The predicate [ ifP ] defines a function  *) ifP_unique 
+	/\b:B/\x,y\/!z  ifP b x y z.
+intros.
+left H.
+select 2.
+intros.
+intro r.
+trivial.
+intros.
+left H2.
+select 2.
+elim H2 with [r].
+elim H0.
+elim H2.
+intros.
+intro l.
+trivial.
+intros.
+left H2.
+elim H2.
+elim H2.
+save.
+
+
+def (* function defined by a test *)
+	Prefix[4.0] "if" b "then" x "else" y = Def \z (ifP b x y z).
+(* if b then x else y = Def \z (ifP b x y z) *)
+
+(*texte 
+Using the definite description operator, we can introduce a new function symbol
+[ if b then x else y ].
+*)
+
+(*fact Basic properties of $if *)
+fact True.if.B /\X/\c1/\c2 (X -> if X then c1 else c2 = c1).
+intros.
+prove ifP X c1 c2 (if X then c1 else c2).
+intro.
+elim ifP_unique.
+trivial +equal.proposition.
+trivial +equal.proposition.
+save.
+
+new_equation True.if.B.
+
+fact False.if.B /\X/\c1/\c2 (~X -> if X then c1 else c2 = c2).
+intros.
+prove ifP X c1 c2 (if X then c1 else c2).
+intro.
+elim ifP_unique.
+trivial +equal.proposition.
+trivial +equal.proposition.
+save.
+
+new_equation False.if.B.
+(*endfact *)
+close_def $if.
+
+
+(*texte
+An alternative would be to add [ if b then x else y ] as a constant
+and replace the previous theorems by axioms. We prefer to limit the
+number of axioms because this should help to detect a contradiction in
+our assumptions. Moreover, we are not replacing two axioms by a more
+powerful one, because the definite description principle is a
+conservative axiom.
+*)
+
+fact (*  Totality of $if  *) total.if.B 
+	/\X/\b:B/\c1,c2:X X(if b then c1 else c2).
+trivial.
+save.
+
+fact (*  Totality of $if a better version  *) case.if.B 
+	/\X/\b:B/\c1,c2 ((b -> X c1) -> (~ b -> X c2) 
+                           -> X(if b then c1 else c2)).
+intro 3.
+trivial.
+save.
+new_intro -t if case.if.B.
+
+(*texte
+The [ case.if.B ] theorem can not be added as an introduction rule
+because it would be an introduction rule for any predicate !
+Nevertheless it is added as a "totality rule" (using the command 
+#new_intro -t#. This tells the #trivial# tactic to use it when the goal is
+of the form [ P(if b then c1 else c2) ] with [ P ] atomic. This is
+useful to prove that functions using $if are total.
+*)
+
+(*** Boolean functions. *)
+
+(*fact We prove the totality of these functions *) 
+fact and.total.B /\x,y:B B(x & y).
+trivial 8.
+save.
+
+fact or.total.B /\x,y:B B(x or y).
+trivial 8.
+save.
+
+fact neg.total.B /\x:B B ~x.
+trivial 8.
+save.
+
+new_intro -i -t and and.total.B.
+new_intro -i -t or or.total.B.
+new_intro -i -t neg neg.total.B.
+(*endfact *)
+
+(*fact The equation for $& *)
+fact and.lTrue.B /\x ((True & x) = x).
+trivial +equal.proposition.
+save.
+fact and.rTrue.B /\x:B ((x & True) = x).
+trivial +equal.proposition.
+save.
+
+fact and.lFalse.B /\x ((False & x) = False).
+trivial +equal.proposition.
+save.
+
+fact and.rFalse.B /\x:B ((x & False) = False).
+trivial +equal.proposition.
+save.
+
+new_equation and.lTrue.B and.rTrue.B and.lFalse.B and.rFalse.B.
+
+(*endfact *)
+
+(*fact The equation for $or *)
+fact or.lFalse.B /\x ((False or x) = x).
+trivial +equal.proposition.
+save.
+
+fact or.rFalse.B /\x:B ((x or False) = x).
+trivial +equal.proposition.
+save.
+
+fact or.lTrue.B /\x ((True or x) = True).
+trivial +equal.proposition.
+save.
+
+fact or.rTrue.B /\x:B ((x or True) = True).
+trivial +equal.proposition.
+save.
+
+new_equation or.lTrue.B or.rTrue.B or.lFalse.B or.rFalse.B.
+(*endfact *)
+
+(*fact The equation for $~ *)
+fact neg.True.B (~True) = False.
+trivial +equal.proposition.
+save.
+
+fact neg.False.B (~False) = True.
+trivial +equal.proposition.
+save.
+
+new_equation neg.True.B neg.False.B.
+(*endfact *)
+
+

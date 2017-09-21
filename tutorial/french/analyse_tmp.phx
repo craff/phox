@@ -1,0 +1,698 @@
+flag auto_lvl 1.
+Import requis.
+
+(* Le but de ce tutorial est de faire un peu d'analyse ! *)
+
+Sort real. (* la sorte des réels *)
+
+Cst d : real -> real -> real. (* la fonction distance *)
+
+Cst R0 : real. (* Le réel zero *)
+
+(* les realtions d'ordre sur les réels *)
+Cst Infix[5] x "<=" y : real -> real -> prop.
+def Infix[5] x ">" y = ~(x <= y). 
+def Infix[5] x ">=" y = y <= x. 
+def Infix[5] x "<" y = y > x. 
+
+(* quelques définition: *)
+
+(* image f A est l'image directe de A par f, image f A y veut dire
+   que y appartient à image f A *)
+def image f A = { y | \/ x (x in A & (f x) = y) }.
+
+(* inverse f A est l'image inverse de A par f, inverse f A x veut dire
+   que x appartient à inverse f A *)
+def inverse f A = { x | f x in A }.
+
+(* U et V sont d'intersection vide *)
+def intervide U V  = ~ \/ x (x in U & x in V).
+
+(* A est inclus dans B *)
+def Infix[5] A "subset" B = /\ x (x in A  -> x in B).
+
+(* O est un ouvert *)
+def ouvert O = /\ x (x in O -> \/a > R0 /\y (d x y < a -> y in O)).
+
+(* première définition de continue *)
+def continue1 f = /\ x  /\e > R0 \/a > R0
+  /\ y (d x y < a -> d (f x) (f y) < e).
+
+(* seconde définition de continue *)
+def continue2 f = /\ U ((ouvert U) -> (ouvert (inverse f U))).
+
+goal /\f (continue1 f -> continue2 f).
+(*  soit f supposons continue1 f [H] prouvons continue2 f  *)
+intros.
+(*  soit U supposons ouvert U [H0]
+   prouvons ouvert (inverse f U)  *)
+intros.
+(*  soit x supposons x in inverse f U [H1]
+   prouvons \/a > R0  /\y (d x y < a -> y in inverse f U)  *)
+intros.
+(*  Ouvre la définition : inverse  *)
+unfold_hyp H1 $inverse. .
+(*  D'après H0 avec x in inverse f U  soit a tel que
+   a > R0 & /\y (d (f x) y < a -> y in U) [H2] 
+     *)
+elim H0 with H1.
+(*  D'après H2, on a a > R0 [H2] et /\y (d (f x) y < a -> y in U) [H3]   *)
+lefts H2.
+(*  D'après H avec a > R0 et  x  soit a0 tel que
+   a0 > R0 & /\y (d x y < a0 -> d (f x) (f y) < a) [H4] 
+     *)
+elim H with H2 and  x.
+(*  D'après H4, on a a0 > R0 [H4] et /\y (d x y < a0 -> d (f x) (f y) < a)
+   [H5]   *)
+lefts H4.
+(*  prouvons a0 > R0 & /\y (d x y < a0 -> y in inverse f U)  *)
+intro [n with  a0].
+(*  prouvons /\y (d x y < a0 -> y in inverse f U)  *)
+intros.
+(*  soit y supposons d x y < a0 [H6] prouvons y in inverse f U  *)
+intros.
+(*  Ouvre la définition : {  *)
+unfold_hyp H1 ${. .
+(*  soit x supposons inverse f U x [H1]
+   prouvons \/a > R0  /\y (d x y < a -> inverse f U y)  *)
+intros.
+(*->*)
+intros.
+unfold continue2.
+unfold_hyp H continue1.
+intros.
+intros.
+unfold_hyp H1 inverse.
+apply H0 with H1.
+lefts G $& $\/.
+apply H with x and H2.
+lefts G $& $\/.
+intro.
+intro.
+axiom H4.
+intros.
+apply H5 with H6.
+apply H3 with G. 
+axiom G0.
+(*->*)
+save th1.
+
+(* axiome sur la distance *)
+claim d_nulle /\x d x x = R0.
+new_equation d_nulle.
+claim d_positive /\x,y (x < y -> d x y > R0).
+claim d_strict /\x,y (d x y <= R0 -> x = y).
+claim d_symetrique /\x,y (d x y = d y x).
+new_equation d_symetrique.
+
+claim inegalite_triangulaire1 /\x,y,z,r (d y z < d (d x y) r -> d x y < r -> d x z < r).
+claim inegalite_triangulaire2 /\x,y,z,r (d y z < d (d x y) r -> d x y > r -> d x z > r).
+
+def boule x r y = d x y < r.
+
+lemma boule_ouverte /\x,r ouvert (boule x r).
+(*->*)
+intros.
+intros.
+intro.
+instance ?1 d (d x x0) r.
+intro.
+elim d_positive.
+axiom H.
+intros.
+elim inegalite_triangulaire1.
+axiom H0.
+axiom H.
+(*->*)
+save.
+
+goal /\f (continue2 f -> continue1 f).
+(*->*)
+intros.
+intros.
+unfold_hyp H continue2.
+local U = boule (f x) e.
+prove ouvert U.
+elim boule_ouverte.
+apply H with G.
+unfold_hyp G0 ouvert.
+apply G0 with x and ?.
+intro.
+elim H0.
+axiom H1.
+lefts G1 $& $\/.
+intro 2.
+axiom H1.
+intros.
+apply H2 with H3.
+unfold_hyp G1 inverse U.
+axiom G1.
+(*->*)
+save th2.
+
+def connexe A = /\ U, V (ouvert U -> ouvert V -> 
+  A subset (U union V) -> intervide U V -> (A subset U) or (A subset V)).
+
+
+goal /\f (continue2 f -> /\ A (connexe A -> connexe (image f A))).
+(*->*)
+intros.
+intros.
+local U' = inverse f U.
+local V' = inverse f V.
+prove A subset (U' union V').
+trivial = H3.
+prove intervide U' V'.
+trivial = H4.
+prove ouvert U'. 
+trivial = H H1.
+prove ouvert V'. 
+trivial = H H2.
+apply H0 with G and G1 and G2 and G0.
+left G3.
+intro l.
+trivial = H5.
+intro r.
+trivial = H5.
+(*->*)
+save th3.
+
+(* axiome sur l'ordre *)
+claim ordre_total /\x,y (x <= y or y <= x).
+claim ordre_reflexif /\x (x <= x).
+claim ordre_transitif /\x,y,z (x <= y -> y <= z -> x <= z).
+claim ordre_antisymetrique /\x,y (x <= y -> y <= x -> x = y).
+claim ordre_dense /\x,y (x < y -> \/z (x < z & z < y)).
+
+(* définition de majorant et borne supérieur *)
+
+def maj m X = /\y (X y -> y <= m).
+def sup m X = maj m X & /\y (maj y X -> m <= y).
+claim axiome_borne_sup /\X (\/x X x -> \/m maj m X  -> \/m sup m X).
+
+(* lemme sur l'ordre, avec des new_elim pour faciliter 
+   le raisonnement sur les inéquations.
+   Ce n'est pas parfait. Notemment, la transitivité stricte 
+   (x < y -> y < z -> x < z) ne marche pas avec trivial.
+*)
+
+new_elim -t $<= t 2 ordre_transitif.
+new_intro r ordre_reflexif.
+
+prop ordre_transitif' /\x,y,z (y <= z -> x <= y -> x <= z).
+trivial.
+save.
+
+new_elim -t $<= t' 2 ordre_transitif'.
+
+prop ordre_transitif2 /\x,y,z (y > x -> y <= z -> z > x).
+trivial.
+save.
+
+new_elim -t $<= t2 2 ordre_transitif2.
+
+prop ordre_transitif2' /\x,y,z (y <= z -> y > x -> z > x).
+trivial.
+save.
+
+new_elim -t $<= t2' 2 ordre_transitif2'.
+
+prop ordre_transitif3 /\x,y,z (x <= y -> z > y -> z > x).
+trivial.
+save.
+
+new_elim -t $<= t3 2 ordre_transitif3.
+
+prop ordre_transitif3' /\x,y,z (z > y -> x <= y -> z > x).
+trivial.
+save.
+
+new_elim -t $<= t3' 2 ordre_transitif3'.
+
+prop ordre_less_imply_lesseq /\x,y (x < y -> x <= y).
+(*->*)
+intros.
+elim ordre_total with x and y.
+trivial.
+(*->*)
+save.
+
+new_intro lilq ordre_less_imply_lesseq.
+
+prop ordre_lesseq_imply_less /\x,y (x != y -> x <= y -> y > x).
+(*->*)
+intros.
+intros.
+elim H.
+elim ordre_antisymetrique with H0 and H1.
+(*->*)
+save.
+
+new_intro lqil ordre_lesseq_imply_less.
+
+prop ordre_2_cas /\x,y (x <= y or x > y).
+intros.
+elim excluded_middle.
+save.
+
+prop ordre_lesseq_2_cas /\x,y (x <= y -> x = y or x < y).
+(*->*)
+intros.
+by_absurd.
+rewrite_hyp H0 demorgan.
+trivial.
+(*->*)
+save.
+
+prop ordre_3_cas /\x,y (x < y or x = y or y < x).
+(*->*)
+intros.
+elim ordre_2_cas with x and y.
+elim ordre_lesseq_2_cas with H.
+trivial.
+trivial.
+trivial.
+(*->*)
+save.
+
+(* dernier axiome sur la distance et l'ordre et leurs conséquences : *)
+
+claim d_increasing_left /\x,y,z (x > y -> y > z -> d x z > d x y).
+claim d_increasing_right /\x,y,z (x > y -> y > z -> d x z > d y z).
+claim d_somme /\x /\e > R0 \/z (x > z & d x z = e).
+claim d_soustraction /\x /\e > R0 \/z (x < z & d x z = e).
+
+prop d_positive_ou_nulle /\x,y (R0 <= d x y).
+(*->*)
+intros.
+elim ordre_3_cas with x and y.
+trivial +d_positive.
+rewrite -l 1 d_symetrique.
+trivial +d_positive.
+(*->*)
+save.
+
+new_intro dpn d_positive_ou_nulle.
+
+prop d_6r /\x,y,z (x < y -> d x z  < d x y -> z < y).
+(*->*)
+intros.
+by_absurd.
+rewrite_hyp H1 demorgan.
+elim ordre_lesseq_2_cas with H1.
+trivial =H0 H2.
+apply d_increasing_right with H2 and H.
+trivial.
+(*->*)
+save.
+
+prop d_6l /\x,y,z (x > y -> d x z < d x y -> z > y).
+(*->*)
+intros.
+by_absurd.
+rewrite_hyp H1 demorgan.
+elim ordre_lesseq_2_cas with H1.
+trivial =H0 H2.
+apply d_increasing_left with H and H2.
+trivial.
+(*->*)
+save.
+
+prop d_8r /\x,y,z (x <= y -> y < z -> d x y < d x z).
+(*->*)
+intros.
+elim ordre_lesseq_2_cas with H.
+trivial +d_positive.
+elim d_increasing_right with H0 then H1.
+(*->*)
+save.
+
+prop d_8l /\x,y,z (x < y -> y <= z -> d y z < d x z).
+(*->*)
+intros.
+elim ordre_lesseq_2_cas with H0.
+trivial +d_positive.
+elim d_increasing_left with H1 then H.
+(*->*)
+save.
+
+prop d_8er /\x,y,z (x <= y -> y <= z -> d x y <= d x z).
+(*->*)
+intros.
+elim ordre_lesseq_2_cas with H.
+trivial.
+elim ordre_lesseq_2_cas with H0.
+trivial.
+intro lilq.
+elim d_increasing_right with H2 then H1.
+(*->*)
+save.
+
+prop d_8el /\x,y,z (x <= y -> y <= z -> d y z <= d x z).
+(*->*)
+intros.
+elim ordre_lesseq_2_cas with H0.
+trivial.
+elim ordre_lesseq_2_cas with H.
+trivial.
+intro lilq.
+elim d_increasing_left with H1 then H2.
+(*->*)
+save.
+
+prop d_9r /\x /\e > R0 \/z (x > z & d x z < e).
+(*->*)
+intros.
+apply d_somme with x and H.
+lefts G $& $\/.
+apply ordre_dense with H0.
+lefts G $& $\/.
+intro.
+intro.
+axiom H3.
+elim d_8l with H2.
+trivial.
+(*->*)
+save.
+
+prop d_9l /\x /\e > R0 \/z (x < z & d x z < e).
+(*->*)
+intros.
+apply d_soustraction with x and H.
+lefts G $& $\/.
+apply ordre_dense with H0.
+lefts G $& $\/.
+intro.
+intro.
+axiom H2.
+elim d_8r with H3.
+trivial.
+(*->*)
+save.
+
+Import bool.
+
+def min x y = if x <= y then x else y.
+
+prop min_left /\x,y min x y <= x.
+intros.
+apply ordre_2_cas with x and y.
+left G.
+trivial.
+trivial.
+save.
+
+prop min_right /\x,y min x y <= y.
+intros.
+apply ordre_2_cas with x and y.
+left G.
+trivial.
+trivial.
+save.
+
+prop min_pos /\x,y>R0 min x y>R0.
+intros.
+apply ordre_2_cas with x and y.
+left G.
+trivial.
+trivial.
+save.
+
+new_intro -i min_left min_left.
+new_intro -i min_right min_right.
+new_intro -i min_pos min_pos.
+
+
+def intervalle I = 
+  /\a,b:I /\x (a <= x -> x <= b -> I x).
+
+fact intervalle_connexe /\I (intervalle I <-> connexe I).
+intros.
+intro.
+intro.
+intros.
+by_absurd.
+rewrite_hyp H4 demorgan.
+lefts H4 $& $\/.
+elim False.
+apply ordre_3_cas with x and x0.
+lefts G.
+select 2.
+trivial =H2 H5 H6 H4 H7 H8.
+select 2.
+(* cas x0 < x *)
+prove V x0.
+trivial =H2 H7 H4.
+local A y = x0 <= y & y <= x & /\z (x0 <= z -> z < y -> V z).
+prove A x0.
+trivial =H8 G.
+prove maj x A.
+intros.
+trivial.
+elim axiome_borne_sup with A.
+trivial =G0.
+trivial =G1.
+left H9.
+apply H10 with G1.
+prove x0 <= m.
+trivial =H9 G0.
+prove A m.
+intros.
+intros.
+by_absurd.
+prove maj z A.
+intros.
+lefts H14.
+by_absurd.
+apply H16 with H17.
+elim H13.
+elim H12.
+elim H10.
+apply H with G3 and G2.
+apply H2 with G5.
+left G6.
+select 2.
+apply H1 with H11.
+elim ordre_lesseq_2_cas with G2.
+trivial =H12 H6 H11.
+lefts G6 $& $\/.
+local a' = min a (d m x).
+apply d_9l with m and a' > R0.
+trivial +d_positive =H13 H12.
+lefts G6 $& $\/.
+prove d m z < a.
+apply ordre_transitif2 with H16.
+elim G6.
+intro.
+prove A z.
+intros.
+trivial =G3 H15.
+apply d_6r with H12 and d m z < d m x.
+prove a' <= d m x.
+trivial =.
+trivial =H16 G7.
+trivial =G7.
+intros.
+elim ordre_2_cas with m and z0.
+elim H14.
+apply d_8r with H19 and H18.
+elim ordre_transitif2 with G7.
+intro.
+elim G4 with [r] then [r].
+axiom H19.
+apply H9 with G7.
+elim H15.
+apply H0 with H11.
+lefts G6 $& $\/.
+local a' = min a (d x0 m).
+apply d_9r with m and a' > R0.
+intro.
+elim ordre_lesseq_2_cas with G3.
+elim H3.
+trivial.
+elim d_positive.
+lefts G6 $& $\/.
+prove d m z < a.
+prove a' <= a.
+trivial =.
+trivial =H15 G6.
+apply H13 with G6.
+prove x0 <= z.
+apply d_6l with x0 < m and d m z < d m x0.
+elim ordre_lesseq_2_cas with G3.
+elim H3.
+trivial.
+prove a' <= d m x0.
+trivial =.
+trivial =H15 G8.
+trivial =G8.
+apply G4 with [r] and [r] and G8 and H14.
+trivial =G7 G9 H3.
+(* cas x < x0 *)
+prove U x.
+trivial =H2 H6 H5.
+local A y = x <= y & y <= x0 & /\z (x <= z -> z < y -> U z).
+prove A x.
+trivial =H8 G.
+prove maj x0 A.
+intros.
+trivial.
+elim axiome_borne_sup with A.
+trivial =G0.
+trivial =G1.
+left H9.
+apply H10 with G1.
+prove x <= m.
+trivial =H9 G0.
+prove A m.
+intros.
+intros.
+by_absurd.
+prove maj z A.
+intros.
+lefts H14.
+by_absurd.
+apply H16 with H17.
+elim H13.
+elim H12.
+elim H10.
+apply H with G3 and G2.
+apply H2 with G5.
+left G6.
+apply H0 with H11.
+elim ordre_lesseq_2_cas with G2.
+trivial =H12 H7 H11.
+lefts G6 $& $\/.
+local a' = min a (d m x0).
+apply d_9l with m and a' > R0.
+trivial +d_positive =H13 H12.
+lefts G6 $& $\/.
+prove d m z < a.
+apply ordre_transitif2 with H16.
+elim G6.
+intro.
+prove A z.
+intros.
+trivial =G3 H15.
+apply d_6r with H12 and d m z < d m x0.
+prove a' <= d m x0.
+trivial =.
+trivial =H16 G7.
+trivial =G7.
+intros.
+elim ordre_2_cas with m and z0.
+elim H14.
+apply d_8r with H19 and H18.
+elim ordre_transitif2 with G7.
+intro.
+elim G4 with [r] then [r].
+axiom H19.
+apply H9 with G7.
+elim H15.
+apply H1 with H11.
+lefts G6 $& $\/.
+local a' = min a (d x m).
+apply d_9r with m and a' > R0.
+intro.
+elim ordre_lesseq_2_cas with G3.
+elim H3.
+trivial.
+elim d_positive.
+lefts G6 $& $\/.
+prove d m z < a.
+prove a' <= a.
+trivial =.
+trivial =H15 G6.
+apply H13 with G6.
+prove x <= z.
+apply d_6l with x < m and d m z < d m x.
+elim ordre_lesseq_2_cas with G3.
+elim H3.
+trivial.
+prove a' <= d m x.
+trivial =.
+trivial =H15 G8.
+trivial =G8.
+apply G4 with [r] and [r] and G8 and H14.
+trivial =G7 G9 H3.
+
+(* autre sens *)
+
+intros.
+intros.
+by_absurd.
+local U z = z < x.
+local V z = z > x.
+prove ouvert U.
+intros.
+intro.
+instance ?3 d x0 x.
+intros.
+elim d_positive.
+axiom H5.
+intros.
+elim d_6r with H5 and H6.
+prove ouvert V.
+intros.
+intro.
+instance ?4 d x x0.
+intros.
+elim d_positive.
+axiom H5.
+intros.
+elim d_6l with H5.
+axiom H6.
+elim H with G and G0.
+intros.
+apply ordre_3_cas with x and x0.
+lefts G1.
+trivial =H6.
+trivial =H4 H5 H6.
+trivial =H6.
+intros.
+lefts H5 $& $\/.
+trivial =H5 H6.
+apply H5 with H1.
+trivial =H3 G1.
+apply H5 with H0.
+trivial =H2 G1.
+save.
+
+(* On va maintenant prouver le théorèmes des valeurs intermédiares *)
+
+theo valeur_intermediare /\f,a,b,c (
+  a < b ->
+  (f a) <  c ->	
+  c < (f b) ->
+  continue1 f ->
+    \/x (a < x & x < b &  f x = c)).
+intro f a b c hyp_1 hyp_2 hyp_3 cont.
+
+local I x= a <= x & x <= b.
+prove intervalle I.
+trivial.
+apply intervalle_connexe with G.
+rmh G.
+apply th1 with cont.
+apply th3 with G and G0.
+apply intervalle_connexe with G1.
+apply G2 with f a and f b and c.
+trivial =hyp_1.
+trivial =hyp_1.
+elim G3.
+trivial.
+trivial.
+intros $& $\/.
+instance ?1 x.
+elim ordre_lesseq_2_cas with a <= x.
+trivial =H.
+elim hyp_2.
+trivial.
+elim ordre_lesseq_2_cas with x <= b.
+trivial =H.
+elim hyp_3.
+trivial.
+left H.
+save.
+
+depend valeur_intermediare.

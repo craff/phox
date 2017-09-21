@@ -1,0 +1,71 @@
+\chapter{Installation.}\label{install}
+
+You can read up-to-date
+instructions at the following url :
+
+\begin{quote}
+ \verb#http://www.lama.univ-savoie.fr/~raffalli/phox.html#
+\end{quote}
+
+We will explain how to install \AFD\ on a Unix machine.  If you are
+familiar with Objective-Caml, it should not be difficult to get it work
+on any machine which can run Objective-Caml.
+
+To install the ``\AFD\ Proof Checker'',  proceed as follow:
+
+\begin{enumerate}
+\item Get and install Objective-Caml version 3.0* (at least 3.08). You can get
+it by ftp:
+\begin{quote}\tt
+                site = ftp.inria.fr \\
+                dir = lang/caml-light \\
+                file = ocaml-3.0*.tar.gz
+\end{quote}
+
+\item Get the latest version of \AFD\ by 
+ftp :
+\begin{quote}\tt
+                site = www.lama.univ-savoie.fr \\
+                       or\\
+                site = ftp.logique.jussieu.fr \\
+                dir  = pub/distrib/phox/current/ \\
+                file = phox-0.xxbx.tar.gz
+\end{quote}
+
+\item Uncompress it and detar it (using {\tt gunzip phox-0.xxbx.tar.gz; tar xvf
+  phox-0.xxbx.tar})
+     
+\item Move to the directory phox-0.xxbx which has just been created.
+          
+\item Edit the file "./config", to suit you need.
+
+\item Type "make".
+
+\item Type "make install" 
+  
+\item If you want the program to look for its libraries in more than one
+  directory, you can set the {\tt PHOXPATH} variable, for instance like
+  this (with csh):
+
+\begin{verbatim}
+setenv PHOXPATH /usr/local/lib/phox/lib:$USERS/phox/examples
+\end{verbatim}
+
+\item You are strongly encouraged to use the emacs interface to \AFD.
+To install an emacs-mode, use Proof-General (release 3.3 or greatest)
+from:
+
+\begin{quote}
+\verb#http://www.proofgeneral.org/~proofgen#
+\end{quote}
+
+Proof-General works better with xemacs, but pre-releases 3.4 works
+reasonably well with gnu-emacs 21.
+
+\end{enumerate}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "doc"
+%%% End: 

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo $1
+echo $2
+
+if [ -f depend ]; then rm depend; fi
+mkdir deptmp
+for file in *.ml *.mli; do 
+      	echo ${file}
+       	$1 ${file} > deptmp/${file}
+done
+cd deptmp
+$2 *.ml *.mli > ../depend
+cd ..
+rm -rf deptmp

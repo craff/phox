@@ -1,0 +1,3 @@
+# $State: Exp $ $Date: 2000/10/12 09:58:27 $ $Revision: 1.1.1.1 $
+
+find $1 \( -name '.*~' -o -name '*~' -o -name '#*#' -o -name 'core' -o -name '*.CKP' -o -name '.*.CKP' -o -name '*.log' \) -type f  -print -exec rm -f {} \;

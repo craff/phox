@@ -1,0 +1,241 @@
+(*header 1998/05/14
+	title = "A basic example on ordering relations"
+	author = "Paul Rozi\`ere"
+	institute = "Equipe PPS, Paris VII university"
+	documents = math doc
+*)
+(** Introduction. *)
+
+(*texte This example shows a very simple development in
+PhoX. See~\chapter{PG} for some preliminairies to use the system. It is
+aimed to explain basics on the system, for people who never use it.
+
+
+Suppose I want to prove some properties on strict ordering relations,
+that is a relation transitive and anti-reflexive. There is not only one
+way to proceed. Here we will use only first order logic and follow an
+axiomatic method.
+
+The first thing is to extend the language with a binary predicate symbol
+for the ordering relation.  We are in a multisorted predicate
+calculus, but her We will work in only one sort, the first thing is to name
+it. *)
+
+Sort d.
+(*sortie Sort d defined. All \AFD commands end with "." *)
+
+(*texte We can now introduce a new symbol : *)
+Cst Infix[5] x "<" y : d -> d -> prop.
+(*sortie $< : d -> d -> prop *)
+
+(*texte The keyword #Cst# means that you introduce a new constante in
+the language.  After the ":" you see the {\em sort} of the language (an
+extended notionof arity). You write #d -> d -> prop# and can see [d -> d
+-> prop]. This means that the defined symbol takes two arguments of
+basic sort [ d ] and gives a proposition : [d -> d -> prop] is the sort
+of predicates of aririty 2 (on sort [ d ].
+
+The keyword Infix means that the syntax for $< is the usual one,
+that is [ x < y ] and not a prefix syntax like [ < x y ]. The priority
+of the symbol is a floating number, here 5. It indicates the prover how
+to restore ommited parenthesis, see in paragraph ~\ref{cmd-top-mdt}
+details on command #Cst#.  By convention you have to give priority 5 for
+all predicate.  *)
+
+(*note  We could also work in a generic sort and declare #<# like that :
+Cst Infix[5] x "<" y : 'a -> 'a -> prop.
+*)
+
+
+(**texte We now give axioms. For transitivity we need only universal
+quantification (For all ...) #/\#, [ /\ ], and implication #-># [ ->
+]. The implication associates first to the right, that is [ A -> B -> C
+] means [ A -> (B -> C) ]. *)
+
+(**note sorts and formulas use the same notation #->#, [ -> ] but the
+meanings are differents. *)
+
+claim transitivity /\x,y,z(x < y -> y < z -> x < z).
+
+(*sortie transitivity = /\x,y,z (x < y -> y < z -> x < z) : theorem *)
+
+(**texte We could also use conjunction (... and ...), #&#, [ & ] and
+write the equivalent proposition [ /\x,y,z((x < y & x < z) -> x < z) ]. 
+The one used (with only implication) is more usable in proofs. *)
+
+(**texte For antireflexivity we need negation, #~#, [ ~ ]. *)
+
+claim antireflexivity /\z ~ z < z.
+(*sortie antireflexivity = /\z ~ z < z : theorem *)
+
+(**texte Actually the negation [ ~ A ] is defined as 
+"A implies a contradiction", that is #A -> False#,  [ A -> False ].
+This can help to understand the commands of the proof below. *)
+
+(**texte We now want to prove antisymmetry, that is "for any x and y, if
+[ x < y ] then [ ~ y < x ]". Let us first give a textual but very
+detailled proof.
+
+  1. Suppose that [ x < y ] and that [ y < x ]. Let us prove a contradiction.
+ 
+  2. By transitivity applied to [ x < y ], [ y < x ] we get [ x < x ].
+
+  3. But this contradicts antireflexivity for [ x ]: that is what we would get.
+
+We now describe this very formal proof in \AFD. We write here the
+commands written by the user followed by a part of the response from the
+prover (we eliminate redundacies for legibility). The response of the
+prove consist in one (in this case) or many {\em sequents}. A sequent is
+divided in two parts :
+
+  some labelled propositions (perhaps none) which are "what you get",
+  hypothesis, propositions that you have proved, or have admitted to
+  prove later, we call it the {\em context} of the current goal ;
+
+  exactly one proposition "what you want", the current goal.
+
+Each command transform current goal or/and its context.
+
+We first begin with a very explicit proof that uses very few automatic
+features. *)
+
+fact  strict.antisymmetry /\x,y(x< y -> ~ y < x).
+(*sortie    |- /\x,y (x < y -> ~ y < x) *)
+intros.
+(*sortie H := x < y *)
+(*sortie    |- ~ y < x *)
+intro.
+(*sortie H0 := y < x *)
+(*sortie    |- False *)
+apply transitivity with H and H0.
+(*sortie G := x < x *)
+apply antireflexivity with x.
+(*sortie G0 := ~ x < x *)
+apply G0 with G.
+(* G1 := False *)
+(*    |- False *)
+axiom G1.
+save.
+(*sortie Building proof ....  *)
+(*sortie Typing proof ....  *)
+(*sortie Verifying proof ....  *)
+(*sortie Saving proof .... *)
+(*sortie strict.antisymmetry = /\x,y (x < y -> ~ y < x) : theorem *)
+
+(*texte 
+By reading the output of the commands we can compare the textual
+proof and the \AFD proof.
+
+  1 . The two commands #intros# and #intro# correspond to step 1 :
+      "suppose that [ x < y ] and [ y < x ]".
+
+
+  2. The third command #apply transitivity with H and H0.# corresponds
+     to step 2 : "by transitivity applied to [ x < y ] (that is #H#),
+     and [ y < x ] (that is #H0#) we get [ x < x ] (that is #G#)".
+
+
+  3. The last commands correspond to a detailled version of step 3 :
+     antireflexivity for [ x ] is [~ x < x] that is #G0# obtained by
+     command #apply antireflexivity with x.#, contradiction (#False#,
+     [False]) is obtained from [~ x < x] (#G0#) and [x < x] (#G#) by
+     command #apply G0 with G#. To undestand this last command recall
+     that [~ A] is [A -> False].
+
+"What we would get" is obtained by command #axiom G1#, which says that the
+current goal : [False] (contradiction), is #G1#.
+*)
+
+(*texte Let us now explain the commands we used, essentially 3 :
+#intro#, #apply# and #axiom#.
+
+The commands #intro# is a generic command. It means informally prove the
+current goal using the standard way for that. For an implication [A ->
+B] that is : "suppose [A], show [B]". For the prover it means that now
+[B] is the current goal and [A] is added to context.
+
+For an universal proposition [/\x
+Ax] that is : "take any [x] prove [A x]". Notice that the choice of the
+name [x] is left to the prover such that it is really {\em any} x. Most
+of the time we use it in a compound form like : [/\x(A x -> B)]. In this
+case you can use #intro 2.#, or like above #intros# (in this case as
+many introduction on [/\] and [->] as you can). The command #intros#
+stop on the first symbol which is not [/\] or [->], here [~]. The
+standard way to prove [~ A] is "suppose A, show [False] (a
+contradiction)". This is sometimes called, but not very properly in this
+case, "reasoning by absurd".  Notice that, by standard way, we donnot
+mean that this way will always succeed. Think for instance to proof in
+arithmetics that need induction.
+
+
+The command #apply# is a command dedicated to universal quantification,
+implication (and negation). We will see below that it is a command very
+near form the #elim# commands. These commands give standard ways to use
+a given formula. For universal quantification [/\x Ax] it gives an
+instance [A t] obtained by #apply /\x A x with A t# (see the second
+occurrence of #apply# above). For implication [A -> B] by using or
+proving [A] it gives [B] (see the third occurrence of #apply# above).
+For the prover, in both cases the obtained formula is added to the
+context (what you get).  The first occurrence #apply transitivity with H
+and H0.# is a compound form of #apply# for universal quantifier and
+implication. It uses a few automatic feature, a completly explicit form
+will be #apply transitivity with x and y and x and H and H0.#, but you
+have enough information by given the two formulas #H# and #H0#.
+
+The command #axiom# manifest evidency : you have get what you want to
+prove, that the current goal is in the context (actually it can be
+a little more).
+*)
+
+(*texte Now we will always describe the same proof of antisymmetry but
+in a more compact way. *)
+
+
+fact  strict.antisymmetry /\x,y(x< y -> ~ y < x).
+(*sortie    |- /\x,y (x < y -> ~ y < x) *)
+intros.
+(*sortie H := x < y *)
+(*sortie    |- ~ y < x *)
+intro.
+(*sortie H0 := y < x *)
+(*sortie    |- False *)
+apply transitivity with H and H0.
+(*sortie G := x < x *)
+elim antireflexivity with G.
+save.
+
+(*texte This proof only differs by the last command #elim ...# which
+summarize the three last commands of the preceding proof. The command
+#elim F# is a generic command, it always ask for at least one argument [
+F ], and can use other arguments. In cas of [/\] and [->] it has the
+same syntax than #apply# and means the same but with one more
+requirement : the current goal has to match the obtained formula. In our
+case #elim antireflexivity with G.# means "applies antireflexivity" in
+order to obtain the current goal, that is [False]. It works because a
+#antireflexivity# is a negation. It ends the proof because for a given
+[x] we got [x < x] (it is in the context).  We could describe essentially
+the same proof only with commands #intro# and #elim#. The corresponding textual proof should be slightly different : *)
+
+fact  strict.antisymmetry3 /\x,y(x< y -> ~ y < x).
+intros.
+intro.
+(*sortie H := x < y *)
+(*sortie H0 := y < x *)
+(*sortie    |- False *)
+elim antireflexivity with x.
+(*sortie    |- x < x *)
+elim transitivity with H and H0.
+save.
+
+(*texte To a good use of the prover, it is best to understand some
+commands like the one above. But for a simle fact like that it is
+always possible tout use an automatic tactic. You just have to say this
+tactic to use the claims (it is not the case by defaults) : *)
+
+
+fact  strict.antisymmetry4 /\x,y(x< y -> ~ y < x).
+trivial + transitivity antireflexivity.
+save.
+
+
+

@@ -1,0 +1,381 @@
+% $State: Exp $ $Date: 2002/05/14 08:50:32 $ $Revision: 1.8 $
+
+\chapter{Expressions, parsing and pretty printing.}\label{parser}
+
+This chapter describes the syntax of \AFD. It is possible to use \AFD\
+without a precise knowledge of the syntax, but for the best use, it is
+better to read this chapter ... But as any formal definition of a
+complex syntax, this is hard to read. Therefore, if it is the first time you
+read BNF-like syntactic rules, you will have problem to understand this
+chapter.
+
+The layout of this chapter is inspired by the documentation of Caml-light (by
+Xavier Leroy).
+
+\section{Notations.}
+
+We will use BNF-like notation (the standard notation for
+grammar) with the following convention:
+\begin{itemize}
+\item Typewriter font for terminal symbols ({\tt like this}). Sequences of
+  terminal symbols are the only thing \AFD\ reads (by definition). We use range
+  of characters to simplify when needed (like {\tt 0...9} for {\tt
+  0123456789}).
+\item Italic for non-terminal symbols ({\it like that}). Non-terminal
+  symbols are meta-variables describing a set of sequences of terminal
+  symbols. All non-terminal symbols we use are defined in this section (a
+  := denotes such a definition)
+\item Square brackets [...] denotes optional components, curly brackets
+  \{...\} denotes the repetition zero, one or more times of a component, curly
+  brackets with a plus \{...\}$_+$ denotes repetition one or more times of a
+  component and vertical bar denotes ... $|$ ... alternate choices.
+  Parentheses are used for grouping.
+\item Warning: sometimes, the syntax uses terminal symbol, like square
+brackets, which we use also with a scpecial meaning to describe the
+grammar. It is not easy to distinguish for instance the typewriter
+square brackets ({\tt []}) and the normal version ({[]}). When needed,
+we will clarify this by a remark.
+\end{itemize}
+
+\section{Lexical analysis.}
+
+\subsubsection*{Blanks} The following characters are blank: space, newline,
+  horizontal tabulation, line feed and form feed. These blanks are ignored, but
+  they will separate adjacent tokens (like identifier, numbers, etc, described
+  bellow) that could be confused as one single token. 
+
+\subsubsection*{Comments} Comments are started by \verb#(*# and ended by 
+\verb#*)#. Nested comments are handled properly. All comments are ignored
+(except in some special case used for TeX generation, see the chapter
+\ref{tex}) but like blank they separate adjacent tokens.
+
+\subsubsection*{String, numbers, ...}
+
+Strings and characters can use the following escape sequences :
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Sequence & Character denoted \\
+\hline
+\verb#\n# & newline (LF) \\
+\verb#\r# & return (CR) \\
+\verb#\t# & tabulation (TAB) \\
+\verb#\#{\it ddd} & The character of code {\it ddd} in decimal  \\
+\verb#\#{\it c} & The character {\it c} when {\it c} is not in \verb#0...9nbt# \\
+\hline
+\end{tabular} 
+\end{center}
+
+\begin{tabular}{lcl}
+{\it string-character} &:=& any character but \verb#"# 
+                            or an escape sequence.\\
+{\it string} &:=& \verb#"# \{{\it string-character}\} \verb#"#\\
+{\it char-character} &:=& any character but \verb#'# 
+                          or an escape sequence.\\
+{\it char} &:=& \verb#'# {\it char-character} \verb#'#\\
+{\it natural} &:=& \{ \verb#0...9# \}$_+$\\
+{\it integer} &:=& [\verb#-#] {\it natural}\\
+{\it float} &:=& {\it integer} [\verb#.# {\it natural}] 
+                             [(\verb#e# $|$ \verb#E#) {\it integer}]
+\end{tabular}
+
+\subsubsection*{Identifiers}
+
+Identifiers are used to give names to mathematical objects. The definition is
+more complex than for most programming languages. This is because we want to
+have the maximum freedom to get readable files. So for instance the following
+are valid identifiers: \verb# A_1'#, \verb#<=#, \verb#<_A#. Moreover, in
+relation with the module system, identifiers can be prefixed with extension
+like in \verb#add.assoc# or \verb#prod.assoc#.
+
+\begin{tabular}{lcl}
+{\it letter} &:=& \verb#A...Z# $|$ \verb#a...z#
+\\
+{\it end-ident}&:=&\{{\it letter} $|$ \verb#0...9# $|$ \verb#_# \} \{ \verb#'# \}
+\\
+{\it atom-alpha-ident} &:=& {\it letter} {\it end-ident} 
+\\
+{\it alpha-ident} &:=& {\it atom-alpha-ident} \{ \verb#.# {\it
+  atom-alpha-ident}\}
+\\
+{\it special-char} &:=& \verb#!# $|$ \verb#%# $|$ \verb#&# $|$ \verb#*# $|$
+  \verb#+# $|$ \verb#,# $|$ \verb#-# $|$ \verb#/# $|$ \verb#:# $|$ \verb#;# $|$
+  \verb#<# $|$ \verb#=# $|$ \verb#># $|$ \\
+                   & & \verb#@# $|$ \verb#[# $|$ \verb#]# $|$ \verb#\# $|$ \verb+#+ $|$
+   \verb#^# $|$ \verb#`# $|$ \verb#\# $|$ \verb#|# $|$
+\verb#{# $|$ \verb#}# $|$
+  \verb#~#
+\\
+{\it atom-special-ident} &:=& \{{\it special-char}\}$_+$ [\verb#_# {\it
+  end-ident}]
+\\
+{\it special-ident} &:=& {\it atom-special-ident} \{ \verb#.# {\it
+  atom-alpha-ident} \}
+\\
+{\it any-ident} &:=& {\it alpha-ident} $|$ {\it special-ident}
+\\
+{\it pattern} &:=& {\it any-ident} $|$ (\verb#_# \{\verb#.# {\it
+  atom-alpha-ident} \})
+\\
+{\it unif-var} &:=& \verb#?# \{\it natural\}
+\\
+{\it sort-var} &:=& \verb#'# \{{\it letter}\}$_+$
+\end{tabular}
+
+\medskip
+\noindent Exemples:
+\begin{itemize}
+\item \verb#N#, \verb#add.commutative.N#, \verb#x0#, \verb#x0'#,
+\verb#x_1#
+are {\it alpha-idents}.
+\item \verb#<#, \verb#<<#, \verb#<_1#, \verb#+#, \verb#+_N# are
+{\it special-idents}.
+\item \verb#?1# is a {\it unif-var}.
+\item \verb#'a# is a {\it sort-var}.
+\item \verb#+#, \verb#_.N# are   {\it patterns} (used only for renaming
+symbol with the module system).
+\end{itemize}
+
+
+\subsubsection*{Special characters}
+
+The following characters are token by themselves:
+
+\begin{center}
+  \verb#(# $|$ \verb#)# $|$ \verb#.# $|$ \verb#$# 
+\end{center}
+
+\section{Sorts}
+
+\begin{center}
+\begin{tabular}{lcl}
+  {\it sorts-list} &:=& {\it sort} \\ &$|$& {\it sort} \verb#,# {\it
+  sorts-list} \\
+  {\it sort} &:=& {\it sort-var} \\
+             &$|$& {\it sort} \verb#-># {\it sort} \\
+             &$|$& \verb#(# {\it sort} \verb#)# \\
+             &$|$& {\it alpha-ident} \\
+             &$|$& {\it alpha-ident} \verb#[# {\it sorts-list} \verb#]#  \\
+\end{tabular}
+\end{center}           
+
+\medskip
+\noindent Examples: \verb#prop -> prop#,
+\verb#('a -> 'b) -> list['a] -> list['b]# are valid {\it sorts}.
+
+
+\section{Syntax}
+
+The parsing and pretty printing of expressions are incremental. Thus we will
+now show the syntax the user can use to specify the syntax of new \AFD\ symbols.
+
+\begin{center}
+\begin{tabular}{lcl}
+{\it ass-ident} &:=& {\it alpha-ident} [\verb#::# {\it sort}] \\
+{\it syntax-arg} &:=& {\it string} $|$ {\it ass-ident} $|$ (\verb#\# {\it
+  alpha-ident} \verb#\#) \\
+{\it syntax} &:=&
+   {\it alpha-ident} \{\it ass-ident\} \\
+  &$|$& 
+  \verb#Prefix# [ \verb#[# {\it float} \verb#]# ] 
+    {\it string} \{{\it syntax-arg}\} \\
+  &$|$&
+  \verb#Infix# [ \verb#[#{\it float}\verb#]# ] 
+    {\it ass-ident} {\it string} \{{\it syntax-arg}\} \\
+  &$|$&
+  \verb#rInfix# [ \verb#[#{\it float}\verb#]# ] 
+    {\it ass-ident} {\it string} \{{\it syntax-arg}\} \\
+  &$|$&
+  \verb#lInfix# [ \verb#[#{\it float}\verb#]# ] 
+    {\it ass-ident} {\it string} \{{\it syntax-arg}\} \\
+  &$|$&
+  \verb#Postfix#$|$ [ \verb#[#{\it float}\verb#]# ] 
+    {\it ass-ident}
+\end{tabular}
+\end{center}
+
+Moreover, in the rule for {\it syntax} a {\it ass-ident} can not be immediately
+followed by another {\it ass-ident} or a (\verb#\# {\it alpha-ident} \verb#\#)
+because this would lead to ambiguities. Moreover, in the same rule, the {\it
+string} must contain a valid identifier ({\it alpha-ident} or {\it
+special-ident}). These constraints are not for \LaTeX\  syntax.
+
+\section{Expressions}
+
+Expressions are not parsed with a context free grammar ! So we will
+give partial BNF rules and explain ``infix'' and ``prefix''
+expressions by hand.
+
+Here are the BNF rules with {\it infix-expr} and {\it prefix-expr}
+left undefined.
+
+\begin{center}
+\begin{tabular}{lclr}
+{\it sort-assignment} &:=& \verb#:<# {\it sort} \\
+{\it alpha-idents-list} &:=& {\it alpha-ident} \\
+  &$|$& {\it alpha-ident} \verb#,# {\it alpha-idents-list} \\
+{\it atom-expr} &:=& {\it alpha-ident} \\
+  &$|$& \verb#$# {\it any-ident}  \\
+  &$|$& {\it unif-var} \\
+  &$|$& \verb#\# {\it alpha-idents-list} {\it sort-assignment} {\it
+atom-expr} \\
+  &$|$& \verb#(# {\it expr} \verb#)# \\
+  &$|$& {\it prefix-expr} \\
+%  &$|$& {\it integer} \\
+%  &$|$& {\it string} \\
+{\it app-expr} &:=& {\it atom-expr} \\
+  &$|$& {\it atom-expr} {\it app-expr} \\
+{\it expr} &:=&  {\it app-expr} \\
+&$|$& {\it prefix-expr} \\
+&$|$& {\it infix-expr} \\
+\end{tabular}
+\end{center}
+
+This definition is clear except for two points:
+\begin{itemize}
+\item The juxtaposition of expression if the definition of {\it
+app-expr} means function application ! 
+\item The keyword \verb#\# introduces abstraction: 
+\verb#\x x# for instance, is the identity function.
+\verb#\x (x x)# is a strange function taking one argument and applying
+it to itself. In fact this second expression is syntaxically valid, but
+it will be rejected by \AFD{}  because it does not admit a sort.
+\end{itemize}
+
+To explain how {\it infix-expr} and {\it prefix-expr} works, we first
+give the following definition:
+
+A syntax definition is a list of items and a priority.
+The priority is a floating point number between 0 and 10.
+Each item in the list is either:
+\begin{itemize}
+\item An {\it alpha-ident}. These items are name for sub-expressions.
+\item A string containing an {\it any-ident}, using escape sequences if
+necessary. These kind of items are keywords.
+\item A token of the form \verb#\# {\it alpha-ident} \verb#\# where
+the {\it alpha-ident} is used somewhere else in the list as a
+sub-expression. These items are ``binders''.
+\item The list should obey the following restrictions (except for
+\LaTeX\ syntax definition):
+\begin{itemize}
+\item The first of the second item in the list should be a keyword.
+If the first item is a keyword, then the syntax definition is
+``prefix'' otherwise it is ``infix''.
+\item A  name for a sub-expression can not be followed by another 
+name for a sub-expression nor a binder.
+\end{itemize}
+\end{itemize}
+
+Remark: this definition clearly follows the definition of a syntax.
+
+Now we can explain how a syntax definition is parsed using the
+following principles. It is not very easy to understand, so we will
+give some examples:
+
+\begin{enumerate}
+\item The first keyword in the definition is the ``name'' of the
+object described by this syntax. This name can be used directly with
+``normal'' syntax prefixed by a \verb#$# sign. 
+
+For instance, if the first keyword is the string \verb#"+"#, then
+\verb#+# is the name of the object and if this object is defined,
+\verb#$+# is a valid expression.
+
+\item To define the way  {\it infix-expr} and {\it prefix-expr} are
+parsed, we will explain how they are parsed and give the same
+expression without using this special syntax.
+
+\item The number of sub-expressions in the list is the ``arity'' of
+the object defined by the syntax.
+
+\item To parse a syntax defined by a list, \AFD{}  examines each item in
+the list:
+\begin{itemize}
+\item If it is the $i^{\hbox{th}}$ sub-expression in the list, 
+then \AFD{}  parses an expression and this expression is the $i^{\hbox{th}}$
+argument $a_i$ of the object. At the end, if no binder is used,
+parsing an object whose name is \verb#N# will be equivalent to parsing
+\verb#$N# $a_1$ \dots $a_n$.
+ 
+\item If it is a keyword, then \AFD{}  parses exactly that keyword.
+
+\item If it is a binder \verb#\x\#, where \verb#x# is the name
+of the $i^{\hbox{th}}$ sub-expression, then the variable \verb#x# may appear in
+the $i^{\hbox{th}}$, and this $i^{\hbox{th}}$ will be prefixed with
+\verb#\x#. At the end,
+parsing an object whose name is \verb#N# will be equivalent to parsing
+\verb#N# (\verb#\#$x_1,\dots,x_n\;a_1$) \dots (\verb#\#$y_1,\dots,y_p\;a_n$).
+
+\item If the first and last item in the syntax definition are
+sub-expressions, the priority are important: \AFD{}  parses expression at
+a given priority level, initially 10. If the priority of the syntax
+definition is strictly greater than the priority level, then this
+syntax definition can not be parsed.
+
+When parsing the first item, if it is a sub-expression, the
+priority level is changed to the priority level of the syntax
+definition (minus $\epsilon = 1e^{-10}$ if the symbol is not left
+associative). Left associative symbols are defined using the keyword
+lInfix of Postfix.
+
+When parsing the last item, if it is a sub-expression, the
+priority level is changed to the priority level of the syntax
+definition (minus $\epsilon = 1e^{-10}$ if the symbol is not right
+associative. Right associative symbols are defined using the keyword
+rInfix of Prefix.
+
+When parsing other items, the priority is set to 10.
+
+\end{itemize}
+\end{enumerate}
+
+Examples:
+\begin{itemize}
+\item The syntax \verb#lInfix[3] x "+" y# is parsed by parsing
+a first expression $a_1$ at priority $3$, then parsing the keyword
+\verb#+# and finally, parsing a second expression $a_2$ at priority
+$3 - \epsilon$. 
+
+Therefore, parsing $a_1$ \verb#+# $a_2$ is equivalent to
+\verb#$+# $a_1 a_2$ and parsing $a_1$ \verb#+# $a_2$ \verb#+# $a_3$ 
+is equivalent to
+\verb#$+# (\verb#$+# $a_1 a_2$) $a_3$.
+
+\item The syntax \verb#Prefix "{" \P\ "in" y "|" P "}"# is parsed by
+parsing the keyword \verb#{#, an identifier $x$, the keyword "in", a
+fist expression $a_1$, the keyword \verb#|#, a second expression $a_2$
+that can use the variable $x$ and the   keyword \verb#}#.
+
+Therefore, parsing \verb#{# $x$ \verb#in# $a_1$ \verb#|# $a_2$
+\verb#}# is equivalent to \verb#${# $a_1$ \verb#\x# $a_2$.
+
+\item Other examples can be found in the appendix \ref{cmd} in the
+description of the commands \verb#Cst# and \verb#def#
+
+\end{itemize}
+
+Remark: there are some undocumented black magic in \AFD parser. For
+instance, to parse $\forall x,y:N \dots$ (meaning 
+$\forall x (N x \rightarrow \forall y (N y \rightarrow \dots))$ or 
+$\forall x,y < z \dots$ (meaning 
+$\forall x (x < z \rightarrow \forall y (y < z \rightarrow \dots))$,
+there is an obscure extension for binders.
+
+This is really specialized code for universal and existential
+quantifications ... but advanturous user, looking at the definition of
+the existential quantifier \verb#\/# in the library file
+\verb#prop.phx# can try to understand it (though, I think it is not
+possible).
+
+\section{Commands}
+
+An extensive list of commands can be found in the index \ref{cmd}
+using the same syntax and conventions.
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "doc"
+%%% End: 

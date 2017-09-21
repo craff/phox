@@ -1,0 +1,33 @@
+
+The folder constains examples to learn how to use PhoX.
+
+Each example uses a file with "holes" to fill named xxx_quest.phx, and
+a complete file named xxx_cor.phx.
+
+These examples cover some precise points:
+
+- tautologie_quest.phx
+
+  The goal of this example is two sided:
+  - We progressively introduce the simplest commands of PhoX on simple
+    formulas of prositional logic or predicate calculus.
+  - These examples can also be used as an introduction in logic for students.
+
+- sort_quest.phx
+  
+  Covers a relatively advanced use of the software using the new_intro, 
+  new_elim and new_rewrite commands which allow to change the behavior and
+  the proof tactics (intro, elim, left, trivial, ...)
+
+- Exo de math (fichiers ideal_quest.phx,
+               commutation_quest.phx, topo_quest.phx,
+               analyse_quest.phx et group_quest.phx)
+
+  Des exercices pour apprendre les math en utilisant PhoX (on apprend
+  PhoX en même temps, mais le but réel est d'apprendre des maths !)
+  
+- Logique Minimale (fichier minlog_quest.phx )
+
+  But similaire au précédent, mais le sujet s'adresse plus à un logicien
+  de bon niveau. 
+

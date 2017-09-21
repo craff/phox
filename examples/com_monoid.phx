@@ -1,0 +1,4 @@
+Use monoid.
+
+claim com /\x,y (x op y = y op x).
+new_equation com.

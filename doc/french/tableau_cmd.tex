@@ -1,0 +1,96 @@
+
+\documentclass[a4paper]{article}
+
+\usepackage{landscape}
+\special{landscape}
+\special{! TeXDict begin /landplus90{true}store end }
+\pagestyle{empty}
+\topmargin=0pt
+\textheight=20cm
+\headsep=0pt
+\begin{document}
+%
+\begin{center}
+\textbf{\Large R\'esum\'e des commandes PhoX} \\
+\vspace{0.5cm}
+\begin{tabular}{|ll|l|ll|l|}
+\hline 
+\multicolumn{2}{|c|}{\textbf{But courant}} &
+\multicolumn{1}{|c|}{\textbf{Commande}} & 
+\multicolumn{2}{|c|}{\textbf{PhoX r\'epond}} & 
+\multicolumn{1}{|c|}{\textbf{En fran\c{c}ais on dirait}} \\
+\hline $H:=A$&$\vdash A$ & axiom H. & pas de but cr\'{e}\'{e}& &
+D'apr\`{e}s $H$ on a le r\'{e}sultat cherch\'{e}. \\
+%
+\hline $ $&$\vdash A\to B$
+& intro. & $H:=A$&$\vdash B$ & Supposons $A$ et prouvons $B$. \\
+%
+\hline $ $&$\vdash A\land B$ & intro. &
+(1) & $\vdash A$ &Montrons d'abord $A$ puis $B$ \cr
+&&& (2)&  $\vdash B$ &\\
+%
+ \hline $ $&$\vdash A\lor B$
+& intro l. & $ $&$\vdash A$ & Il suffit de montrer $A$. \\
+\hline $ $&$\vdash A\lor B$ & intro r. & $ $&$\vdash B$ & Il
+suffit de montrer $B$. \\ \hline $ $&$\vdash \forall xA[x]$ &
+intro. & $ $&$\vdash A[x]$  & Soit $x$ quelconque.\ Montrons
+$A[x]$. \\ 
+%
+\hline $ $&$\vdash \exists x A[x]$ &intro. && $ \vdash A[?]$& On cherche $x$ tel
+que $A[x]$. \\
+&& instance ? t & & $ \vdash A[t]$ & $t$ convient, montrons A[t]. \\%
+%
+\hline $ $&$\vdash \lnot A$ & intro. & $H:=A$&$\vdash False$ &
+Supposons $A$ et cherchons une contradiction. \\ \hline
+$H:=A\to B$ &$\vdash B$ & elim H. & $H:=A\to
+B$ &$\vdash A$ & Puisqu'on a $A\to B,$ il suffit de montrer
+$A$. \\
+% 
+\hline
+$H:=A\land B$&$\vdash B$ & elim H. & pas de but cr\'{e}\'{e}& & D'apr%
+\`{e}s $H$ on a le r\'{e}sultat cherch\'{e}. \\ 
+%
+\hline
+$H:=A\land B$&$\vdash A$ & elim H. & pas de but cr\'{e}\'{e}& & D'apr%
+\`{e}s $H$ on a le r\'{e}sultat cherch\'{e}. \\ 
+%
+\hline $H:=A\lor B$&$\vdash C$ & elim H. & (1) $H:=A$ & $ \vdash C$ 
+ & Supposons d'abord $A$ et montrons $C$.  \\
+ &&& (2) $H:=B$ & $ \vdash C$ 
+ & Supposons ensuite $B$ et montrons $C$.  \\
+% 
+\hline $H:=\exists xA[x]$&$\vdash C$ & elim H. & $H:=A[x]$&$\vdash C$  &
+Prenons un $x$ tel qu'on ait $A[x]$. \\
+%
+\hline $H:=A\land B$&$\vdash C$ & left H. & $H:=A,H_{0}:=B$&$\vdash C$ & D'apr\`{e}s $H$ on a $A$ et on a $B$. \\
+%
+\hline $H:=A\lor B$&$\vdash C$ & left H. & (1) $H:=A$ & $ \vdash C$ 
+ & Supposons d'abord $A$ et montrons $C$.  \\
+ &&& (2) $H:=B$ & $ \vdash C$ 
+ & Supposons ensuite $B$ et montrons $C$.  \\
+% 
+\hline $H:=\exists xA[x]$&$\vdash C$ & left H. & $H:=A[x]$&$\vdash C$  & Prenons un $x$ tel qu'on ait $A[x]$. \\
+%
+\hline
+$H:=A\to B$, & & apply H with H$_{0}$. &
+$H:=A\to B$,
+& & Comme on a $A\to B$ et $A$ on a $B$. \\
+$H_{0}:=A$ &$\vdash C$&& $H_{0}:=A,H_{1}:=B$ &$\vdash C$&\\
+%
+\hline $H:=\forall xA[x]$&$\vdash C$ & apply H with t. &
+$H:=\forall
+xA[x],H_{0}:=A[t]$&$\vdash C$ & D'apr\`{e}s $H$ on a $A[t]$. \\
+\hline $ $&$\vdash A$ & by\_absurd. & $H:=\lnot
+A$&$\vdash A$ & Raisonnons par l'absurde et supposons non $A$. \\
+\hline & $\vdash A$&elim False.&&$\vdash False$&Cherchons une
+contradiction.\\
+\hline $H:=\lnot A$& $\vdash C$&elim $H$.&$H:=\lnot A$&$\vdash
+A$&Comme on a $\lnot A$, il suffit de prouver $A$.\\
+\hline $H:=\lnot A,H_0:=A$&$\vdash C$& elim $H$ with $H_0$.&pas de
+but cr\'e\'e&& $H$ et $H_0$ sont contradictoires.\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\end{document}

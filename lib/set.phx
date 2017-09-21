@@ -1,0 +1,458 @@
+flag auto_lvl 1.
+
+def Infix[5.0] X "subset" Y = /\x (X x -> Y x).
+
+def Infix[5.0] X "subset_2" Y = /\x,x' (X x x' -> Y x x').
+
+def Infix[5.0] X "subset_3" Y = /\x,x',x'' (X x x' x'' -> Y x x' x'').
+
+def Infix[4.0] X "union" Y = \x (X x or Y x).
+
+def Infix[4.0] X "union_2" Y = \x,x' (X x x' or Y x x').
+
+def Infix[4.0] X "union_3" Y = \x,x',x'' (X x x' x'' or Y x x' x'').
+
+def Union F = \x \/X (F(X) & X x).
+def Union_2 F = \x,x' \/X (F(X) & X x x').
+def Union_3 F = \x,x',x'' \/X (F(X) & X x x' x'').
+
+def Infix[4.0] X "inter" Y = \x (X x & Y x).
+
+def Infix[4.0] X "inter_2" Y = \x,x' (X x x' & Y x x').
+
+def Infix[4.0] X "inter_3" Y = \x,x',x'' (X x x' x'' & Y x x' x'').
+
+def Inter F = \x /\X (F(X) -> X x).
+def Inter_2 F = \x,x' /\X (F(X) -> X x x').
+def Inter_3 F = \x,x',x'' /\X (F(X) -> X x x' x'').
+
+def complement B A = \x (~A x & B x).
+def complement_2 B A = \x,y (~A x y & B x y).
+def complement_3 B A = \x,y,z (~A x y z & B x y z).
+
+def injective X Y f = (X => Y) f & /\x,y:X (f x = f y -> x = y). 
+def surjective X Y f = (X => Y) f & /\y:Y \/x:X y = f x.
+def bijective X Y f = injective X Y f & surjective X Y f.
+
+def Inv f X y = Def \x (X x & y = f x).
+
+def Direct_image f X y = \/x:X y = f x.
+def Inverse_image f Y x = Y (f x).
+
+
+lemma Set.eq /\X,Y (X subset Y -> Y subset X -> X = Y).
+intros.
+elim equal.extensional.
+intro.
+elim equal.proposition.
+trivial.
+save.
+
+new_intro -n eq Set.eq.
+
+
+lemma surjective_bis /\X,Y /\f:(surjective X Y) (Direct_image f X = Y).
+intros.
+elim equal.extensional.
+intro 2.
+trivial.
+save.
+
+new_equation surjective_bis.
+
+lemma Inv_bijective_image /\X,Y /\f:(injective X Y) bijective (Direct_image f X) X (Inv f X).
+intros. 
+prove /\y:(Direct_image f X) \/!x:X y = f x.
+trivial.
+prove /\y:(Direct_image f X) (X (Inv f X y) & y = f (Inv f X y)).
+intros.
+apply G with H0.
+elim Def.axiom with G0.
+rmh G.
+intros.
+intros.
+trivial.
+intros.
+prove f (Inv f X x) = f (Inv f X y).
+trivial = H2.
+rewrite_hyp G -r G0.
+intros.
+trivial.
+intro 4.
+trivial.
+elim H.
+trivial.
+trivial.
+save.
+
+lemma Inv_bijective /\X,Y /\f:(bijective X Y) bijective Y X (Inv f X).
+intros.
+elim Inv_bijective_image.
+trivial = H.
+save.
+
+
+lemma Inv1 /\X,Y /\f:(injective X Y) /\y:(Direct_image f X) (f (Inv f X y) = y).
+intros. 
+prove /\y:(Direct_image f X) \/!x:X y = f x.
+trivial.
+prove /\y:(Direct_image f X) (X (Inv f X y) & y = f (Inv f X y)).
+intros.
+apply G with H1.
+elim Def.axiom with G0.
+trivial.
+save.
+
+lemma Inv2 /\X,Y /\f:(injective X Y) /\x:X (Inv f X (f x) = x).
+intros.
+elim H.
+trivial +Inv_bijective_image.
+elim Inv1.
+trivial.
+trivial.
+save.
+
+new_equation Inv2.
+
+def emptyset = \x False.
+
+lemma inter.empty /\X (emptyset inter X = emptyset).
+intros.
+elim equal.extensional.
+intro.
+elim equal.proposition.
+trivial.
+save.
+
+new_equation inter.empty.
+
+lemma inter.commutative /\X,Y (X inter Y = Y inter X).
+intros.
+elim equal.extensional.
+intro.
+elim equal.proposition.
+trivial.
+save.
+
+new_equation inter.commutative.
+
+lemma inter.associative /\X,Y,Z (X inter (Y inter Z) = (X inter Y) inter Z).
+intros.
+elim equal.extensional.
+intro.
+elim equal.proposition.
+trivial.
+save.
+
+new_equation inter.associative.
+
+lemma inter.empty' /\X (X inter emptyset = emptyset).
+trivial.
+save.
+
+new_equation inter.empty'.
+
+lemma union.empty /\X (emptyset union X = X).
+intros.
+elim equal.extensional.
+intro.
+elim equal.proposition.
+trivial.
+save.
+
+new_equation union.empty.
+
+lemma union.commutative /\X,Y (X union Y = Y union X).
+intros.
+elim equal.extensional.
+intro.
+elim equal.proposition.
+trivial.
+save.
+
+new_equation union.commutative.
+
+lemma union.associative /\X,Y,Z (X union (Y union Z) = (X union Y) union Z).
+intros.
+elim equal.extensional.
+intro.
+elim equal.proposition.
+trivial.
+save.
+
+new_equation union.associative.
+
+lemma union.empty' /\X (X union emptyset = X).
+trivial.
+save.
+
+new_equation union.empty'.
+
+fact complement_Inter /\A,F (complement A (Inter F) = Union (Direct_image (complement A) F)).
+intros.
+intro.
+intros.
+left H.
+rewrite_hyp H demorganl.
+trivial.
+intros.
+lefts H Union Direct_image $& $\/.
+intros.
+intros.
+rewrite_hyp H0 H1.
+elim H0.
+elim H2.
+rewrite_hyp H0 H1.
+trivial.
+save.
+
+
+fact complement_Union /\A,F (\/x F x -> complement A (Union F) = Inter (Direct_image (complement A) F)).
+intros.
+intro.
+intros.
+left H0.
+intros.
+lefts H2 Direct_image $& $\/.
+rewrite H3.
+trivial.
+intros.
+intros.
+intro.
+lefts H1.
+apply H0 with complement A X and ?.
+trivial.
+elim G.
+left H.
+apply H0 with complement A x0 and ?.
+trivial.
+left G.
+save.
+
+def singleton a = \x (x = a).
+
+Inductive Finite X =
+  emptyset: Finite emptyset
+| singleton: /\X,a (Finite X -> Finite (X union singleton a)).
+
+lemma Finite_Direct_image /\I:Finite /\f (Finite (Direct_image f I)).
+intros.
+elim H.
+trivial.
+prove Direct_image f (X union singleton a) = Direct_image f X union singleton (f a).
+intro.
+rewrite G.
+intro.
+save.
+
+
+lemma Finite.union /\X,Y:Finite Finite (X union Y).
+trivial.
+save.
+
+lemma Finite.subset /\Y:Finite /\X (X subset Y -> Finite X).
+intro 2.
+elim H.
+intros.
+prove X = emptyset.
+elim equal.extensional.
+intro.
+elim equal.proposition.
+trivial.
+intro.
+intros.
+elim excluded_middle with X0 a.
+local X1 = \x (X0 x & x != a).
+prove Finite X1.
+trivial 6.
+prove X0 = X1 union singleton a.
+elim equal.extensional.
+intro.
+elim equal.proposition.
+elim excluded_middle with x = a.
+trivial.
+trivial.
+intro.
+elim H1.
+intros.
+prove x != a.
+trivial.
+elim H2 with H4.
+trivial.
+save.
+
+lemma Finite.inter /\X:Finite /\Y Finite (X inter Y).
+intro 2.
+elim H.
+trivial.
+intro.
+prove (X0 union singleton a) inter Y subset (X0 inter Y) union singleton a.
+trivial.
+elim Finite.subset with G.
+intro.
+elim H1.
+save.
+
+Import nat.
+
+def Cardinal A n = N n & \/f (bijective \x (N x & x < n) A f).
+
+(*
+fact Cardinal_remove /\n:N /\A /\a:A (Cardinal A (S n) -> 
+Cardinal \x (A x & x != a) n).
+intros.
+local A' = \x (A x & x != a).
+from Cardinal A' n.
+lefts H1.
+left H2.
+apply H3 with H0.
+lefts G.
+intros.
+Import bool.
+local g n = f (if n < x then n else (S n)).   
+instance ?1 g.
+prove  (\x (N x & x < n) => A') g.
+intros.
+left H7.
+elim excluded_middle with x0 < x.
+intro.
+elim H2.
+intro.
+trivial.
+trivial.
+intro.
+rewrite_hyp H10 H5.
+apply H2 with H10.
+intro.
+trivial.
+trivial.
+trivial.
+trivial.
+intro.
+elim H2.
+intro.
+trivial.
+trivial.
+intro.
+rewrite_hyp H10 H5.
+apply H2 with H10.
+intro.
+trivial.
+trivial.
+trivial.
+trivial.
+
+trivial.
+trivial.
+trivial.
+intro.
+intro.
+
+
+trivial.
+trivial.
+
+eshow intro.
+trivial =G.
+intros.
+prove x0 < S n.
+trivial.
+apply H2 with G.
+intro.
+intro.
+rewrite_hyp H10 H5.
+apply H2 with H10.
+trivial.
+trivial.
+trivial.
+intro.
+intro.
+elim H2.
+trivial.
+intro.
+rewrite_hyp H10 H5.
+apply H2 with H10.
+trivial.
+trivial.
+trivial.
+intro.
+intro.
+intros.
+elim H3 with H7;; trivial.
+intro.
+intros.
+left H5.
+apply H4 with H5.
+lefts G1.
+left H9.
+left H9.
+trivial.
+trivial.
+prove A = A' union singleton a.
+prove A a.
+elim H3.
+trivial.
+intros.
+intros.
+elim excluded_middle with x = a.
+trivial.
+trivial.
+trivial.
+intro.
+elim H1.
+save.
+*)
+
+fact Cardinal_finite /\n:N /\A (Cardinal A n -> Finite A).
+intro 2.
+elim H.
+intros.
+lefts H0.
+prove A = emptyset.
+intros ;; Try trivial.
+intro.
+intros.
+lefts H2.
+lefts H3.
+local a = f y.
+local A' = \x (A x & x != a).
+prove ~A' a.
+trivial.
+prove Cardinal A' y.
+intros.
+instance ?1 f.
+prove  (\x (N x & x < y) => A') f.
+intros.
+left H5.
+apply H3 with H5.
+trivial.
+intro.
+intro.
+apply H3 with H7;; trivial.
+
+intro.
+intro.
+intros.
+elim H3 with H7;; trivial.
+intro.
+intros.
+left H5.
+apply H4 with H5.
+lefts G1.
+left H9.
+left H9.
+trivial.
+trivial.
+prove A = A' union singleton a.
+prove A a.
+elim H3.
+trivial.
+intros.
+intros.
+elim excluded_middle with x = a.
+trivial.
+trivial.
+trivial.
+intro.
+elim H1.
+save.

@@ -1,0 +1,455 @@
+% $State: Exp $ $Date: 2000/10/12 09:58:27 $ $Revision: 1.1.1.1 $
+
+\makeatletter
+\newcount\formulanum
+\tracingstats=1
+\newread\@prettyin
+\immediate\openin\@prettyin=\jobname.pin
+\newwrite\@prettyout
+\immediate\openout\@prettyout=\jobname.pout
+
+\newbox\@atombox
+\newbox\last@box
+\newcount\@boxlevel\@boxlevel=0
+\newcount\@sizelevel\@boxlevel=0
+
+\def\pt@dim#1#2{\dimen0=#1\immediate\write\@prettyout{\the\dimen0,}%
+                \dimen0=#2\immediate\write\@prettyout{\the\dimen0}}
+
+\def\start@atom{\setbox\@atombox=\hbox\bgroup$\set@style}%
+\def\end@atom{$\egroup%
+  \immediate\write\@prettyout{atom:\the\wd\@atombox}\box\@atombox\ignorespaces}
+
+\def\extraspace#1{\immediate\write\@prettyout{atom:#1}}
+
+\def\set@style{%
+  \baselineskip=0pt%
+  \ifcase\@sizelevel\displaystyle\or\scriptstyle%
+  \else\scriptscriptstyle\fi}
+
+\def\set@skip{%
+  \ifcase\@sizelevel%
+              \lineskiplimit=0.6ex%
+              \lineskip=0.6ex%
+          \or \lineskiplimit=0.45ex%
+              \lineskip=0.45ex%
+          \else
+              \lineskiplimit=0.35ex%
+              \lineskip=0.35ex\fi}
+
+\def\set@smallskip{%
+  \ifcase\@sizelevel%
+              \baselineskip=0pt%
+              \lineskiplimit=0.3ex%
+              \lineskip=0.3ex%
+          \or \baselineskip=0pt%
+              \lineskiplimit=0.225ex%
+              \lineskip=0.225ex%
+          \else\baselineskip=0pt%
+              \lineskiplimit=0.15ex%
+              \lineskip=0.15ex\fi}
+
+\def\look@for@newbreak{%
+   \ifx\next\newbreak\def\@action{}%
+   \else\def\@action{\hbox\bgroup\start@atom}%
+   \fi\@action}
+
+\def\the@input@false{\let\@theinput\iffalse}
+\def\the@input@read{\read\@prettyin to \@theinput}
+\def\read@input{%
+	\ifeof\@prettyin\the@input@false%
+        \else\the@input@read\fi}
+\def\prettyend{\global\let\read@input\the@input@false\iffalse}
+
+\def\def@open@br{\def\@@@open{%
+	     \set@skip\setbox\last@box\hbox\bgroup$%
+             \vcenter\bgroup\vbox\bgroup}%
+	     \def\@@@close{\egroup\egroup$\egroup\copy\last@box}}
+\def\def@open@nbr{\def\@@@open{\set@skip\setbox\last@box\hbox\bgroup}%
+                  \def\@@@close{\egroup\copy\last@box}}%
+
+\def\pretty@box{
+   \ifx\next[%
+     \def\@action[##1]{\pretty@@box##1}%
+   \else%
+     \def\@action{\prettybox}%
+   \fi\@action}
+
+\def\pretty@@box#1{%
+   \ifnum\@boxlevel>0\relax\end@atom\else%
+     \immediate\write\@prettyout{start:#1}\fi%
+   \advance\@boxlevel by 1\relax%
+   \immediate\write\@prettyout{open}%
+   \read@input\@theinput\def@open@br\else\def@open@nbr\fi%
+   \@@@open%
+   \futurelet\next\look@for@newbreak}%
+\def\endprettybox{%
+   \end@atom\egroup\@@@close%
+   \immediate\write\@prettyout{close}%
+   \advance\@boxlevel by -1\relax\ifnum\@boxlevel>0\relax%
+      \start@atom\fi\ignorespaces}
+
+\def\prettybox{%
+   \ifnum\@boxlevel>0\relax\end@atom\else%
+     \immediate\write\@prettyout{start:\the\textwidth}\fi%
+   \advance\@boxlevel by 1\relax%
+   \immediate\write\@prettyout{open}%
+   \read@input\@theinput\def@open@br\else\def@open@nbr\fi%
+   \@@@open%
+   \futurelet\next\look@for@newbreak}%
+\def\endprettybox{%
+   \end@atom\egroup\@@@close%
+   \immediate\write\@prettyout{close}%
+   \advance\@boxlevel by -1\relax\ifnum\@boxlevel>0\relax%
+     \start@atom\fi\ignorespaces}
+
+\def\ini@box{%
+   \ifnum\@boxlevel>0\relax\else%
+   \immediate\write\@prettyout{start:\the\textwidth}\fi%
+   \advance\@boxlevel by 1\advance\@sizelevel by 1\relax%
+   \immediate\write\@prettyout{iopen}%
+   \read@input\@theinput\def@open@br\else\def@open@nbr\fi%
+   \@@@open%
+   \futurelet\next\look@for@newbreak}%
+\def\endini@box{%
+   \end@atom\egroup\@@@close%
+   \immediate\write\@prettyout{iclose}%
+   \advance\@boxlevel by -1\advance\@sizelevel by -1\relax\ignorespaces}
+
+\def\iner@box{%
+   \ifnum\@boxlevel>0\relax\else%
+   \immediate\write\@prettyout{start:\the\textwidth}\fi%
+   \advance\@boxlevel by 1\relax%
+   \immediate\write\@prettyout{iopen}%
+   \read@input\@theinput\def@open@br\else\def@open@nbr\fi%
+   \@@@open%
+   \futurelet\next\look@for@newbreak}%
+\def\endiner@box{%
+   \end@atom\egroup\@@@close%
+   \immediate\write\@prettyout{iclose}%
+   \advance\@boxlevel by -1\relax\ignorespaces}
+
+\newenvironment{max@box}
+  {\immediate\write\@prettyout{max}}
+  {\immediate\write\@prettyout{endmax}}
+
+\def\look@next{%
+    \ifx\next_%
+      \def\action##1##2{_{\catcode`\^=13\catcode`\_=13\relax%
+          \set@style\ini@box##2\relax\endini@box}%
+         $\egroup\endmax@box\start@atom}%$
+    \else\ifx\next^%
+      \def\action##1##2{^{\catcode`\^=13\catcode`\_=13\relax%
+          \set@style\ini@box##2\relax\endini@box}%
+         $\egroup\endmax@box\start@atom}%$
+    \else\def\action{$\egroup\endmax@box\start@atom\ignorespaces}%$
+    \fi\fi\action}
+
+\newcommand{\pretty@sub}[1]{%
+   \end@atom\max@box\bgroup\catcode`\^=7\catcode`\_=8$_{\catcode`\^=13\catcode`\_=13\relax%
+      \set@style\ini@box#1\endini@box}%$
+   \futurelet\next\look@next}
+
+\newcommand{\pretty@sup}[1]{%
+   \end@atom\max@box\bgroup\catcode`\^=7\catcode`\_=8$^{\catcode`\^=13\catcode`\_=13\relax%
+      \set@style\ini@box#1\endini@box}%$
+   \futurelet\next\look@next}
+
+\newdimen\extrafrac@display
+\setbox0=\hbox{$\displaystyle \frac{1}{1}$}
+\extrafrac@display=\wd0
+\setbox0=\hbox{$\scriptstyle 1$}
+\advance\extrafrac@display by -\wd0
+
+\newdimen\extrafrac@script
+\setbox0=\hbox{$\scriptstyle \frac{1}{1}$}
+\extrafrac@script=\wd0
+\setbox0=\hbox{$\scriptscriptstyle 1$}
+\advance\extrafrac@script by -\wd0
+
+\newdimen\extrafrac@scriptscript
+\setbox0=\hbox{$\scriptscriptstyle \frac{1}{1}$}
+\extrafrac@scriptscript=\wd0
+\setbox0=\hbox{$\scriptscriptstyle 1$}
+\advance\extrafrac@scriptscript by -\wd0
+
+\newcommand{\extrafrac}{%
+  \ifcase\@sizelevel\extraspace{\the\extrafrac@display}%
+                 \or\extraspace{\the\extrafrac@script}%
+               \else\extraspace{\the\extrafrac@scriptscript}\fi}
+
+\let\@frac=\frac
+
+\newcommand{\pretty@frac}[2]{%
+   \end@atom\max@box%
+   $\set@style\@frac{\iner@box\extrafrac#1\endini@box}%
+                  {\iner@box\extrafrac#2\endini@box}$%
+   \endmax@box\start@atom\ignorespaces}
+
+\newbox\del@box
+\newbox\del@@box
+\newdimen\del@size
+\newdimen\pass@dim
+
+\newcommand{\pretty@op}[3]{%
+   \end@atom\max@box%
+    \setbox\del@box\hbox{\ini@box#3\endini@box}%    
+    \del@size=\ht\del@box\advance\del@size by \dp\del@box%
+    \setbox\del@@box\hbox{\ini@box#2\endini@box}%
+    \advance\del@size by -\ht\del@@box\advance\del@size by -\dp\del@@box%
+    \divide\del@size by 2%
+    \raise\del@size\hbox{$\set@smallskip%
+    \vcenter{\vbox{\halign{\hfill ##\hfill\cr%
+    \box\del@box\cr%
+    \iner@box#1\endiner@box\cr%
+    \box\del@@box\cr}}}$}%
+   \endmax@box\start@atom\ignorespaces}
+
+\let\@left=\left
+\let\@right=\right
+\newcommand{\pretty@left}[1]{%
+   \end@atom\setbox\del@box\hbox\bgroup$\@left#1\iner@box}
+
+\newcommand{\pretty@right}[1]{%
+   \endiner@box\global\pass@dim=-\wd\last@box\@right#1$\egroup%
+   \advance\pass@dim by \wd\del@box%
+   \extraspace{\the\pass@dim}%
+   \box\del@box\start@atom\ignorespaces}
+
+\newcommand{\pretty@sqrt}[1]{%
+   \end@atom\setbox\del@box\hbox{$\@sqrt{\iner@box#1%
+   \endiner@box\global\pass@dim=-\wd\last@box}$}%
+   \advance\pass@dim by \wd\del@box%
+   \extraspace{\the\pass@dim}%
+   \box\del@box\start@atom\ignorespaces}
+
+%the following does not work ??????????????
+%\newcommand{\prettyroot}[2]{%
+%   \end@atom\setbox\del@box=\hbox{\begin{iner@box}#2%
+%   \end{iner@box}}\del@size=-\wd\del@box%
+%   \setbox\del@@box\hbox{$\root #1 \of {\box\del@box}$}%
+%   \advance\del@size by \wd\del@@box%
+%   \extraspace{\the\del@size}%
+%   \box\del@@box\start@atom\ignorespaces}
+
+\newcommand{\pretty@hat}[2]{%
+   \end@atom\setbox\del@box\hbox{$#1{\iner@box#2%
+   \endiner@box\global\pass@dim=-\wd\last@box}$}%
+   \advance\pass@dim by \wd\del@box%
+   \extraspace{\the\pass@dim}%
+   \box\del@box\start@atom\ignorespaces}
+
+\newcommand{\pretty@hattwo}[3]{%
+   \end@atom\setbox\del@box\hbox{$\max@box#1{\iner@box#2%
+   \endiner@box\global\pass@dim=\wd\last@box}{\iner@box#3\endiner@box%
+   \ifdim\wd>\pass@dim\global\pass@dim=-\wd\last@box
+   \else\global\pass@dim=-\pass@dim\fi\endmax@box}$}%
+   \advance\pass@dim by \wd\del@box%
+   \extraspace{\the\pass@dim}%
+   \box\del@box\start@atom\ignorespaces}
+
+\newcommand{\pretty@int}[3]{%
+   \end@atom\setbox\del@box\hbox{\max@box#1{\ini@box#2%
+   \endini@box\global\pass@dim=\wd\last@box}{\ini@box#3\endini@box%
+   \ifdim\wd\last@box>\pass@dim\global\pass@dim=-\wd\last@box
+   \else\global\pass@dim=-\pass@dim\fi}\endmax@box}%
+   \advance\pass@dim by \wd\del@box%
+   \extraspace{\the\pass@dim}%
+   \box\del@box\start@atom\ignorespaces}
+
+
+\newcommand{\newbreak}[1]{%
+  \immediate\write\@prettyout{newbreak:#1}%
+     \read@input\@theinput%
+       \expandafter\def\csname #1\endcsname##1##2{%
+          \end@atom\immediate\write\@prettyout{break:#1,}\pt@dim{##1}{##2}%
+          \egroup\hbox\bgroup\hspace{##2}\start@atom\ignorespaces}%
+     \else%
+       \expandafter\def\csname #1\endcsname##1##2{%
+          \end@atom\immediate\write\@prettyout{break:#1,}\pt@dim{##1}{##2}%
+          \hspace{##1}\start@atom\ignorespaces}%
+     \fi%
+  \futurelet\next\look@for@newbreak}
+
+\def\newbreak@true#1{%
+  \def\@tmp{\egroup\hbox\bgroup\hspace{#1}\start@atom\ignorespaces}}
+\def\newbreak@false#1{%
+  \def\@tmp{\hspace{#1}\start@atom\ignorespaces}}
+\newcommand{\ibreak}[2]{%
+  \end@atom\immediate\write\@prettyout{imbreak:}\pt@dim{#1}{#2}%
+  \read@input\@theinput\newbreak@true{#2}\else\newbreak@false{#1}\fi%
+  \@tmp}
+
+\catcode`\^=13\def^{\pretty@sup}%
+\catcode`\_=13\def_{\pretty@sub}%
+\catcode`\^=7
+\catcode`\_=8
+
+\let\@sqrt=\sqrt
+
+\let\@sum=\sum
+\let\@int=\int
+\let\@prod=\prod
+\let\@oint=\oint
+\let\@coprod=\coprod
+\let\@bigcap=\bigcap
+\let\@bigcup=\bigcup
+\let\@bigsqcup=\bigsqcup
+\let\@bigvee=\bigvee
+\let\@bigwedge=\bigwedge
+\let\@bigodot=\bigodot
+\let\@bigotimes=\bigotimes
+\let\@bigoplus=\bigoplus
+\let\@bigupplus=\bigupplus
+
+\def\@@int#1#2{$\set@style\catcode`\^=7\catcode`\_=8%
+  \@int_{\catcode`\^=13\catcode`\_=13\relax#1}^{\catcode`\^=13\catcode`\_=13\relax#2}$}
+\def\@@oint#1#2{$\set@style\catcode`\^=7\catcode`\_=8%
+  \@oint_{\catcode`\^=13\catcode`\_=13\relax#1}^{\catcode`\^=13\catcode`\_=13\relax#2}$}
+
+\let\@overline=\overline
+\let\@hat=\hat
+\let\@check=\check
+\let\@tilde=\tilde
+\let\@acute=\acute
+\let\@grave=\grave
+\let\@dot=\dot
+\let\@ddot=\ddot
+\let\@breve=\breve
+\let\@bar=\bar
+\let\@vec=\vec
+\let\@underline=\underline
+\let\@widetilde=\widetilde
+\let\@widehat=\widehat
+\let\@overleftarrow=\overleftarrow
+\let\@overrightarrow=\overrightarrow
+
+\def\pretty@@op#1{%
+  \def\@action{\pretty@@op@{#1}}%
+  \catcode`\^=7\catcode`\_=8%
+  \futurelet\next\@action}
+
+\def\pretty@@op@#1{%
+  \ifx\next_%
+    \def\@action##1##2{\pretty@@op@sup{#1}{##2}}%
+  \else\ifx\next^%
+    \def\@action##1##2{\pretty@@op@sub{#1}{##2}}%
+  \else%
+    \def\@action{\pretty@op{\catcode`\^=13\catcode`\_=13\relax#1}{}{}}%
+  \fi\fi\@action}
+
+\def\pretty@@op@sup#1#2{%
+  \def\@action{\pretty@@op@@sup{#1}{#2}}%
+  \futurelet\next\@action}
+
+\def\pretty@@op@@sup#1#2{%
+  \ifx\next^%
+    \def\@action##1##2{\pretty@op{\catcode`\^=13\catcode`\_=13\relax#1}%
+                      {\catcode`\^=13\catcode`\_=13\relax#2}%
+                      {\catcode`\^=13\catcode`\_=13\relax##2}}%
+  \else%
+    \def\@action{\pretty@op{\catcode`\^=13\catcode`\_=13\relax#1}%
+                           {\catcode`\^=13\catcode`\_=13\relax#2}{}}%
+  \fi\@action}
+
+\def\pretty@@op@sub#1#2{%
+  \def\@action{\pretty@@op@@sub{#1}{#2}}%
+  \futurelet\next\@action}
+
+\def\pretty@@op@@sub#1#2{%
+  \ifx\next_%
+    \def\@action##1##2{\pretty@op{\catcode`\^=13\catcode`\_=13\relax#1}%
+                                 {\catcode`\^=13\catcode`\_=13\relax##2}%
+                                 {\catcode`\^=13\catcode`\_=13\relax#2}}%
+  \else%
+    \def\@action{\pretty@op{\catcode`\^=13\catcode`\_=13\relax#1}{}%
+                           {\catcode`\^=13\catcode`\_=13\relax#2}}%
+  \fi\@action}
+
+\def\pretty@@int#1{%
+  \def\@action{\pretty@@int@{#1}}%
+  \catcode`\^=7\catcode`\_=8%
+  \futurelet\next\@action}
+
+\def\pretty@@int@#1{%
+  \ifx\next_%
+    \def\@action##1##2{\pretty@@int@sup{#1}{##2}}%
+  \else\ifx\next^%
+    \def\@action##1##2{\pretty@@int@sub{#1}{##2}}%
+  \else%
+    \def\@action{\pretty@int{\catcode`\^=13\catcode`\_=13\relax#1}{}{}}%
+  \fi\fi\@action}
+
+\def\pretty@@int@sup#1#2{%
+  \def\@action{\pretty@@int@@sup{#1}{#2}}%
+  \futurelet\next\@action}
+
+\def\pretty@@int@@sup#1#2{%
+  \ifx\next^%
+    \def\@action##1##2{\pretty@int{\catcode`\^=13\catcode`\_=13\relax#1}%
+                      {\catcode`\^=13\catcode`\_=13\relax#2}%
+                      {\catcode`\^=13\catcode`\_=13\relax##2}}%
+  \else%
+    \def\@action{\pretty@int{\catcode`\^=13\catcode`\_=13\relax#1}%
+                           {\catcode`\^=13\catcode`\_=13\relax#2}{}}%
+  \fi\@action}
+
+\def\pretty@@int@sub#1#2{%
+  \def\@action{\pretty@@int@@sub{#1}{#2}}%
+  \futurelet\next\@action}
+
+\def\pretty@@int@@sub#1#2{%
+  \ifx\next_%
+    \def\@action##1##2{\pretty@int{\catcode`\^=13\catcode`\_=13\relax#1}%
+                                 {\catcode`\^=13\catcode`\_=13\relax##2}%
+                                 {\catcode`\^=13\catcode`\_=13\relax#2}}%
+  \else%
+    \def\@action{\pretty@int{\catcode`\^=13\catcode`\_=13\relax#1}{}%
+                           {\catcode`\^=13\catcode`\_=13\relax#2}}%
+  \fi\@action}
+
+\newenvironment{mmath}{%
+   \catcode`\^=13%
+   \catcode`\_=13%
+   \let\left=\pretty@left%
+   \let\right=\pretty@right%
+   \let\frac=\pretty@frac%
+   \let\sqrt=\pretty@sqrt%
+   %
+   \def\sum{\pretty@@op{\@sum}}%
+   \def\prod{\pretty@@op{\@prod}}%
+   \def\coprod{\pretty@@op{\@coprod}}%
+   \def\bigcap{\pretty@@op{\@bigcap}}%
+   \def\bigcup{\pretty@@op{\@bigcup}}%
+   \def\bigsqcup{\pretty@@op{\@bigsqcup}}%
+   \def\bigvee{\pretty@@op{\@bigvee}}%
+   \def\bigwedge{\pretty@@op{\@bigwedge}}%
+   \def\bigodot{\pretty@@op{\@bigodot}}%
+   \def\bigotimes{\pretty@@op{\@bigotimes}}%
+   \def\bigoplus{\pretty@@op{\@bigoplus}}%
+   \def\biguplus{\pretty@@op{\@biguplus}}%
+   %
+   \def\int{\pretty@@int{\@@int}}%
+   \def\oint{\pretty@@int{\@@oint}}%
+   %
+   \def\overline{\pretty@hat{\@overline}}%
+   \def\hat{\pretty@hat{\@hat}}%
+   \def\check{\pretty@hat{\@check}}%
+   \def\tilde{\pretty@hat{\@tilde}}%
+   \def\acute{\pretty@hat{\@acute}}%
+   \def\grave{\pretty@hat{\@grave}}%
+   \def\dot{\pretty@hat{\@dot}}%
+   \def\ddot{\pretty@hat{\@ddot}}%
+   \def\breve{\pretty@hat{\@breve}}%
+   \def\bar{\pretty@hat{\@bar}}%
+   \def\vec{\pretty@hat{\@vec}}%
+   \def\underline{\pretty@hat{\@underline}}%
+   \def\widetilde{\pretty@hat{\@widetilde}}%
+   \def\widehat{\pretty@hat{\@widehat}}%
+   \def\overleftarrow{\pretty@hat{\@overleftarrow}}%
+   \def\overrightarrow{\pretty@hat{\@overrightarrow}}%
+   %
+   \futurelet\next\pretty@box%
+}{\endprettybox}
+  
+\makeatother

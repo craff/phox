@@ -1,0 +1,74 @@
+flag auto_lvl 1.
+Import nat.
+Import ac.
+
+
+def Min X n = X n & /\x:N (X x -> n <= x). 
+
+fact Min_principle /\X (\/n:N X n -> \/x:N Min X x).  
+intros.
+(*  From H, let n such that N n [H] and X n [H0]   *)
+lefts H.
+(*  By absurd  *)
+by_absurd;; elim False.
+(*  From H1, we have /\x:X  (X n -> \/x0:X  ~ n <= x0) [H1]   *)
+rewrite_hyp H1 demorganl.
+prove  /\x:N (X x ->  \/x0:N (X x0 & x0 < x)).
+intros.
+apply H1 with H3.
+lefts G.
+intros.
+axiom H4.
+elim not.lesseq.imply.less.N. 
+rmh H1.
+elim ~X n.
+rmh H0.
+elim well_founded.N with H.
+intros.
+elim H0 with [case].
+intro.
+apply G with H0;; Try trivial.
+intro.
+trivial.
+save.
+
+def min X = Def (Min X).
+
+fact Min_def /\X subset N (\/x X x ->  Min X (min X)) .
+intros.
+elim AC.
+left H0.
+apply Min_principle with H0.
+trivial.
+trivial.
+save.
+
+def bounded A n = \/f:(injective A N) /\x:A (f x < n).
+def finite A= \/n:N bounded A n.
+def cardinal A = min (bounded A).
+
+
+defrec compute_cardinal A f n =
+  if n = N0 then N0 else
+    if \/x:A (f x = n -> S (compute_cardinal A f (n)
+
+rewrite_hyp H1 -l 1 demorganl.
+rewrite_hyp H1 -l 1 demorganl.
+rewrite_hyp H1 -l 1 demorganl.
+rewrite_hyp H1 -l 1 demorganl.
+rewrite_hyp H1 -l 1 demorganl.
+
+
+(*  From H1 with  X n  prove X n then let x we have
+   X x & ~ n <= x [H2]   *)
+elim H1 with H0.
+(*  From H2, we have X x [H2] and ~ n <= x [H3]   *)
+lefts H2.
+
+
+
+
+
+
+
+

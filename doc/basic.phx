@@ -1,0 +1,154 @@
+(* $State: Exp $ $Date: 2006/01/26 19:17:16 $ $Revision: 1.4 $ *)
+(* Propositionnal calculus and other basic stuff *)
+
+
+tex
+	title = "The primitive symbols of the logic."
+	author = "Christophe Raffalli"
+	institute = "Paris VII \\& Paris XII university"
+	documents = math doc
+.
+
+
+(*! math
+%; whizzy-master doc.tex
+\let\ifdoc\iffalse
+*)
+
+(*! doc
+%; whizzy-master libdoc.tex
+\let\ifdoc\iftrue
+*)
+
+(*! math doc
+
+\section{Sorts.}\tdx{sorts}
+
+In the \AFD\ formal system, we will manipulate {\em expressions}. But
+we will have to consider different kinds of expressions, for instance
+individual terms which are the objects of the logic (which means that
+we will prove their properties) and formulas which express
+properties of these objects. A {\em sort}\footnote{If you know typed
+$\lambda$-calculus, sorts are {\em simple-types} constructed using 
+atomic types like {\tt prop} or {\tt nat}} is a formal name for a kind of
+expressions.
+
+There exists one basic sort of objects: {\tt prop} (for formulas or
+types). New basic sort may be added, and sort may have parameters:
+for instance typing
+\begin{verbatim}
+Sort nat.
+Sort list['a].
+\end{verbatim}
+adds two sorts: one is called {\tt nat} and the other is called {\tt
+list['a]}. The second sort has one parameter allowing to distinguish
+{\tt list[nat]} and {\tt list[bool]}. 
+
+
+Complex sorts can be constructed using arrows: if $\tau$
+and $\tau'$ are sorts, $\tau \rightarrow \tau'$ is also a
+sort. Intuitively, an expression of sort $\tau \rightarrow \tau'$ is
+an expression of sort $\tau'$ with a {hole} for an expression of sort
+$\tau$. For instance the sort ${\tt nat} \rightarrow {\tt prop}$
+(\verb#nat -> prop# in ASCII) \idx{->} is the sort of unary
+predicates on natural numbers.
+
+Warning: although we use the same notation, the arrow between sorts is
+not related with the implication that we will introduce bellow. 
+
+\section{The construction of expressions}
+\tdx{expressions}
+
+The basic ways of constructing {\em expressions} (or simply-typed
+$\lambda$-terms) in a given {\em context} (a context declares the sorts
+of some {\em variables}) are the following:
+\begin{description}
+
+\item[Variable:] \tdx{variables} A variable is just a name (see
+the chapter ``Expressions, parsing and pretty printing'' of the documentation of \AFD\ for the description of valid variable
+identifiers in ASCII). In a {\em context} where a variable \[ x \]
+is of sort $\tau$, \[ x \] is an expression of sort $\tau$
+
+\item[Abstraction:] \tdx{abstraction}\idx{\char92} \[ \x e \] (\{ \x e \} in ASCII) is an expression of sort $\tau \rightarrow
+\tau'$ if $e$ is an expression of sort $\tau'$ when the context is
+extended to declare \[ x \] of sort $\tau$. The variable \[ x \] is
+{\em bound} in the expression \[ \x e \]. This means that its name
+does not matter (renaming \[ x \] gives an expression that we consider
+identical to the original one).
+
+\item[Application:] \tdx{application}\[ e e' \] (\{ e e' \} in
+ASCII) is an expression of sort $\tau'$ if \[ e \] is an
+expression of sort $\tau \rightarrow \tau'$ and if \[ e' \] is an
+expression of sort $\tau$.
+
+It is important to remark that an expression like \[ \x x \] may have
+many sorts: ${\tt prop}\rightarrow {\tt prop}$ or $({\tt
+prop}\rightarrow {\tt prop})\rightarrow({\tt prop}\rightarrow {\tt
+prop})$. But any sort has a most general sort using meta-variables
+written \verb#'a#. One can
+obtain all the other sorts by replacing the meta-variables. For instance the most general sort of \[ \x x \] is 
+$\verb#'a# \rightarrow \verb#'a#$.
+
+\end{description}
+
+\section{The primitive logical constants}
+\tdx{formulas}
+
+Here are the only primitive logical constants:
+\begin{description}
+\item[Implication] \tdx{implication}\idx{->}\[ $-> \] (\{ $-> \} in ASCII) 
+is an expression of
+sort $\hbox{\tt prop} \rightarrow \hbox{\tt prop} \rightarrow \hbox{\tt prop}$. Thus it is
+a {\em binary connective}. We can use
+it with an Infix notation: if \[ A \] and \[ B \] are formulas
+(expressions of sort $\cal F$), we can write \[ A -> B \] (\{ A ->
+B \} in ASCII)\ for the application of \[ $-> \] to \[ A \] and \[ B \].
+The meaning of this formula is: \[ A -> B \] is true if \[ B \] is
+true whenever \[ A \] is true.
+
+\item[Universal quantification] \tdx{universal quantification}\idx{/\char92}\[ $/\ \] (\{ $/\ \} in ASCII) is an expression which admits any
+ sort of the form $(\tau \rightarrow \hbox{\tt prop}) \rightarrow \hbox{\tt prop}$.
+
+As for implication, \[ $/\ \] can be used with a special syntax: \[
+ /\x A \] denotes $\[ $/\ \] \[ \x A \]$ (\{ /\x A \} denotes
+ \{ $/\ \} \ \{ \x A \} in ASCII). \[ /\x A \] is true if 
+ \[ A \] is true when \[ x \] takes any value of sort $\tau$
+ if $x$ is used with the sort $\tau$ (which means that \[ $/\ \] is
+ used with the sort $(\tau \rightarrow \hbox{\tt prop}) \rightarrow \hbox{\tt prop}$).
+ 
+\item[Equality] \[ $= \] \tdx{equality}\idx{=} (\{ $= \} in ASCII) is
+an expression of sort $\tau \rightarrow \tau \rightarrow \hbox{\tt
+prop}$ for any sort $\tau$ (it is a
+predicate constant of arity 2). As for implication, it can be used with an
+infix syntax. This equality is equivalent\footnote{The equality is
+added as a primitive symbol to minimize the size
+of proofs using equality reasonning.} to Leibniz equality: two
+terms are equal if they can not be distinguished by a predicate: \[ x =
+y \] is equivalent to \[ /\X (X x -> X y) \]. 
+
+\end{description} 
+
+Notation: We give some {\em priorities} to the
+different symbols to be able to omit some parenthesis. We will come
+back bellow on this point. Moreover, we allow the following
+abbreviations:
+\begin{itemize}
+\item \[ /\x,y,z:<'a A \] for $\forall x \forall y \forall z A$ (\{ /\x,y,z A \} in ASCII).
+\item \[ /\x:P  A \] for $\forall x (P x \rightarrow A)$ 
+(\{ /\x:P A \} in ASCII). 
+\item \[ /\x (P x -> /\y (P y -> A)) \] for 
+ $\forall x (P x \rightarrow \forall y (P y \rightarrow A)$ 
+(\{  /\x (P x -> /\y (P y -> A)) \} in ASCII). 
+\item \[ /\x (x = y -> A) \] for $\forall x (x = y \rightarrow A)$ 
+(\{ /\x = y A \} in ASCII). This abbreviation can be used with any
+infix predicate symbol.
+\item \[ A -> B -> C \] for $A \rightarrow (B \rightarrow C)$.
+\end{itemize}
+
+
+When producing LaTeX articles with \AFD\ one can decide not to use any of
+these abbreviations by setting some flags (see appendix \ref{flag}). Moreover, one can also decide to use standard
+mathematical notations for application: $f(x,y)$ instead of \[ f x y
+\]. We decided to use here the nearest notation to the ASCII syntax. 
+
+*)

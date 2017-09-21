@@ -1,0 +1,55 @@
+
+Ce répertoire contient des exemples pour vous permettre 
+d'apprendre le logiciel.
+
+Chaque exemple comprends un fichier "à trou" nommer xxx_quest.phx, a
+qui contient des indications pour compléter les trous et un corrigé 
+xxx_cor.phx.
+
+Ces exemples couvrent des points précis que voici:
+
+
+- tautologie_quest.phx
+
+  Le but de cet exemple est double: 
+  - on introduit progressivement les commandes les plus simples du
+    système PhoX sur des exemples simples de logique propositionnelle ou
+    du calcul des prédicats. 
+  - Ces exemples peuvent aussi servir d'illustration pour pour une introduction
+    à la logique auprès des étudiants. 
+
+- intro_quest.phx
+
+  Le but de ce fichier est également d'introduire aux principales
+  commandes de preuve de PhoX à travers des résultats très élémentaires
+  sur les ordres (équivalence entre les axiomatisation d'ordre strict et
+  d'ordre large). Les commandes de preuve concernant les connecteurs
+  usuels, le quantificateur universel et l'égalité sont abordées (mais pas
+  le raisonnement par l'absurde).
+
+- intro2_quest.phx
+
+  La suite du précédent : les commandes de preuves concernant
+  le quantificateur existentiel sont abordées, ainsi qu'un exemple
+  d'utilisation de l'opérateur de description définie (qui ne couvre
+  qu'une partie de son usage).
+
+- sort_quest.phx
+  
+  Couvre une utilisation assez avancé du logiciel avec les 
+  commanded new_intro, new_elim et new_rewrite qui permettent 
+  d'étendre et de controler les tactiques de preuves (intro, elim, left
+  trivial, ...)
+
+- Exo de math (fichiers ideal_quest.phx,
+               commutation_quest.phx, topo_quest.phx,
+               analyse_quest.phx et group_quest.phx)
+
+  Des exercices pour apprendre les math en utilisant PhoX (on apprend
+  PhoX en même temps, mais le but réel est d'apprendre des maths !)
+  
+- Logique Minimale (fichier minlog_quest.phx )
+
+  But similaire au précédent, mais le sujet s'adresse plus à un logicien
+  de bon niveau. 
+

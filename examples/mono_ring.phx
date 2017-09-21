@@ -1,0 +1,57 @@
+(* mono_ring : 
+     an "additive" commutative monoid and
+     a "multiplicative" monoid *)
+
+Use com_monoid with
+  op -> rInfix[3.5] x "+" y
+| e  -> R0
+| set -> _
+| G  -> R
+| _ -> _.add
+.
+
+Use monoid with
+  op -> rInfix[3] x "*" y
+| e  -> R1
+| set -> _
+| G  -> R
+| _ -> _.prod
+.
+
+claim distrib_left /\x,y,z (x * (y + z) = x * y + x * z).
+claim distrib_right /\x,y,z ((y + z) * x = y * x + z * x).
+new_equation distrib_left.
+new_equation distrib_right.
+
+Use nat_monoid with  
+  _ -> _.add
+| from monoid with
+    op -> rInfix[3.5] x "+" y
+  | e  -> R0
+  | set -> _
+  | G  -> R
+  | _ -> _.add
+  .
+| from nat with
+    * -> rInfix[3] x "*.nat" y
+  | + -> rInfix[3.5] x "+.nat" y
+  | ^ -> Infix[2.5] x "^.nat" y
+  . 
+.
+
+Use nat_monoid with  
+  @ -> Infix [2.5] x "^" y %as $^ y x
+| _ -> _.nprod
+| from monoid with
+    op -> rInfix[3] x "*" y
+  | e  -> R1
+  | set -> _
+  | G  -> R
+  | _ -> _.prod
+  .
+| from nat with
+    * -> rInfix[3] x "*.nat" y
+  | + -> rInfix[3.5] x "+.nat" y
+  | ^ -> Infix[2.5] x "^.nat" y
+  . 
+.

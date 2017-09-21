@@ -1,0 +1,100 @@
+(*header 2000/12/19
+
+        title = "Un exemple sur les entiers (somme des [n] premiers entiers)"
+        author = "Paul Roziere"
+        institute = "PPS"
+*)
+
+(*texte 
+Un exemple de définition axiomatique d'une fonction sur les
+entiers. Les déclarations new_rewrite et new_intro sont indispensables
+pour que le lemme soit prouvable par trivial.  
+
+Il est possible également de définir directement cette fonction en
+utilisant le principe de définition par induction (voir librairie
+nat.phx), qui utilise lui même l'opérateur de description définie.
+
+Dans un proche avenir ces définitions pourront se faire automatiquement
+(en particulier les new_rewrite et new_intro seront fait
+automatiquement). *)
+
+flag auto_lvl 1.
+
+
+(*texte
+ On importe un certains nombres de définitions et de théorèmes sur les
+entiers. Par exemple la sorte "nat" voir ci-dessous, le prédicat $N
+(être un entier), l'entier 0 ($N0), la fonction successeur ($S) etc.
+*)
+
+Import nat.
+
+
+(*texte
+ On ajoute le nouveau symbole de fonction "somme" au langage. Sa
+notation est préfixe. La priorité est indiquée par [3] (on doit placer
+les éventuelles parenthèses absentes d'abord autour des termes dont le
+symbole principal est le plus petit).  C'est une priorité usuelle pour
+les symboles de fonctions. 
+
+ La notation ":nat -> nat" indique la sorte de la fonction : c'est une
+fonction unaire définie entre objets de sorte "nat". Les entiers sont
+des objets de sorte "nat". C'est une notation qui signifie uniquement
+que l'on peut écrire par exemple "somme N0" (où "N0" désigne l'entier
+0). Elle ne signifie pas que "somme N0" est effectivement un entier
+(voir l'énoncé de totalité ci-dessous). *)
+
+Cst Prefix[3] "somme" n : nat -> nat.
+
+(*texte 
+ La fonction est définie par deux axiomes, qui sont donc ajoutés à la
+théorie. Remarquez qu'alors la cohérence n'est pas assurée par le
+système. *)
+
+claim sum0 somme N0 = N0.
+claim sumS /\x:N(somme (S x) = (S x) + somme x).
+
+(*texte
+ Les égalités définissant la somme sont orientées de gauche à droite et
+ajoutées comme règles de réécriture.  Les tactiques trivial ou intro(s)
+pourront les utiliser. *)
+
+new_rewrite sum0.
+new_rewrite sumS.
+
+(*texte 
+ Dans phox le fait pour un objet "x" d'être de sorte "x:nat" n'assure
+pas que "x" est effectivement un entier : "N x". L'énoncé de totalité
+suivant est donc indispensable pour utiliser "somme". *)
+
+fact somme.total /\x :N N (somme x).
+trivial.
+save.
+
+(*texte 
+ La totalité de la fonction somme est ajoutée comme nouvelle règle
+d'introduction. Le -t indique au prouveur que c'est un énoncé de
+totalité.  Les tactiques trivial ou intro(s) pourront l'utiliser.  *)
+
+
+new_intro -t somme somme.total.
+
+(*texte
+ Prouvons maintenant un énoncé élémentaire sur "somme".  *)
+
+lemma th /\x :N (somme x + somme x = x * (S x)).
+trivial.
+save.
+
+
+(*note
+ Cet exemple est adapté du tutorial d'Isabelle. Dans Isabelle les règles
+de réécriture, appellées règles de simplification, sont ajoutées
+automatiquement. L'énoncé de totalité est inutile puisque, contrairement
+à phox, il n'y a que les entiers dans la sorte nat. Le lemme est prouvé
+par un pas d'induction explicite, puis la tactique automatique.  *)
+
+
+
+
+

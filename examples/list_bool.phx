@@ -1,0 +1,166 @@
+(*header 99/03/18
+	title = "Lists and booleans"
+	author = "Christophe Raffalli"
+	institute = "Chambéry University"
+*)
+
+tex
+	title = "Lists and booleans"
+	author = "Christophe Raffalli"
+	institute = "Chambéry University"
+	 documents = math doc
+.
+
+
+Import list.
+Import bool.
+
+flag auto_lvl 1.
+flag auto_type true.
+
+
+def exists f l = def_rec.List False \x,l,r (f x or r) l.
+
+goal /\f exists f nil = False.
+trivial.
+save exists.nil.List.
+new_equation exists.nil.List.
+
+goal /\f/\a/\l:(List \x True) exists f (a::l) = (f a or exists f l).
+trivial.
+save exists.cons.List.
+new_equation exists.cons.List.
+
+close_def exists.
+
+goal /\D /\f:(D => B)/\l:(List D) B (exists f l).
+trivial 6.
+save exists.total.List.
+new_intro -i -t exists exists.total.List.
+
+
+goal /\D/\f:(D => B)/\l,l':(List D) 
+	exists f (l@l') = (exists f l or exists f l').
+intros.
+elim H0.
+rewrite append.lnil.List exists.nil.List.
+intro.
+rewrite append.lcons.List exists.cons.List H4.
+elim -1 a H.
+trivial.
+trivial.
+save exists.append.List.
+new_equation exists.append.List.
+
+(*! math doc
+
+\begin{definition}\idx{exists} We define:
+$$\begin{array}{ll}
+\[ exists f y = $$exists f x \] & \ifdoc( \{ exists f x \} \;\;\text{in ASCII})\fi \cr
+\end{array}$$
+\end{definition}
+
+\begin{proposition} We prove the following properties of \[ exists \] :
+$$\begin{array}{ll}
+\[ $$exists.total.List\] & \ifdoc( \{exists.total.List\} \idx{exists.total.List})\fi \cr
+\[ $$exists.cons.List\] & \ifdoc( \{exists.cons.List\} \idx{exists.cons.List})\fi \cr
+\[ $$exists.nil.List\] & \ifdoc( \{exists.nil.List\} \idx{exists.nil.List})\fi \cr
+\[ $$exists.append.List\] & \ifdoc( \{exists.append.List\} \idx{exists.append.List})\fi \cr
+\end{array}$$
+\end{proposition}
+*)
+
+def forall f l = def_rec.List True \x,l,r (f x & r) l.
+
+goal /\f forall f nil = True.
+trivial.
+save forall.nil.List.
+new_equation forall.nil.List.
+
+goal /\f/\a/\l:(List \x True) forall f (a::l) = (f a & forall f l).
+trivial.
+save forall.cons.List.
+new_equation forall.cons.List.
+
+close_def forall.
+
+goal /\D /\f:(D => B)/\l:(List D) B (forall f l).
+trivial 6.
+save forall.total.List.
+new_intro -i -t forall forall.total.List.
+
+goal /\D/\f:(D => B)/\l,l':(List D) 
+	forall f (l@l') = (forall f l & forall f l').
+intros.
+elim H0.
+rewrite append.lnil.List forall.nil.List.
+intro.
+rewrite append.lcons.List forall.cons.List H4.
+elim -1 a H.
+trivial.
+trivial.
+save forall.append.List.
+new_equation forall.append.List.
+
+(*! math doc
+
+\begin{definition}\idx{forall} We define:
+$$\begin{array}{ll}
+\[ forall f y = $$forall f x \] & \ifdoc( \{ forall f x \} \;\;\text{in ASCII})\fi \cr
+\end{array}$$
+\end{definition}
+
+\begin{proposition} We prove the following properties of \[ forall \] :
+$$\begin{array}{ll}
+\[ $$forall.total.List\] & \ifdoc( \{forall.total.List\} \idx{forall.total.List})\fi \cr
+\[ $$forall.cons.List\] & \ifdoc( \{forall.cons.List\} \idx{forall.cons.List})\fi \cr
+\[ $$forall.nil.List\] & \ifdoc( \{forall.nil.List\} \idx{forall.nil.List})\fi \cr
+\[ $$forall.append.List\] & \ifdoc( \{forall.append.List\} \idx{forall.append.List})\fi \cr
+\end{array}$$
+\end{proposition}
+*)
+
+def mem x l = exists \y (x = y) l.
+
+goal /\x (mem x nil = False).
+trivial.
+save mem.nil.List.
+new_equation mem.nil.List.
+
+goal /\x,y/\l:(List \x True) (mem x (y::l) = (x = y or mem x l)).
+intros.
+rewrite mem exists.cons.List.
+intro.
+save mem.cons.List.
+new_equation mem.cons.List.
+
+goal /\D/\x:D/\l : (List D) (equal.decidable D -> B (mem x l)).
+trivial 6.
+save mem.total.List.
+new_intro -i -t mem mem.total.List.
+
+goal /\D/\x:D/\l,l' : (List D) (equal.decidable D -> mem x (l @ l') = (mem x l or mem x l')). 
+intros.
+unfold mem.
+rewrite exists.append.List.
+intro.
+save mem.append.List.
+
+
+(*! math doc
+
+\begin{definition}\idx{mem} The membership relation is defined by
+$$\begin{array}{ll}
+\[ mem x l = $$mem x l \] & \ifdoc( \{ mem x l\} \;\;\text{in ASCII})\fi \cr
+\end{array}$$
+\end{definition}
+
+\begin{proposition} We prove the following properties of \[ mem \] :
+$$\begin{array}{ll}
+\[ $$mem.total.List\] & \ifdoc( \{mem.total.List\} \idx{mem.total.List})\fi \cr
+\[ $$mem.cons.List\] & \ifdoc( \{mem.cons.List\} \idx{mem.cons.List})\fi \cr
+\[ $$mem.nil.List\] & \ifdoc( \{mem.nil.List\} \idx{mem.nil.List})\fi \cr
+\[ $$mem.append.List\] & \ifdoc( \{mem.append.List\} \idx{mem.append.List})\fi \cr
+\end{array}$$
+\end{proposition}
+*)

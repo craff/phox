@@ -1,0 +1,11 @@
+(* commutative ring : a ring whose multiplicative monoid is commutative *)
+
+Use ring.
+
+Use com_monoid with
+  op -> rInfix[3] x "*" y
+| e  -> R1
+| set -> _
+| G  -> R
+| _ -> _.prod
+.

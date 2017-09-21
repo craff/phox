@@ -1,0 +1,57 @@
+(* un exo facile: 
+   si la réunion de deux groupes G1 et G2 est un groupe G alors
+   G1 inclus dans G2 ou l'inverse.
+   On a gardé un minimum d'axiomes
+*)
+Sort g.
+
+Cst G : g -> prop.
+Cst G1 : g -> prop.
+Cst G2 : g -> prop.
+
+Cst Infix[3] x "*" y : g -> g -> g.
+Cst i : g -> g.
+
+claim Gop /\x,y:G G (x * y).
+claim G1op /\x,y:G1 G1 (x * y).
+claim G2op /\x,y:G2 G2 (x * y).
+
+new_intro -i Gop Gop.
+new_intro -i G1op G1op.
+new_intro -i G2op G2op.
+
+claim Gi /\x:G G (i x).
+claim G1i /\x:G1 G1 (i x).
+claim G2i /\x:G2 G2 (i x).
+
+new_intro -i Gi Gi.
+new_intro -i G1i G1i.
+new_intro -i G2i G2i.
+
+claim i_left /\x,y (i x * (x * y) = y).
+claim i_right /\x,y ((x * y) * i y = x).
+new_equation i_left.
+new_equation i_right.
+
+flag auto_lvl 1.
+
+goal /\x (G x <-> G1 x or G2 x) -> /\x:G1 G2 x or /\x:G2 G1 x.
+(*->*)
+intros.
+by_absurd.
+elim False.
+rewrite_hyp H0 demorgan.
+lefts H0 $& $\/.
+prove G (x * x0).
+trivial.
+elim H with G0.
+prove G1 ((x * x0) * (i x0)).
+trivial.
+trivial.
+prove G2 ((i x) * (x * x0)).
+trivial.
+trivial.
+(*->*)
+save th.
+
+depend th.

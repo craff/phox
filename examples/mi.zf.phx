@@ -1,0 +1,890 @@
+
+(* ************************************************ *)
+(* AF2 formalization of Zermelo-Fraenkel Set Theory *)
+(*                                                  *)
+(* Comon base of early axioms to define ordinals in *)
+(* two different ways: with and without the         *)
+(* foundation axiom.                                *)
+(*                                                  *)
+(* Frito y Fede - Febrero 1996                      *)
+(* ************************************************ *)
+
+
+tex
+  title = "AF2 formalization \\ of \\ Zermelo-Fraenkel Set Theory"
+  author = "Frito y Fede - Febrero 1996"
+  institute = "Chalmers institute of Technology"
+  documents = math
+. 
+
+flag auto_lvl 3.
+
+(* ************* *)
+(* Basic symbols *)
+(* ************* *)
+
+(*! math
+\section{The basic axioms.}
+*)
+
+Sort set.
+(* Membership relation *)
+Cst Infix[3] x "E" y : set -> set -> prop.
+tex_syntax $E Infix[3] x "\\in" y.
+
+(*! math
+\begin{definition}
+  We introduce a binary relation \[ x E y \].
+\end{definition}
+*)
+
+(* Set inclusion relation *)
+def Infix[3] x "<<" y = /\z E x  z E y.
+tex_syntax $<< Infix[3] x "\\subset" y.
+
+(*! math
+\begin{definition}
+  We define inclusion by $ \[ x << y \] := \[ $$<< x y \] $.
+\end{definition}
+*)
+
+
+(* *************************** *)
+(* AXIOM: Extensionality axiom *)
+(* *************************** *)
+
+claim ext /\x/\y (/\z (z E x <-> z E y) -> x = y).
+tex_syntax ext "extensionality".
+
+(*! math
+\begin{axiom}[\[ ext \] ]
+  The axiom of extensionaly expresses that two sets with the same
+elements are equal: 
+  \[[ $$ ext \]]
+\end{axiom}
+*)
+
+(* Mutual inclusion iff equality *)
+goal /\x/\y (x << y & y << x <-> x = y).
+prove ext. 
+trivial.
+save exti.
+
+(* Transitivity of inclusion *)
+goal /\x/\y/\z (x << y & y << z -> x << z).
+trivial.
+save inc_tran.
+
+(*! math
+\begin{proposition}
+  We can trivially prove the following propositions (only the first
+  uses the \[ ext \] axiom:
+  $$\begin{array}{ll}
+    \[ $$ exti \] & \hspace{1cm} \[ exti \] \cr
+    \[ $$ inc_tran \] & \hspace{1cm} \[ inc_tran \] \cr
+  \end{array}$$
+\end{proposition}
+*)
+
+(* ******************************** *)
+(* AXIOM: Pair axiom and properties *)
+(* ******************************** *)
+
+def Pair x y z = /\u (u E z <-> (x = u or y = u)).
+claim pair_ax /\x/\y\/z Pair x y z.
+tex_syntax pair_ax "pair axiom".
+
+(*! math
+\begin{axiom}[\[ pair_ax \] ]
+  This axiom expresses that for any two sets, there
+  exists a set whose elements are exactly those two sets:
+  $$ \[ $$pair_ax \] \;\text{where}\; 
+     \[ Pair x y z \] := \[ $$Pair x y z \] $$
+\end{axiom}
+*)
+
+(* unicity of the pair set (to apply consistently the definition principle) *)
+goal /\x/\y\/!z Pair x y z.
+(*! math
+\begin{proposition}[pair unicity].
+  We ca prove the unicity of pair:
+  \[[ $0 \]]
+\end{proposition}
+*)
+intros.
+(*! math
+\begin{proof}
+  For any arbitrary \[ x \] and \[ y \] , we must prove \[ $0 \].
+*)
+elim pair_ax.
+intros.
+intro.
+(*! math
+  Using the \[ pair_ax \] we can assume \[ $$H \] and we must prove \[ $0 \]. 
+  This is immediate using the \[ ext \] axiom. \qed
+\end{proof}
+*)
+trivial 5 +ext.
+save pair_unique.
+tex_syntax pair_unique "pair unicity".
+
+(* Pair set definition *)
+
+def pair x y = Def (Pair x y).
+tex_syntax pair Prefix "\\{" x "," y "\\}".
+
+(*! math
+\begin{definition}
+  Using the definition principle, we can give a name to a pair:
+  $$ \[ pair x y\] := \[Def \z (Pair x y z) \].$$
+*)
+
+(* pair x y IS the pair between x and y *)
+goal /\x/\y Pair x y (pair x y).
+intros.
+intro.
+trivial + pair_unique.
+save pair_is_pair.
+
+(*!math 
+  Then using the \[definite_description\] axiom and the \[pair_unique\] theorem, 
+  we can prove immediately \[ $$pair_is_pair \].
+\end{definition}
+*)
+
+goal /\x,y,z/\X ((x = y -> X) -> (x = z -> X) -> x E pair y z -> X).
+trivial + pair_is_pair.
+save pair_elim.
+tex_syntax pair_elim "pair elimination".
+
+new_elim -i $E pair pair_elim.
+
+(* ** Pair set properties ** *)
+
+(* Pairs contain both of their elements *)
+goal /\x/\y x E pair x y.
+intros.
+trivial + pair_is_pair.
+save x_in_pairxy.
+tex_syntax x_in_pairxy "pair left introduction".
+
+goal /\x/\y y E pair x y.
+intros.
+trivial + pair_is_pair.
+save y_in_pairxy.
+tex_syntax y_in_pairxy "pair right introduction".
+
+new_intro lpair x_in_pairxy.
+new_intro rpair y_in_pairxy.
+
+close_def pair.
+
+(*!math
+  \begin{proposition} 
+    Then, it is easy to prove the following ``introduction and 
+    elimination rule'' for \[ pair x y \] :
+    $$ \begin{array}{ll}
+    \[ $$ x_in_pairxy \] &\hspace{1cm} \[ x_in_pairxy \] \cr
+    \[ $$ y_in_pairxy \] &\hspace{1cm} \[ y_in_pairxy \] \cr
+    \[ $$ pair_elim \] &\hspace{1cm} \[ pair_elim \] \cr
+    \end{array}$$
+  \end{proposition}
+*)
+
+(* Symmetry of pairs *)
+goal /\x/\y pair x y = pair y x.
+trivial +ext.
+save pair_symm.
+
+(* Two pairs are equal iff they are obtained by pairing the same elements *)
+goal /\x1/\y1/\x2/\y2 (pair x1 y1 = pair x2 y2 <-> 
+                      ((x1 = x2 & y1 = y2) or (x1 = y2 & y1 = x2))).
+intros.
+intro.
+intro.
+prove x1 = x2 or x1 = y2.
+ prove x1 E pair x2 y2. trivial. trivial.
+prove y1 = x2 or y1 = y2.
+ prove y1 E pair x2 y2. trivial. trivial.
+prove x2 = x1 or x2 = y1.
+ prove x2 E pair x1 y1. trivial. trivial.
+prove y2 = x1 or y2 = y1.
+ prove y2 E pair x1 y1. trivial. trivial.
+rmh H.
+trivial.
+trivial + pair_symm.
+save pair_ext.
+
+(* pair x y is the smallest set containing x and y *)
+goal /\x,y,z (x E z & y E z <-> pair x y << z).
+trivial.
+save pair_1.
+
+(* ******************** *)
+(* Singleton definition *)
+(* ******************** *)
+
+def sing x = pair x x.
+
+(* ** Singleton properties ** *)
+
+(* two singletons are equal iff they are singletons of the same element *)
+goal /\x/\y (sing x = sing y <-> x = y).
+intros.
+intro.
+next.
+trivial.
+intro.
+elim -5 [l] pair_ext.
+trivial.
+trivial.
+save sing_ext.
+
+goal /\x (x E sing x).
+trivial.
+save sing_intro.
+
+new_intro sing sing_intro. 
+
+goal /\x,y,X ((x = y -> X) -> y E (sing x) ->  X ).
+trivial.
+save sing_elim.
+
+new_elim -i $E sing sing_elim. 
+
+(* ****************** *)
+(* AXIOM: Union axiom *)
+(* ****************** *)
+
+def Union x z = /\u (u E z <-> \/y (y E x & u E y)).
+
+claim union_ax /\x\/z Union x z.
+
+(* Unicity of the union *)
+goal /\x\/!z Union x z.
+intro.
+elim union_ax.
+intro.
+intro.
+intro.
+elim ext.
+trivial + union_ax.
+save union_unique.
+
+(* Union set definition *)
+
+def union x = Def (Union x).
+
+(* the union is a union *)
+goal /\x Union x (union x).
+trivial + union_unique.
+save union_is_union.
+
+(* ** Union properties ** *)
+
+close_def union.
+
+goal /\x/\y E x /\z E y  z E union x.
+trivial + union_is_union.
+save union_intro.
+
+new_intro union union_intro.
+
+goal /\X/\x,y (/\z (z E y -> x E z -> X) -> x E (union y) -> X).
+trivial + union_is_union.
+save union_elim. 
+
+new_elim -i $E union union_elim.
+
+(* ************ *)
+(* Binary union *)
+(* ************ *)
+
+def Infix[2] x "U" y = union (pair x y).
+
+(* ** Binary union properties *)
+
+(* The bin-union includes both its uniends *)
+goal /\a/\b/\z(z E a -> z E a U b).
+trivial.
+save x_inc_unionxy.
+
+goal /\a/\b/\z(z E b -> z E a U b).
+trivial.
+save y_inc_unionxy.
+
+new_intro U_left x_inc_unionxy.
+new_intro U_right y_inc_unionxy.
+
+goal /\x,y,z,X ((z E x -> X) -> (z E y -> X) -> z E (x U y) -> X). 
+trivial 6.
+save U_elim.
+
+new_elim -i $E U_elim U_elim.
+
+close_def $U.
+
+(* Bin-union is idempotent *)
+goal /\a a = a U a.
+trivial +ext.
+save union_idemp.
+new_equation -r union_idemp.
+
+(* Bin-union is symetric *)
+goal /\x/\y (x U y = y U x).
+trivial +ext.
+save union_sym.
+new_equation union_sym.
+
+(* Bin-union is associative *)
+goal /\x/\y/\z (x U (y U z) = (x U y) U z).
+intros.
+elim ext.
+trivial 7.
+save union_assoc.
+new_equation union_assoc.
+
+(* ******************* *)
+(* AXIOM: Subset axiom *)
+(* ******************* *)
+
+def Subset y F z = /\x (x E z <-> x E y & F x).
+
+claim subset_ax /\F/\y\/z Subset y F z.
+
+
+goal /\F/\y\/!z Subset y F z.
+intros.
+elim subset_ax.
+instance ?1 y. instance ?2 F. 
+intros.
+intro.
+intro.
+elim ext.
+trivial.
+save subset_unique.
+
+(* Subset definition *)
+
+def Prefix "{" \F\ "E" y "|" F "}" = Def (Subset y F).
+
+goal /\F/\y Subset y F {x E y | F x}.
+trivial + subset_unique.
+save sub_is_sub.
+
+close_def ${.
+
+goal /\F/\x,y (x E y -> F x -> x E { x E y | F x}).
+trivial +sub_is_sub.
+save sub_intro.
+
+new_intro sub sub_intro.
+
+goal /\x,y,F,X ((x E y -> F x -> X) -> x E { x E y | F x} -> X).
+intros.
+elim H.
+elim -4 [l] -6 [l] sub_is_sub.
+elim -4 [l] -6 [r]  sub_is_sub.
+save sub_elim.
+
+new_elim -i $E sub sub_elim.
+
+(* **************** *)
+(* AXIOM: Empty Set *)
+(* **************** *)
+
+def Empty x = /\y(~ y E x). 
+
+claim empty_ax \/x Empty x.
+
+goal \/!x Empty x.
+elim empty_ax.
+intros.
+intro.
+instance ?1 x.
+trivial +ext.
+save empty_unique.
+
+(* Empty set definition *)
+
+def Prefix "{}" = Def (Empty).
+
+goal Empty {}.
+trivial + empty_unique.
+save empty_is_empty.
+
+(* ** Empty set properties ** *)
+
+goal /\x,X (x E {} -> X).
+intros.
+elim empty_is_empty.
+save empty_empty.
+new_elim -i $E empty empty_empty.
+
+goal /\x ({} << x).
+trivial.
+save empty_bottom.
+
+close_def ${}.
+
+goal /\x (x << {} -> x = {}).
+trivial +ext.
+save empty_minimal.
+
+goal /\x (x U {} = x).
+trivial 8 +ext.
+save union_neut_r.
+
+goal /\x ({} U x = x).
+trivial + union_sym union_neut_r.
+save union_neut_l.
+
+(* *********************** *)
+(* Intersection definition *)
+(* *********************** *)
+
+def inter x = {z E union x | /\y (y E x -> z E y)}.
+
+(* ** Properties ** *)
+
+goal /\x,y,a (a E y -> /\z E y  x E z -> x E inter y).
+trivial 8.
+save inter_intro_non_empty.
+
+goal inter {} = {}.
+trivial 100 +ext.
+save inter_empty.
+
+new_intro inter inter_intro_non_empty.
+
+goal /\x,y,a/\X (a E y -> (/\z E y x E z -> X) -> 
+                 x E inter y -> X). 
+trivial.
+save inter_elim_non_empty.
+
+new_elim -i $E inter 2 inter_elim_non_empty.
+
+close_def inter.
+
+goal /\x/\y (x E y -> inter y << x).
+trivial.
+save inter_1.
+
+goal /\x ({} E x -> inter x = {}).
+trivial 8 + ext.
+save inter_2.
+
+goal /\y(\/z(z E  y) -> /\x (/\z (z E y -> x << z) -> x << inter y)).
+trivial.
+save inter_3.
+
+(* ****************************** *)
+(* Binary Intersection definition *)
+(* ****************************** *)
+
+def Infix [1.5] x "I" y = inter (pair x y).
+
+(* ** Binary intersection properties ** *)
+
+goal /\x,y,z (z E x -> z E y -> z E x I y).
+trivial.
+save binter_intro.
+
+new_intro binter binter_intro.
+
+goal /\x,y,z (z E x I y -> z E x).
+trivial.
+save binter_elim_l. (* bad elimination rule ! *)
+
+goal /\x,y,z (z E x I y -> z E y).
+trivial.
+save binter_elim_r. (* bad elimination rule ! *)
+
+goal /\x,y,z,X ((z E x -> z E y -> X) -> z E x I y -> X). 
+intros.
+elim H.
+elim binter_elim_l. 
+elim binter_elim_r. 
+save binter_elim.
+
+new_elim -i $E binter binter_elim.
+
+close_def $I.
+
+goal /\x (x I {} = {}).
+trivial 6 +ext.
+save r_binter_null.
+
+goal /\x ({} I x = {}).
+trivial 6 +ext.
+save l_binter_null.
+
+goal /\x/\y (x I y = y I x).
+trivial 6 + ext.
+save inter_symm.
+
+goal /\x (x I x = x).
+trivial 6 +ext.
+save inter_idemp.
+
+goal /\x/\y/\z (((x I y) I z) = x I (y I z)).
+trivial 8 +ext.
+save inter_assoc.
+
+(* **************** *)
+(* AXIOM: Power Set *)
+(* **************** *)
+
+def Power x z = /\y(y E z <-> y << x).
+
+claim power_ax /\x\/z Power x z.
+
+goal /\x\/!z Power x z.
+intro.
+elim power_ax.
+instance ?1 x.
+intro.
+intro.
+trivial 6 +ext.
+save power_unique.
+
+(* Power set definition *)
+
+def power x = Def (Power x).
+
+goal /\x Power x (power x).
+trivial +power_unique.
+save power_is_power.
+
+close_def power.
+
+
+(* ** Power set properties ** *)
+
+goal /\x, y (x << y -> x E power y).
+trivial +power_is_power.
+save power_intro.
+
+new_intro power power_intro.
+
+goal /\x,y,X ((x << y -> X) -> x E (power y) -> X).
+trivial +power_is_power.
+save power_elim.
+
+new_elim -i $E power power_elim.
+
+close_def power.
+
+goal /\x ((pair {} x) << power x).
+trivial 6.
+save power_1.
+
+goal /\x (union (power x) = x).
+trivial 7 +ext.
+save power_2.
+
+goal /\x (inter (power x) = {}).
+trivial 10 +ext.
+save power_3.
+
+(* ****************** *)
+(* AXIOM: Replacement *)
+(* ****************** *)
+
+def isPropFun F = /\x/\y/\z (F x y & F x z -> y = z).
+
+def Range x F z = /\y (y E z <-> \/w (w E x & F w y)).
+
+claim repl_ax /\F (isPropFun F -> /\x\/z Range x F z).
+
+goal /\F (isPropFun F -> /\x\/!z Range x F z).
+intro.
+intro.
+intro.
+elim repl_ax.
+intro.
+intro.
+trivial 6 +ext.
+save range_unique.
+
+(* Range set definition *)
+
+def range x F = Def (Range x F).
+
+goal /\F (isPropFun F -> /\x Range x F (range x F)).
+intro.
+intro.
+intro.
+intro.
+elim range_unique.
+save range_is_range.
+
+close_def range.
+
+(* *********************** *)
+(* Ordered pair definition *)
+(* *********************** *)
+
+def Prefix "[" x "," y "]" = pair (sing x) (pair x y).
+
+(* ** Ordered pair properties ** *)
+
+goal /\x1/\x2/\y1/\y2 ([x1,y1] = [x2,y2] -> x1 = x2 & y1 = y2).
+intros.
+elim -6 H pair_ext.
+rmh H.
+prove x1 = x2.
+trivial + sing_ext.
+intro.
+trivial + pair_ext.
+rmh H.
+prove x1 = y2.
+ prove sing x1 = pair x2 y2. trivial.
+ elim -6 G pair_ext. trivial. trivial.
+prove x1 = y1 & x1 = x2.
+ prove pair x1 y1 = sing x2. trivial.
+ elim -6 G0 pair_ext. trivial. trivial.
+trivial - H0.
+save couple_ext.
+
+(* **************************** *)
+(* Cartesian product definition *)
+(* **************************** *)
+
+def lInfix[2.0]
+     x "*" y = {c E power (power (x U y)) | \/a\/b (a E x & b E y & c = [a,b])}.
+
+(* ** Cartesian product properties ** *)
+
+goal /\x,y /\a E x/\b E y [a , b] E x * y.
+intros.
+elim -4 [r] sub_is_sub.
+intro.
+elim -3 [r] power_is_power.
+elim -4 [l] pair_1.
+prove a E x U y. trivial + x_inc_unionxy. 
+prove b E x U y. trivial + y_inc_unionxy. 
+intro.
+trivial.
+trivial.
+trivial.
+save cart_intro.
+
+new_intro cart cart_intro.
+
+goal /\x,y,z,X (/\a E x /\b E y (z = [a , b] -> X) -> z E (x * y) -> X).
+trivial.
+save cart_elim.
+
+new_elim -i $E cart cart_elim.
+
+close_def $*.
+close_def $[.
+
+goal /\x/\y/\z(z E x * y -> \/a\/b (a E x & b E y & z = [a,b])).
+trivial.
+save cart_prod_1.
+
+goal /\x/\y/\z/\a/\b (a E x & b E y & z = [a,b] -> z E x * y).
+trivial.
+save cart_prod_2.
+
+goal /\x,y,a,b ([a, b ] E x * y -> a E x & b E y).
+intros.
+elim H.
+prove a = a0 & b = b0.
+trivial +couple_ext.
+trivial.
+save cart_prod_3.
+
+(* *********************** *)
+(* Relations and functions *)
+(* *********************** *)
+
+def Rel x y = x * y.
+
+def Fun x y = { z E power(x * y) | /\a E x \/! b [a,b] E z }.
+
+goal /\x,y/\f << (x * y) (/\a E x \/! b [a,b] E f -> f E Fun x y).
+intros.
+trivial.
+save fun_intro.
+
+new_intro fun fun_intro.
+
+goal /\x,y,f,X ((f << x * y -> /\a E x \/! b [a,b] E f -> X) ->
+                  f E (Fun x y) -> X).
+trivial 8.
+save fun_elim.
+
+new_elim -i $E fun fun_elim.
+
+close_def Fun.
+
+goal /\x,y /\f E (Fun x y) /\a E x \/! b [a,b] E f.
+trivial.
+save fun_is_fun.
+
+def Infix[0.5] f "[[" x "]]" = Def \y ([x,y] E f).
+
+goal /\x,y /\f E (Fun x y)/\a E x f[[a]] E y.
+intros.
+prove ([a,f[[a]] ] E f).
+elim Def.axiom.
+elim fun_is_fun.
+prove f << x * y.
+trivial.
+trivial = G G0 +cart_prod_3.
+save fun_total.
+
+def Inj x y = 
+  { f E Fun x y | /\b E y/\a1,a2 E x (b = f[[a1]] & b = f[[a2]] -> a1 = a2)}.
+def Surj x y = 
+  { f E Fun x y | /\b E y\/a E x b = f[[a]] }.
+def Bij x y =
+  { f E Fun x y | /\b E y\/!a (a E x & b = f[[a]]) }.
+
+goal /\x,y,f (f E Inj x y -> f E Surj x y -> f E Bij x y). 
+intros.
+elim H.
+elim H0.
+elim H1.
+intros.
+intros.
+elim H4.
+intro.
+trivial.
+save Bij_1.
+
+goal /\x,y,f (f E Bij x y -> f E Surj x y). 
+intros.
+elim H.
+elim H0.
+intros.
+intros.
+elim H1.
+trivial.
+save Bij_2.
+
+goal /\x,y,f (f E Bij x y -> f E Inj x y). 
+intros.
+elim H.
+elim H0.
+intros.
+intros.
+elim H1.
+prove a1 = z.
+trivial.
+prove a2 = z.
+trivial.
+save Bij_3.
+
+(* ********************************* *)
+(* Sucesor definition and Properties *)
+(* ********************************* *)
+
+def succ x = x U sing x.
+
+goal /\x,y (y E succ x <-> y = x or y E x).
+trivial.
+save succ_ext.
+
+(* *********************************************************** *)
+(* Membership relation is a well founded total order relation, *)
+(* when restricted to a given set.                             *)
+(* *********************************************************** *)
+
+def PertTrans x = /\w,y,z(w E x -> y E x -> z E x -> w E y -> y E z -> w E z).
+
+def PertAntiRefl x = /\y(y E x -> ~ y E y).
+
+def PertOrder x = PertTrans x & PertAntiRefl x.
+
+def PertWellFded x = /\y(y << x -> \/z(z E y) -> 
+                     \/z(z E y & /\w(w E y -> z = w or z E w))).
+
+def PertWFOrder x = PertOrder x & PertWellFded x.
+
+def PertTotal x = /\y,z (y E x -> z E x -> y E z or y = z or z E y).
+
+goal /\x (PertWellFded x -> PertTotal x).
+intros.
+intros.
+elim -1 (pair y z) H.
+trivial + pair_1 - H.
+trivial =.
+prove z0 = y or z0 = z. trivial - H H0 H1.
+prove /\ w E (pair y z)  (z0 = w or z0 E w). trivial - H H0 H1 G. rmh H H0 H1 H2.
+elim G.
+elim -1 z G0.
+elim y_in_pairxy.
+trivial - G G0.
+trivial - G G0.
+elim -1 y G0.
+elim x_in_pairxy.
+trivial - G G0.
+trivial - G G0.
+save pert_total.
+
+
+(* ************************* *)
+(* Transitive set definition *)
+(* ************************* *)
+
+def Transet x = /\y,z (z E y & y E x -> z E x).
+
+(* ************************************************* *)
+(* ORDINALS defined without the well founded axiom.  *)
+(* Ordinals well foundeness is introduced within the *)
+(* definition.                                       *)
+(* ************************************************* *)
+
+def WFOrd x = Transet x & PertWFOrder x.
+
+goal WFOrd {}.
+intros.
+intro.
+trivial + empty_empty.
+trivial + empty_empty.
+save zero_wford.
+
+(*
+goal /\x(WFOrd x -> WFOrd (succ x)).
+intros.
+intro.
+intro.
+intros.
+elim -1 x -2 y succ_ext.
+trivial.
+trivial + x_inc_unionxy.
+trivial + x_inc_unionxy.
+intro.
+intro.
+intro.
+intros.
+elim -1 x -2 z0 succ_ext.
+trivial.
+intro.
+prove y0 E x. trivial - H1 H2 H3 H4. 
+prove w E x. trivial - H1 H2 H3 H5 H6.
+prove PertTrans x. trivial - H1 H2 H3 H4 H5 H6 G G0.
+elim -1 w -2 y0 -3 z0 G1.
+intro.
+intro.
+elim succ_ext. rmh H7.
+intro.
+trivial.
+intro. trivial.
+intro.
+intros.
+prove y2 << x or \/y3(y3 << x & y2 = (sing x) U y3).
+
+
+goal /\y(\/z(z E y) -> /\z (z E y -> WFOrd z) -> (inter y) E y).
+
+
+goal /\y(\/z(z E y) -> /\z (z E y -> WFOrd z) -> WFOrd (inter y)).
+*)
+
+
+

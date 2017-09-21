@@ -1,0 +1,553 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage{a4wide}
+\usepackage{color}
+
+\usepackage{epsfig}
+
+
+\newcommand{\prompt}[0]{>PhoX> }
+% \newcommand{\indexe}[1]{ #1 \index{#1}  }
+\title{Some points to start with the proof assistant PhoX.}
+
+\begin{document}
+
+\maketitle
+%\section{Introduction.}
+
+\tableofcontents{}
+
+\begin{abstract}
+The PhoX \cite{PHOX} system allows to interactively check the
+development of mathematical theory, and especially to check {\em
+proofs}. It uses a small number of commands. These commands are
+{\em extensible} by the user, this means that we can modify their
+behavior (this aspect is not covered by this document).
+\end{abstract}
+
+\section{Logical foundations.}
+PhoX uses {\em multi-sorted Higher-order logic}.
+The fact the we use {\em higher-order logic} means we can quantify non
+only on object -- for instance natural numbers -- but also on
+properties on these objects (or sets of objects). We can for instance
+express in the language the axiom of induction on natural number that
+says that any property verified for $0$ and closed by application of
+the successor is true for any natural number (this means that any
+subset of natural number containing $0$ and closed by application of
+the successor is the set of all natural numbers). In {\em first order
+logic} we can only express this axiom as a schema, which means
+enumerate all the instance of induction for  each property on natural
+numbers that can be written.\footnote{Both ways for expressing
+inductions are not strictly speaking equivalent.}. This is a very
+simple case of property expressed in higher order logic. There exists
+other properties that can not be stated at all in first order logic
+with the same language.
+
+The notion of {\em sort} (or types) allows to distinguish many kinds
+of objects, for instance lines from points in geometry. Therefore, we
+are able to check syntactically that the predicate of ``incidence''
+related one point and one line. This is also a difference with
+first-order logic where there is only on kind of object.
+
+Of course, Higher-order logic contains first order
+logic. Nevertheless, it is possible to use other first order theories,
+like set theory, which are more expressive and ``stronger'' than
+the higher-order logic of PhoX. We made the choice of higher-order
+logic not because it is stronger, but because sorts allow to eliminate
+many incorrect statements ; this syntactic verification is performed
+in a way which is mostly compatible with common mathematical
+practice.
+
+The user can extend the language by adding new sorts, new constants,
+new functions, new predicates \dots{} one can also add new axioms.
+
+To develop proofs, the user uses a command language inspired from {\em
+natural deduction}, an abstract form of formal mathematical proofs.
+
+\section{The interface.}
+
+\subsection{The interactive loop.}
+Communication between PhoX and the user is through an {\em interaction
+loop}. This means that the user send commands to the system and to
+each command corresponds an answer of the system ; this answer
+indicates if the command was accepted or not and when it was accepted,
+it gives some information about the modification of the current state
+of the system.
+
+There are essentially two kind of commands : {\em global commands}
+which are used to write definition or modify the system and {\em proof
+commands} which are used to write proofs.
+The prompt \verb~>PhoX>~ indicated that the machine is waiting for a
+global command it becomes \verb~%PhoX%~ when the system is inside a proof.
+
+We can keep a list of commands in a file with the extension
+``\verb#.phx#''. The system will be able to reload later this kind of files.
+
+\subsection{The Emacs interface.}
+
+The version of PhoX you will be using here uses a full page interface
+which allows both to edit and validate such a file. This interface
+communicates with the system through the interactive loop described
+above. Therefore, the file is evaluated linearly.
+
+This interface is realized with XEmacs \cite{Xemacs} and
+ProofGeneral \cite{PG} (D. Aspinall).  XEmacs is a text editor of the
+Emacs family which exists under many operating system.
+the figure \ref{ecran} shows an example of PhoX screen. The screen is
+divided in two parts : in the upper part, the {\em script} of commands
+given to the system and in the lower part, the answer from PhoX to the
+latest command.
+
+\begin{figure}\label{ecran}
+\hspace{-3cm}\input{ecran.pdf_t}
+\caption{A Sample of PhoX screen}
+\end{figure}
+
+The already interpreted command are highlighted by a different
+background color. Some navigation buttons allow to advance and go back
+in the file. Going back is the only way to modify an already
+interpreted command: this ensures coherence between the proof script
+and the system.
+
+If the system was correctly installed, it is enough to open a file
+with the extension \verb#.phx# to use this interface.
+
+\section{Syntax.}
+
+\verb#(* *)# delimits comments.
+
+PhoX uses a {\em functional notation} (also used in  languages like
+LISP or CAML) : for example $\hbox{d} \, x \, y$ for
+$\hbox{d}(x,y)$ or $\hbox{Im} \, f \, y$ for $y \in \hbox{Im}(f)$
+or $\hbox{open } U = \forall x (U \, x \rightarrow \exists e{>}0\,
+\forall y (d \, x \, y < e \rightarrow U \, y))$.
+PhoX can also use {\em infix} (like $x < y$) or {\em postfix} (like
+$n!$) notation for specific symbols.
+
+Moreover, we will always express sets as properties. This is why we
+write $\hbox{Im} \, f \, y$ instead of $y \in \hbox{Im}(f)$.
+
+%\subsection{Parenthésage et priorité.}
+%Seules les parenthèses usuelles \verb#( )# peuvent être utilisées pour
+%parenthéser les expressions (pas de crochets ni d'accolades).  Pour
+%éviter de trop nombreuses parenthèses, PhoX tient compte également de
+%{\em priorités} entre symboles, autant que possible celles usuelles
+%(souvent un peu plus que celles usuelles). Par exemple si les
+%déclarations convenables ont été faites on peut écrire $x + y*z$ et le
+%système comprendra $x+(y*z)$. Si les déclarations respectent les
+%conventions usuelles\footnote{dans l'état, un utilisateur peut faire une
+%  déclaration qui ne les respectent pas.}, les symboles de fonction ou
+%d'opération ont systématiquement priorité sur les symboles de prédicat
+%qui eux-mêmes ont priorité sur les symboles de connecteurs ou de
+%quantificateur ce qui est habituel, ainsi dans la définition d'ouvert on
+%a pu écrire $d \, x \, y < e \rightarrow U \, y$ plutôt que : $((d \, x \, y) <
+%e) \rightarrow (U \, y)$. Il est toujours possible d'ajouter des parenthèses non
+%nécessaires à la saisie, mais elles n'apparaîtrons pas dans les
+%réponses.
+
+%PhoX utilise aussi des règles
+%d'{\em associations} pour les opérateurs infixes : par exemple $A\land
+%B\land C$ se lit $(A\land B)\land C$, et pour les entiers, $x + y + z$ se lit
+%$x + (y+z)$.  Ces règles d'associations à gauche (comme le symbole
+%$\land$) ou à droite (comme le symbole $+$) sont purement syntaxiques et
+%ont peu à voir avec l'associativité. Ainsi il est important de noter que
+%l'implication associe à droite : $A\rightarrow B \rightarrow C$ signifie
+%$A\rightarrow (B\rightarrow C)$, ce qui est assez usuel en logique, et rappelle
+%la synonymie avec $(A\land B)\rightarrow C$, mais ne l'est pas dans le reste
+%des mathématiques.
+
+%Ces priorités et règles d'association sont systématiquement utilisées
+%pour l'affichage des réponses, ce qui peut parfois rendre la lecture un
+%peu difficile.
+
+%\subsection{Quantifications.}
+
+%Certaines abréviations sont utilisées pour les suites de quantifications
+%($\forall$ ou $\exists$) de même nature, $\forall x,y\,A$ pour $\forall
+%x \forall y\,A$, et pour les quantifications bornées $\forall x{\in}
+%A\,B$ pour $\forall x (A \, x \rightarrow B)$. Pour un prédicat en
+%notation infixe comme $<$ on aura également $\exists x{<}y\,B$ pour
+%$\exists x (x < y \land B)$.
+
+%Ces abréviations facilitent le plus souvent la lecture. Elles sont
+%utilisées systématiquement à l'affichage (ce qui peut être parfois
+%troublant).
+
+%
+
+We give in the following table the entry code of standard symbols and
+some useful abbreviations.
+
+\begin{center}
+\begin{tabular}[t]{|l|l|l|}
+
+\hline-
+\verb# ~ # & $¬$ & negation\\
+\verb# & # & $\land$ & conjunction \\
+\verb# or # & $\lor$ & disjunction \\
+\verb# -> # & $\rightarrow$ & implication \\
+\verb# <-> # & $\leftrightarrow$ & equivalence \\
+\verb# /\ # & $\forall$ & for all\\
+\verb# \/ # & $\exists$ & there exists\\
+\verb# = # & \verb#=# & equality \\
+\verb# != # & $\neq$ & distinct \\
+\verb# \ # & $\lambda $ & lambda abstraction \\
+\verb#False # & \verb#False # & false \\
+\verb#True # & \verb#True #  & true\\
+\hline
+% \verb# <= # & $\leq $ & inférieur ou égal$¹$ \\
+% \verb# >= # & $\geq $ & supérieur ou égal$¹$ \\
+% \hline
+% \multicolumn{3}{l}{(1) ces symboles ne sont pas prédéfinis}\\
+\hline
+\verb#/\x,y B x y# & $\forall$\verb#x,y B x y# & $\forall x\forall y\, B\,x\,y$\\
+\verb#\/x,y B x y# & $\exists$\verb#x,y B x y# & $\exists x\exists y\, B\,x\,y$\\
+\verb#/\x:A B x# & $\forall$\verb#x#$\in$\verb#A B x# & $\forall x(A\, x \rightarrow B\,x)$\\
+\verb#\/x:A B x# & $\exists$\verb#x#$\in$\verb#A B x# & $\exists x(A\, x \land B\,x)$\\
+\verb#/\x,y:A B x y# & $\forall$\verb#x,y#$\in$\verb#A B x y# &
+$\forall x(A\, x \rightarrow \forall y(A\,y \rightarrow B\,x\,y))$\\
+\verb#\/x,y:A B x y# & $\exists$\verb#x,y#$\in$\verb#A B x y# &
+$\exists x(A\, x \land \exists y(A\,y \land B\,x\,y))$\\
+\hline
+\end{tabular}
+\end{center}
+
+\section{The commands of PhoX.}\label{commandes}
+
+\subsection{Global commands.}
+
+These commands are used, primarily, to define the mathematical
+vocabulary we use and to state the properties we want to prove. In
+our practice, the students do not write themselves these commands:
+it is the teacher who prepared a script where they are included.
+
+\begin{description}
+\item[\verb~Sort~] allows to introduce news {\em  sorts} of
+objects. For example the commands
+ \verb~Sort scalar. Sort vector.~ introduce two new sorts, for the vectors and for the
+scalars. This concept allows to capture the typing errors, for
+example, the attempt to add  vectors and  scalars.
+
+From these atomic sorts, PhoX will recognize, for all sorts $s$
+and $s'$, the sort of the functions from $s$ to $s'$ denoted by $s
+\to s'$.
+
+These concepts, a priori complex, are not problematic for the
+students, mainly because they appear only in the commands
+\verb~Sort~ and \verb~Cst~, which are prepared by the teacher, and
+in the error messages coming, for example, from the attempt to add
+a vector and a scalar.
+
+\item[\verb~Cst~] allows to define new constants. For example, the
+commands \verb~Cst S0: scalar.~ \verb~Cst V0: vector.~ defines
+two constants \verb#S0# for the scalar $0$ and \verb#V0# for the
+vector $0$. These two objects will be then clearly distinct
+objects.
+We can also define functional constants:\\
+\verb~Cst lInfix[3] x "+" y : vector -> vector -> vector.~\\
+\verb~Cst rInfix[2] x "*" y : scalar -> vector -> vector.~\\
+We have said that $+$ is associative on the left, $*$ is
+associative on the right and that $*$ has higher priority than
+$+$. This allows to write $a*x + b*y + c*z$ instead of $((a*x) +
+(b*y)) + (c*z)$. The relative complexity of the command again is
+not an obstacle since it has been prepared by the teacher.
+
+\item[\verb~def~] allows to make definitions. Note that
+it is not necessary to give the sort of the objects: it is
+automatically computed by PhoX using the {\em type inference}
+algorithm of Damas-Milner \cite{DM82}. For example:
+
+\verb~def inj f =~ $\forall x,y (f x = f y \to x = y)$\verb~.~\\
+\verb~Cst Infix[5.0] x "<" y : real -> real -> prop.~\\
+\verb~def Infix[5.0] x ">" y = y < x.~
+
+\item[\verb~claim~] allows to give {\em axioms}.
+
+\verb~claim S_inj~ $\forall x,y \in N (S x = S y \to x = y)$\verb~.~
+
+\item[\verb~goal~] allows to start the proof of a statement.
+
+\verb~goal~ $\forall h,g (\hbox{inj}\,h \land \hbox{inj}\,g
+\land \forall x (h x = x \lor g x = x) \to \forall x (h
+(g x) = g (h x))$\verb~.~
+
+
+\item[\verb~save~] finishes a proof.  When there is nothing more to
+prove, the command \verb#save nom_du_theoreme.# asks the system to save the
+theorem for future uses. This command also builds {\em the proof
+tree} and checks it. The correction of the theorem does not rely  on the
+correction of the commands used during the proof, but only on the correction of
+this simple verification.
+\end{description}
+
+
+\subsection*{Proof commands.}
+
+These commands are used to build proofs. There are
+ few of them and they correspond to intuitive stages of
+reasoning: it is essential for the students because they must
+easily see the parallel between the proofs carried out with PhoX
+and those, more informal, made elsewhere in mathematics. During a
+proof, there are a certain number of {\em goals} to achieve. Each
+of them has a single conclusion and a set of assumptions to which
+PhoX gives a name. Here is an example with two goals:
+
+\noindent\verb~goal 1/2~\\
+\verb~H :=~ $\hbox{inj}\,h$\\
+\verb~H1 :=~ $\hbox{inj}\,g$\\
+\verb~H2 :=~ $g\,x = x$\\
+\verb~H3 :=~ $g (h x) = h x$\\
+\verb~   |-~ $h (g x) = g (h x)$
+
+\noindent\verb~goal 2/2~\\
+\verb~H :=~ $\hbox{inj}\,h$\\
+\verb~H1 :=~ $\hbox{inj}\,g$\\
+\verb~H2 :=~ $h\,x = x$\\
+\verb~   |-~ $h (g x) = g (h x)$
+
+This may seem heavy because, at each step of the proof and for
+each goal, all the available assumptions are repeated. In fact, it
+is very useful form a pedagogical point of view, because this helps
+the students to understand that  the available assumptions may
+change from one step to another and this is not a clear mechanism
+for them.
+
+The main commands to progress in a proof are given below. All
+(except \verb~instance~ and \verb~select~ which are total) are
+applied to the first goal called the {\em current goal} and leave
+the other goals unchanged.
+
+\begin{description}
+\item{\verb~axiom~} allows to end the proof of the current goal when
+its conclusion is one of the assumptions.
+The command \verb~flag auto_lvl 1~
+tells PhoX to automatically detect axioms. In the following example, the
+command \verb~axiom H4~ finishes the current goal:
+
+\verb~goal 1/2~\\
+\verb~H :=~ $\hbox{continue1}\,f$\\
+\verb~H4 :=~ $a_0 > R0$\\
+\verb~   |-~ $a_0 > R0$\\
+
+
+\item{\verb~intro~}  corresponds to one { \em
+introduction rule}. Its action depends on the conclusion of the
+current goal (no assumption is used). {\verb~intro n~ makes $n$
+introductions. \verb~intros~}  makes all the possible
+introductions (actually, it
+ is a bit more complex and similar to the \verb~lefts~
+command described below). Here is a first example:
+
+\verb~goal 1/1~\\
+\verb~   |-~ $\forall h,g (\hbox{inj}\,h \land \hbox{inj}\,g \land \forall
+x (h\,x = x \lor g\,x = x) \to \forall x (h (g x)) = (g (h x)))$\verb~.~\\
+\verb~%PhoX% intros.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{inj}\,h \land \hbox{inj}\,g \land \forall
+x (h\,x = x \lor g\,x = x)$ \verb~.~\\
+\verb~   |-~ $h (g x) = g (h x)$ \verb~.~\\
+
+If more than one introduction rules  may be applied (for example, to show $A
+\lor B$, one can show either  $A$ or  $B$), we can specify the name of the rule
+to be applied by typing \verb#intro l# (for ``left'') to show $A$ or
+\verb#intro r# (for ``right'') to show $B$.
+
+\item{\verb~apply~ and \verb~elim~} correspond to the elimination rules. They are the  most complex
+commands. In practice, as for the introduction rules, it is useful
+to be able to apply several elimination rules with a single
+command. For example, by saying ``from $\forall x (A(x)
+\to B(x))$ and $A(a)$ I deduce $B(a)$'', we implicitly say
+that we want to use the hypothesis with $a$ for $x$.
+
+
+The \verb~apply~ command allows this by typing \verb~apply~
+$\forall x (A(x) \to B(x))$ \verb~with~ $A(a)$. In
+general, one uses \verb~apply H1 with H2~ where \verb~H1~ and
+\verb~H2~ are the names of the assumptions : the first command is
+more readable, but longer to write. One can also give several
+hints (like $A(a)$) to \verb~apply~ by separating them by the key
+word \verb~and~.
+
+The \verb~elim~ command is very similar to \verb~apply~, but it
+must lead to the conclusion of the current goal, whereas the
+\verb~apply~ command adds what it produces to the assumptions. It
+is a subtle and often useful way to indicate the value of
+variables. Here are two examples:
+
+\verb~goal 1/1~\\
+\verb~H5 :=~ $\forall y_0 (d\,x\,y_0 < a' \to d (f x) (f y_0) < a)$\\
+\verb~H6 :=~ $d\,x\,y < a'$\\
+\verb~   |-~ $d (f x) (f y) < a$\\
+\verb~%PhoX% elim H5.~
+
+\verb~goal 1/1~\\
+\verb~H5 :=~ $\forall y_0 (d\,x\,y_0 < a' \to d (f x) (f y_0) < a)$\\
+\verb~H6 :=~ $d\,x\,y < a'$\\
+\verb~   |-~ $d\,x\,y < a'$
+
+We could have written \verb~elim H5 with H6~
+to avoid the command \verb~axiom H6~.
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{continuous} f$\\
+\verb~H1 :=~ $U (f x)$\\
+\verb~H0 :=~ $\forall x_0 \in U \,\exists a{>}R0 \,\forall y (d\,x_0\,y < a \to U y)$\\
+\verb~   |-~ $\exists a{>}R0 \,\forall y (d\,x\,y < a \to \hbox{inverse}\,f\,U\,y)$\\
+\verb~%PhoX% apply H0 with H1.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{continuous} f$\\
+\verb~H1 :=~ $U (f x)$\\
+\verb~H0 :=~ $\forall x_0 \in U\, \exists a{>}R0 \,\forall y (d\,x_0\,y < a \to U y)$\\
+\verb~G :=~ $\exists a{>}R0 \,\forall y (d\,(f x)\,y < a \to U
+y)$\\
+\verb~   |-~ $\exists a{>}R0 \,\forall y (d\,x\,y < a \to \hbox{inverse}\,f\,U\,y)$
+
+\item{\verb~prove~ and \verb~use~} correspond to the introduction of a
+lemma. \verb~prove A~ indicates that we want to prove \verb~A~
+first to use it later to solve the current goals. The command
+\verb~use A~ just inverses the two goals.
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{bijective} (f \circ f)$\\
+\verb~   |-~ $\hbox{bijective} f$\\
+\verb~%PhoX% prove~ $\hbox{injective f}$\verb~.~
+
+\verb~goal 1/2~\\
+\verb~H :=~ $\hbox{bijective} (f \circ f)$\\
+\verb~   |-~ $\hbox{injective} f$\\
+\verb~goal 2/2~\\
+\verb~H :=~ $\hbox{bijective} (f \circ f)$\\
+\verb~H0 :=~ $\hbox{injective} f$\\
+\verb~   |-~ $\hbox{bijective} f$
+
+\item{\verb~left~ and \verb~lefts~} correspond to introduction rules for the {\em
+assumptions}. Even if these rules (we have not seen them
+yet)  are derivable from the others, they are essential in practice. For
+instance, we use them to replace an assumption of the form $A \land B$ by two
+hypotheses $A$ and $B$. The \verb~lefts~ version (whose behavior can
+be controlled with the same syntax as
+\verb~intros~ by indicating the connectives it should breaks) performs one or more of these rules : \\
+\verb~goal 1/1~\\
+\verb~H2 :=~ $\forall z{\leq}e' \;  z < e$\\
+\verb~G :=~ $\exists a{>}R0 \,\forall y (d\,x\,y \leq a \to d (f x) (f y) \leq e')$\\
+\verb~   |-~ $\exists a{>}R0 \,\forall y (d\,x\,y < a \to d (f x) (f y) < e')$\\
+\verb~%PhoX% lefts G $~$\exists$ \verb~$~$\land$\verb~.~
+
+\verb~goal 1/1~\\
+\verb~H2 :=~ $\forall z{\leq}e' \;  z < e$\\
+\verb~H3 :=~ $a > R0$\\
+\verb~H4 :=~ $\forall y (d\,x\,y \leq a \to d (f x) (f y) \leq e')$\\
+\verb~   |-~ $\exists a{>}R0 \,\forall y (d\,x\,y < a \to d (f x) (f y) < e')$
+
+\item{\verb~by_absurd~} allows to use the absurdity rule by adding the
+                         negation of the conclusion to the
+assumptions:\\
+\verb~goal 1/1~\\
+\verb~H :=~ $\lnot \forall x (X\,x)$\\
+\verb~   |-~ $\exists x \lnot (X\,x)$\\
+\verb~%PhoX% by_absurd.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\lnot \forall x (X\,x)$\\
+\verb~H :=~  $\lnot \exists x \lnot (X\,x)$\\
+\verb~   |-~ $\exists x \lnot (X\,x)$
+
+Another way to use absurdity is \verb~elim excluded_middle with A~ which will introduce two goals, one with \verb~A~ in the assumptions,
+the other with its negation. Other commands are related to
+absurdity  like the De Morgan's laws (see command \verb~rewrite~).
+
+\item{\verb~unfold~ and \verb~unfold_hyp~} allow to replace a symbol by
+its definition. The first acts on the conclusion, the second on an assumption:
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{continue1}\,f$\\
+\verb~H0 :=~ $\hbox{ouvert}\,U$\\
+\verb~   |-~ $\hbox{ouvert} (\hbox{inverse}\,f\,U)$\\
+\verb~%PhoX% unfold ouvert. unfold_hyp H0 ouvert.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{continue1}\,f$\\
+\verb~H0 :=~ $\forall x\in U  \,\exists a{>}R0 \,\forall y (d\,x\,y < a \to U y)$\\
+\verb~   |-~ $\forall x\in (\hbox{inverse}\,f\,U) \,\exists a{>}R0
+\,\forall y (d\,x\,y < a \to \hbox{inverse}\,f\,U y)$
+
+\item{\verb~auto~ and \verb~trivial~} indicate to PhoX to try to solve
+the current goal. One should not expect a miracle, and we often
+have to interrupt the proof search (using the ``Interrupt''
+button).
+
+\item{\verb~instance~}. Some rules (as
+$\exists_e$) need to find the good value for a variable. PhoX does
+not require this value immediately. In this case, the system
+introduces an {\em existential variable} whose name starts with a
+question mark. The command \verb~instance~ gives the value of such
+a
+variable: \\
+\verb~goal 1/1~\\
+\verb~H5 :=~ $\forall y_0 (d\,?1\,y0 < a_0 -> d (f ?1) (f y_0) < a)$\\
+\verb~H6 :=~ $d\,x\,y < a_0$\\
+\verb~   |-~ $d (f x) (f y) < a$\\
+\verb~%PhoX% instance ?1 x.~
+
+\verb~goal 1/1~\\
+\verb~H5 :=~ $\forall y_0 (d\,x\,y0 < a_0 -> d (f x) (f y_0) < a)$\\
+\verb~H6 :=~ $d\,x\,y < a_0$\\
+\verb~   |-~ $d (f x) (f y) < a$\\
+
+\item{\verb~select~} allows to change the current goal.
+It is especially useful when several goals have an existential
+variable and we want to start with the goal which ``forces''
+ the value of this variable.
+
+
+\item{\verb~rewrite~, \verb~rewrite_hyp~} correspond to
+equational reasoning. The first command allows to transform the
+conclusion of the current goal by using an equality, the second
+does the same for an assumption. The example below corresponds to
+De Morgan's laws. \verb~demorgan~ is here the name of a list of
+theorems
+corresponding to each law: \\
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{Adh} \, (\hbox{Union} \, A \, B) \,x$\\
+\verb~H0 :=~ $\lnot (\forall e {>} R0 \,\exists y \in A  \,
+(d\,x\,y) < e \lor\forall e {>} R0
+ \,\exists y \in B \, (d\,x\,y) < e)$\\
+\verb~   |-~ $\hbox{False}$\\
+\verb~%PhoX% rewrite_hyp H0 demorgan.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{Adh} (\hbox{Union} \, A \, B) x$\\
+\verb~H0 :=~ $\exists e {>} R0 \,\forall y \in A \,\lnot (d\,x\,y <
+e) \land \exists
+e {>} R0 \,\forall y \in B  \,\lnot (d\,x\,y < e)$\\
+\verb~   |-~ $\hbox{False}$
+
+\item {\verb~from A~} indicates to the system that it has to look for the
+equational reasoning steps that allow to transform the conclusion
+of the current goal into \verb~A~. This corresponds to the usual
+manner to write equational proofs (one indicates the different
+steps without specifying the transformations carried out).
+Unfortunately, the automation of PhoX is not very powerful and it
+is often  (but not always)necessary to indicate more steps than
+required for a human reader.
+
+\end{description}
+
+\addcontentsline{toc}{section}{Références}
+\bibliography{biblio}
+\bibliographystyle{plain}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

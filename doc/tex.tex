@@ -1,0 +1,211 @@
+% $State: Exp $ $Date: 2006/01/26 19:17:16 $ $Revision: 1.4 $
+
+\chapter{Generation of \LaTeX\ documents.}\label{tex}
+
+When compiling a \AFD\ file (using the \verb#phox -c# command) you can 
+generate one or more \LaTeX\ documents. This generation is NOT automatic. But
+\AFD\ can produce a \LaTeX\ version of any formula available in the current
+context. This means that when you want to present your proof informally, you
+can insert easily the current goal or hypothesis in your document. In practice
+you almost never need to write mathematical formulas in \LaTeX\ yourself. When
+a formula does not fit on one line, you can tell \AFD\ to break it
+automatically for you (this will require two compilations in \LaTeX\ and the
+use of a small external tool {\tt pretty} to decide where to break).
+
+You can also specify the \LaTeX\ syntax of any \AFD\ constant or definition so
+that they look like you wish. In fact using all these possibilities, you can
+completely hide the fact that your paper comes from a machine assisted proof !
+
+The \LaTeX\ file produced by \AFD\ can be used as stand-alone articles or
+inserted in a bigger document (which can be partially written in
+pure \LaTeX).
+
+In this chapter, we assume that the reader as a basic knowledge of \LaTeX.
+
+\section{The \LaTeX\ header.}
+
+If you want \AFD\ to produce one or more \LaTeX\ documents, you need to add a
+  {\em \LaTeX\ header} at the beginning of your file (only one header
+  should be used in a file even in a multiple modules file).
+A \LaTeX\ header look like this\idx{tex}:
+
+\begin{verbatim}
+tex
+  title = "A Short proof of Fermat's last Theorem"
+  author = "Donald Duck"
+  institute = "University of Dingo-city"
+  documents = math slides.
+\end{verbatim}
+
+The three first fields are self explanatory and the strings can contain any
+valid \LaTeX\ text which can be used as argument of the \verb#\title# of
+\verb#\author# commands. 
+
+The last field is a list of documents that \AFD\ will produce. In this case, if
+this header appears in a file \verb#fermat.phx#, the command 
+\verb#phox -c fermat.phx# will produce two files named \verb#fermat.math.tex# 
+and \verb#fermat.slides.tex#.
+
+The document names \verb#math# and \verb#slides# will be used later in
+\LaTeX\ comments.
+
+Warning: do not forget the dot at the end of the header.
+
+\section{\LaTeX\ comments.}
+
+A \LaTeX\ comment is started by \verb#(*! doc1 doc2 ...# (on the same line)
+and ended by \verb#*)#. As far as building the proof is concerned, these
+comments are ignored. \verb#doc1#, \verb#doc2#, ... must be among the document
+names declared in the header. Thus, when compiling a \AFD\ file, the content
+of these comments are directly outputed to the corresponding \LaTeX\ files
+(except for the formulas as we will see in the next section).
+
+\section{Producing formulas}
+
+To output a formula (which fits on one line), you use \verb#\[ ... \]# 
+or \verb#\{ ... \}#. The first form will print the formula in a
+{\em mathematical version} (like $\forall X (X \to X)$). The second
+will produce a verbatim version, using the \AFD\ syntax (like 
+\verb#/\X (X -> X)#). 
+The second form is useful when producing a documentation for a \AFD\
+library, when you have to teach your reader the \AFD\ syntax you use.
+
+Formulas produced by \verb#\[ ... \]# may be broken by TeX using its usual
+breaking scheme. Formula produced by \verb#\{ ... \}# will never be broken
+(because \LaTeX\ do not insert break inside a box produced by \verb#\verb#).
+We will see later how to produce larger formulas.
+
+\LaTeX\ formulas can use extra goodies:
+\begin{itemize}
+\item They can contain free variables.
+
+\item If \verb#A# is a defined symbol in \AFD\ , \verb#$$A# will refer to the
+  definition of \verb#A# (If this definition is applied to arguments, the
+  result will be normalised before printing). Remember that a single dollar
+  must be used when $A$ as a special syntax and you want just to refer to $A$
+  (For instance you use \verb#$+# to refer to the addition symbol when it is
+  not applied to two arguments).
+  
+\item All the hypothesis of the current goal are treated like any defined
+  symbol.
+
+\item \verb#$0# refers to the conclusion of the current goal.
+
+\item You can use the form \verb#\[n# or \verb#\{n# where \verb#n# is an
+  integer to access the conclusion and the hypothesis of the nth goal to prove
+  (instead of the current goal).
+
+\item You can use the following flags (see the index \ref{flag} for a more
+detailed description) to control how formulas will look like: {\tt
+binder\_tex\_space, comma\_tex\_space, min\_tex\_space, max\_tex\_space,
+tex\_indent, \\ tex\_lisp\_app, tex\_type\_sugar, tex\_margin, tex\_max\_indent}
+
+\end{itemize}
+
+A \verb#\[ ... \]# or \verb#\{ ... \}# can be used both in text mode
+and in math mode. If you are in text mode, \verb#\[ ... \]# is
+equivalent to \verb#$\[ ... \]$# (idem with curly braces).
+
+WARNING: the closing of a formula: \verb#\]#, \verb#\}#
+ should not be immediately followed by a character such that this
+closing plus this character is a valid identifier for \AFD. Good practice is
+ always to follow it by a white space. This is a very common error!
+
+\section{Multi-line formulas}
+
+You can produce formulas fitting on more than one line using 
+\verb#\[[ ... \]]# or \verb#\{{ ... \}}#. 
+
+The second form produces verbatim formulas similar to those produced by the
+\AFD\ pretty printer (with the same breaking scheme) like:
+\begin{verbatim}
+lesseq.rec2.N
+ = /\X
+     /\x,y:N 
+       (X x -> /\z:N  (x <= z -> z < y -> X z -> X (S z)) -> 
+          x <= y -> X y)
+ : Theorem
+\end{verbatim}
+
+The first form produces multi-line formulas using the same mathematical syntax
+than \verb#\[ ... \]# like:
+\includeafd{examples.ex1.tex}
+
+However, breaking formulas in not an easy task. When you compile with \LaTeX\
+a file {\tt test.tex} produced from an \AFD\ file using \verb#\[[ ... \]]#, a
+file {\tt test.pout} is produced. Then using the command {\tt pretty test} (do
+not forget to remove the extension in the file name), a file {\tt test.pin} is
+produced which tells \LaTeX\ where to break lines. Then you can compile one
+more time your \LaTeX\ file. It may be necessary to do all this one more time
+to be sure to reach a fix-point.
+
+The formula produced in this way will use no more space than specified by the
+\LaTeX\ variable \verb#\textwidth#. Therefore, you can change this variable if
+you want formulas using a given width.
+
+\section{User defined \LaTeX\ syntax.}\idx{tex\_syntax}
+
+You can specify yourself the syntax to be used in the math version of a
+formula.  To do so you can use the \verb#tex_syntax#.  This command can have
+three form:
+\begin{description}
+\item[\tt tex\_syntax {\em symbol} "{\em name}"] : tells \AFD\ to use this {\em
+  name} for this {\em symbol}. {\em name} should be a valid \LaTeX\ expression
+  in text mode and will be included inside an \verb#hbox# in math mode. This
+  form should be used to give names to theorems, lemmas and functions which
+  are to be printed just as a name (like sin or cos).
+\item[\tt tex\_syntax {\em symbol} Math "{\em name}"] : tells \AFD\ to use this
+  {\em name} for this {\em symbol}. {\em name} should be a valid \LaTeX\
+  expression in math mode and will be included directly in math mode.
+\item[\tt tex\_syntax {\em symbol} {\em syntax}] : tell \AFD\ to use the given
+  {\em syntax} for this {\em symbol}. The {\em syntax} uses the same
+  convention as for the command \verb#def# of \verb#cst#. When the {\em
+  symbol} is used without its syntax (using \verb#$symbol#) the first keyword
+  if the syntax is \verb#Prefix# or the second otherwise will be
+  used. Moreover, you can separate tokens with the following spacing
+  information (to change the default spacing):
+  \begin{description}
+  \item{\tt !} suppresses all space and disallow breaking (in multi-line
+  formulas).
+  \item{\tt <{\em n}>} (where {\tt\em n} is an integer) uses {\tt\em n} 100th
+  of {\tt em} for spacing and disallows breaking (in multi-line formulas).
+  \item{\tt <{\em n i}>} (where {\tt\em n} and {\tt\em i} are integers) uses
+  {\tt\em n} 100th of {\tt em} for spacing and allows breaking (in multi-line
+  formulas) using {\tt\em i} 100th of {\tt em} of extra indentation space.
+  \end{description} 
+\end{description}    
+
+\section{examples.}
+
+\begin{verbatim}
+cst 2 rInfix[4] x "|->" y.
+tex_syntax $|-> rInfix[4] x "\\hookrightarrow" y.
+\end{verbatim}
+Will imply the \verb#\[ A |-> B \]# gives $ A \hookrightarrow B $ in your
+\LaTeX\ document. You should note that you have to double the \verb#\# in
+strings.
+ 
+\begin{verbatim}
+Cst Prefix[1.5] "Sum" E "for" \E\ "=" a "to" b 
+  : (Term -> Term) -> Term -> Term -> Term.
+tex_syntax $Sum Prefix[1.5] 
+  "\\Sigma" "_{" ! \E\ "=" a ! "}^{" ! b ! "}" E %as $Sum E a b.
+\end{verbatim}
+Will imply that \verb#\[Sum f i for i = n to p\]# gives $\Sigma_{i = n}^{p} f
+i$ in your \LaTeX\ document. We have separated the \verb#"\\Sigma"# from the
+\verb#"_{"# so that \verb#"\[$Sum\]"# just produces a single $\Sigma$ and we 
+used \verb#"%as"# to modify the order of the arguments (because {\tt E} comes
+last in the \LaTeX\ syntax and first in the \AFD\ syntax).
+
+More complete examples can be found by looking at the libraries and examples
+distributed with \AFD.
+
+
+ 
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "doc"
+%%% End: 

@@ -1,0 +1,15 @@
+(* $State: Exp $ $Date: 2000/12/04 09:35:26 $ $Revision: 1.1 $ *)
+
+tex
+	title = "examples of \LaTeX\ formulas"
+	author = ""
+	institute = ""
+	documents = ex1 
+.
+
+Import nat.
+
+(*! ex1
+{\textwidth = 10cm \[[ $$lesseq.rec2.N \]] }
+*) 
+

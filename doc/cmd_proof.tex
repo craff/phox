@@ -1,0 +1,1148 @@
+% $State: Exp $ $Date: 2006/02/24 17:01:52 $ $Revision: 1.18 $
+
+
+\section{Proof commands.}\label{proof-commands}
+
+The command described in this section are available only after
+starting a new proof using the {\tt goal} command. Moreover, except
+{\tt save} and {\tt undo} they can't be use after you finished the
+proof (when the message {\tt proved} has been printed).
+
+\subsection{Basic proof commands.}
+All proof commands are complex commands, using unification and
+equational rewriting. The following ones are extensions of the basic
+commands of natural deduction, but much more powerful.
+\begin{description}
+
+\item[{\tt axiom {\em hypname}.}\idx{axiom}]
+ Tries to prove the current
+  goal by identifying it with hypothesis {\em hypname}, using
+  unification and equational reasoning.
+
+\begin{verbatim}
+...
+G := X (?1 + N0)
+   |- X (N0 + ?2)
+%PhoX% axiom G.
+0 goal created.
+proved
+%
+\end{verbatim}
+
+\begin{verbatim}
+...
+H := N x
+H0 := N y
+H1 := X (x + S N0)
+   |- X (S x)
+%PhoX% axiom H1.
+0 goal created.
+proved
+\end{verbatim}
+
+\item[{\tt elim \{{\em num0}\} {\em expr0} 
+\{ with {\em opt1} \{and/then  ... \{and/then {\em optn}\}...\} 
+.}]\idx{elim}\footnote{Curly braces denote an optional
+  argument. You should note type them.}]
+
+  
+  This command corresponds to the following usual tool in natural proof
+  : prove the current goal by applying hypothesis or theorem {\tt
+    expr0}.  More formally this command tries to prove the current goal
+  by applying some elimination rules on the formula or theorem {\tt\em
+    expr0} (modulo unification and equational reasoning).  Elimination
+  rules are built in as the ordinary ones for forall quantifier and
+  implication. For other symbols,  elimination
+  rules can be defined with the {\tt new\_elim}) commands.
+%The default one 
+
+ After this tactic succeeds, all
+the new goals (Hypothesis of {\tt expr0} adapted to this particular
+case) are printed, the first one becoming the new current goal.
+
+
+\begin{verbatim}
+
+New goal is:
+goal 1/1
+H := N x
+H0 := N y
+H1 := N z
+   |- x + y + z = (x + y) + z
+
+%PhoX% elim H.  (* the default elimination rule for predicate N 
+                   is induction *)
+2 goals created.
+
+New goals are:
+goal 1/2
+H := N x
+H0 := N y
+H1 := N z
+   |- N0 + y + z = (N0 + y) + z
+
+goal 2/2
+H := N x
+H0 := N y
+H1 := N z
+H2 := N y0
+H3 := y0 + y + z = (y0 + y) + z
+   |- S y0 + y + z = (S y0 + y) + z
+\end{verbatim}
+
+The following example use equational rewriting :
+
+\begin{verbatim}
+H := N x
+H0 := N y
+H1 := N z
+   |- x + y + z = (x + y) + z
+
+%PhoX% elim equal.reflexive.  
+(* associativity equations are in library nat *)
+0 goal created.
+
+\end{verbatim}
+
+You have the option to give some more informations {\em opti}, that can
+be expressions (individual terms or propositions), or abbreviated name
+of elimination rules.
+
+Expressions has to be given between parenthesis if they are not
+variables. They indicate that a for-all quantifier (individual term) or
+an implication (proposition) occuring (strictly positively) in {\tt
+  expr0} has to be eliminated with this expression. In case there is
+only one such option, the first usable occurence form left to right is
+used (regardless the goal).
+
+\begin{verbatim}
+def lInfix[5] R "Transitive" = 
+  /\x,y,z ( R x y -> R y z -> R x z).
+...
+
+H := R Transitive
+H0 := R a b
+H1 := R b c
+   |- R a c
+%PhoX% elim H with H0.  
+1 goal created, with 1 automatically solved.
+\end{verbatim}
+
+but
+
+\begin{verbatim}
+H := R Transitive
+H0 := R a b
+H1 := R b c
+   |- R a c
+
+%PhoX% elim H with H1.  
+Error: Proof error: Tactic elim failed.
+\end{verbatim}
+
+You can pass several options separated by {\tt and} or {\tt then}. In
+case {\tt opti} is introduced by an {\tt and}, the tactic search the
+first unused occurrence in {\tt expr0} of forall quantifier, implication
+or connective usable with {\tt opti}.
+
+\begin{verbatim}
+H := R Transitive
+H0 := R a b
+H1 := R b c
+   |- R a c
+
+%PhoX% elim H with a and b and c.  
+0 goal created.
+\end{verbatim}
+
+to skip a variable or hypothesis you can use unification variables
+(think that {\tt ?} match any variable or hypothesis) :
+
+\begin{verbatim}
+H := R Transitive
+H0 := R a b
+H1 := R b c
+   |- R a c
+
+%PhoX% elim H with ? and b.  (* ? will match a *)
+0 goal created.
+
+\end{verbatim}
+
+In case {\tt opti} is introduced by a {\tt then} : {\tt ... {\em opti}
+then {\em opti'} ...},  the tactic search the first unused occurrence of
+forall quantifier, implication or connective usable with {\tt opti'}
+{\em after} the occurrence used for {\tt opti}.
+
+\begin{verbatim}
+H := R Transitive
+H0 := R a b
+H1 := R b c
+   |- R a c
+
+%PhoX% elim H with H0 and a.  
+0 goal created.
+\end{verbatim}
+
+but 
+
+\begin{verbatim}
+H := R Transitive
+H0 := R a b
+H1 := R b c
+   |- R a c
+
+%PhoX% elim H with H0 then a.  
+Error: Proof error: Tactic elim failed.
+\end{verbatim}
+
+
+Abbreviated name of elimination rules have to be given between square
+brackets. The tactic try to uses this elimination rule for the first
+connective in {\tt expr0} using it.
+
+\begin{verbatim}
+H := N x
+   |- x = N0 or \/y:N  x = S y
+
+%PhoX% elim H with [case].  
+2 goals created.
+
+New goals are:
+goal 1/2
+H := N x
+H0 := x = N0
+   |- N0 = N0 or \/y:N  N0 = S y
+
+goal 2/2
+H := N x
+H0 := N y
+H1 := x = S y
+   |- S y = N0 or \/y0:N  S y = S y0
+\end{verbatim}
+
+You can use abbreviated names and expression, {\tt and} and {\tt then}
+together. All occurrences matched after a {\tt then {\em opti}} have to
+be after the one matched by {\em opti}. The {\tt and} matches the
+first unused occurrence with respect to the previous constraint on a
+possible {\tt then} placed before.
+
+%% cet exemple passe en rempl{\c c}ant then par and.
+\begin{verbatim}
+H := /\x:N  ((x = N0 -> C) & ((x = N1 -> C) & (x = N2 -> C)))
+   |- C
+
+%PhoX% elim H with N1 and [r] then [l].  
+2 goals created.
+
+New goals are:
+goal 1/2
+H := /\x:N  ((x = N0 -> C) & ((x = N1 -> C) & (x = N2 -> C)))
+   |- N N1
+
+goal 2/2
+H := /\x:N  ((x = N0 -> C) & ((x = N1 -> C) & (x = N2 -> C)))
+   |- N1 = N1
+\end{verbatim}
+
+
+
+The first option {\tt{\em num0}} is not very used. It allows to precise
+the number of elimination rules to apply.
+
+\item[{\tt elim \{{\em num0}\} \{-{\em num1} {\em opt1}\} ... \{-{\em numn}
+  {\em optn}\} {\em expr0}.}\footnote{Curly braces denote an optional
+  argument. You should note type them.}]
+
+{\em This syntax is now deprecated} but still used in libraries and
+examples. Use the syntax above!
+
+  Tries to prove the current goal by applying some elimination rules on the
+  formula or theorem {\tt\em expr0}. You have the option to precise a minimum
+  number of
+  elimination rules ({\tt\em num0}) or/and give some information {\tt\em opti}
+  to help in finding the {\tt\em numi}-th elimination. 
+  \begin{itemize}
+  \item If the {\tt\em numi}-th elimination acts on a for-all quantifier,
+    {\tt\em opti} must be an expression which can be substituted to this
+    variable (this expression has to be given between parenthesis if it is not
+    a variable).
+  \item If the {\tt\em numi}-th elimination acts on an implication, {\tt\em
+      opti} must be an expression which can be unified with the left formula
+    in the implication (this expression has to be given between parenthesis if
+    it is not a variable).
+  \item If the {\tt\em numi}-th elimination acts on a connective for which you
+    introduced new elimination rules (using {\tt new\_elim}), {\tt\em opti}
+    has to be the abbreviated name of one of these rules, between square
+    bracket.
+  \end{itemize}
+  
+  Moreover, this tactic expands the definition of a symbol if and only if this
+  symbol has no elimination rules.
+
+  After this tactic succeeded, all the new goals are printed, the last
+  one to be printed is the new current goal.
+
+\begin{verbatim}
+>phox> goal /\x/\y/\z (N x -> N y -> N z -> 
+  x + (y + z) = (x + y) + z).
+
+   |- /\ x /\ y /\ z (N x -> N y -> N z -> 
+  x + y + z = (x + y) + z)
+>phox> intro 6. 
+
+H := N x
+H0 := N y
+H1 := N z
+   |- x + y + z = (x + y) + z
+>phox> elim -4 x nat_rec. 
+
+H := N x
+H0 := N y
+H1 := N z
+   |- /\ y0 (N y0 -> y0 + y + z = (y0 + y) + z -> 
+  S y0 + y + z = (S y0 + y) + z)
+
+H := N x
+H0 := N y
+H1 := N z
+   |- O + y + z = (O + y) + z
+
+>phox> elim equal_refl.
+
+H := N x
+H0 := N y
+H1 := N z
+   |- /\ y0 (N y0 -> y0 + y + z = (y0 + y) + z -> 
+  S y0 + y + z = (S y0 + y) + z)
+\end{verbatim}
+
+\item[{\tt intro {\em num}.} or {\tt intro {\em info1 .... infoN}} \idx{intro}]
+
+  In the second form,  {\tt \em infoX} is either an identifier {\tt \em name}, either an expression
+of the shape {\tt [{\em  name opt}]} and {\tt \em opt} is empty or is
+a ``with'' option for an {\tt elim} command.
+
+  In the first form, apply {\tt\em num} introduction rules on the goal
+  formula. New names are automatically generated for hypothesis and
+  universal variables. In this form, the intro command only uses the
+  last intro rule specified for a given connective by the {\tt
+    new\_intro} command.
+
+  In the second form, for each {\tt\em name} an intro rule is applied on the
+  goal formula. If the outermost connective is an implication, the {\tt\em
+    name} is used as a new name for the hypothesis. If it is an universal
+  quantification, the {\tt\em name} is used for the new variable. If it is a
+  connective with introduction rules defined by the {\tt new\_intro} command,
+  {\tt\em name} should be the name of one of these rules and this rule will be
+  applied with the given {\tt elim} option is some where given. 
+
+Moreover, this tactic expands definition of a symbol if and only if
+  this symbol has no introduction rules.
+
+\begin{verbatim}
+>phox> goal /\x /\y (N x -> N y -> N (x + y)).
+
+   |- /\ x /\ y (N x -> N y -> N (x + y))
+>phox> intro 7.
+
+H := N x
+H0 := N y
+H1 := X O
+H2 := /\ y0 (X y0 -> X (S y0))
+   |- X (x + y)
+>phox> abort.
+>phox> goal /\X /\Y /\x (X x & Y -> \/x X x or Y).
+
+   |- /\ X /\ Y /\x (X x & Y -> \/x X x or Y)
+>phox>  intro A B a H l.
+
+H := A a & B
+   |- \/x A x
+
+>phox> intro [n with a].
+
+H := A x & B
+   |- A a
+\end{verbatim}
+
+\item[{\tt intros \{{\em symbol\_list}\}.}\idx{intros}]
+  
+  Apply as many introductions as possible without expanding a definition.  If
+  a {\em symbol\_list} is given only rules for these symbols are applied and
+  only defined symbols in this list are expanded. If no list is given,
+  Definitions are expanded until the head is a symbol with some introduction
+  rules and then only those rules will be applied and those definition will be
+  expanded (if this head symbol is an implication or a universal
+  quantification, introduction rules for both implication and universal
+  quantification will be applied, as showed by the following example).
+
+\begin{verbatim}
+>phox> goal /\x /\y (N x -> N y -> N (x + y)).
+
+   |- /\ x,y (N x -> N y -> N (x + y))
+>phox> intros.
+
+H0 := N y
+H := N x
+   |- N (x + y)
+\end{verbatim}
+
+\end{description}
+
+%% end of section basic proof commands
+
+\subsection{More proof commands.}
+
+\begin{description}
+
+\item[{\tt apply  \{ with {\em opt1} \{and/then  ... 
+\{ 
+and/then
+{\em optn}\}...\} 
+.}\idx{apply}]
+
+
+  
+Equivalent to {\tt use ?. elim ... }. Usage is similar to {\tt elim}
+(see this entry above for details).  The command {\tt apply} adds to the
+current goal a new hypothesis obtained by applying {\em expr0} (an
+hypothesis or a theorem) to one or many hypothesis of the current goal.
+as for {\tt elim}, if there are unproved hypothesis of {\tt\em expr0}
+they are added as new goals. The difference with {\tt elim}, is that
+{\tt apply} has not to prove the current goal.
+
+\begin{verbatim}
+H0 := /\a0,b (R a0 b -> R b a0)
+H1 := /\x \/y R x y
+H := /\a0,b,c (R a0 b -> R b c -> R a0 c)
+   |- R a a
+
+%PhoX% apply H1 with a.  
+
+...
+G := \/y R a y
+   |- R a a
+
+%PhoX% left G.  
+...
+H2 := R a y
+   |- R a a
+
+%PhoX% apply H0 with H2.  
+...
+G := R y a
+   |- R a a
+
+[%PhoX% elim H with ? and y and ?. (* concludes *)]
+[%Phox% elim H with H2 and G. (* concludes *)]
+[%Phox% apply H with H2 and G. (* concludes if auto_lvl=1. *)]
+
+%Phox% apply H with a and y and a. (* does not conclude. *)
+...
+G0 := R a y -> R y a -> R a a
+   |- R a a
+...
+\end{verbatim}
+
+\item[{\tt apply  \{{\em num0}\} \{-{\em num1} {\em opt1}\} ... \{-{\em numn}
+  {\em optn}\} {\em expr0}.}]
+Old syntax for apply, don't use it ! See {\tt elim}. 
+
+\item[{\tt by\_absurd.}\idx{by\_absurd}]
+
+  Equivalent to {\tt elim absurd. intro.}
+
+\item[{\tt by\_contradiction.}\idx{by\_contradiction}]
+
+  Equivalent to {\tt elim contradiction. intro.}
+
+\item[{\tt from {\em expr}.}\idx{from}]
+
+  Try to unify {\tt\em expr} (which can be a formula or a
+  theorem) with the current goal. If it succeeds, {\tt\em expr} replace the
+  current goal.
+
+\begin{verbatim}
+>phox> goal /\x/\y/\z (N x -> N y -> N z -> 
+  x + (y + z) = (x + y) + z).
+
+   |- /\ x /\ y /\ z (N x -> N y -> N z -> 
+  x + y + z = (x + y) + z)
+>phox> intro 6.
+....
+
+....
+
+H := N x
+H0 := N y
+H1 := N z
+H2 := N y0
+H3 := y0 + y + z = (y0 + y) + z
+   |- S y0 + y + z = (S y0 + y) + z
+>phox> from S (y0 + y + z) = S (y0 + y) + z.
+
+H := N x
+H0 := N y
+H1 := N z
+H2 := N y0
+H3 := y0 + y + z = (y0 + y) + z
+   |- S (y0 + y + z) = S (y0 + y) + z
+>phox> from S (y0 + y + z) = S ((y0 + y) + z).
+
+H := N x
+H0 := N y
+H1 := N z
+H2 := N y0
+H3 := y0 + y + z = (y0 + y) + z
+   |- S (y0 + y + z) = S ((y0 + y) + z)
+>phox> trivial.
+proved
+\end{verbatim}
+
+
+\item[{\tt left {\em hypname} \{{\em num} | {\em info1 .... infoN}\}.}\idx{left}]
+
+  An elimination rule whose conclusion can be any formula is called a left
+  rule. The left command applies left rules to the hypothesis of name {\em
+  hypname}. If an integer {\em num} is given, then {\em num} left rule are
+  applied. The arguments {\em info1 .... infoN} are used as in the
+  {\tt intro} command.
+
+  \begin{verbatim}
+>phox> goal /\X,Y (\/x (X x or Y) -> Y or \/x X x).
+
+   |- /\X /\Y (\/x (X x or Y) -> Y or \/x X x)
+
+%phox% intros.
+1 goal created.
+New goal is:
+
+H := \/x (X x or Y)
+   |- Y or \/x X x
+
+%phox% left H z.
+1 goal created.
+New goal is:
+
+H0 := X z or Y
+   |- Y or \/x X x
+
+%phox% left H0.
+2 goals created.
+New goals are:
+
+H1 := X z
+   |- Y or \/x X x
+
+
+H1 := Y
+   |- Y or \/x X x
+
+%phox% trivial.
+0 goal created.
+Current goal now is:
+
+H1 := X z
+   |- Y or \/x X x
+
+%phox% trivial.
+0 goal created.
+proved
+\end{verbatim}
+
+\item[{\tt lefts {\em hypname} \{{\em symbol\_list}\}.}\idx{lefts}]
+
+  Applies ``many'' left rules on the hypothesis of name {\em
+  hypname}. If a {\em symbol\_list} is given only rules for these symbols are
+  applied and only defined symbols in this list are expanded. If no list is
+  given, Definitions are expanded until the head is a symbol with some left
+  rules and then only those rules will be applied and those definitions will be
+  expanded.
+
+\begin{verbatim}
+>phox> goal /\X,Y (\/x (X x or Y) -> Y or \/x X x).
+
+   |- /\X /\Y (\/x (X x or Y) -> Y or \/x X x)
+
+%phox% intros.
+1 goal created.
+New goal is:
+
+H := \/x (X x or Y)
+   |- Y or \/x X x
+
+%phox% lefts H $\/ $or.                              
+2 goals created.
+New goals are:
+
+H1 := X x
+   |- Y or \/x0 X x0
+
+
+H1 := Y
+   |- Y or \/x0 X x0
+
+%phox% trivial.
+0 goal created.
+Current goal now is:
+
+H1 := X x
+   |- Y or \/x0 X x0
+
+%phox% trivial.
+0 goal created.
+proved
+\end{verbatim}
+
+\begin{verbatim}
+...
+H := N x
+H0 := N y
+H1 := N y0
+H2 := S y0 <= S y
+   |- S y0 <= y or S y0 = S y
+%PhoX% print lesseq.S_inj.N. 
+lesseq.S_inj.N = /\x0,y1:N  (S x0 <= S y1 -> x0 <= y1) : theorem
+%PhoX% apply -5 H2 lesseq.S_inj.N.
+3 goals created, with 2 automatically solved.
+
+New goal is:
+H := N x
+H0 := N y
+H1 := N y0
+H2 := S y0 <= S y
+G := y0 <= y
+   |- S y0 <= y or S y0 = S y
+\end{verbatim}
+ 
+Another example (in combination with {\tt rmh}) :
+
+\begin{verbatim}
+...
+H := List D0 l
+H0 := D0 a
+H1 := List D0 l'
+H2 := /\n0:N  (n0 <= length l' -> List D0 (nthl l' n0))
+H4 := N y
+G := y <= length l'
+   |- List D0 (nthl (a :: l') (S y))
+
+%PhoX% apply -3 G H2 ;; rmh H2.
+2 goals created, with 1 automatically solved.
+New goal is:
+
+H := List D0 l
+H0 := D0 a
+H1 := List D0 l'
+H4 := N y
+G := y <= length l'
+G0 := List D0 (nthl l' y)
+   |- List D0 (nthl (a :: l') (S y))
+\end{verbatim}
+
+\item[{\tt prove {\em expr}.}\idx{prove}]
+  
+  Adds {\tt\em expr} to the current hypothesis and adds a new goal with
+  {\tt\em expr} as conclusion, keeping the hypothesis of the current
+  goal (cut rule). {\tt\em expr} may be a theorem, then no new goal is
+  created. The current goal becomes the new statment.
+
+\begin{verbatim}
+>phox> goal /\x1/\y1/\x2/\y2 (pair x1 y1 = pair x2 y2 
+  -> x1 = x2 or y1 = x2).
+
+   |- /\ x1 /\ y1 /\ x2 /\ y2 (pair x1 y1 = pair x2 y2 
+  -> x1 = x2 or y1 = x2)
+>phox> intro 5.
+
+H := pair x1 y1 = pair x2 y2
+   |- x1 = x2 or y1 = x2
+>phox> prove pair x2 y2 = pair x1 y1.
+ 
+H := pair x1 y1 = pair x2 y2
+G := pair x2 y2 = pair x1 y1
+   |- x1 = x2 or y1 = x2
+
+H := pair x1 y1 = pair x2 y2
+   |- pair x2 y2 = pair x1 y1
+\end{verbatim}
+  
+\item[{\tt use {\em expr}.}\idx{use}]
+  Same as {\tt prove} command, but keeps the current goal, only adding
+  {\tt\em expr} to hypothesis.
+\end{description}
+%% end of section more proof commands
+
+\subsection{Automatic proving.}
+
+Almost all proof commands use some kind of automatic proving. The
+following ones try to prove the formula with no indications on the
+rules to apply.
+\begin{description}
+
+\item[{\tt auto ...}\idx{auto}]
+  
+  Tries {\tt trivial} with bigger and bigger value for the depth limit. It only
+  stops when it succeed or when not enough memory is available. This command
+  uses the same option as {\tt trivial} does.
+
+\item[{\tt trivial \{{\em num}\} \{{-|= \em name1 ... namen}\} \{{+ \em theo1
+      ... theop}\}.}\idx{trivial}\footnote{Curly braces denote an optional argument. You
+    should note type them.}]
+
+  Try a simple trivial tactic to prove the current goal. The option
+  {\tt\em num} give a limit to the number of elimination performed by
+  the search. Each elimination cost (1 + number of created goals).
+
+  The option \{{\tt- \em name1 ... namen}\} tells {\tt trivial} not to use the
+  hypothesis {\tt\em name1 ... namen}. The option \{{\tt= \em name1 ...
+    namen}\} tells {\tt trivial} to only use the hypothesis {\tt\em name1 ...
+    namen}.  The option {\tt + \em theo1 ... theop} tells {\tt trivial} to use
+  the given theorem.
+
+\begin{verbatim}
+>phox> goal /\x/\y (y E pair x y).
+   
+   |- /\x/\y (y E pair x y)
+>phox> trivial + pair_ax.
+proved.
+\end{verbatim}
+\end{description}
+
+%% end of section Automatic proving
+
+\subsection{Rewriting.}
+\begin{description}
+
+\item[\tt rewrite \{-l {\em lim} | -p {\em pos} | -ortho\} \{\{-r|-nc\}
+{\em eqn1}\} \{\{-r|-nc\} {\em eqn2}\} ... 
+\idx{rewrite}]
+
+If {\tt\em eqn1}, {\tt\em eqn2}, ... are equations (or conditional
+equations) or list of equations (defined using {\tt def\_thlist}), the
+current goal is rewritten using these equations {\em as long as
+possible}. For each equation, the option {\tt -r} indicates to use it
+from right to left (the default is left to right) and the option {\tt
+  -nc} forces the system not to try to prove automatically the
+conditions necessary to apply the equation (the default is to try).
+
+\begin{verbatim}
+...
+H0 := N y
+H1 := N z
+H2 := N y0
+H3 := y0 * (y + z) = y0 * y + y0 * z
+   |- S y0 * (y + z) = S y0 * y + S y0 * z
+
+%PhoX% print mul.lS.N.
+mul.lS.N = /\x0,y1:N  S x0 * y1 = y1 + x0 * y1 : theorem
+%PhoX% rewrite mul.lS.N.
+1 goal created.
+New goal is:
+
+H0 := N y
+H1 := N z
+H2 := N y0
+H3 := y0 * (y + z) = y0 * y + y0 * z
+   |- (y + z) + y0 * (y + z) = (y + y0 * y) + z + y0 * z
+
+%PhoX% rewrite H3.
+1 goal created.
+New goal is:
+
+H0 := N y
+H1 := N z
+H2 := N y0
+H3 := y0 * (y + z) = y0 * y + y0 * z
+   |- (y + z) + y0 * y + y0 * z = (y + y0 * y) + z + y0 * z
+...
+\end{verbatim}
+  
+  If {\tt\em sym1}, {\tt\em sym2}, are defined symbol, their
+  definition will be expanded. Do not use {\tt rewrite} just for
+  expansion of definitions, use {\tt unfold} instead.
+
+  Note: by default, {\tt rewrite} will unfold a definition if and only
+  if it is needed to do rewriting, while {\tt unfold} will not (this
+  mean you can use {\tt unfold} to do rewriting if you do not want to
+  perform rewriting under some definitions).
+ 
+  The global option {\tt-l {\em lim}} limits to {\tt\em lim} steps of
+  rewriting. The option {\tt-p {\em pos}} indicates to perform only one
+  rewrite step at the {\em pos}-th possible occurrence (occurrences are
+  numbered from 0). These options allows to use for instance
+  commutativity equations. The option {\tt-ortho} tells the system to
+  apply rewriting from the inner subterms to the root of the term
+  (if a rewrite rule $r_2$ is applied after another rule $r_1$, then
+  $r_2$ is not applied under $r_1$). This restriction ensures
+  termination, but do not always reach the normal form when it exists. 
+
+\begin{verbatim}
+...
+H := N x
+H0 := N y
+H1 := N z
+   |- (y + z) * x = y * x + z * x
+
+%PhoX% rewrite -p 0 mul.commutative.N.
+1 goal created.
+New goal is:
+
+H := N x
+H0 := N y
+H1 := N z
+   |- x * (y + z) = y * x + z * x
+
+%PhoX% rewrite -p 1 mul.commutative.N.
+1 goal created.
+New goal is:
+
+H := N x
+H0 := N y
+H1 := N z
+   |- x * (y + z) = x * y + z * x
+...
+\end{verbatim}
+
+
+\item[\tt rewrite\_hyp {\em hyp\_name}  ...\idx{rewrite\_hyp}]
+
+  Similar to {\tt rewrite} except that it rewrites the hypothesis named  
+  {\tt\em hyp\_name}. The dots (...) stands for the {\tt rewrite} arguments.
+
+\item[\tt unfold ...\idx{unfold}]
+
+  A synonymous to {\tt rewrite}, use it when you only do expansion
+  of definitions.
+
+\item[\tt unfold\_hyp {\em hyp\_name}  ...\idx{unfold\_hyp}]
+
+  A synonymous to {\tt rewrite\_hyp}, use it when you only do expansion
+  of definitions.
+
+\end{description}
+%% end of section rewriting
+
+\subsection{Managing existential variables.}
+
+Existential variables are usually designed in phox by {\tt ?x} where
+{\tt x} is a natural number. They are introduced for instance by
+applying an {\tt intro} command to an existential formula, or sometimes
+by applying an {\tt elim H} command where {\tt H} is  an universal formula.
+
+You can use existential variables in goals, for instance :
+
+\begin{verbatim}
+>PhoX> goal N3^N2=?1.  
+
+Goals left to prove:
+
+   |- N3 ^ N2 = ?1
+
+%PhoX% rewrite calcul.N.  
+1 goal created.
+New goal is:
+
+Goals left to prove:
+
+   |- S S S S S S S S S N0 = ?1
+
+%PhoX% intro.  
+0 goal created.
+proved
+%PhoX% save essai.  
+Building proof .... 
+Typing proof .... 
+Verifying proof .... 
+Saving proof ....
+essai = N3 ^ N2 = S S S S S S S S S N0 : theorem
+\end{verbatim}
+
+\begin{description}
+\item[{\tt constraints.}\idx{constraints}]
+
+  Print the constraints which should be fulfilled by unification variables.
+
+\begin{verbatim}
+>phox> goal /\X (/\x\/y X x y -> \/y/\x X x y).
+
+   |- /\ X (/\ x \/ y X x y -> \/ y /\ x X x y)
+%phox% intro 4.
+
+H := /\ x0 \/ y X x0 y
+   |- X x ?32
+%phox% constraints.
+Unification variable ?32 should not use x
+\end{verbatim}
+
+\item[{\tt instance {\em expr0} {\em expr1}.}\idx{instance}] :
+
+  Unify {\tt\em expr0} and {\tt\em expr1}. This is useful to instantiate some
+  unification variables. {\tt\em expr0} must be a variable or an expression
+  between parenthesis.
+
+\begin{verbatim}
+H := N x
+H0 := N y
+H3 := y = N2 * X + N1
+   |- S y = N2 * ?792
+>phox> instance ?792 S X.
+
+H := N x
+H0 := N y
+H3 := y = N2 * X + N1
+   |- S y = N2 * S X
+\end{verbatim}
+  
+\item[{\tt lock {\em var}.}\idx{lock}] : This command {\em locks} the
+  existential variable (or meta-variable, or unification variable) {\em
+    var} for unification.  That is for all succeeding commands {\em var}
+  is seen as a constant, except the command {\tt instance} that makes
+  the existential variable disappear, and the command {\tt unlock} that
+  explicitely unlocks the existential variable.  When introduced in a
+  proof, it is possible that you still donnot know the value to replace
+  an existential variable by. As there is no more general unifier in
+  presence of high order logic and equational reasoning, somme commands
+  could instanciate an unlocked existential variable in an unexpected
+  way.
+
+For instance in the following case :
+\begin{verbatim}
+%PhoX% local y = x - k.  
+...
+%PhoX% prove N y.  
+2 goals created.
+New goals are:
+
+Goals left to prove:
+
+H := N k
+H0 := N n
+G := N ?1
+H1 := N x
+H2 := x >= ?1
+G0 := k <= ?1
+   |- N y
+...
+%PhoX% trivial.
+
+\end{verbatim}
+
+if {\tt ?1} is not locked, {\tt ?1} will be instanciated by {\tt y},
+which is not the expected behaviour.
+
+\item[{\tt unlock {\em var}.}\idx{unlock}] : This command {\em unlocks} the
+  existential variable (or existential variable) {\em var} for unification, in
+  case this variable is locked (see above {\tt lock}). Recall that {\tt
+    instance} unlock automatically the existential variable if
+  necessary.
+
+\end{description}
+%% end of section Managing existential variable
+
+\subsection{Managing goals.}
+\begin{description}
+\item[{\tt goals.}\idx{goals}]
+  
+  Prints all the remaining goals, the current goal being the last to be
+  printed, being the first with option {\tt -pg} used for Proof General
+  (cf {\tt next} for an example).
+
+\item[{\tt after  \{em num\}.}\idx{after}]
+Change  the current goal. If no {\em num} is given then the current goal
+  become the last goal.  If  {\em num} is given, then the current
+  goal is sent after  the {\em num}th.
+
+
+\item[{\tt next \{em num\}.}\idx{next}]
+  
+  Change the current goal. If no {\em num} is given then the current goal
+  becomes the last goal. If a positive {\em num} is given, then the current
+  goal becomes the {\em num}th (the 0th being the current goal). If a negative
+  {\em num} is given, the {\em num}th goal become the current one ({\tt next
+    -4} is the ``inverse'' command of {\tt next 4}).
+
+\begin{verbatim}
+>phox> goals.
+
+H := N x
+H0 := N y
+H1 := N z
+   |- /\ y0 (N y0 -> y0 + y + z = (y0 + y) + z -> 
+  S y0 + y + z = (S y0 + y) + z)
+
+H := N x
+H0 := N y
+H1 := N z
+   |- /\ y0 (N y0 -> O + y0 + z = y0 + z -> 
+  O + S y0 + z = S y0 + z)
+
+H := N x
+H0 := N y
+H1 := N z
+   |- O + O + z = O + z
+>phox> next.
+
+H := N x
+H0 := N y
+H1 := N z
+   |- /\ y0 (N y0 -> O + y0 + z = y0 + z -> 
+  O + S y0 + z = S y0 + z)
+ ...
+\end{verbatim}
+
+\item[{\tt select {\em num}.}\idx{select}]
+The  {\tt\em num}th goal becomes the current goal.
+
+\end{description}
+%% end of section Managing goals
+
+\subsection{Managing context.}
+\begin{description}
+
+\item[{\tt local .....}\idx{local}]
+  
+  The same syntax as the {\tt def} command but to define symbols local
+  to the current proof (see the {\tt def} (section~\ref{cmd-top-mdt})
+  command for the syntax).
+
+\item[{\tt rename {\em oldname} {\em newname}.}\idx{rename}]
+
+  Rename a constant or an hypothesis local to this goal (can not be used to rename local definitions).
+
+\item[{\tt rmh {\em name1} ... {\em namen}.}\idx{rmh}]
+
+  Deletes the hypothesis {\tt\em name1, ...,namen} from the current goal.
+
+\begin{verbatim}
+>phox>  goal /\X /\Y (Y -> X -> X). 
+
+   |- /\ X /\ Y (Y -> X -> X)
+>phox> intro 3.
+
+H := Y
+   |- X -> X
+>phox> rmh H.
+
+   |- X -> X
+\end{verbatim}
+
+\item[{\tt slh {\em name1} ... {\em namen}.}\idx{slh}]
+
+  Keeps only the hypothesis {\tt\em name1, ...,namen} in the current goal.
+
+\begin{verbatim}
+>phox> goal /\x,y : N N (x + y).
+
+   |- /\ x,y : N N (x + y)
+>phox> intros.
+
+H0 := N y
+H := N x
+   |- N (x + y)
+>phox> slh H.
+
+H := N x
+   |- N (x + y)
+\end{verbatim}
+\end{description}
+%% end of section Managing context
+
+\subsection{Managing state of the proof.}
+
+\begin{description}
+
+\item[{\tt abort.}\idx{abort}]
+
+  Abort the current proof, so you can start another one !
+
+\begin{verbatim}
+>phox> goal /\X /\Y (X -> Y).
+
+   |- /\ X /\ Y (X -> Y)
+>phox> intro 3.
+
+H := H
+   |- Y
+>phox> goal /\X (X -> X).
+Proof error: All ready proving.
+>phox> abort.
+>phox> goal /\X (X -> X).
+
+   |- /\ X (X -> X)
+\end{verbatim}
+
+\item[{\tt \{Local\} save \{{\em name}\}.}\idx{Local}\idx{save}]
+
+  When a proof is finished (the message {\tt proved} has been
+  printed), save the new theorem with the given {\tt\em name} in the
+  data base. Note: the proof is verified at this step, if an error
+  occurs, please report the bug !
+  
+  You do not have to give the name if the proof was started with the
+  {\tt theorem} command or a similar one instead of {\tt goal} : the
+  name from the declaration of {\tt theorem} is choosen.
+
+  The prefix {\tt Local} tells that this theorem should not be exported. This
+  means that if you use the {\tt Import} or {\tt Use} command, only the
+  exported theorems will be added.
+  
+\begin{verbatim}
+>phox>  goal /\x (N x -> N S x).
+
+   |- /\ x (N x -> N (S x))
+>phox> trivial.
+proved
+>phox> save succ_total.
+Building proof .... Done.
+Typing proof .... Done.
+Verifying proof .... Done.
+\end{verbatim}
+
+
+\item[{\tt undo \{{\em num}\}.}\idx{undo}]
+
+  Undo the last action (or the last {\tt\em num} actions).
+
+\begin{verbatim}
+>phox> goal /\X (X -> X).
+
+   |- /\ X (X -> X)
+>phox> intro.
+
+   |- X -> X
+>phox> undo.
+
+   |- /\ X (X -> X)
+\end{verbatim}
+
+\end{description}
+%% end of section Managing state of the proof
+
+\subsection{Tacticals.}
+This feature is new and has limitations.
+
+\begin{description}
+\item[{\tt {\em tactic1}  ;; {\em tactic2}}\idx{;;}]
+Use {\tt\em tactic1} for all goals generated by {\tt\em tactic1}.
+
+%% example
+
+\item[{\tt Try {\em tactic}}\idx{Try}] If {\tt {\em tactic}} is
+  successful, {\tt Try {\em tactic}} is the same as {\tt\em tactic}. If
+  {\tt {\em tactic}} fails, {\tt Try {\em tactic}} succeeds and does not
+  modify the current goal. This is useful after a {\tt ;;}.
+
+%% example
+
+\end{description}
+
+%% end of section Tacticals
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "doc"
+%%% End: 

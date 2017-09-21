@@ -1,0 +1,169 @@
+% $State: Exp $ $Date: 2004/04/20 11:58:21 $ $Revision: 1.5 $
+
+\chapter{Inductive predicates and data-types.}
+
+This chapter describes how you can construct predicate and data-types
+inductively. This correspond traditionnally to the definition of a set
+as the smallest set such that ...
+
+This kind of definitions are not to difficult to write by hand, but they are
+not very readable and moreover, you need to prove many lemmas before
+using them. \AFD  will generate and prove automatically these lemmas
+(most of the time)
+
+\section{Inductive predicates.}
+
+We will first start with some examples:
+
+\begin{verbatim}
+Use nat.
+
+Inductive Less x y =
+  zero : /\x Less N0 x
+| succ : /\x,y (Less x y -> Less (S x) (S y))
+. 
+
+Inductive Less2 x y =
+  zero : Less2 x x
+| succ : /\y (Less2 x y -> Less2 x (S y))
+. 
+\end{verbatim}
+
+This example shows two possible definitions for 
+the predicate less or equal on natural numbers.
+
+The name of the predicates will be \verb#Less# and \verb#Less2# and
+they take both two arguments. They are the smallest predicates verifying
+the given properties. The identifier \verb#zero# and \verb#succ# are
+just given to generate good names for the produced lemmas.
+
+These lemmas, generated and proved by \AFD , are:
+
+\begin{verbatim}
+zero.Less = /\x Less N0 x : theorem
+succ.Less = /\x,y (Less x y -> Less (S x) (S y)) : theorem
+\end{verbatim}
+
+Which are both added as introduction rules for that predicate with
+\verb#zero# and \verb#succ# as abbreviation (this means you can type
+\verb#intro zero# or \verb#intro succ# to specify which rule to use
+when \AFD  guesses wrong).
+
+\begin{verbatim}
+rec.Less =
+  /\X/\x,y
+    (/\x0 X N0 x0 ->
+     /\x0,y0 (Less x0 y0 -> X x0 y0 -> X (S x0) (S y0)) ->
+     Less x y -> X x y) : theorem
+
+case.Less =
+  /\X/\x,y
+   ((x = N0 -> X N0 y) ->
+    /\x0,y0 (Less x0 y0 -> x = S x0 -> y = S y0 -> X (S x0) (S y0)) ->
+    Less x y -> X x y) : theorem
+\end{verbatim}
+
+The first one: \verb#rec.less# is an induction principle (not very
+useful ?). It is added as an elimination rule. The second one is to
+reason by cases. It is added as an invertible left rule: 
+If you want to prove \verb#P x y# with an hypothesis
+\verb#H := Less x y#, the command \verb#left H# will ask you to prove
+\verb#P N0 y# with the hypothesis \verb#x = N0# (there may be other
+occurrences of \verb#x# left) and  \verb#P (S x0) (S y0)# with three
+hypothesis: \verb#Less x0 y0#, \verb#x = S x0# and \verb#y = S y0#.
+
+The general syntax is:
+
+\begin{center}
+\begin{tabular}{l}
+\verb#Inductive# {\it syntax} $[$ \verb#-ce# $]$ $[$ \verb#-cc# $]$ = \\
+\hspace{1cm} {\it alpha-ident} $[$ \verb#-ci# $]$ : {\it expr} \\
+\hspace{1cm} $\{$ \verb#|#  {\it alpha-ident}  $[$ \verb#-ci# $]$ : {\it expr} $\}$
+\end{tabular}
+\end{center}
+
+You will remark that you can give a special syntax to your predicate.
+The option \verb#-ce# means to claim the elimination rule.
+The option \verb#-cc# means to claim the case reasonning.
+The option \verb#-ci# means to claim the introduction rule specific to
+that property.
+
+\section{Inductive data-types.}
+
+The definition of inductive data-types is similar. Let us start with
+an example:
+
+\begin{verbatim}
+ Data List A =
+  nil : List A nil
+| cons x l : A x -> List A l -> List A (cons x l)
+.
+\end{verbatim}
+
+
+This example will generate a sort \verb#list# with one parameter. It
+will create two constants \verb#nil : list['a]# and
+\verb#cons : 'a -> list['a] -> list['a]#.
+
+It will also claim the axiom that these constants are distinct and injective.
+
+Then it will proceed in the same manner as the following inductive
+definition to define the predicate \verb#List# and the corresponding
+lemmas:
+
+\begin{verbatim}
+ Inductive List A l =
+  nil : List A nil
+| cons : /\x,l (A x -> List A l -> List A (cons x l))
+.
+\end{verbatim}
+
+There is also a syntax more similar to ML:
+
+\begin{verbatim}
+type List A =
+  nil  List A nil
+| cons of A and List A
+.
+\end{verbatim}
+
+The general syntax is (\verb#Data# can be replaced by \verb#type#):
+
+\begin{center}
+\begin{tabular}{l}
+{\it constr-def} $:=$ \\
+\hspace{1cm} {\it alpha-ident} \{\it ass-ident\} $|$ \\ 
+\hspace{1cm} \verb#[# {\it alpha-ident} \verb#]# {\it syntax} \\
+\verb#Data# {\it syntax} $[$ \verb#-ce# $]$ $[$ \verb#-cc# $]$ $[$
+\verb#-nd# $]$ $[$ \verb#-ty# $]$ = \\
+\hspace{1cm} {\it constr-def}  $[$ \verb#-ci# $]$ $[$ \verb#-ni# $]$ :
+{\it expr} $|$ \\
+\hspace{1cm} $\{$ \verb#|#  {\it constr-def}  $[$ \verb#-ci# $]$  $[$
+\verb#-ni# $]$ : {\it expr} $\}$
+\hspace{1cm} $\{$ \verb#|#  {\it constr-def}  $[$ \verb#-ci# $]$  $[$
+\verb#-ni# $]$ \verb#of# {\it expr} $[$ \verb#and# {\it expr} \dots $]$ \end{tabular}
+\end{center}
+
+We can remark three new options: \verb#-nd# to tell PhoX not to generate
+the axioms claiming that all the constructors are distinct,
+\verb#-ty# to tell PhoX to generate typed axioms (for instance
+\verb#/\x:N (N0 != S x)# instead of \verb#/\x (N0 != S x)#) and
+\verb#-ni# to tell PhoX not to generate
+the axiom claiming that a specific constructor is injective.
+
+One can also remark that we can give a special syntax to the
+constructor, but one still need to give an alphanumeric identifier
+(between square bracket) to generate the name of the theorems.
+
+Here is an example with a special syntax:
+
+\begin{verbatim}
+Data List A =
+  nil : List A nil
+| [cons] rInfix[3.0] x "::" l : A x -> List A l -> List A (x::l)
+.
+\end{verbatim}
+
+
+
+ 

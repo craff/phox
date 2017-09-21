@@ -1,0 +1,187 @@
+% $State: Exp $ $Date: 2003/01/31 12:44:43 $ $Revision: 1.6 $
+
+\chapter{The module system}
+
+
+This chapter describes the \AFD\ module system. Its purpose is to allow
+reusing of theory. For instance you can define the notion of groups and prove
+some of their properties. Then, you can define fields and reuse your group
+module twice (for multiplication and addition).
+
+\section{Basic principles}
+
+Our module system strongly uses the notion of names. Any objects (theorems,
+terms, ...) has a distinct name. Therefore, if you want to merge two \AFD\
+modules which both declare an object with the same name, this two objects must
+coincide after merging.   
+
+Here are the conditions under which two objects can coincide:
+\begin{itemize}
+\item They must have the same sorts. A formula can not coincide with a
+natural number.
+\item If both objects are defined expressions, their definitions must be
+structurally equal.
+\item If both objects are theorems or axioms, they must have structurally equal
+conclusions. They do not need to have the same proof.
+\end{itemize}
+
+If one of this condition is not respected, the loading of modules will fail.
+
+These rules allow you to make coincide an axiom with a theorem and a constant
+with a definition. This is why we can prove axiomatic properties of a
+structure like groups by adding some constants and axioms and then use this
+module on a particular group where the axioms may be proven and the constants
+may already exists.
+
+\section{Compiling and importing}
+
+When you have written a \AFD\ file {\tt foo.phx}, you can compile it using the command:
+\begin{verbatim}
+phox -c foo.phx
+\end{verbatim}
+
+This compilation generates two files {\tt foo.phi} and {\tt foo.pho} and
+possibly one or more \LaTeX\ file (see the chapter \ref{tex}).
+
+The file {\tt foo.pho} is a core image of \AFD\ just after the
+compilation. You can use it to restart \AFD\ in a state equivalent to the
+state it had after reading the last line of the file {\tt foo.phx}. This is
+useful when developing to avoid executing each line in the file before
+continuing it.
+
+The file {\tt foo.phi} is used when you want to reuse the theory developed in
+the file {\tt foo.phx}. To do so you can use the command\idx{Import}:
+\begin{verbatim}
+Import foo.  
+\end{verbatim}
+
+This command includes all the objects declared in the file {\tt foo.phx}. The
+above rules are used to resolve name conflicts.
+
+\section{Renaming and using}
+
+The command {\tt Import} is not sufficient. Indeed, if one wants to use twice
+the same module, it is necessary to rename the different objects it can
+contains to have distinct copies of them.  
+
+To do this, you can use the command {\tt Use} (see the index of commands for
+its complete syntax and the definition of renaming). The different
+possibilities of renaming, and a careful choice of names allow you to
+transform easily the names declared in the module you want to use\idx{Use}.
+
+When you use a module, you sometimes know that you are not extending the
+theory. For instance, if you prove that a structure satisfies all the group
+axioms, you can load the group module to use all the theorems about groups and
+you are not extending the theory. The {\tt -n} option of the {\tt Use} command
+checks that it is the case and an error will result if you extend the theory. 
+
+Important note: there is an important difference between {\tt Use} and {\tt
+Import} other than the possibility of renaming with {\tt Use}. When you apply
+a renaming to a module {\tt foo} this renaming does not apply to the module
+imported by {\tt foo} (with {\tt Import}) but it applies to the module used
+by {\tt foo} (with {\tt Use}). This allows you to import modules like natural
+numbers when developing other theories with a default behaviour which is not
+to rename objects from the natural numbers theory when your module is used.
+You can override this default behaviour (see the index of commands), but it is
+very seldom useful.
+
+\section{Exported or not exported?}
+
+By default, anything from a \AFD\ file is exported and therefore available to
+any file importing or using it (except the flags values!). However, you can
+make some theorems of rules local using the {\tt Local}\idx{Local} prefix (see
+the index of commands). 
+
+However, constants and axioms are always exported, and a definition appearing
+in an exported definition or theorem is always exported. So it is only useful
+to declare local some rules (created using {\tt new\_intro}, {\tt new\_elim}
+or {\tt new\_equation}), \LaTeX\ syntaxes (created using {\tt tex\_syntax}),
+lemmas or definitions only appearing in local lemmas.
+
+\section{Multiple modules in one file}\idx{Module}
+
+Warning: this mode can not be used with XEmacs interface and in general
+in interactive mode ! To use it, develop the last module in
+interactive mode as one file and add it at the end of the main file when it
+works.
+
+This feature will probably disappear soon ....
+
+It is sometimes necessary to develop many small modules. It is possible in
+this case to group the definitions in the same file using the following
+syntax:
+
+\begin{verbatim}
+Module name1.
+  ...
+  ...
+end.
+
+Module name2.
+  ...
+  ...
+end.
+
+...
+\end{verbatim}
+
+If the file containing these modules is named {\tt foo} this is
+equivalent to having many files {\tt foo.name1.phx}, {\tt foo.name2.phx},
+\dots containing the definitions in each module. Therefore the name of each
+module (to be used with {\tt Import} or {\tt Use}) will be {\tt foo.name1},
+{\tt foo.name2}, \dots.
+
+Moreover, a module can use the previously defined modules in the same
+file using only the name of the module (omitting the file name).
+
+Here is an example where we define semi-groups and homomorphisms.
+
+\begin{verbatim}
+Module semigroup.
+  Sort g.
+  Cst G : g -> prop.
+  Cst rInfix[3] x "op" y : g -> g -> g.
+
+  claim op_total /\x,y:G  G (x op y).
+  new_intro -t total op_total.
+
+  claim assoc /\x,y,z:G  x op (y op z) = (x op y) op z.
+  new_equation -b assoc.
+
+end.
+
+Module homomorphism.
+
+  Use semigroup with
+    _ -> _.D
+  .
+
+  Use semigroup with
+    _ -> _.I
+  .
+
+  Cst f : g -> g. 
+
+  claim totality.f /\x:G.D  G.I (f x).
+  new_intro -t f totality.f.
+
+  claim compatibility.f /\x1,x2:G.D  f (x1 op.D x2) = f x1 op.I f x2.
+  new_equation compatibility.f.
+
+end.
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "doc"
+%%% End: 

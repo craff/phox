@@ -1,0 +1,57 @@
+% $State: Exp $ $Date: 2005/09/19 07:16:40 $ $Revision: 1.9 $
+
+\documentclass[twoside,11pt,a4paper]{report}
+\usepackage{phox_report}
+\usepackage{mparhack}
+\usepackage{makeidx}
+%\usepackage{hevea}
+\usepackage{html}
+
+
+\title{User's manual of the \AFD\ library \\
+                {\footnotesize Version 0.89}}
+\author{Christophe Raffalli}
+\date{}
+
+\hfuzz 8pt
+
+\makeindex
+\def\idx#1{\index{#1@\tt #1}}
+\def\tdx#1{\index{#1@\sl #1}}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+%\input{./basic.doc.tex}
+
+\input{./prop.tex}
+
+\input{./bin_rel.tex}
+
+\input{./bool.tex}
+
+\input{./nat_def.tex}
+\includeafd{./nat.tex}
+\includeafd{./nat_ax.tex}
+
+\input{./product.tex}
+
+\input{./sum.tex}
+
+\input{./list.tex}
+\includeafd{./list_nat.tex}
+\includeafd{./list_nat_ax.tex}
+
+\input{./quotient.tex}
+
+\input{./ac.tex}
+
+%\bibliography{biblio}
+%\bibliographystyle{plain}
+
+\InputIfFileExists{libudoc.ind}{}{\typeout{No file libudoc.ind.}}
+
+\end{document}

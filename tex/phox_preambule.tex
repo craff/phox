@@ -1,0 +1,25 @@
+% $State: Exp $ $Date: 2002/01/17 16:14:08 $ $Revision: 1.2 $
+
+\ifx\undefined\afdeuxpreambuleread\def\@action{}\else\def\@action{\endinput}\fi
+\@action
+\def\afdeuxpreambuleread{}
+
+\documentclass[a4,11pt]{article}
+\usepackage{lncstheo}
+\usepackage{fancyvrb}
+\usepackage{phox}
+
+
+\makeatletter
+
+\def\beginafdeux#1#2#3#4{%
+  #4%
+  \title{#1}%
+  \author{#2\\#3}%
+  \begin{document}%
+  \maketitle}
+\def\endafdeux{\end{document}}
+
+\makeatother
+
+

@@ -1,0 +1,300 @@
+(* On inclus certaines définitions toutes prêtes *)
+Import requis.
+
+
+(* Voici une première preuve. Comprenez la preuve et
+comment on la tape dans le logiciel.
+
+IL EST INDISPENSABLE que vous fassiez la relation entre la
+preuve sur machine et la preuve sur papier que vous faites 
+en TD ou à l'examen. *)
+
+goal /\A,B,C (A minus (B union C) = (A minus B) inter (A minus C)).
+(* On "décompose" la formule à prouver *)
+(* on commence par les "pour tout" *)
+intros.
+(* maintenant on décompose l'égalité des deux ensembles *)
+intro.
+(* 2 sous-buts sont crées, on décompose le premier *)
+intros.
+(* on va maintenant décomposer l'hypothèse H *)
+left H.
+(* on peut transformer l'hypothèse H0 grâce aux lois de De Morgan *)
+rewrite_hyp H0 demorganl.
+(* on décompose la conjonction *)
+left H0.
+(* on décompose l'intersection *)
+intro.
+(* on décompose la soustraction ensembliste *)
+intro.
+(* on a ce que l'on cherche *)
+axiom H.
+axiom H0.
+(* on décompose la soustraction ensembliste *)
+intro.
+(* on a ce que l'on cherche *)
+axiom H.
+axiom H1.
+
+(* suite de la preuve similaire *)
+intros.
+left H.
+left H.
+left H0.
+intro.
+axiom H.
+intro.
+left H3.
+(* H1 permet de prouver l'absurde (False) donc tout, si on a H3 *)
+elim H1	with H3.
+(* idem pour H2 *)
+elim H2 with H3.
+save tmp.
+
+(* On définit l'image directe et réciproque. Il faudra taper 
+ImageDir f A et non f[A] *)
+
+def ImageDir f A = { y | \/x in A  f x = y }.
+def ImageRec f A = { x | f x in A }.
+
+(* voici une preuve à terminer *)
+
+goal /\f,A,B ImageDir f (A union B) = ImageDir f A union ImageDir f B.
+intros.
+intro.
+intros.
+(* x est mal nommé car dans l'ensemble d'arrivé, on renomme *)
+rename x y.
+(* ici, on arrête de décomposer la formule à demontrer car 
+on ne peut savoir si y est dans ImageDir f A ou ImageDir f B.
+*)
+left H.
+left H.
+left H.
+(* Dans le premier cas, on sait que y est dans ImageDir f A d'où le intro l
+("l" pour left) *)
+intro l.
+intro.
+intro.
+axiom H.
+axiom H0.
+(* Dans ce cas, on sait que y est dans ImageDir f B d'où le intro r
+("r" pour right)*)
+intro r.
+intro.
+intro.
+axiom H.
+axiom H0.
+
+(* terminer l'autre inclusion vous même *)
+(*->*)
+intros.
+left H.
+left H.
+left H.
+intro.
+intro.
+intro l.
+axiom H.
+axiom H0.
+left H.
+left H.
+intro.
+intro.
+intro r.
+axiom H.
+axiom H0.
+(*->*)
+save idu.
+
+(* faire les trois preuves suivantes *)
+
+goal /\f,A,B ImageRec f (A union B) = ImageRec f A union ImageRec f B.
+intros.
+intro ext.
+(*->*)
+trivial.
+trivial.
+(*->*)
+save iru.
+
+goal /\f,A,B ImageRec f (A inter B) = ImageRec f A inter ImageRec f B.
+intros.
+intro ext.
+(*->*)
+trivial.
+trivial.
+(*->*)
+save iri.
+
+goal /\f,A,B ImageDir f (A inter B) subset ImageDir f A inter ImageDir f B.
+(*->*)
+intros.
+intros.
+left H.
+left H.
+left H.
+intros.
+intros.
+axiom H.
+axiom H0.
+intros.
+axiom H1.
+axiom H0.
+(*->*)
+save idi.
+
+def injective f = /\x,y (f x = f y -> x = y).
+def surjective f = /\y\/x (f x = y).
+
+goal /\f (/\A,B (ImageDir f A inter ImageDir f B subset ImageDir f (A inter B)) <-> injective f).
+(*->*)
+intros.
+intro.
+intros.
+intros.
+local A = { z | x = z }.
+local B = { z | y = z }.
+apply H with A and B.
+rmh H.
+prove f x in ImageDir f A inter ImageDir f B.
+intro n.
+trivial.
+trivial.
+apply G with G0. 
+lefts G1.
+lefts H.
+intros.
+intro .
+intros.
+intros.
+lefts H0.
+lefts H0.
+lefts H1.
+apply H with x0. 
+apply G with x1. 
+intros.
+instance ?1 x0. 
+trivial.
+axiom H2.
+(*->*)
+save idi'.
+
+goal /\f,A ImageRec f (A cpl) = (ImageRec f A) cpl.
+intros.
+intro ext.
+(*->*)
+intros.
+unfold_hyp H ImageRec. 
+unfold ImageRec. 
+axiom H. 
+trivial.
+(*->*)
+save irc.
+
+goal /\f (/\A ImageDir f (A cpl) subset (ImageDir f A) cpl <-> injective f).
+(*->*)
+intros.
+intros.
+intros.
+intros.
+local A = { z | x != z }.
+apply H with  A.
+apply G with f x. 
+apply G0 with f x in ImageDir f (A cpl). 
+trivial.
+rewrite_hyp G1 H0. 
+by_absurd;; elim False.
+elim G1. 
+intros.
+instance ?1 y. 
+trivial.
+intro.
+intros.
+intros.
+lefts H0.
+intros.
+elim H0. 
+lefts H2.
+apply H with x0. 
+apply G with  x1. 
+apply G0 with f x0 = f x1. 
+intros.
+axiom H2. 
+(*->*)
+save idc. 
+
+goal /\f (/\A (ImageDir f A) cpl subset ImageDir f (A cpl) <-> surjective f).
+(*->*)
+intros.
+intros.
+intros.
+intros.
+local A = { x | f x != y }.
+apply H with  A. 
+apply G with  y. 
+apply G0 with  y in ImageDir f A cpl. 
+trivial.
+lefts G1.
+trivial.
+trivial.
+(*->*)
+save idc'.
+
+(* On définit R réflexive. Remarquez que l'on doit écrire R x y au lieu de 
+x R y (dommage). Complétez les deux autres définitions *)
+
+def reflexive R = /\x (R x x).
+def symetrique R = 
+(*->*)
+/\x,y (R x y -> R y x).
+(*->*)
+def transitive R = 
+(*->*)
+/\x,y,z (R x y -> R y z -> R x z).
+(*->*)
+
+def equivalence R = reflexive R & symetrique R & transitive R.
+
+(* On définit la classe de x pour la relation R.
+Remarque, on ne peut pas faire l'abus de notation que l'on
+fait toujours en math qui est d'oublier la relation dans
+la notation "x avec une barre au dessus" *)
+
+def class R x = { y | R x y }.
+
+(* finir les preuves qui suivent *)
+goal /\R /\x,y (equivalence R -> (R x y -> y in class R x)).
+(*->*)
+trivial.
+(*->*)
+save inclass.
+
+(* pour cette preuve, on pourra introduire un lemme grâce à la
+commande prove. Si vous voulez utiliser le résultat précédent (ce
+n'est pas nécessaire), il faudra taper elim inclass with R *)
+
+goal /\R /\x,y (equivalence R -> (R x y <-> class R x = class R y)).
+(*->*)
+intros.
+intros.
+intros.
+intros.
+intro a.
+intro.
+unfold class $in ${.
+unfold_hyp H1 class $in ${.
+trivial.
+trivial.
+
+intros.
+prove x in class R y.
+trivial.
+prove x in class R x.
+trivial.
+trivial.
+(*->*)
+save eqclass.
+
+
+

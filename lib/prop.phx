@@ -1,0 +1,552 @@
+(* $State: Exp $ $Date: 2005/02/28 14:10:07 $ $Revision: 1.19 $ *)
+(* Propositionnal calculus and other basic stuff *)
+
+(*header
+	title = "Basic PhoX Library"
+	author = "Christophe Raffalli, Paul Rozière"
+	institute = "Université de Savoie, université Paris VII"
+*)
+
+flag auto_lvl 1.
+
+(*texte
+Warning: This library is always loaded !
+*)
+
+(** Propositionnal connective. *)
+
+(*** Conjunction. *)
+
+def (* Conjunction. *) rInfix[7]  
+  X "&" Y = /\K ((X -> Y -> K) -> K).
+(* X & Y = /\K ((X -> Y -> K) -> K)*)
+tex_syntax $& rInfix[7]  X "\\land" Y.
+
+(*prop Conjunction rules. *)
+
+proposition conjunction.intro 
+  /\X /\Y (X -> Y -> X & Y).
+trivial.
+save.
+new_intro n conjunction.intro.
+
+proposition conjunction.left.elim 
+  /\X /\Y (X & Y -> X).
+trivial.
+save.
+
+proposition conjunction.right.elim 
+  /\X /\Y (X & Y -> Y).
+trivial.
+save.
+
+proposition conjunction.left 
+  /\X,Y,Z ((Y -> Z -> X) -> Y & Z -> X).
+trivial.
+save.
+
+(*endprop *)
+
+new_elim -n -i $& s conjunction.left. 
+(* do not change the abbreviated name s, it is used in the code (bad hack) *)
+new_elim $& l conjunction.left.elim.
+new_elim $& r conjunction.right.elim.
+close_def $&.
+
+def (* Equivalence. *)
+  Infix [8.5]  X "<->" Y = (X -> Y) & (Y -> X).
+(* X <-> Y = (X -> Y) & (Y -> X) *)
+tex_syntax $<-> Infix[8.5]  X "\\leftrightarrow" Y.
+
+(*** Disjunction. *)
+
+def (* Disjunction. *) rInfix[8]  X "or" Y = 
+  /\K ((X -> K) -> (Y -> K) -> K).
+(* X or Y = /\K ((X -> K) -> (Y -> K) -> K) *)
+tex_syntax $or rInfix[8]  X "\\lor" Y.
+
+(*prop Disjunction rules. *)
+
+proposition disjunction.left.intro 
+  /\X /\Y (X -> X or Y).
+trivial.
+save.
+
+proposition disjunction.right.intro 
+  /\X /\Y (Y -> X or Y).
+trivial.
+save.
+
+new_intro l disjunction.left.intro.
+new_intro r disjunction.right.intro.
+
+proposition disjunction.elim 
+  /\X,Y,Z ((Y -> X) -> (Z -> X) -> Y or Z -> X).
+trivial.
+save.
+
+new_elim -i $or n disjunction.elim.
+
+close_def $or.
+
+(*end *)
+
+(*** Propositional constants and negation. *)
+
+(*def Propositional constants and negation. *)
+
+def False = /\X X.
+tex_syntax False Prefix "\\bot".
+
+def True = /\X (X -> X).
+tex_syntax True Prefix "\\top".
+
+def Prefix[6.5] "~" X = X -> False.
+(* ~ X = X -> False *)
+elim_after_intro $~.
+tex_syntax $~ Prefix[6.5] "\\neg".
+
+(*end *)
+
+(*prop Propositional constants and negation rules. *)
+
+proposition true.intro 
+  True.
+trivial.
+save.
+new_intro n true.intro.
+
+proposition true.elim 
+  /\X (X -> True -> X).
+trivial.
+save.
+new_elim -i -n $True l true.elim.
+
+close_def True.
+
+proposition false.elim 
+  /\X (False -> X).
+trivial.
+save.
+new_elim -i False n false.elim.
+
+close_def False.
+
+proposition not.elim 
+  /\X,Y (X -> ~ X -> Y).
+trivial.
+save.
+
+(*end *)
+
+(*** Existential quantifiers. *)
+
+(*def Existential quantifiers definitions. *)
+
+def Prefix[6] "\\/"  \A,(\R,x(R x)):$& \  A = 
+  /\K (/\x (A x -> K) -> K).
+(* \/x (A x) =  /\K (/\x (A x -> K) -> K)*)
+tex_syntax $\/ Prefix[6] "\\exists"  \A,(\R,x(R x)):$& \  A.
+
+def Prefix[6] "\\/!" \P,(\R,x(R x)):$& \ P = \/z /\w (P w <-> w = z).
+(* \/!x (A x) = \/z /\w (A w <-> w = z) *)
+tex_syntax $\/! Prefix[6] "\\exists!" \P\ P.
+
+(*end *)
+
+(*prop Existential rules *)
+
+proposition exists.intro 
+  /\A/\x (A x -> \/x A x).
+trivial.
+save.
+new_intro n exists.intro.
+
+proposition exists.elim 
+  /\X/\A (/\x (A x -> X) -> \/x A x -> X). 
+trivial.
+save.
+new_elim -i $\/ l exists.elim.
+(* do not change the abbreviated name l, it is used in the code (bad hack) *)
+
+close_def $\/.
+
+new_intro -i refl equal.reflexive.
+
+proposition exists.one.intro 
+  /\A/\x (A x -> /\y (A y -> y = x) -> \/!x A x).
+trivial.
+save.
+new_intro n exists.one.intro.
+
+proposition exists.one.elim 
+  /\X,A (/\z (A z -> /\w (A w -> w = z) -> X) -> \/!x A x -> X).
+trivial.
+save.
+new_elim -i $\/! n exists.one.elim.
+
+close_def $\/!.
+
+(*end *)
+
+(*
+The arrow type (function from E to D where E and D are predicate of arity 1)
+*)
+
+def (* The arrow type *) rInfix[9] E "=>" D = \f (/\x:E D (f x)).
+(* E => D = \f (/\x:E D (f x)) *)
+tex_syntax $=> rInfix[9] E "\\Rightarrow" D.
+
+(*texte
+The next definition is useful to get extra parenthesis.
+*)
+
+def Prefix "{{" e "}}" = e.
+(* {{ e }} = e *)
+tex_syntax ${{ Prefix "\\left(" ! e ! "\\right)".
+
+(*** Equality. *)
+
+claim equal.proposition
+	/\X,Y (X <-> Y -> X = Y).
+
+new_intro prop equal.proposition.
+
+claim equal.extensional
+	/\X,Y (/\x (X x = Y x) -> X = Y).
+ 
+proposition equal.symmetric 
+	/\x,y (x = y -> y = x).
+trivial.
+save equal.symmetric.
+
+proposition equal.transitive 
+	/\x,y,z (x = y -> y = z -> x = z).
+trivial.
+save equal.transitive.
+
+def Infix[5]  x "!=" y = ~ x = y.
+(* x != y = ~ x = y *)
+tex_syntax $!= Infix[5]  x "\\neq" y.
+
+proposition not_equal_refl /\x,y (x != y -> y != x).
+trivial.
+save.
+
+def equal.decidable P = /\x,y:P (x = y or x != y).
+
+(*** Some tautologies. *)
+
+proposition int_contraposition_general 
+	/\A/\B ((A -> B) -> /\X ((B -> X) -> (A -> X))).
+trivial.
+save.
+
+proposition int_contraposition 
+	/\A/\B ((A -> B) -> (~ B -> ~ A)).
+trivial.
+save.
+
+proposition equivalence.int_contraposition 
+	/\A/\B ((A <-> B) -> (~ A <-> ~ B)).
+trivial.
+save.
+
+proposition equivalence.reflexive 
+	/\A (A <-> A).
+trivial.
+save.
+
+proposition equivalence.symmetrical 
+	/\A,B ((A <-> B) -> (B <-> A)).
+trivial.
+save.
+
+proposition equivalence.transitive 
+	/\A,B,C ((A <-> B) -> (B <-> C) -> (A <-> C)). 
+trivial.
+save.
+
+proposition disjunction.reflexive 
+	/\A (A or A <-> A).
+trivial.
+save.
+
+proposition disjunction.symmetrical /\A,B (A or B -> B or A).
+trivial.
+save disjunction.symmetrical.
+
+proposition disjunction.associative /\A,B,C (A or (B or C) -> A or B or C).
+trivial.
+save.
+
+proposition conjunction.reflexive /\A (A & A <-> A).
+trivial.
+save.
+
+proposition conjunction.symmetrical /\A,B (A & B -> B & A).
+trivial.
+save.
+
+proposition conjunction.associative /\A,B,C (A & (B & C) -> A & B & C).
+trivial.
+save.
+
+proposition disj_conj.distributive /\A,B,C ((A & B) or (A & C) -> A & (B or C)).
+trivial.
+save.
+
+proposition conj_disj.distributive /\A,B,C ((A or B) & (A or C) -> A or (B & C)).
+trivial.
+save.
+
+(*** Classical logic. *)
+
+claim peirce_law /\X,Y (((X -> Y) -> X) -> X).
+
+(*texte
+If you want to do intuitionnistic logic only, do not use this axiom ! You can
+always use the command depend to see if a theorem uses the Peirce's
+law
+*)
+
+proposition not_idempotent 
+	/\X(~ ~ X -> X).
+intros.
+elim peirce_law.
+intro.
+elim H.
+axiom H0.
+save.
+
+proposition absurd 
+	 /\X((~ X -> X) -> X).
+intros.
+elim peirce_law.
+axiom H.
+save absurd.
+
+proposition contradiction
+	 /\X(~ ~ X -> X).
+intros.
+elim peirce_law.
+trivial.
+save contradiction.
+
+proposition excluded_middle 
+	/\X (X or ~X).
+intro.
+elim peirce_law.
+trivial.
+save excluded_middle.
+
+proposition arrow_left /\A,B,X ((~ A -> X) -> (B -> X) -> (A -> B) ->  X).
+intros.
+elim absurd.
+trivial 8.
+save.
+
+new_elim -n $-> n 3 arrow_left. 
+
+proposition forall_left /\A,X /\x ((A x -> X) -> /\x A x -> X).
+trivial.
+save.
+
+new_elim -n $/\ n forall_left. 
+
+
+(*** Definite description. *)
+
+Cst Def : ( 'a -> prop ) -> 'a.
+tex_syntax Def Prefix "\\Delta" ! "^{" ! \P\ ! "}_{" ! P ! "}".
+
+claim (* definite description axiom *) Def.axiom 
+  /\P (\/!z P z -> P (Def \x (P x))).
+new_intro -o 10.0 -t Def Def.axiom.
+
+proposition Def.lemma /\P (\/!z P z -> /\x (P x -> Def \y (P y) = x)).
+intros.
+prove P (Def \z (P z)).
+intro.
+elim H.
+prove x = z.
+elim H2.
+elim H2.
+save.
+
+(*** Contraposition. *)
+
+proposition contraposition
+/\ A,B((~B -> ~A)= (A -> B)).
+intros.
+intro.
+intro.
+(* goal 1/2 |- (~ B -> ~ A) -> A -> B*)
+  intros.
+  elim absurd.
+  intro.
+  elim H.
+(* goal 2/2 |- (A -> B) -> ~ B -> ~ A *)
+  trivial.
+save.
+
+proposition equivalence.contraposition
+/\ A,B((~B <-> ~A)= (A <-> B)).
+intros.
+intro.
+intro.
+(* goal 1/2 |- (~ B <-> ~ A) -> A <-> B*)
+  intro.
+  left H.
+  intro.
+  (* 1.1 *)
+     intro.
+     elim absurd.
+     intro.
+     elim H.
+  (* 1.2 *)
+     intro.
+     elim absurd.
+     intro.
+     elim H0.
+(* goal 2/2 |- (A <-> B) -> ~ B <-> ~ A *)
+   trivial.
+save.
+
+def_thlist contrapose =
+   contraposition
+   equivalence.contraposition.
+
+(*texte 
+For reasoning by contraposition (classical reasoning) you can use:
+"rewrite -p 0 -r contrapose."
+For the intuitionnistic instance of reasoning by contraposition:
+rewrite contrapose.
+*)
+
+(*** De Morgan Laws. *)
+
+proposition conjunction.demorgan 
+	/\X,Y ((~ (X & Y)) = (~X or ~Y)).
+intros.
+intro.
+intros.
+intro.
+elim absurd.
+intro.
+elim H.
+intro.
+elim absurd.
+intro.
+trivial.
+elim absurd.
+intro.
+trivial.
+trivial.
+save.
+
+proposition conjarrowleft.demorgan 
+	/\X,Y ((~ (X & Y)) = (X -> ~Y)).
+rewrite conjunction.demorgan.
+intros.
+intros.
+intros.
+trivial.
+intros.
+elim absurd.
+trivial.
+save.
+
+proposition conjarrowright.demorgan 
+	/\X,Y ((~ (X & Y)) = (Y -> ~X)).
+rewrite conjunction.demorgan.
+intros.
+intros.
+intros.
+trivial.
+intros.
+elim absurd.
+trivial.
+save.
+
+proposition disjunction.demorgan 
+	/\X,Y ((~ (X or Y)) = (~X & ~Y)).
+trivial.
+save.
+
+proposition arrow.demorgan
+	/\X,Y ((~ (X -> Y)) = (X & ~ Y)).
+intros.
+intro.
+intro.
+intro.
+elim absurd.
+intro.
+elim H.
+trivial.
+trivial.
+save.
+
+proposition negation.demorgan 
+	/\X ((~ ~ X) = X).
+trivial +absurd.
+save.
+
+proposition forall.demorgan 
+	/\X ((~ /\x X x) = (\/x ~X x)).
+intros.
+intro.
+intro.
+intro.
+elim absurd.
+intro.
+elim H.
+intro.
+elim absurd.
+intro.
+trivial.
+trivial.
+save.
+
+proposition exists.demorgan 
+	/\X ((~ \/x X x) = (/\x ~X x)).
+trivial.
+save.
+
+def_thlist demorgan =
+  disjunction.demorgan
+  forall.demorgan
+  arrow.demorgan
+  exists.demorgan
+  conjunction.demorgan
+  negation.demorgan.  
+
+def_thlist demorganl =
+  disjunction.demorgan
+  forall.demorgan
+  arrow.demorgan
+  exists.demorgan
+  conjarrowleft.demorgan
+  negation.demorgan.  
+
+def_thlist demorganr =
+  disjunction.demorgan
+  forall.demorgan
+  arrow.demorgan
+  exists.demorgan
+  conjarrowright.demorgan
+  negation.demorgan. 
+
+def Prefix "Let" \e'\ "=" e "inside" e' = e' e.
+(* Let x= e inside e' = (\x e') e *)
+  
+
+
+proposition and_arrow /\X,Y,Z ((X & Y -> Z) -> X -> Y -> Z).
+trivial.
+save and_arrow.
+
+proposition exists_arrow /\X,Z ((\/x X x -> Z) -> /\x (X x -> Z)).
+trivial.
+save exists_arrow.
+

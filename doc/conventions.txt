@@ -1,0 +1,190 @@
+		   Paul Rozière -- Christophe Raffali
+      Conventions d'écriture pour les librairies et fichiers phox.
+
+
+Ces conventions permettent d'organiser les fichiers sources pour phox.
+Les scripts phoxx.awk et phox_tex.awk (répertoire tools) utilisent ces
+conventions pour donner une sortie lisible d'un source phox. Ces outils
+suppriment les preuves phox. Le script phoxx.awk fournit une sortie
+texte lisible, le script phox_tex.awk une sortie LaTeX (à compiler).
+Ces outils sont utilisés pour la documentation TeX et texte des
+librairies de la distribution (voir les Makefile).
+
+A Faire : 
+
+un vérificateur syntaxique pour les conventions
+
+une sortie html
+
+Affinage, extension et éventuellement modification pour améliorer la
+sortie. On peut s'inspirer du Structured Text de Zope et Wiki, voir :
+
+http://www.zope.org/Members/jim/StructuredTextWiki/StructuredText
+http://www.cis.upenn.edu/~edloper/pydoc/stminus-001.html
+
+
+------------------------------------------------------------------------------
+		      Description des conventions
+
+EN TETE de FICHIER :
+
+Un exemple suffit, ne pas oublier la date.
+ 
+ex.
+
+(*header  1998/03/16
+
+
+	title = "Natural numbers (second part)"
+	author = "Christophe Raffalli"
+	institute = "Paris VII \\& Paris XII university"
+*)
+
+DÉCOUPAGE en SECTIONS SOUS-SECTIONS etc.
+
+section (**
+subsection (***
+subsubsection (****
+paragraph     (*****
+ne pas mettre le numéro : 
+n'importe quels caractères non blancs ..., après les * est ignoré. 
+
+fin du titre : jusqu'à la fin du commentaire
+pas de commentaire imbriqué dans un titre.
+
+ex.
+
+(** Definition of functions on natural numbers. *)
+
+...
+
+(*** Definition by induction *)
+
+
+ÉCRITURE DES FORMULES dans LES COMMENTAIRES :
+
+formules phox (Texte logique) : soit un token phox commençant par un $
+			       soit entres crochets "[" et "]"
+
+/\ x x=x ---> (* [ /\ x x=x ] *)
+=        ---> (* $=            *)
+
+ex.
+
+(*texte 
+Then the booleans are defined by the following predicate [B x]
+*)
+
+(*** Elimination rules for $B *)
+
+
+ÉCRITURE de COMMANDES PHOX, MODULES ...
+
+Texte a mettre en \verb (ex. noms de modules, commande) : placer entre "#"
+
+ex. 
+
+(* see module #nat.phx# *)
+
+
+LES COMMANDES de DÉCLARATION DES THÉORÈMES
+
+Commandes analogues à theorem
+
+prop,  lem, theo, fact, cor
+
+la preuve se termine par save sans arguments.
+
+La commande claim a la même syntaxe.
+
+
+Le commentaire après le prop (resp. lem, theo, fact, cor ...)  
+ est une description en anglais mathématique du théorème démontré (style
+ distributivité à gauche de la multiplication sur l'addition dans les
+ entiers).  L'idée étant de récupérer cela aussi bien en tex que dans
+ une aide en ligne qui contiendrait le nom af2 du théorème, son énoncé
+ af2, et cette description.
+
+ex.
+
+fact (* Totality of addition *)  add.total.N /\x,y:N N(x + y).
+
+
+A priori les goal sont maintenant a utiliser seulement pour les lemmes
+locaux.
+
+La syntaxe tex est introduite par tex-syntax après le save (pour le
+moment non utilisé).
+
+DÉFINITIONS
+
+Syntaxe analogue aux théorèmes, avec la syntaxe tex introduite par
+tex_syntax.
+
+ex.
+
+def (* graph of a function defined by induction *)
+    def_rec_P.N a f n z = /\X (
+        X N0 a ->
+        /\y:N/\r (X y r  -> X (S y) (f y r)) -> X n z).
+
+tex_syntax def_rec_P.N Math "\\text{\\rm DEF}_{\\rm I\\hspace{-0.2em}N}^{rec}".
+
+
+
+GROUPEMENT de PLUSIEURS ÉNONCÉS : 
+
+(*lem, (*prop, (*theo (*def, (*fact, (*cst (*cor
+
+le titre sur la même ligne, puis éventuellement des paragraphes séparés
+par une ligne vide.
+
+fin de groupement: (*end...  *) (*end *) suffit, on peut ajouter
+quelque-chose comme (*endlem *) (non interprété)
+Il FAUT un espace avant le "*)". 
+
+ex.
+
+(*def propositional constants and negation *)
+
+def False = /\X X.
+tex_syntax False Prefix "\\bot".
+
+def True = /\X (X -> X).
+tex_syntax True Prefix "\\top".
+
+def Prefix[6.5] "~" X = X -> False.
+elim_after_intro $~.
+tex_syntax $~ Prefix[6.5] "\\neg".
+
+(*end *)
+
+
+COMMENTAIRES
+
+Textes à placer dans la sortie texte et tex :   (*texte ... *)
+ 					     ou (*note ... *)
+j'ai utilisé note pour des commentaires "moins importants" (à mettre en
+bas de page par exemple). 					     
+
+ex :
+(*texte
+Using the definite description operator, we can define the
+predecessor as follows. *)
+
+(*note see module  #nat_ax.af2#,  section ordering, for definitions of
+orders on natural numbers *)
+
+
+Textes à placer seulement dans la sortie TeX :(*tex ...  *)
+Textes à placer seulement dans la sortie ascii :(*ascii ...  *) (non utilisé)
+
+
+
+
+
+
+
+Attention, le texte entre  (*!  *) sera interprété par phox. (je ne sais
+plus à quoi ça sert, probablement à rester compatible avec l'ancien mode
+TeX de Christophe).

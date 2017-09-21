@@ -1,0 +1,50 @@
+Sort nat.
+Cst N0 : nat.
+Cst Prefix[2] "S" x : nat -> nat.
+
+claim (* zero and successor distinct *) N0_not_S /\x (N0 != S x).
+claim (* successor injective *) S_inj /\x,y (S x = S y -> x = y).
+
+
+def N x = /\X (X N0 -> /\y (X y -> X (S y)) -> X x).
+
+def Add x y z = /\X (/\y X N0 y y -> /\x,y,z (X x y z -> X (S x) y (S z)) -> X x y z).
+
+flag auto_lvl 2.
+
+fact Add_inversion
+  /\x,y,z (Add x y z -> (x = N0 & z = y) or \/x',z' (x = S x' & z = S z' & Add x' y z')).
+intros.
+elim H.
+intro y0 l.
+trivial.
+intros.
+intro r.
+left H0.
+intros.
+intro. intro. trivial.
+lefts H0.
+intros.
+intro. intro. trivial.
+save.
+
+fact Add_unique /\x,y,z1,z2 (Add x y z1 -> Add x y z2 -> z1 = z2).
+intros.
+elim /\z2 (Add x y z2 -> z1 = z2).
+elim H.
+intros.
+apply Add_inversion with H1.
+left G.
+trivial.
+trivial + N0_not_S.
+intros.
+apply Add_inversion with H2.
+left G.
+trivial + N0_not_S.
+lefts H3.
+apply S_inj with H3.
+use z = z'.
+intro.
+elim H1.
+axiom H5.
+save.

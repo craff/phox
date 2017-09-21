@@ -1,0 +1,1069 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage[frenchb]{babel}
+\usepackage{a4wide}
+\usepackage{color}
+\usepackage[hyperindex]{hyperref}
+\usepackage{epsfig}
+\usepackage{makeidx}
+
+\newcommand{\prompt}[0]{>PhoX> }
+% \newcommand{\indexe}[1]{ #1 \index{#1}  }
+\title{Quelques éléments pour débuter avec le vérificateur de preuves PhoX.}
+\author{
+R. David --  Université de
+Savoie, C. Raffalli -- Université de
+Savoie, \\P. Rozière -- Université Paris 7}
+
+\makeindex
+
+\begin{document}
+
+\maketitle
+%\section{Introduction.}
+
+\tableofcontents{}
+
+\vspace{2em}
+\noindent
+Le système PhoX \cite{PHOX} permet de vérifier interactivement le
+développement de théories mathématiques, en particulier de vérifier des
+{\em preuves}.  Il utilise un petit nombre de commandes.  Celles-ci sont
+{\em extensibles} par l'utilisateur, c'est à dire qu'il peut en modifier
+le comportement (un aspect qui ne sera pas étudié dans ce document).
+
+\section{Les fondements logiques.}
+Le système PhoX se fonde sur une {\em logique d'ordre supérieur
+  multisorte}.  Le fait qu'il s'agit de {\em logique d'ordre supérieur}
+signifie que l'on peut quantifier non seulement sur les objets -- par
+exemples les entiers -- mais aussi sur des propriétés sur ces objets (ou
+des ensembles d'objets), on peut par exemple exprimer dans le langage de
+l'arithmétique l'axiome de récurrence qui dit que toute propriété
+vérifiée pour $0$ et close par passage au successeur est vérifiée pour
+tout entier (dit autrement, tout sous-ensemble des entiers qui contient
+$0$ et qui est clos par application du successeur est l'ensemble des
+entiers). En {\em logique du premier ordre} -- pour l'essentiel la
+logique étudiée en cours -- on ne peut exprimer la récurrence que comme
+un {\em schéma d'axiomes}, c'est à dire énumérer les instances de la
+récurrence pour chaque propriété sur les entiers exprimable dans le
+langage de l'arithmétique\footnote{En fait ces deux façons d'exprimer la
+  récurrence ne sont pas vraiment équivalentes.}. Ceci est un
+cas très simple de propriété exprimable à l'ordre supérieur. Il en
+existe d'autres qui ne peuvent pas du tout s'exprimer en logique du
+premier ordre tant que l'on reste dans le même langage de base.
+
+La notion de {\em sorte} (ou de type) permet de distinguer plusieurs
+sortes d'objet, par exemple des points et des droites en géométrie
+plane.  On pourra ainsi vérifier syntaxiquement que le prédicat ``être
+situé sur'' prend bien comme arguments un point et une droite.  Ceci
+diffère à nouveau de la logique du premier ordre étudiée en cours, qui
+n'utilise qu'une seule sorte d'objet.
+
+La logique d'ordre supérieur contient bien-sûr la logique du premier
+ordre.  Cependant il est possible d'utiliser des théories du premier
+ordre comme certaines théorie des ensembles plus expressives et plus
+``fortes'' que la logique d'ordre supérieur de PhoX. On fait le choix de
+la logique d'ordre supérieur non parce qu'elle est plus ``forte'', mais
+parce que les sortes permettent d'éliminer un certain nombre d'écritures
+incorrectes ; cette vérification syntaxique étant réalisée par le
+système d'une façon qui ne diverge pas trop avec la pratique
+mathématique usuelle.
+
+L'utilisateur peut étendre le langage en ajoutant de nouvelles sortes,
+de nouvelles constantes, de nouvelles fonctions, de nouveaux prédicats
+\dots{} Il peut également ajouter des axiomes.
+
+Enfin pour développer les preuves l'utilisateur a accès à un langage de
+commandes inspiré de la {\em déduction naturelle}, une forme abstraite
+de la preuve formelle mathématique.
+
+\section{L'interface.}
+\subsection{La boucle d'interaction.}
+La communication du système PhoX proprement dit avec l'utilisateur se
+fait par l'intermédiaire d'une {\em boucle d'interaction}, c'est à dire
+que l'utilisateur envoie des {\em commandes} au système, à chaque
+commande correspond une réponse du système ; celle-ci indique si la
+commande est acceptée ou non -- dans ce cas elle a pu modifier l'état du
+système -- et quand elle est acceptée donne le plus souvent des
+indications sur l'état du système qui en résulte.
+
+
+On distingue essentiellement deux modes de fonctionnement de PhoX,
+auxquels correspondent deux jeux de commande du système suivant que l'on
+a ou non entamé une preuve.
+
+Le mode par défaut est celui des {\em commandes globales} qui permettent
+d'étendre la syntaxe, de déclarer des axiomes, d'introduire des
+définitions, plus généralement de personnaliser le système et bien-sûr
+de basculer en mode preuve. On peut alors utiliser les {\em commandes de
+  preuve} pour conduire le système à construire la preuve d'un énoncé
+donné.
+
+Le prompt \verb~>PhoX>~ indique que la machine attend une commande
+globale.
+Il se transforme en \verb~%PhoX%~
+quand le système est en mode preuve.
+
+On peut conserver une suite de commandes dans un fichier dont
+l'extension doit être ``\verb#.phx#''.
+
+\subsection{L'interface Emacs.}
+La version du système qui vous est présentée utilise une interface
+pleine page qui permet à la fois d'éditer et de valider un tel fichier.
+Cette interface communique avec le système par l'intermédiaire de la
+boucle d'interaction décrite au paragraphe précédent. Ainsi le fichier
+est évalué linéairement.
+
+Cette interface a été réalisée à l'aide de XEmacs \cite{Xemacs} et
+ProofGeneral \cite{PG} de D. Aspinall.  XEmacs est un éditeur de la
+famille Emacs qui existe sous de nombreux systèmes d'exploitation.
+  La
+figure \ref{ecran} montre un exemple d'écran PhoX. L'écran est divisé en
+deux parties : on trouve, dans la partie haute, le {\em script} des
+commandes données au système et, dans la partie basse, la réponse de
+PhoX à la dernière commande.
+
+\begin{figure}\label{ecran}
+\hspace{-3cm}\input{../../ecran.pdf_t}
+\caption{Exemple d'écran PhoX}
+\end{figure}
+
+Les commandes déjà interprétées sont mises en évidence par un fond de
+couleur différente. Des boutons de navigation permettent d'avancer ou de
+revenir en arrière au point désiré. Le retour en arrière (en utilisant
+les boutons de navigations) est la seule façon de modifier une commande
+déjà interprétée : cela permet de garantir une cohérence entre le script
+et l'état du système.
+
+Si le système est bien installé il suffit d'éditer sous Xemacs un
+fichier dont l'extension est \verb#.phx# pour utiliser cette interface.
+\section{La syntaxe.}
+PhoX utilise une notation en ligne pour la saisie comme l'affichage.
+Pour la saisie il utilise les caractères ascii (les lettres usuelles
+mais pas les lettres accentuées). Cependant, grâce à l'interface Xemacs,
+certaines suites de caractères peuvent être affichées en utilisant les
+symboles usuels pour quelques uns d'entre eux $\forall,\ \exists$ \dots{}
+Les signes \verb#(* *)# délimitent du texte qui ne sera pas évalué par
+le système (ce que l'on appelle les {\em commentaires} dans un langage
+informatique).
+
+\subsection{Notation fonctionnelle.}
+PhoX utilise le plus souvent la {\em notation fonctionnelle} (utilisée
+dans les langages informatiques comme LISP ou CAML) : par exemple
+``$\hbox{d} \, x \, y$'' au lieu de ``$\hbox{d}(x,y)$''. Il peut manipuler aussi
+bien des notations {\em préfixes}, comme ``$\hbox{d} \, x \, y$'', qu'{\em
+  infixe}, comme ``$x < y$'' ou plus rarement {\em postfixe}, comme la
+notation usuelle pour la factorielle ``$n\, !$''.  L'utilisateur peut
+choisir l'une de ces notations pour les nouveaux symboles qu'il
+introduit.
+
+Par ailleurs en logique d'ordre supérieur on exprimera souvent comme une
+propriété ce qui s'exprime d'habitude en utilisant la notation
+ensembliste.  ainsi on écrira ``$\hbox{Im} \, f \, y$'' pour ``$y \in
+\hbox{Im}(f)$''.  Voici par exemple comment l'on dira que $U$ est un ouvert
+: $\hbox{ouvert } U = \forall x (U \, x \rightarrow \exists e{>}0\,
+\forall y (d \, x \, y < e \rightarrow U \, y))$.
+
+\subsection{Parenthésage et priorité.}
+Seules les parenthèses usuelles \verb#( )# peuvent être utilisées pour
+parenthéser les expressions (pas de crochets ni d'accolades).  Pour
+éviter de trop nombreuses parenthèses, PhoX tient compte également de
+{\em priorités} entre symboles, autant que possible celles usuelles
+(souvent un peu plus que celles usuelles). Par exemple si les
+déclarations convenables ont été faites on peut écrire $x + y*z$ et le
+système comprendra $x+(y*z)$. Si les déclarations respectent les
+conventions usuelles\footnote{dans l'état, un utilisateur peut faire une
+  déclaration qui ne les respecte pas.}, les symboles de fonction ou
+d'opération ont systématiquement priorité sur les symboles de prédicat
+qui eux-mêmes ont priorité sur les symboles de connecteurs ou de
+quantificateur, ce qui respecte l'usage. Ainsi dans la définition d'ouvert
+on a pu écrire $d \, x \, y < e \rightarrow U \, y$ plutôt que : $((d \,
+x \, y) < e) \rightarrow (U \, y)$. Il est toujours possible d'ajouter
+des parenthèses non nécessaires à la saisie, mais elles n'apparaîtront
+pas dans les réponses.
+
+PhoX utilise aussi des règles d'{\em association} pour les opérateurs
+infixes : par exemple $A\land B\land C$ se lit $A\land (B\land C)$, et
+pour les entiers, $x + y + z$ se lit $(x+y)+z)$.  Ces règles
+d'association à droite (comme le symbole $\land$) ou à gauche (comme le
+symbole $+$) sont purement syntaxiques et ont peu à voir avec
+l'associativité. Ainsi il est important de noter que l'implication, qui
+n'est pas associative, associe à droite : $A\rightarrow B \rightarrow C$
+signifie $A\rightarrow (B\rightarrow C)$, ce qui est assez usuel en
+logique, et rappelle la synonymie avec $(A\land B)\rightarrow C$, mais
+ne l'est pas dans le reste des mathématiques.
+
+Ces priorités et règles d'association sont systématiquement utilisées
+pour l'affichage des réponses, ce qui dans quelques cas peut rendre la
+lecture un peu difficile\footnote{mais facilite l'implémentation !}.
+Vous pouvez toujours utiliser la commande \verb~print~ (décrite dans la
+suite, voir l'index) pour vérifier que le parenthésage est bien celui
+que vous pensez.
+
+\subsection{Quantifications.}
+
+Certaines abréviations sont utilisées pour les suites de quantifications
+($\forall$ ou $\exists$) de même nature, $\forall x,y\,A$ pour $\forall
+x \forall y\,A$, et pour les quantifications bornées $\forall x{\in}
+A\,B$ pour $\forall x (A \, x \rightarrow B)$. Pour un prédicat en
+notation infixe comme $<$ on aura également $\exists x{<}y\,B$ pour
+$\exists x (x < y \land B)$.
+
+Ces abréviations quand elles sont usuelles, ce qui est le cas le plus
+fréquent, facilitent la lecture. Mais elles sont utilisées
+systématiquement à l'affichage, ce qui est parfois troublant -- utilisez
+la commande \verb~print~ dans ce cas.
+
+\subsection{Récapitulatif des notations.}
+On donne dans le tableau ci-dessous le code d'entrée des symboles
+standards de PhoX, la façon dont ils sont affichés par l'interface
+Xemacs, et leur signification. On ajoute quelques exemples et
+abréviations usuelles.
+\begin{center}
+\begin{tabular}[t]{|l|l|l|}
+
+\hline
+\verb# ~ # & $¬$ & négation\\
+\verb# & # & $\land$ & conjonction \\
+\verb# or # & $\lor$ & disjonction \\
+\verb# -> # & $\rightarrow$ & implication \\
+\verb# <-> # & $\leftrightarrow$ & équivalence \\
+\verb# /\ # & $\forall$ & quelque soit\\
+\verb# \/ # & $\exists$ & il existe \ldots tel que\\
+\verb# = # & \verb#=# & égalité \\
+\verb# != # & $\neq$ & différent \\
+\verb# \ # & $\lambda $ & lambda abstraction \\
+\verb#False # & \verb#False # & l'absurde (la proposition toujours fausse) \\
+\verb#True # & \verb#True #  & la tautologie (la proposition toujours vraie)\\
+\hline
+% \verb# <= # & $\leq $ & inférieur ou égal$¹$ \\
+% \verb# >= # & $\geq $ & supérieur ou égal$¹$ \\
+% \hline
+% \multicolumn{3}{l}{(1) ces symboles ne sont pas prédéfinis}\\
+\hline
+\verb#/\x,y B x y# & $\forall$\verb#x,y B x y# & $\forall x\forall y\, B\,x\,y$\\
+\verb#\/x,y B x y# & $\exists$\verb#x,y B x y# & $\exists x\exists y\, B\,x\,y$\\
+\verb#/\x:A B x# & $\forall$\verb#x#$\in$\verb#A B x# & $\forall x(A\, x \rightarrow B\,x)$\\
+\verb#\/x:A B x# & $\exists$\verb#x#$\in$\verb#A B x# & $\exists x(A\, x \land B\,x)$\\
+\verb#/\x,y:A B x y# & $\forall$\verb#x,y#$\in$\verb#A B x y# &
+$\forall x(A\, x \rightarrow \forall y(A\,y \rightarrow B\,x\,y))$\\
+\verb#\/x,y:A B x y# & $\exists$\verb#x,y#$\in$\verb#A B x y# &
+$\exists x(A\, x \land \exists y(A\,y \land B\,x\,y))$\\
+\hline
+\end{tabular}
+\begin{minipage}[c]{12cm}
+{\footnotesize Pour mémoriser la notation des quantificateurs, pensez que le $\forall$ est une sorte de conjonction infinie, et le $\exists$ une sorte de disjonction infinie.}
+\end{minipage}
+\end{center}
+
+On voit qu'il existe assez peu de symboles prédéfinis. Ils sont presque
+tous énumérés ci-dessus (\verb#A# et \verb#B# n'en font pas partie !).
+Il faut noter que l'égalité est {\em polymorphe}. En particulier cela a
+un sens d'écrire l'égalité de deux énoncés (sorte \verb#prop#) pour
+laquelle on utiliserait ordinairement  le signe ``$\equiv$''.
+
+
+
+\section{Les commandes du système.}
+Toute commande du système doit se terminer par ``\verb#. #'' suivi d'un
+espace ou retour à la ligne.
+On rappelle que le texte entre \verb#(* *)# n'est pas évalué.
+
+Dans la suite on donnera les exemples sous forme de suite d'entrées
+(commandes) et de sorties, ce qui ne correspond pas à ce que l'on
+obtient avec l'interface ProofGeneral. Pour les distinguer les entrées
+sont préfixée par \verb# >PhoX> # ou \verb# %PhoX% #
+(ce n'est pas le cas avec votre interface).  On donne uniquement la
+syntaxe de saisie.
+
+Ces commandes peuvent être essayées avec l'interface ProofGeneral. Pour
+cela écrire la commande et cliquez sur le bouton {\em Next}. Si la
+commande est acceptée, il est possible de revenir en arrière en cliquant
+sur le bouton {\em Undo}. Vous ne pouvez envoyer une commande que si
+elle est précédée de commandes déjà acceptées. En particulier il faut
+effacer les commandes décrites ci-dessous quand elles renvoient une
+erreur (ou les placer en commentaire), pour poursuivre.  Il est parfois
+utile de réinitialiser le système grâce au bouton {\em Restart}. On peut
+ainsi changer de théorie, ou tout simplement sortir de situations --
+rares espérons le -- où l'interface devient inutilisable, typiquement
+quand l'interface n'est plus synchrone avec le vérificateur de preuves,
+c'est à dire que certaines des commandes affichées comme acceptées par
+l'interface n'ont pas été envoyées au vérificateur de preuves ou
+vice-versa. En bref, dans une situation où l'interface ne semble pas se
+comporter correctement, n'hésitez pas à réinitialiser par {\em restart}
+!
+
+On peut envoyer les commandes une à une grâce au
+bouton {\em Next} ou plusieurs à la fois grâce au bouton {\em Goto} (qui
+permet également de revenir en arrière pour un groupe de commandes).
+
+Les raccourcis clavier << Ctrl j >> (<<Enter>> si vous avez de la
+chance) pour {\em Next} et << Ctrl c Ctrl u >> pour {\em Undo} sont
+disponibles.
+
+Il est parfois utile, pour pouvoir se relire ensuite, de rappeler la
+sortie dans le fichier d'édition : c'est ce que fait le raccourci
+clavier << Ctrl C Ctrl ; >> qui place cette sortie en commentaire (pour
+que le fichier d'édition reste correct). Pour la lisibilité, vous avez
+souvent intérêt à faire du tri dans la sortie insérée en effaçant les
+lignes redondantes avec une précédente sortie.
+
+\subsection{Vérification de la syntaxe.}
+Il est possible de vérifier la correction syntaxique d'une {\em expression
+ close} grâce à la commande \verb~print~\index{\verb~print~}.
+On obtiendra par exemple
+les entrées et sorties suivantes :
+
+\begin{verbatim}
+>PhoX> print /\x x = x.
+/\x x = x : prop
+>PhoX> print /\x,y,z(x=y -> y=z -> x=z).
+/\x,y,z (x = y -> y = z -> x = z) : prop
+>PhoX> print /\x/\y/\z(x=y -> (y=z -> x=z)).
+/\x,y,z (x = y -> y = z -> x = z) : prop
+>PhoX> print (* transitivité *)  /\x,y,z(x=y -> y=z -> x=z).
+/\x,y,z (x = y -> y = z -> x = z) : prop
+>PhoX> print /\x/\y/\z x=y -> y=z -> x=z.
+Syntax Error: Unbound identifier: "z"
+>PhoX> print x=x.
+Syntax Error: Unbound identifier: "x"
+>PhoX> print \x(x=x).
+\x (x = x) : ?a -> prop
+\end{verbatim}
+
+Remarquez qu'à chaque fois que la commande est acceptée la sorte de
+l'expression est indiquée.  Dans le dernier exemple \verb#\x(x=x)#, les
+parenthèses sont indispensables. Cette expression est un prédicat à une
+place, le signe \verb#?a# indiquant que ce prédicat peut s'utiliser pour
+n'importe quelle sorte.
+
+Cette commande permet également d'afficher l'énoncé correspondant à un
+axiome ou théorème déjà démontré aussi bien par l'utilisateur qu'à
+l'initialisation du système, comme pour les exemples qui suivent :
+
+\begin{verbatim}
+>PhoX> print equal.transitive.
+equal.transitive = /\x,y,z (x = y -> y = z -> x = z) : theorem
+>PhoX> print excluded_middle.
+excluded_middle = /\X (X or ~ X) : theorem
+\end{verbatim}
+
+La commande \verb~print~ ne modifie pas bien-sûr l'état du système.
+\subsection{Déclarer une théorie.}
+\subsubsection{Signature d'une théorie.}\label{signature}
+La signature d'une théorie regroupe les symboles de constantes de
+fonctions et de prédicats qui permettent d'énoncer la théorie. La notion
+de signature d'une théorie est un peu plus compliquée qu'en logique du
+premier ordre, puisqu'il peut y avoir plusieurs sortes d'objets. La
+seule sorte de base prédéfinie est \verb#prop#, celle des propositions
+ou énoncés (formules closes).
+
+Supposons que l'on veuille définir la théorie de groupe ordonné. On
+introduit tout d'abord une sorte pour les élément du groupe grâce à la
+commande \verb~Sort~ \index{\verb~Sort~}  :
+
+
+\begin{verbatim}
+>PhoX> Sort g.
+Sort g defined
+\end{verbatim}
+
+On introduit ensuite la signature de la théorie proprement dite (c'est
+à dire les constantes non définies que la théorie manipule): les
+symboles \verb#+# pour la loi de groupe, \verb#e# pour l'élément neutre,
+\verb#-# pour l'opposé, \verb#<# pour l'ordre strict. Pour cela on
+utilise la commande \verb~Cst~ \index{\verb~Cst~} :
+\begin{verbatim}
+>PhoX> Cst  rInfix[3.5] x "+" y : g -> g -> g.
+$+ : g -> g -> g
+>PhoX> Cst e : g.
+e : g
+>PhoX> Cst Prefix[2] "-" x : g -> g.
+$- : g -> g
+>PhoX> Cst Infix[5] x "<" y : g -> g -> prop.
+$< : g -> g -> prop
+\end{verbatim}
+% $
+
+On peut maintenant vérifier la syntaxe de quelques expressions :
+
+\begin{verbatim}
+>PhoX> print /\x x+e=x.
+/\x x + e = x : prop
+>PhoX> print - (((-e) + e) + (e + (-e))).
+- (- e + e + (e + - e)) : g
+>>> print e < e + e.
+e < e + e : prop
+\end{verbatim}
+
+On ne s'attarde pas sur la forme des déclarations, notez que \verb#+#
+est en notation infixe et associe à gauche comme l'illustre la dernière
+expression. Notez également la priorité de \verb#-# sur \verb#+# qui ne
+correspond pas exactement à l'usage et qui est imposée par le système et
+non par l'utilisateur.  Pour le moment vous pouvez considérer les
+priorités indiquées par les nombres 3.5 et 5 comme standards l'une pour
+une fonction l'autre pour une relation.
+
+On peut étendre le vocabulaire en ajoutant quelques définitions, par exemple
+la soustraction et l'ordre large :
+
+\begin{verbatim}
+>PhoX> def lInfix[3.5] x "--" y = x + (-y).
+$-- = \x,y (x + - y) : g -> g -> g
+>PhoX> def Infix[5] x "<=" y = x < y or x = y.
+$<= = \x,y (x < y or x = y) : g -> g -> prop
+\end{verbatim}
+
+
+On peut maintenant donner les axiomes de la théorie des groupes en
+utilisant la commande \verb~claim~ \index{\verb~claim~} :
+
+\begin{verbatim}
+>PhoX> claim associative /\x,y,z x + (y +z) = (x + y) +z.
+associative = /\x,y,z x + (y + z) = x + y + z : theorem
+>PhoX> claim neutre_droite /\x x + e = x.
+neutre_droite = /\x x + e = x : theorem
+>PhoX> claim oppose_droite /\x x + (-x) = e.
+oppose_droite = /\x x + - x = e : theorem
+\end{verbatim}
+
+Il faudrait maintenant ajouter les axiomes d'ordre et la compatibilité
+de l'ordre et de la loi de groupe.
+
+\subsubsection{Librairies.}
+Une autre façon de définir une théorie est de charger une librairie,
+c'est à dire essentiellement un fichier tel que ceux que vous pouvez
+écrire, qui le plus souvent ne contient pas seulement la signature d'une
+théorie, mais également des définitions, des théorèmes déjà démontrés,
+des extensions implicites des commandes de preuves etc.  Pour charger la
+librairie des entiers naturels on utilise la commande \verb~Import~
+\index{\verb~Import~}\footnote{ Cette commande ne peut être utilisée
+  directement pour charger un fichier que vous avez défini.} (il faut
+utiliser la commande \verb~restart~ ou redémarrer PhoX pour supprimer
+certaines définitions précédentes incompatibles avec la librairie des
+entiers, de toutes façons, ne saisissez pas ce qui suit si vous voulez
+continuer le tutoriel !) :
+
+\begin{verbatim}
+>PhoX> Import nat.
+Loading nat
+*** adding constants: N0 $S nat
+*** adding axioms: S_inj.N N0_not_S.N
+\end{verbatim}
+% $
+
+Le message de sortie ne dit rien des nouvelles définitions et des
+nouveaux théorèmes. Si vous avez entré les précédentes commandes, la
+commande \verb#Import nat.# ne sera pas acceptée car elle définit
+\verb#+# que vous avez déjà introduit comme constante. Si cela était
+utile, il faudrait utiliser d'autres commandes qui permettraient de
+renommer certains symboles.
+
+On suppose dans la suite que la commande \verb#Import nat# n'a pas été
+entrée.
+
+
+
+\subsection{Les preuves.}
+\subsubsection{Entamer une preuve.}
+Tout d'abord on déclare l'énoncé que l'on veut prouver et on lui donne
+un nom, qui servira à y faire référence dans la suite  si c'est utile. On
+utilise pour cela l'une quelconque des commandes
+\verb~theorem~ \index{\verb~theorem~},
+\verb~proposition~ \index{\verb~proposition~},
+\verb~lemma~ \index{\verb~lemma~},
+\verb~fact~ \index{\verb~fact~},
+\verb~corollary~ \index{\verb~corollary~},
+(les abréviations \verb~theo~, \verb~prop~,\verb~lem~, \verb~cor~ sont
+aussi disponibles). Ces commandes ont toutes exactement le même effet :
+PhoX bascule en mode preuve, les commandes indiquées ci-dessus ne sont
+plus disponibles sauf la commande \verb~print~.  Voici un exemple (qui
+suppose que vous ayez déjà entré les commandes du paragraphe~\ref{signature}).
+
+\begin{verbatim}
+>PhoX> fact oppose_gauche /\x (- x) + x = e.
+Here is the goal:
+goal 1/1
+   |- /\x - x + x = e
+\end{verbatim}
+
+\subsubsection{Représentation d'une preuve.}\label{representation}
+On va décomposer une preuve en un certain nombre d'étapes. On peut
+supposer qu'à chaque étape correspond un certain {\em état de preuve}.
+Un état de preuve est une liste de {\em buts}. Chaque but se décompose
+en deux parties :
+\begin{itemize}
+\item {\em ce que l'on a}, une liste d'énoncés qui représente les
+  hypothèse courantes, les énoncés déjà démontrés, et des déclarations
+  de variables (soit $x$ quelconque \dots), ces dernières n'étant pas
+  affichées par PhoX. PhoX nomme tous ces énoncés, en utilisant suivant
+  les cas : \verb#H, H0, H1, ...# ou \verb#G, G0, G1, ...#.
+
+\item{\em ce que l'on veut}, un unique énoncé que nous souhaitons donc
+déduire de
+  {\em ce que l'on a}, dans le cadre de la théorie développée, donc en
+  utilisant éventuellement les axiomes qui ont été déclarés et les
+  théorèmes déjà démontrés. PhoX préfixe un tel énoncé par \verb#|-#.
+\end{itemize}
+
+Voici un exemple de but en PhoX :
+\begin{verbatim}
+G := - x + - - x = e
+G0 := - x + x + e = - x + x
+   |- - x + x = e
+\end{verbatim}
+
+A chaque étape (sauf cas exceptionnel que l'on verra plus tard) on ne
+modifie qu'un but, en le remplaçant par un ou plusieurs buts dont il est
+à peu près évident qu'ils ont pour conséquence le but de départ.  Quand
+le but est évidemment valide, par exemple {\em ce que l'on veut} est un
+énoncé présent dans {\em ce que l'on a} (c'est ce que l'on appelle un
+{\em axiome de la déduction}), la preuve de ce but est terminée, et on
+supprime le but de l'état de preuve. Quand il n'y a plus de buts dans
+l'état de preuve, la preuve est terminée.
+
+Le fait d'analyser un but courant comme un énoncé à prouver sous
+hypothèses une liste de formules et non comme une simple formule peut
+sembler un peu compliqué à première vue, mais est en fait naturel
+et indispensable pour une représentation simple des preuves.
+
+On va donner sous cette forme une preuve volontairement détaillée du
+fait que l'opposé à droite définit également un opposé à gauche. Pour le
+moment ne faites pas attention au détail des commandes. Dans ce cas
+l'état de preuve ne comporte toujours qu'un seul but. On ne donne
+ci-dessous que la partie la plus significative des sorties.
+\begin{verbatim}
+>PhoX> fact oppose_gauche /\x (-x) + x = e.
+%PhoX% intro.
+    |- - x + x = e
+%PhoX% apply oppose_droite with (- x).
+ G := - x + - - x = e
+    |- - x + x = e
+%PhoX% apply neutre_droite with ((- x) + x).
+ G := - x + - - x = e
+ G0 := - x + x + e = - x + x
+    |- - x + x = e
+%PhoX% rewrite  -l 1 -r G0.
+ G := - x + - - x = e
+ G0 := - x + x + e = - x + x
+    |- - x + x + e = e
+%PhoX% rmh G0.
+%PhoX% rewrite  -r G.
+ G := - x + - - x = e
+    |- - x + x + (- x + - - x) = - x + - - x
+%PhoX% rmh  G.
+%PhoX% rewrite associative.
+    |- - x + x + - x + - - x = - x + - - x
+%PhoX% rewrite -p 1 -r associative.
+    |- - x + (x + - x) + - - x = - x + - - x
+%PhoX% rewrite -p 0 oppose_droite.
+    |- - x + e + - - x = - x + - - x
+%PhoX% rewrite neutre_droite.
+    |- - x + - - x = - x + - - x
+%PhoX% intro.
+ 0 goal created.
+%PhoX% save.
+ oppose_gauche = /\x - x + x = e : theorem
+\end{verbatim}
+
+
+On voit sur cet exemple qu'une preuve est décrite en PhoX par une suite
+de commandes : les sorties sont utiles pour l'utilisateur afin de
+comprendre ce qu'il fait et donc de créer cette suite de commandes mais
+PhoX vérifie que cette suite de commandes constitue une preuve sans
+avoir besoin des sorties.
+
+Ceci différencie les preuves en PhoX des preuves naturelles : on est
+souvent moins précis en preuve naturelle dans ce qui correspond aux
+commandes. Par exemple on dirait ``par associativité'' à la place de
+``\verb#rewrite -p 1 -r associative.#'' qui indique de plus d'utiliser
+l'associativité en la deuxième occurrence possible (\verb# -p 1#) et
+dans le sens inverse de l'énoncé de départ (\verb# -r#) mais l'on
+donnerait la sortie.  Bien-sûr cette preuve est très particulière d'une
+part parce qu'elle est essentiellement égalitaire, d'autre part parce
+qu'elle est linéaire (il n'y a toujours qu'un seul but à prouver).
+
+Notons qu'il est possible de faire vérifier une preuve plus courte,
+d'une part en utilisant les automatismes de PhoX (voir dans le
+paragraphe \ref{principales-commandes-preuves} les commandes \verb#auto#
+et \verb#trivial#), d'autre part en utilisant l'<< extensibilité >> des
+commandes de PhoX comme ici \verb#intro#, mais ce dernier
+point ne rentre pas dans le cadre de cette introduction.
+
+
+\subsubsection{Un autre exemple, le paradoxe de Cantor.}
+On présente maintenant un exemple un peu plus riche logiquement (et sans
+raisonnement égalitaire). C'est une version ``positive'' du paradoxe de
+Cantor en théorie des ensembles : << il est faux que toute propriété
+soit équivalente à l'appartenance à un ensemble>>. Cette proposition se
+démontre sans aucun axiome de la théorie des ensembles. Là aussi on
+présente la suite des commandes et la partie la plus significative des
+réponses. On donne en parallèle une preuve rédigée en suivant la preuve
+PhoX (et qui ne cherche donc pas à être << élégante >>).
+
+Comme pour les groupes on définit la sorte des ensembles (les objets que
+l'on manipule), et la relation d'appartenance entre les ensembles (une
+relation binaire) :
+
+
+\begin{verbatim}
+>PhoX> Sort set.
+Sort set defined
+>PhoX> Cst (* appartenance *) Infix[5] x "in" y : set -> set -> prop.
+$in : set -> set -> prop
+\end{verbatim}
+
+%$
+
+La propriété annoncée s'énonce :
+
+\begin{verbatim}
+>PhoX> theorem cantor ~ /\P\/x/\y(y in x <-> P y).
+\end{verbatim}
+
+
+Supposons que toute propriété soit équivalente à l'appartenance à un
+ensemble (soit \verb#H# cette hypothèse) :
+\begin{verbatim}
+%PhoX% intro.
+H := /\P \/x /\y (y in x <-> P y)
+   |- False
+\end{verbatim}
+c'est le cas en particulier de la propriété ``ne pas appartenir à
+soi-même'' qui définit un ensemble que l'on appelle \verb#x# :
+
+\begin{verbatim}
+%PhoX% elim H with \y(~ y in y).
+H0 := /\y (y in x <-> ~ y in y)
+   |- False
+\end{verbatim}
+On obtient que les éléments de \verb#x# sont exactement les éléments qui
+n'appartiennent pas à eux-mêmes.
+
+On détaille la suite, mais celle-ci est ``triviale'' pour PhoX (commande
+\verb#auto#).
+\\
+On a donc si \verb#x# appartient à lui-même alors il n'appartient pas à
+lui même (\verb#H1#), et si \verb#x# n'appartient pas à lui-même alors
+il appartient à lui-même (\verb#H2#).
+
+\begin{verbatim}
+%PhoX% apply H0 with x.
+G := x in x <-> ~ x in x
+%PhoX% left G.
+H1 := x in x -> ~ x in x
+H2 := ~ x in x -> x in x
+\end{verbatim}
+
+Distinguons deux cas suivant que \verb#x# appartient ou non à \verb#x#.
+\begin{verbatim}
+%PhoX% elim excluded_middle with x in x.
+2 goals created.
+goal 1/2
+...
+H3 := x in x
+   |- False
+
+goal 2/2
+...
+H3 := ~ x in x
+   |- False
+\end{verbatim}
+
+Si \verb#x# appartient à lui-même, alors il n'appartient pas à lui-même
+d'après \verb#H1#, ce qui est absurde.
+
+\begin{verbatim}
+H3 := x in x
+%PhoX% elim H1 with H3 and H3.
+0 goal created.
+\end{verbatim}
+
+Si \verb#x# n'appartient pas à lui-même, alors il appartient à lui-même
+d'après \verb#H2#, ce qui est absurde également, et la preuve est terminée.
+
+\begin{verbatim}
+H3 := ~ x in x
+%PhoX% apply H2 with H3.
+G := x in x
+%PhoX% elim H3 with G.
+0 goal created.
+End of goals.
+%PhoX% save.
+cantor = ~ /\P \/x /\y (y in x <-> P y) : theorem
+\end{verbatim}
+
+On voit que si la preuve en PhoX suit le déroulement d'une preuve
+usuelle, elle utilise des commandes qui ne font pas appel directement au
+vocabulaire mathématique. Cela peut sembler curieux d'utiliser la même
+commande dans des situations très différentes. Par exemple \verb#intro#,
+est utilisée, entre autres pour la réflexivité de l'égalité (à la fin de
+l'exemple traité au paragraphe~\ref{representation}) et pour ce que
+certains appelleraient un raisonnement par l'absurde, au début de
+l'exemple que l'on vient de traiter\footnote{Il est important qu'il
+  s'agisse d'une négation, ce n'est pas un ``vrai'' raisonnement par
+  l'absurde en théorie de la démonstration.}.
+
+Ces commandes font en fait référence à la structure logique des
+formules, ce qui permet entre autres d'en limiter le nombre. Ainsi les
+deux usages de \verb#intro# ci-dessus s'expliquent ainsi. la commande
+\verb#intro# essaye d'utiliser une façon ``standard'' de prouver un
+énoncé (``la'' façon standard si cela a un sens, mais ce n'est pas
+toujours le cas). Par exemple, si cet énoncé est une égalité, on
+considère que la façon standard est la réflexivité de l'égalité ! Si
+cet énoncé est une négation on a considéré que la façon standard est
+de supposer l'énoncé que l'on nie pour aboutir à une contradiction. On
+reprend et détaille un peu ceci dans le paragraphe suivant.
+
+\subsection{Les commandes de preuves.}
+\subsubsection{Quelques principes.}
+Une commande est composé d'un mot clef comme \verb#rewrite# ou
+\verb#intro# ci-dessus, suivi ou non, selon les commandes, d'un
+argument. Comme pour les commandes globales elle peut s'écrire sur
+plusieurs lignes et doit se terminer par un point ``\verb#.#'' suivi
+d'un espace ou d'un retour à la ligne.
+
+Dans le premier exemple ci-dessus, \verb#rewrite associative # a un
+argument, \verb#intro# n'en a pas. Cet argument peut être une expression
+du langage ou, comme dans ce cas un nom y faisant référence.  Ce nom
+peut être local : référencé dans le but courant comme \verb#G# et
+\verb#G0# dans le premier exemple ci-dessus ou global comme
+\verb#associative# ci-dessus.
+
+Il peut y avoir des arguments optionnels qui modifie le comportement de
+la commande. Certains d'entre eux sont introduit par un mot qui commence
+par un tiret ``\verb#-#'' (voir \verb#-p 0#, \verb#-r# ci-dessus). C'est
+une tradition héritée du système d'exploitation Unix, et ce tiret n'a
+rien à voir avec la soustraction ! Cette tradition n'est d'ailleurs pas
+entièrement respectée par PhoX (voir le paragraphe suivant).
+
+Le comportement des commandes dépend fortement du but courant, par
+exemple du ``constructeur principal'' de la formule conclusion (ce que
+l'on veut). Les noms des commandes sont souvent inspirés du vocabulaire
+de la théorie de la démonstration. Ainsi quand on parle d'introduction
+ce mot fait référence à une description de la preuve dans l'ordre
+inverse de celui que vous pratiquez avec PhoX.
+
+On décrit maintenant les principales commandes qui permettent de
+développer une preuve.
+\subsubsection{Principales commandes de preuves.}\label{principales-commandes-preuves}
+\begin{description}
+  \item{\verb~axiom~} \index{\verb~axiom~} permet de terminer un but
+  lorsque sa conclusion est une des hypothèses. Exemple~: dans la
+  situation
+  suivante, la commande \verb~axiom H4~ termine le but courant~:\\
+  \verb~goal 1/2~\\
+  \verb~H :=~ $\hbox{continue1}\,f$\\
+  \verb~H4 :=~ $a_0 > R0$\\
+  \verb~   |-~ $a_0 > R0$
+
+  Notez qu'ici ``axiome'' est utilisé seulement dans le sens ``axiome de
+  la déduction'', ce qui n'est pas le sens le plus usuel du mot
+  ``axiome'' en mathématique, voir pour cela la commande \verb#claim#
+  (consultez l'index).
+
+  On peut demander à PhoX de détecter automatiquement les axiomes (de la
+  déduction) grâce à la commande \verb~flag auto_lvl 1~.
+
+\item{\verb~intro~ et \verb~intros~} \index{\verb~intro~}
+  \index{\verb~intros~} correspondent aux {\em règles d'introduction}.
+  Leur action dépend uniquement de la conclusion du but à prouver (on
+  n'utilise pas d'hypothèse). Par règle d'introduction on entend une
+  façon ``standard'' (souvent la bonne, mais pas forcément suivant le
+  contexte) de prouver un type d'énoncé. Par exemple la façon standard
+  de prouver $A\land B$ est \dots{} de prouver $A$ et de prouver $B$. La
+  façon standard de prouver $A\rightarrow B$ est de supposer $A$ pour prouver
+  $B$. La façon standard de prouver $\forall x \, A\,x$ est de prouver
+  $A\,x$ pour une variable $x$ quelconque, c'est à dire une variable qui
+  n'est pas encore déclarée (ceci peut obliger à choisir un nouveau nom de
+  variable).
+
+  La commande \verb#intro# permet de ne faire qu'une seule introduction
+  ou, avec un paramètre qui est un nombre entier, de préciser le nombre
+  d'introductions. La commande \verb#intros# fait toutes les
+  introductions possibles (en fait c'est un peu plus compliqué, cf.
+  commande \verb~lefts~). Voici un premier exemple~:\\
+  \verb~goal 1/1~\\
+  \verb~ |-~ $\forall h,g (\hbox{inj}\,h \wedge \hbox{inj}\,g \wedge
+  \forall
+  x (h\,x = x \vee g\,x = x) \rightarrow \forall x (h (g x)) = (g (h x)))$\verb~.~\\
+\verb~%PhoX% intros.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{inj}\,h \wedge \hbox{inj}\,g \wedge \forall
+x (h\,x = x \vee g\,x = x)$ \verb~.~\\
+\verb~   |-~ $h (g x) = g (h x)$ \verb~.~
+
+Un problème se pose lorsqu'il y a un choix possible pour une règle
+d'introduction. Par exemple, pour montrer $A \vee B$, on peut soit montrer $A$,
+soit montrer $B$. On peut alors préciser le nom de la règle à appliquer en
+tapant \verb#intro l# (pour << left >>) pour montrer $A$ ou
+ \verb#intro r# (pour << right >>) pour montrer $B$.
+
+\item{\verb~apply~ et \verb~elim~} \index{\verb~apply~}
+  \index{\verb~elim~} correspondent aux {\em règles d'élimination}. Par
+  règle d'élimination on entend une façon standard d'utiliser un énoncé.
+  Par exemple la façon standard d'utiliser $A\lor B$ est de raisonner par
+  cas suivant que l'on suppose $A$ ou que l'on suppose $B$. La façon
+  standard d'utiliser $A\rightarrow B$ et de supposer ou d'avoir démontré
+  $A$ pour en déduire $B$. La façon standard d'utiliser $\forall x\,
+  A\,x$ est d'en déduire $A\,e$ où $e$ représente un élément du domaine
+  (ce peut être une expression ``compliquée'').
+
+  Les commandes \verb#apply# et \verb#elim# sont les commandes les plus
+  complexes à utiliser. Dans la pratique, comme pour les règles
+  d'introduction, on désire pouvoir appliquer plusieurs règles
+  d'élimination en une seule fois en disant des choses du genre << de
+  $\forall x (A(x) \rightarrow B(x))$ et de $A(a)$ je déduis $B(a)$ >>.
+  Dans cet exemple, on a indiqué implicitement que l'on désirait donner
+  la valeur $a$ à $x$.
+
+La commande \verb~apply~ permet de faire cela en tapant \verb~apply~  $\forall
+x (A(x) \rightarrow B(x))$ \verb~with~ $A(a)$. En général, on tape d'ailleurs
+plutôt \verb~apply H1 with H2~ où \verb~H1~ et \verb~H2~ sont le nom des
+hypothèses concernées (en fait la première commande est plus lisible, mais plus
+longue à écrire). On peut aussi donner plusieurs indications à \verb~apply~ en
+les séparant par le mot clef \verb~and~.
+
+La commande \verb~elim~ est très similaire à \verb~apply~, mais elle
+doit conduire immédiatement à démontrer la conclusion du but courant,
+alors que la commande
+\verb~apply~ ajoute ce qu'elle produit parmi les hypothèses. Il s'agit d'une
+manière subtile et souvent utile d'indiquer la valeur des variables. Voici deux
+exemples utilisant ces
+commandes~:\\
+\verb~goal 1/1~\\
+\verb~H5 :=~ $\forall y_0 (d\,x\,y_0 < a' \rightarrow d (f x) (f y_0) < a)$\\
+\verb~H6 :=~ $d\,x\,y < a'$\\
+\verb~   |-~ $d (f x) (f y) < a$\\
+\verb~%PhoX% elim H5.~
+
+\verb~goal 1/1~\\
+\verb~H5 :=~ $\forall y_0 (d\,x\,y_0 < a' \rightarrow d (f x) (f y_0) < a)$\\
+\verb~H6 :=~ $d\,x\,y < a'$\\
+\verb~   |-~ $d\,x\,y < a'$
+
+On aurait pu taper \verb~elim H5 with H6~
+pour éviter la commande \verb~axiom H6~.
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{continue1} f$\\
+\verb~H1 :=~ $U (f x)$\\
+\verb~H0 :=~ $\forall x_0 \in U \,\exists a{>}R0 \,\forall y (d\,x_0\,y < a \rightarrow U y)$\\
+\verb~   |-~ $\exists a{>}R0 \,\forall y (d\,x\,y < a \rightarrow \hbox{inverse}\,f\,U\,y)$\\
+\verb~%PhoX% apply H0 with H1.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{continue1} f$\\
+\verb~H1 :=~ $U (f x)$\\
+\verb~H0 :=~ $\forall x_0 \in U\, \exists a{>}R0 \,\forall y (d\,x_0\,y < a \rightarrow U y)$\\
+\verb~G :=~ $\exists a{>}R0 \,\forall y (d\,(f x)\,y < a \rightarrow U
+y)$\\
+\verb~   |-~ $\exists a{>}R0 \,\forall y (d\,x\,y < a \rightarrow \hbox{inverse}\,f\,U\,y)$
+
+\item{\verb~prove~ et \verb~use~} \index{\verb~prove~} \index{\verb~use~} correspondent à
+l'introduction d'un lemme. \verb~prove A~ indique que l'on veut
+prouver \verb~A~, que l'on pourra ensuite utiliser. La commande
+\verb~use A~ inverse juste l'ordre des buts~:\\
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{bijective} (f \circ f)$\\
+\verb~   |-~ $\hbox{bijective} f$\\
+\verb~%PhoX% prove~ $\hbox{injective f}$\verb~.~
+
+\verb~goal 1/2~\\
+\verb~H :=~ $\hbox{bijective} (f \circ f)$\\
+\verb~   |-~ $\hbox{injective} f$\\
+\verb~goal 2/2~\\
+\verb~H :=~ $\hbox{bijective} (f \circ f)$\\
+\verb~H0 :=~ $\hbox{injective} f$\\
+\verb~   |-~ $\hbox{bijective} f$
+
+\item{\verb~left~ et \verb~lefts~} \index{\verb~left~} \index{\verb~lefts~} correspondent à
+un type de règles dont on n'a pas encore parlé~: les règles d'introduction pour
+les hypothèses (ces règles sont démontrables à partir des autres, mais
+sont indispensables en pratique). Il s'agit par exemple de remplacer une hypothèse de la forme $A
+\wedge B$ par deux hypothèses~: $A$ et $B$. La version  \verb~lefts~ permet
+d'enchaîner plusieurs de ces règles en indiquant les connecteurs auxquels on
+veut l'appliquer (on peut utiliser la même syntaxe pour contrôler le
+comportement de \verb~intros~)~:\\
+\verb~goal 1/1~\\
+\verb~H2 :=~ $\forall z{\leq}e' \;  z < e$\\
+\verb~G :=~ $\exists a{>}R0 \,\forall y (d\,x\,y \leq a \rightarrow d (f x) (f y) \leq e')$\\
+\verb~   |-~ $\exists a{>}R0 \,\forall y (d\,x\,y < a \rightarrow d (f x) (f y) < e')$\\
+\verb~%PhoX% lefts G $~$\exists$ \verb~$~$\wedge$\verb~.~
+
+\verb~goal 1/1~\\
+\verb~H2 :=~ $\forall z{\leq}e' \;  z < e$\\
+\verb~H3 :=~ $a > R0$\\
+\verb~H4 :=~ $\forall y (d\,x\,y \leq a \rightarrow d (f x) (f y) \leq e')$\\
+\verb~   |-~ $\exists a{>}R0 \,\forall y (d\,x\,y < a \rightarrow d (f x) (f y) < e')$
+
+\item{\verb~by_absurd~} \index{\verb~by_absurd~} permet de faire un raisonnement
+par l'absurde en ajoutant la négation de la conclusion parmi les hypothèses~:\\
+\verb~goal 1/1~\\
+\verb~H :=~ $\neg \forall x (X\,x)$\\
+\verb~   |-~ $\exists x \neg (X\,x)$\\
+\verb~%PhoX% by_absurd.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\neg \forall x (X\,x)$\\
+\verb~H :=~  $\neg \exists x \neg (X\,x)$\\
+\verb~   |-~ $\exists x \neg (X\,x)$
+
+Plutôt que d'utiliser le raisonnement par l'absurde, il est parfois
+commode d'utiliser le tiers-exclu : la commande
+\verb~elim excluded_middle with A~,
+introduira deux buts, un avec \verb~A~ dans les
+hypothèses, l'autre avec sa négation.
+
+On peut encore utiliser le raisonnement par contraposée et les lois de
+De Morgan et (voir commande \verb~rewrite~).
+
+\item{\verb~unfold~ et \verb~unfold_hyp~} \index{\verb~unfold~} \index{\verb~unfold_hyp~} permettent de
+remplacer un symbole par sa définition. La première agit sur la
+conclusion, la seconde sur une hypothèse~:
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{continue1}\,f$\\
+\verb~H0 :=~ $\hbox{ouvert}\,U$\\
+\verb~   |-~ $\hbox{ouvert} (\hbox{inverse}\,f\,U)$\\
+\verb~%PhoX% unfold ouvert. unfold_hyp H0 ouvert.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{continue1}\,f$\\
+\verb~H0 :=~ $\forall x\in U  \,\exists a{>}R0 \,\forall y (d\,x\,y < a \rightarrow U y)$\\
+\verb~   |-~ $\forall x\in (\hbox{inverse}\,f\,U) \,\exists a{>}R0
+\,\forall y (d\,x\,y < a \rightarrow \hbox{inverse}\,f\,U y)$
+
+\item{\verb~auto~ et \verb~trivial~} \index{\verb~auto~}
+  \index{\verb~trivial~} indiquent à PhoX d'essayer de résoudre seul le
+  but courant. Il ne faut pas en attendre de miracle, et l'on doit
+  souvent interrompre la recherche (en tapant << Ctrl c >> deux fois).
+  Ces commandes n'utilisent que ce qui est déclaré dans le but courant
+  pour chercher la preuve. Elles n'utilisent pas les axiomes (introduits
+  par \verb#claim#) ou les théorèmes déjà démontrés. On peut leur
+  demander d'utiliser ceux-ci en utilisant l'argument optionnel \verb#+#
+  suivi du ou des noms des théorèmes ou axiomes à utiliser, comme
+  indiqué dans la preuve suivante où l'on donne une version plus rapide de
+  l'exemple du paragraphe \ref{representation} :
+
+\begin{verbatim}
+>PhoX> fact oppose_gauche /\x (-x) + x = e.
+%PhoX% intro.
+    |- - x + x = e
+%PhoX% apply oppose_droite with (- x).
+ G := - x + - - x = e
+    |- - x + x = e
+%PhoX% trivial + associative oppose_droite neutre_droite.
+ 0 goal created.
+%PhoX% save.
+ oppose_gauche = /\x - x + x = e : theorem
+\end{verbatim}
+
+
+\item{\verb~instance~} \index{\verb~instance~} est utile car certaines
+  règles (comme l'introduction d'un $\exists$) nécessitent de trouver la
+  bonne valeur pour une variable. PhoX ne demande pas de trouver cette
+  valeur immédiatement. Dans ce cas, le système introduit des {\em
+    variables existentielles} dont le nom commence par un point
+  d'interrogation. La commande \verb~instance~ permet de choisir la
+  valeur de ce type de variables.
+
+\verb~goal 1/1~\\
+\verb~H5 :=~ $\forall y_0 (d\,?1\,y0 < a_0 \rightarrow d (f ?1) (f y_0) < a)$\\
+\verb~H6 :=~ $d\,x\,y < a_0$\\
+\verb~   |-~ $d (f x) (f y) < a$\\
+\verb~%PhoX% instance ?1 x.~
+
+\verb~goal 1/1~\\
+\verb~H5 :=~ $\forall y_0 (d\,x\,y0 < a_0 \rightarrow d (f x) (f y_0) < a)$\\
+\verb~H6 :=~ $d\,x\,y < a_0$\\
+\verb~   |-~ $d (f x) (f y) < a$
+
+\item{\verb~select~} \index{\verb~select~} permet de changer de but
+courant. C'est surtout utile lorsque plusieurs buts contiennent une
+variable existentielle et que l'on veut commencer par le but qui impose
+vraiment la valeur de cette variable.
+
+\item{\verb~rewrite~, \verb~rewrite_hyp~} \index{\verb~rewrite~}
+  \index{\verb~rewrite_hyp~} correspondent au raisonnement équationnel.
+  Ils prennent en argument une équation ou un nom désignant celle-ci
+  (voir l'exemple du paragraphe \ref{representation}) ou un nom
+  désignant une liste d'équations (voir l'exemple qui suit).
+
+  La commande \verb~rewrite eq ~ permet de transformer la conclusion du
+  but courant en utilisant l'égalité \verb~eq~, la commande
+  \verb~rewrite_hyp H eq ~ fait de même pour l'hypothèse \verb~H~.
+  Chaque équation est lue de la gauche vers la droite, et donc cela
+  n'est pas la même chose de passer en argument une équation ou son
+  écriture symétrique.  L'argument optionnel \verb#-r# permet d'utiliser
+  la symétrique de l'équation passée en argument. L'équation est
+  utilisée tant qu'il est possible de le faire ce qui peut ne pas
+  terminer : utilisez << Ctrl c >> deux fois pour vous sortir de telles
+  situations.  Il existe des options qui vous permettent de restreindre
+  cette utilisation et de la préciser (voir l'usage de \verb#-p# dans
+  l'exemple du paragraphe \ref{representation}).
+
+  Il ne faut pas oublier que PhoX peut traiter l'équivalence logique
+  (``$\equiv$'') comme une égalité.  Ainsi l'exemple ci-dessous
+  correspond aux lois de De Morgan pour le calcul propositionnel et les
+  quantificateurs.  \verb~demorgan~ est ici le nom d'une liste de
+  théorèmes
+  équationnels correspondant chacun à une loi de De Morgan précise. \\
+  \verb~goal 1/1~\\
+  \verb~H :=~ $\hbox{Adh} \, (\hbox{Union} \, A \, B) \,x$\\
+  \verb~H0 :=~ $\neg (\forall e {>} R0 \,\exists y \in A \, (d\,x\,y) <
+  e \vee\forall e {>} R0
+  \,\exists y \in B \, (d\,x\,y) < e)$\\
+  \verb~   |-~ $\hbox{False}$\\
+\verb~%PhoX% rewrite_hyp H0 demorgan.~
+
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{Adh} (\hbox{Union} \, A \, B) x$\\
+\verb~H0 :=~ $\exists e {>} R0 \,\forall y \in A \,\neg (d\,x\,y <
+e) \wedge \exists
+e {>} R0 \,\forall y \in B  \,\neg (d\,x\,y < e)$\\
+\verb~   |-~ $\hbox{False}$
+
+% ajouter un exemple pour la contraposée
+Pour le raisonnement par contraposée, la commande est un peu cryptique :
+il faut écrire \verb~rewrite -p 0 -r contrapose~ (une seule réécriture
+en la première position possible) pour raisonner par contraposée sur une
+implication ou une équivalence.
+
+\item{\verb~from~} \index{\verb~from~} permet de faire du raisonnement
+  égalitaire de façon automatique.  La commande \verb~from A.~ indique au
+  système de trouver seul les étapes de raisonnement équationnel qui
+  permettent de transformer la conclusion du but courant en \verb~A~.
+  Cela correspond plus à la manière habituelle d'écrire des preuves (on
+  indique les étapes du raisonnement équationnel sans préciser les
+  transformations effectuées).
+% ajouter un exemple
+
+
+
+
+\end{description}
+
+
+
+\addcontentsline{toc}{section}{Références}
+\bibliography{biblio}
+\bibliographystyle{plain}
+\newpage
+\addcontentsline{toc}{section}{Index}
+\input{phox_intro.ind}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

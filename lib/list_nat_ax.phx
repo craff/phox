@@ -1,0 +1,202 @@
+(*header 99/03/18
+	title = "Lists and integers"
+ 	author = "Christophe Raffalli, Paul Roziere"
+	institute = "Equipe de Logique, Université Chambéry, Paris VII"
+*)
+
+Use nat_ax.
+Use list.
+
+flag auto_lvl 1.
+
+(** Some functions using integers *)
+(*** Length of a list *)
+
+(*texte
+The length of a list is defined by :
+*)
+
+def length l = def_rec.List N0 \x,l,r (S r) l.
+
+(*fact Characteristic properties of $length *)
+fact length.nil.List length nil = N0.
+trivial.
+save.
+new_equation length.nil.List.
+
+fact length.cons.List /\a/\l:(List \x True) length (a::l) = S (length l).
+trivial.
+save.
+new_equation length.cons.List.
+(*endfact *)
+
+close_def length.
+
+fact (* totality of $length *) length.total.List 
+				/\l:(List \x True) N (length l).
+trivial.
+save.
+new_intro -i -t length length.total.List.
+
+fact  (* $length on $@ is $+ *) length.append.List
+	 /\l,l':(List \x True) length (l @ l') = length l + length l'.
+intro 2.
+elim H.
+intros.
+intro.
+intros.
+intro.
+save.
+new_equation length.append.List.
+
+fact length.map.List /\D,f /\l:(List D) length (map f l) = length l.
+intros.
+elim H.
+trivial.
+trivial.
+save.
+new_equation length.map.List.
+
+fact (* l with length 0 is nil *) length_elim.N0.List
+/\X/\l:(List \x True) ((l=nil -> X) ->  length l =N0 -> X).
+intro 3.
+elim -1 [case] H.
+trivial.
+trivial.
+save.
+
+fact (* l with length > 0 is a cons *) length_elim.S.List
+/\X/\D/\l:(List D)(/\l':(List D)/\a:D (l=a::l' -> X) -> N0 < length l -> X).
+intro 4.
+elim -1 [case] H.
+trivial.
+trivial.
+save.
+
+
+new_elim  List length_elim.N0 length_elim.N0.List.
+new_elim  List length_elim.S length_elim.S.List.
+
+(*** n-th element of a list as partial function
+*)
+(*texte
+we will define a partial function that return the (n-1)-th element of a
+given list (the first element is at position 0).
+*)
+
+Cst (* l truncated before n-th element  *) nthl : list['a] -> nat -> list['a].
+Cst  (* (n-1)-th element of l *) nth : list['a] -> nat -> 'a.
+
+(*axiom characteristic properties of nthl and nth *) 
+claim nthl.N0.List /\D/\l:(List D) /\n:N (nthl l N0)= l.
+
+claim nthl.S.List 
+/\D/\l:(List D)/\a:D /\n:N (nthl (a::l) (S n))=nthl l n.
+
+
+claim nth.N0.List /\D/\l:(List D)/\a:D /\n:N (nth (a::l) N0)= a.
+
+claim nth.S.List 
+/\D/\l:(List D)/\a:D /\n:N (nth (a::l) (S n))=nth l n.
+
+new_equation nthl.N0.List.
+new_equation nthl.S.List.
+new_equation nth.N0.List.
+new_equation nth.S.List.
+(*endaxiom *)
+
+(* doit etre faux sans autre condition
+fact nthl.tail.List  
+/\D/\l:(List D)/\a:D /\n:N tail (nthl (a::l) n) =(nthl l n).
+intros.
+elim H1.
+trivial + nthl.N0.List.
+rewrite  nthl.S.List.
+elim H.
+
+save.
+*)
+
+
+
+fact (* totality of nthl on its definition set *) nthl.total.List
+/\D /\ l:(List D) /\n:N (n <= (length l) -> (List D (nthl l n))).
+intro 3.
+(* recurrence sur la structure de la liste l *)
+elim H.
+trivial. (* cas nil *)
+intro 2.
+(* recurrence sur l'entier n dans le cas cons *)
+elim H3.
+intros.
+trivial. (* cas 0 *)
+intro.
+prove y <= length l'.
+trivial.
+apply -3 G H2.
+rmh G H2 H3 H5 H6.
+rewrite nthl.S.List.
+save.
+
+new_intro -t -i nthl length.total.List.
+
+fact (* length of nthl l n *) length.nthl.List
+/\D/\n:N /\l:(List D) (n <= (length l) -> length  (nthl l n) = length l - n ).
+intro 3.
+elim H.
+trivial.
+intro 2.
+elim H2.
+trivial.
+trivial.
+save.
+
+new_equation length.nthl.List.
+
+fact (* nth is head of nthl *) head.nthl.List
+/\D /\l:(List D) /\n:N (n < (length l) -> (nth l n = head (nthl l n))).
+intro 3.
+elim    H. (* sur l *)
+trivial. (* l = nil *)
+intro 2. (* l = a::l' *)
+elim -1 [case1] H3.
+trivial.
+trivial.
+save.
+
+new_equation length.nthl.List.
+
+fact (* totality of nth on its definition set *) nth.total.List
+/\D /\ l:(List D) /\n:N (n < (length l) -> D (nth l n)).
+intros.
+prove (List D (nthl l n)).
+trivial +nthl.total.List.
+prove N0 < length (nthl l n).
+trivial + length.nthl.List.
+prove nthl l n != nil.
+trivial.
+rewrite head.nthl.List.
+trivial.
+save.
+
+new_intro -t -i nth nth.total.List.
+
+fact lenght_induction.List 
+  /\A,X (/\l:(List A) (/\l':(List A) (length l' < length l -> X l') -> X l) ->
+     /\l:(List A) X l).
+intros.
+elim well_founded.N with N (length l) and \n (/\l:(List A) (length l = n -> X l)) ;; Try trivial 2. 
+intros.
+rmh H0.
+elim H3 with [case].
+elim H.
+intros.
+trivial =.
+elim H.
+intros.
+intros.
+elim H2 with H8.
+trivial.
+intro.
+save.
+

@@ -1,0 +1,167 @@
+flag auto_lvl 3.
+Import nat.
+
+(****************************************************************************)
+(*                              Factoriel                                   *)
+(****************************************************************************)
+
+(* This example shows that equational reasoning is possible but not
+   efficient enough !! *)
+
+(* needs bool.af2, eq.af2, nat.af2 and nat_order.af2 *)
+
+(* Definition of factoriel *)
+
+Cst Postfix[1.5] x "!" : nat -> nat.
+
+claim fact_0 N0! = N1.
+claim fact_S /\x:N (S x)! = x! * S x.
+
+new_equation fact_0. new_equation fact_S.
+
+(* totality proof *)
+
+goal /\x:N N(x!).
+intros.
+elim H.
+trivial.
+from N (S y * y!).
+trivial.
+save fact_total.
+new_intro -i -t fact fact_total.
+
+
+(****************************************************************************)
+(*                         Binomial coef                                    *)
+(****************************************************************************)
+
+(* Pascal definition *)
+
+Cst C : nat -> nat -> nat.
+
+claim C_00 C N0 N0 = N1.
+claim C_0S /\x C N0 (S x) = N0.
+claim C_S0 /\x C (S x) N0 = N1.
+claim C_SS /\x,y C (S x)(S y) = (C x y) + (C x (S y)).
+
+new_equation C_00. new_equation C_0S. new_equation C_S0. new_equation C_SS.
+
+(* Totality proof *)
+
+goal /\ n,p:N N(C n p).
+intro 2.
+elim H.
+trivial.
+intros.
+elim H2.
+trivial.
+from N (C y y0 + C ? ?). 
+intro.
+trivial 2 =H1 H0 H3.
+trivial 2 =H1 H0 H3.
+save C_total.
+new_intro -i -t C C_total.
+
+
+(****************************************************************************)
+(*                         Properties of C n p                              *)
+(****************************************************************************)
+
+(* case n < p *)
+
+goal /\n,p:N (n < p -> C n p = N0).
+intro 2.
+elim H.
+trivial.
+intro 2.
+elim H2.
+intro.
+trivial.
+intros.
+rewrite C_SS.
+prove  C y y0 = N0.
+trivial =H0 H1 H3 H5.
+prove C y (S y0) = N0.
+trivial =H0 H1 H3 H5.
+rewrite [ -lim 0 ] add.rN0.N G G0.
+intro.
+save C_n_less_p.
+(* new_equation C_n_less_p. no need ! *)
+
+goal /\n:N (C n n = N1).
+intro 2.
+elim H.
+trivial.
+rewrite C_SS.
+prove C y (S y) = N0.
+elim C_n_less_p.
+trivial.
+trivial.
+rewrite H1 G.
+intro.
+save C_n_n.
+new_equation C_n_n.
+
+(* The interesting case : p <= n ! *)
+
+
+goal /\n,p:N ((p <= n) ->  (n - p)! * p! * C n p = n!).
+intro 2.
+elim H.
+intro 2.
+elim H0.
+trivial.
+trivial.
+intro 2.
+elim H2.
+(* cas p = 0 et n = S z *)
+intros.
+rewrite C_S0 mul.rN1.N fact_0.
+intro.
+intros.
+(* cas p = S z0 et n = S z *)
+rmh H H2 H4.
+rewrite sub.S.N.
+prove (S y)! = y! * (S y0) + y! * (y - y0).
+rewrite -r mul.left.distributive.N.
+rewrite -l 1 add.commutative.N.
+rewrite add.rsub.N add.rS.N fact_S.
+intro.
+rewrite G. rmh G.
+rewrite C_SS.
+left H5.
+rewrite mul.left.distributive.N. 
+prove (y - y0) ! * (S y0) ! * C y y0 = y ! * S y0.
+rewrite fact_S.
+prove (y - y0) ! * y0 ! * C y y0 = y !.
+elim H1.
+rewrite -r G. rmh G.
+intro.
+rewrite G. rmh G.
+prove  (y - y0) ! * (S y0) ! * C y (S y0) = y ! * (y - y0).
+next.
+intro.
+elim -5 H lesseq.case2.N.
+prove C y (S y) = N0.
+elim C_n_less_p.
+trivial.
+trivial.
+rewrite H2 G sub.inv.N mul.rN0.N.
+intro.
+prove (y - y0) ! = (y - y0) * (y - S y0) !.
+elim -5 H2 lesseq.S_is_S.N.
+lefts H4.
+rewrite H5.
+rewrite sub.lS.N.
+intro.
+rewrite G.
+rmh G.
+rewrite -p 1 -r mul.associative.N.
+rewrite -p 0 -r mul.associative.N.
+rewrite H1.
+intro.
+save C_n_greater_p.
+
+
+
+

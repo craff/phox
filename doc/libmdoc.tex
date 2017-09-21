@@ -1,0 +1,29 @@
+% $State: Exp $ $Date: 2000/12/04 09:35:27 $ $Revision: 1.2 $
+
+\documentclass[a4,twoside]{report}
+\usepackage{phox_report}
+
+\title{Mathematical manual of the \AFD\ library}
+\author{Christophe Raffalli}
+\date{June 1996}
+
+\hfuzz 5pt
+\def\idx#1{}
+\def\tdx#1{}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\input{./prop.math.tex}
+\input{./bool.math.tex}
+\input{./nat.math.tex}
+\input{./product.math.tex}
+\input{./sum.math.tex}
+
+\bibliography{biblio}
+\bibliographystyle{plain}
+
+\end{document}

@@ -1,0 +1,24 @@
+% $State: Exp $ $Date: 2000/10/12 09:58:25 $ $Revision: 1.1.1.1 $
+
+\ifx\undefined\preambuleread\else\endinput\fi
+\message{<preambule>}
+\def\preambuleread{}
+
+\ifx\undefined\principal\else\makeindex\fi
+\documentstyle[twoside]{report}
+\pagestyle{headings}
+\input macros
+\input lmacros
+        
+\title{\Huge The \AFD\ Proof checker \vspace{2ex}\\ Documentation
+\vspace{2ex} \\ \large Version 0.2 \vspace{2ex}\\ This is not even a Draft}
+\date{\today}
+\author{\LARGE Christophe Raffalli \vspace{2ex}\\
+        \LARGE University Paris VII\vspace{2ex}\\
+        \LARGE Logic team, URA 753\vspace{2ex}\\
+        \large and\vspace{2ex}\\
+        \LARGE Chalmers University of Technology\vspace{2ex}\\
+        \LARGE Department of Computer Sciences.}
+
+\begin{document}
+

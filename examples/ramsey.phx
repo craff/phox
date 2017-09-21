@@ -1,0 +1,230 @@
+Import nat.
+Import bool.
+Import ac.
+
+flag auto_lvl 1.
+
+(* Proof of the Ramsey's Theorem for two colors with singletons and pairs *)
+
+(* simple definition of increasing function *)
+
+def increasing f = /\x:N (f x < f (S x)).
+
+(* lemma to make the previous definition usable in a more standard way *)
+
+fact increasing' /\f:(N => N) (increasing f -> 
+  /\x,y:N (x < y -> f x < f y)).
+intros.
+elim H3 with [rec].
+intro.
+elim H0.
+prove f z < f (S z).
+elim H0.
+trivial.
+save.
+
+(* definition of what is a constant function:*)
+def constant f = /\x,x':N (f x = f x').
+
+(* Ramsey's theorem for two colors with singletons: 
+Let f be a function from N to N 
+Let c be a colouring of all natural number
+There exists h such that c o f o h is constant *)
+
+fact ramsey1 /\f:(N => N) /\c:(N => B) (\/h:(N => N) (increasing h & constant (\x (c (f (h x)))))).
+intros.
+elim excluded_middle with \/M:N /\n:N (n > M -> c (f n)).
+lefts H1 $& $\/.
+intro.
+instance ?1 \x S (x + M).
+intros;; trivial 6.
+
+rewrite_hyp H1 demorganl.
+local psi x = Def \x0 (N x0 & (x0 > x & ~ c (f x0))).
+prove /\x:N (N (psi x) & (psi x > x & ~ c (f (psi x)))).
+intros.
+elim AC.
+elim H1.
+Local close_def psi.
+local h = def_rec.N (psi N0) (\p\r (psi r)).
+prove (N => N) h.
+trivial.
+intros $& $\/.
+axiom G0.
+unfold increasing.
+intros.
+from h x < psi (h x).
+elim G with [r] then [l].
+trivial = G0 H2.
+prove /\x:N ~ (c (f (h x))).
+intros.
+elim H2 with [case].
+elim G with [r] then [r].
+intro.
+from  ~ c (f (psi (h y))).
+elim G with [r] then [r].
+elim G0.
+trivial = G1.
+save.
+
+(* a coloring of all pairs of natural number is encoded has a symmetric
+binary function. The value of c x x will never be used ! *)
+ def coloring c = /\x,y:N (B(c x y)) & /\x,y:N (c x y = c y x).
+
+(* because of the definition of coloring, we can assume x < y and x' <
+y' to test if c is constant *) 
+def constant2 c = /\x,x',y,y':N (x < y -> x' < y' -> c x y = c x' y').
+
+(* Ramsey's theorem for two colors with pairs: 
+Let f be a function from N to N 
+Let c be a colouring of all pairs natural numbers
+There exists h such that c o f o h is constant *)
+
+fact ramsey2 /\f:(N => N) /\c:coloring (
+  \/h:(N => N) (increasing h & constant2 (\x,y (c (f (h x)) (f (h y)))))).
+intros.
+prove /\f:(N => N) \/h:(N => N) (increasing h & constant (\y (c (f N0) (f (h y))))).
+intros.
+elim ramsey1 with f0.
+intros.
+elim H0.
+trivial.
+local psi f = Def \h ((N => N) h &  (increasing h & constant \y (c (f N0) (f (h y))))).
+prove /\f:(N => N) (?1 f psi).
+intros.
+apply G with H1.
+elim AC with G0.
+rmh G.
+prove ((N => N) => N => N) psi.
+trivial.
+prove /\f:(N => N) increasing (psi f).
+intros.
+elim G0 with [r] and [l].
+prove /\f:(N => N) constant \y ((c (f N0)) (f (psi f y))).
+intros.
+elim G0 with [r] and [r].
+rmh G0.
+print psi.
+local psi' f = \x (psi f (S x)).
+prove ((N => N) => N => N) psi'.
+trivial = G.
+prove /\f:(N => N) psi' f N0 > N0.
+intros.
+apply G1 with N N0;; trivial.
+local phi = def_rec.N (\y y) \p\r\x (r (psi' (\y (f (r y))) x)).
+prove (N => N => N) phi.
+unfold -l 1 $=>.
+intro 2.
+intro.
+intros.
+elim H3.
+elim G0.
+intros.
+elim H.
+elim H3.
+trivial.
+prove /\x:N increasing (phi x).
+intro 2.
+elim H1.
+rewrite phi def_rec.N0.N.
+trivial =.
+unfold increasing.
+intro 2.
+unfold phi.
+rewrite def_rec.S.N.
+from phi y (psi' (? phi) x0) < phi y (psi' (? phi) (S x0)).
+prove psi' \y0 (f (phi y y0)) x0 < psi' \y0 (f (phi y y0)) (S x0).
+elim G1.
+trivial =G4 H2 H.
+intro.
+elim increasing' with H3.
+trivial =G4 H2.
+elim G0.
+trivial =G4 H2 H.
+elim G0.
+trivial =G4 H2 H.
+intro.
+local h' n = phi n N0.
+prove (N => N) h'.
+trivial.
+prove increasing h'.
+unfold h'.
+intros.
+unfold -p 1 phi.
+rewrite def_rec.S.N.
+from phi x N0 < phi x (psi' (? phi) ?).
+apply G5 with H1.
+elim increasing' with G7.
+trivial =G4 H1.
+intro.
+elim G0.
+trivial =G4 H1 H.
+intro.
+elim G3.
+trivial =G4 H1 H.
+local tag n = c (f (h' n)) (f (h' (S n))).
+prove (N => B) tag.
+left H0.
+intros.
+elim H0.
+elim H.
+elim G6.
+elim H.
+elim G6.
+intro.
+apply ramsey1 with \x x and G8.
+trivial.
+lefts G9 $& $\/.
+intros $& $\/.
+instance ?2 \x (h' (h x)).
+trivial =G6 G7 H1 H2.
+intros.
+elim increasing' with G7.
+trivial =H4 H1.
+trivial =H4 H1.
+elim H2.
+prove /\x,y:N (x < y -> /\zy:N \/zx:N phi y zy = phi x (psi' (\y (f (phi x y))) zx)).
+intro 5.
+elim H6 with [rec].
+trivial.
+intro 2.
+trivial.
+intro 2.
+prove phi (S z) zy = phi z ?.
+unfold -p 0 phi.
+rewrite def_rec.S.N.
+from phi z (? phi) = ?.
+intro.
+elim H9 with psi' \y0 (f (phi z y0)) zy.
+elim G0.
+trivial =H7 H10 H G4.
+prove /\x,y:N  (x < y -> c (f (h' x)) (f (h' y)) = tag x).
+intros.
+apply G9 with H6 then N N0.
+intro.
+lefts G10 $& $\/.
+rewrite -p 1 h'.
+rewrite H8.
+apply G2 with (\y (f (phi x y))) and ?.
+trivial =H4 H G4.
+unfold_hyp G10 constant.
+unfold psi' tag.
+unfold -p 2 h'.
+unfold -p 2 phi.
+rewrite def_rec.S.N.
+from ? = c ? (f (phi x (? phi))).
+elim G10.
+intro.
+intros.
+intros.
+apply increasing' with H1 and H8.
+apply increasing' with H1 and H9.
+apply G10 with G11.
+trivial = H1 H4.
+trivial = H1 H6.
+apply G10 with G12.
+trivial = H1 H5.
+trivial = H1 H7.
+rewrite G13 G14.
+elim H3.
+save.

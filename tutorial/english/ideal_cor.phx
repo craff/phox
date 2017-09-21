@@ -1,0 +1,234 @@
+(* Our goal is to show that in a commutative ring, all maximal ideals are principal and that the converse is true if the ring is principal.
+
+Remark: the existence of an inverse for the sum is not used in the proof.
+*)
+
+(* PhoX will automatically detect the axioms. *)
+flag auto_lvl 1.
+
+(* One sort for the ring elements. *)
+Sort ringelt.
+
+(* Sum and product. *)
+Cst lInfix[4]  x"+"y  : ringelt -> ringelt -> ringelt.
+Cst lInfix[3] x"*"y   : ringelt -> ringelt -> ringelt.
+
+(* The two neutral elements *)
+Cst  zero : ringelt.
+Cst one : ringelt.
+
+(* The properties we need *)
+claim plusassoc /\x,y,z  x+(y+z)=x+y+z.
+claim pluscom /\x,y x+y=y+x.
+claim multassoc /\x,y,z x*(y*z)=x*y*z.
+claim multcom /\x,y x*y=y*x.
+claim eltabs /\x (x*zero=zero & zero*x=zero).
+claim eltneutrezero /\x (x+zero=x & zero+x=x).
+claim eltneutreone /\x (x*one=x & one*x=x).
+claim distributivity /\a,x,y a*(x+y)=a*x+a*y.
+claim distributivityr /\a,x,y (x+y)*a=x*a+y*a.
+
+(* We indicate to PhoX that the automatic equationnal reasonning 
+  can use these equations. *)
+new_equation plusassoc.
+new_equation pluscom.
+new_equation multassoc.
+new_equation multcom.
+new_equation eltabs.
+new_equation eltneutreone.
+new_equation eltneutrezero.
+new_equation distributivity.
+new_equation distributivityr.
+
+(* The following line allow to type "rewrite calcul" to simplify an expression using all the axioms except distributivity. *)
+def_thlist calcul = eltabs eltneutreone eltneutrezero  plusassoc multassoc.
+
+(* he following line allow to type "rewrite  develop" to simplify an expression using all the axioms including distributivity. *)
+def_thlist develop = eltabs eltneutreone eltneutrezero  plusassoc multassoc distributivity distributivityr.
+
+(* Some definitions.  *)
+def ideal I = /\x,y:I (I (x+y)) & /\x:I /\z (I (z*x)) & I zero.
+
+def principal I = \/a /\x (I x <-> \/y x = a*y).
+
+def Infix[5] I "subset" J = /\x:I J x.
+
+def maximal I = ideal I & ~(I one) & /\J (ideal J & I subset J -> J subset I or J one).
+
+def prime I = ideal I & ~(I one) & /\x,y ((I (x*y)) -> I x or I y).
+
+(* We will prove this lemma after the theorem. *)
+claim lemme /\I:ideal /\x (maximal I ->  ~ I x -> \/i:I \/a (i+a*x=one)).
+
+(* le sens direct du théorème *)
+goal /\I:ideal (maximal I -> prime I).
+(*->*)
+intros.
+unfold prime.
+intros.
+lefts  H0.
+
+intro 3.
+by_absurd.
+rewrite_hyp H2 disjunction.demorgan.
+left H2.
+apply lemme  with H2.
+left G.
+left H4.
+left H5.
+
+apply lemme  with H3.
+left G.
+left H6.
+left H7.
+prove I one.
+from I (one*one).
+from I ((i+a*x)*(i0+a0*y)).
+rewrite develop  .
+lefts H.
+elim H.
+elim H.
+elim H.
+elim H9 with H4.
+elim H9 with H4 .
+elim H9 with H6.
+elim H9 with H1.
+lefts H0.
+elim H9.
+(*->*)
+save thm1.
+
+(* two more definitions *)
+def regular = /\x,y,a (a*x=a*y -> a=zero or x=y).
+def Aprincipal =  regular & /\I (ideal I  -> principal I).
+
+(* the converse of the previous theorem *)
+goal Aprincipal -> 
+     /\I:ideal ((\/x:I ~x=zero) -> prime I -> ~ I one -> maximal I).
+(*->*)
+intro.
+left H.
+intros.
+intros.
+intro 2.
+left H5.
+prove principal I.
+apply H0 with H1.
+prove principal J.
+apply H0 with H5.
+left G.
+left G0.
+rename x p.
+rename x0 q.
+prove I p.
+trivial = H7.
+prove J q.
+trivial = H8.
+prove J p.
+elim H6.
+elim H8 with G1.
+rename y x.
+lefts H3.
+apply H10 with I (q * x).
+axiom G.
+elim G2.
+intro l.
+intros.
+elim H7 with H12.
+elim H8 with H13.
+elim H7 with [r].
+intro.
+instance ?1 y * y0.
+intro.
+elim H7 with H12.
+prove  x * one = x * (q * y).
+intro.
+apply regular with G3.
+left G4.
+intro r.
+elim H8 with [r].
+intro.
+axiom H14.
+prove p = zero.
+intro.
+left H2.
+left H2.
+elim H15.
+elim H7 with H2.
+intro.
+(*->*)
+save thm2.
+
+(* one definition useful to prove the lemma: 
+   generates I x is the smallest ideal containing I and x. *)
+def generates I x y = \/i:I \/a (y=i+a*x).
+
+(* First property of genrates *)
+prop lemme1 /\I:ideal /\x ideal (generates I x).
+(*->*)
+intros.
+lefts H.
+intros.
+intros.
+rename x0 z.
+lefts H2 $& $\/ generates.
+rename x0 j.
+lefts H3 $& $\/ generates.
+rename x0 i.
+rewrite H4 H5.
+intros generates $& $\/.
+select 2.
+instance ?2 a + a0.
+instance ?1 j + i.
+intro.
+elim H.
+intros.
+lefts H2 $& $\/ generates.
+rename x1 i.
+rewrite H3.
+intros generates $& $\/.
+select 2.
+instance ?4 z*a.
+instance ?3 z*i.
+intro.
+elim H1.
+intros generates $& $\/.
+axiom H0.
+intro.
+(*->*)
+save.
+
+(* second proprerty of generates (trivial) *)
+prop  lemme2 /\I,x I subset (generates I x).
+trivial.
+save.
+
+(* third proprerty of generates (trivial) *)
+prop  lemme3 /\I:ideal /\x generates I x x.
+trivial.
+save.
+
+(* proff of the lemma *)
+prove_claim lemme.
+(*->*)
+intros.
+local J = generates I x.
+prove ideal J.
+elim lemme1.
+prove I subset J.
+elim lemme2.
+prove J x.
+elim lemme3.
+apply H0 with G & G0.
+intro.
+elim G2.
+elim H1.
+elim H2.
+elim H2.
+left H3.
+left H4.
+intro 2.
+axiom H3.
+intro 2.
+(*->*)
+save.

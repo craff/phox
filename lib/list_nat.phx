@@ -1,0 +1,52 @@
+(*header 99/03/18
+	title = "Lists"
+ 	author = "Christophe Raffalli, Paul Roziere"
+	institute = "Equipe de Logique, Université Chambéry, Paris VII"
+*)
+
+
+Use nat.
+Use list.
+
+(** Data type of list of length n *)
+
+(** Some functions using integers *)
+
+(*texte
+we will define a partial function that return the (n-1)-th element of a
+given list (the first element is at position 0).
+*)
+
+def (* l truncated after n-th element  *) nthl =
+                                        \l (def_rec.N l \n,l(tail l)).
+
+def  (* (n-1)-th element of l *) nth = \l\n( head(nthl l n)).
+
+
+(*fact characteristic properties of nthl and nth *)
+fact nthl.N0.List /\D/\l:(List D) /\n:N (nthl l N0)= l.
+trivial.
+save.
+
+Local lemma nthl.tail.List
+/\D/\l:(List D)/\a:D /\n:N tail (nthl (a::l) n) =(nthl l n).
+trivial.
+save.
+
+fact nthl.S.List
+/\D/\l:(List D)/\a:D /\n:N (nthl (a::l) (S n))=nthl l n.
+intros.
+trivial +nthl.tail.List.
+save.
+
+fact nth.N0.List /\D/\l:(List D)/\a:D /\n:N (nth (a::l) N0)= a.
+trivial.
+save.
+
+fact nth.S.List
+/\D/\l:(List D)/\a:D /\n:N (nth (a::l) (S n))=nth l n.
+trivial +nthl.S.List.
+save.
+(*endfact *)
+
+Use -n list_nat_ax.

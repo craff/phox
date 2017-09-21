@@ -1,0 +1,13 @@
+
+Import bool.
+
+Data Z sign n =
+  Z0 : Z sign Z0
+| [succ] Prefix[2] "S" n : /\x (Z True x -> Z True (S x))
+| [pred] Prefix[2] "P" n : /\x (Z False x -> Z False (P x))
+.
+
+search "".
+print case.Z   .
+
+print pred_not_succ.Z.

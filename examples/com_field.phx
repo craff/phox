@@ -1,0 +1,7 @@
+(* a commutative field : a commutative ring and a field *)
+
+Use com_ring with
+  R' -> K'
+| R -> K
+.
+Use field.

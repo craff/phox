@@ -1,0 +1,89 @@
+# $State: Exp $ $Date: 2003/02/12 21:01:42 $ $Revision: 1.10 $
+
+# Edit this file to choose the right path 
+# on your local installation
+
+# main directory (can be use or not for the next variables).
+top=
+prefix=/usr/local
+# prefix = /usr
+# prefix = ${HOME}
+
+# where to put the binary files
+BINDIR = ${prefix}/bin
+
+# where to put the PhoX library files
+LIBDIR = ${prefix}/lib/phox
+
+# where to put the doc :
+DOCDIR = ${prefix}/doc/phox
+
+# The name of the emacs comand you use (may be emacs, xemacs, ...)
+# Note: xemacs displays special symbols in an elegant way 
+EMACS = xemacs
+
+# Normally, the path for the emacs library is automatically computed.
+# If is fails set this variable:
+# EMACSDIR = ${prefix}/share/emacs/site-lisp
+
+# The following directory must be in your TEXINPUTS path
+TEXDIR = /usr/share/texmf/tex/latex/phox
+# TEXDIR = ${prefix}/lib/texmf/tex/latex/phox
+
+# where to put documentation files needed by PhoX
+# (no reasons to change these four variables)
+TEXTDOCDIR=${DOCDIR}/text
+TEXDOCDIR=${DOCDIR}/tex
+HTMLDOCDIR=${DOCDIR}/html
+EXAMPLESDIR = ${DOCDIR}/examples
+TUTORIALDIR = ${DOCDIR}/tutorial
+
+# Do you want the native code compiled version of PhoX (recommended) ?
+PHOXVERS = phoxopt     # use native-code compiler
+#PHOXVERS = phoxslow      # use byte-code compiler
+
+# Do you want the native code compiled version of pretty (recommended)
+# (the pretty formatter for TeX document) ?
+PRETTYVERS = prettyopt     # use native-code compiler
+# PRETTYVERS = prettyslow      # use byte-code compiler
+
+# Where to find ocaml and others (3.04 or later) :
+CAMLC = ocamlc -g
+CAMLDEP = ocamldep
+CAMLO = ocamlopt                     # if you are in hurry and find the 
+#CAMLO = ocamlopt.opt               # native-code compiler too slow, 
+#				     # change this to ocamlopt.opt
+#                                    # (if you have compiled it !)
+
+CAMLPREPRO = -pp camlp4o
+#                                    # Uncomment the previous line if you
+#                                    # use ocaml 3.04 or later
+
+# where to find sed
+SED = sed
+
+# where to find AWK (used to build documentation and for creating tags
+# tables). As documentation is built in distribution, you need awk only
+# if you want to create tags table for phox files. If needed, gnu awk is
+# required.
+AWK = gawk
+
+# where to find PERL (used by phoxdep in a #!... comment)
+PERL = perl
+
+# The default path used by PhoX (if the PHOXPATH variable is undefined)
+DEFAULT_PATH = $(LIBDIR)
+# The character separating each directory in the path
+# (normally ':' but ';' under windows)
+DELIM=:
+# Warning do not add spaces in the definition of DELIM and DEFAULT_PATH
+
+
+# where to create distributions (you probably do not need to use this
+# variable). This directory must not be in source directory.
+DISTRIBDIR = /home/raffalli/FTP/PhoX/$(VERSNUM)
+#DISTRIBDIR = /mnt/disk/PhoX
+
+# name of the root directory in the tar archive file for distribution
+# (you probably do not need to use this variable).  
+DISTRIBTARDIR = phox-$(VERSNUM)

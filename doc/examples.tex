@@ -1,0 +1,204 @@
+% $State: Exp $ $Date: 2003/02/07 09:57:40 $ $Revision: 1.4 $
+%; whizzy-master doc.tex
+
+\chapter{Examples}
+
+\section{How to read the examples.}
+
+We write examples using standard mathematical notation, as it will
+appear on the screen if you use the ProofGeneral interface under
+XEamcs. If you want to type formulas, we give the table of special
+symbols, with their ASCII syntax:
+
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+& Symbol & ASCII \\
+\hline
+Universal quantification & $\forall$ & \verb~/\~ \\
+Existential quantification & $\exists$ & \verb~\/~ \\
+Conjunction & $\land$ & \verb~&~ \\
+Disjunction & $\lor$ & \verb~or~ \\
+Less or equal & $\leq$ & \verb~<=~ \\
+Greater or equal & $\geq$ & \verb~>=~ \\
+Different & $\neq$ & \verb~!=~ \\
+Belong (in quantification) & $\forall x\in A$ & \verb~/\x:A~ \\
+\hline
+\end{tabular}
+\end{center}
+
+What you have to type to enter a formula, is exactly what is obtained
+when you replace each mathematical symbol by its ASCII equivalent.
+
+For instance, to type $\forall e{>}R0 \,\exists a{>}R0
+\,\forall y
+(\hbox{d}\,x\,y \leq a \rightarrow \hbox{d} (f x) (f y) \leq e)$,
+you just type
+
+\verb~/\e>R0 \/a>R0/\y (d x y <= a -> d (f x) (f y) <= e)~
+
+We assume you read the previous section ! Moreover, you should report to
+the appendix \ref{cmd} to get a detailed desciption of each command.
+
+
+\section{An example in analysis}
+
+The example given below is a typical small standalone proof (using no
+library).
+
+We prove that two definitions of the continuity of a function are
+equivalent. We give only one of the directions, the other is
+similar. We have written it in a rather elaborate way in order to show
+the possibilities of the system.
+
+\begin{itemize}
+\item We define the sort of reals.  \\
+\verb~>PhoX> Sort real.~
+
+\verb~Sort~ is the name of the command used to create new sorts, but
+you can also use it to give name to existing sorts.
+ 
+\item We give a symbol for the distance and the real 0  (denoted by
+$R0$) as well as predicates for inequalities.                         \\
+\verb~>PhoX> Cst d : real -> real -> real.~                    \\
+\verb~>PhoX> Cst R0 : real.~                                   \\
+\verb~>PhoX> Cst Infix[5] x "<=" y : real -> real -> prop.~    \\
+\verb~>PhoX> Cst Infix[5] x "<" y : real -> real -> prop.~     \\
+\verb~>PhoX> def Infix[5] x ">" y = y < x.~                    \\
+\verb~>PhoX> def Infix[5] x ">=" y = y <= x.~
+
+The command \verb~Cst~ introduces new constants of given sorts while
+\verb~def~ is used to give definitions. The commands to define
+inequalities are quite
+complex, because we want to use some infix notation with a specific
+priority.
+
+\item Here are the two definitions of the continuity:
+\\\verb~>PhoX> def continue1 f x =~ \\\verb~  ~$\forall e{>}R0 \,\exists a{>}R0
+\,\forall y
+(\hbox{d}\,x\,y < a \rightarrow \hbox{d} (f x) (f y) < e)$\verb~.~                      \\
+\verb~>PhoX> def continue2 f x =~ \\\verb~  ~$\forall e{>}R0 \,\exists a{>}R0
+\,\forall y (\hbox{d}\,x\,y \leq a \rightarrow \hbox{d} (f x) (f
+y) \leq e)$\verb~.~
+
+\item and the lemmas needed for the proof. \\
+\verb~>PhoX> claim lemme1~ $\forall x,y (x < y \rightarrow x \leq y)$\verb~.~ \\
+\verb~>PhoX> claim lemme2~ $\forall x{>}R0 \,\exists y{>}R0 \forall z (z \leq y \rightarrow z < x)$\verb~.~
+
+The command \verb~claim~ allows to introduce new axioms (or lemmas that
+you do not want to prove now. You can prove them later using the
+command \verb~prove_claim~). Beware that there may be a contradiction
+in your axioms! 
+
+\item We begin the proof using the command \verb~goal~: \\
+\verb~>PhoX> goal~ $\forall x,f (\hbox{continue1} \, f \, x \rightarrow \hbox{continue2} \, f \, x)$\verb~.~\\
+\verb~goal 1/1~\\
+\verb~   |-~ $\forall x,f (\hbox{continue1} \, f \, x \rightarrow
+\hbox{continue2} f x)$
+
+\item We start with some ``introductions''.\\
+\verb~%PhoX% intro 5.~\\
+\verb~goal 1/1~\\
+\verb~H :=~ $\hbox{continue1} \, f \, x$\\
+\verb~H0 :=~ $e > R0$\\
+\verb~   |-~ $\exists a{>}R0  \,\forall y (\hbox{d}\,x\,y \leq a \to \hbox{d} (f x) (f y) \leq e)$
+
+An ``introduction'' for a given connective, is the natural way to
+establish the truth of that connective without using other fact
+or hypothesis. For instance, to prove $A \to B$, we assume $A$ and
+prove $B$. Here, PhoX did five introductions: 
+\begin{itemize}
+\item one for $\forall x$ and one for $\forall f$,
+\item one for the implication $(\hbox{continue1} \, f \, x \rightarrow
+\hbox{continue2} f x)$, 
+\item one for the $\forall e$ inside the definition
+of $\hbox{continue2}$ 
+\item and finally, one for the hypothesis $e > R0$.
+\end{itemize}
+
+Therefore, PhoX created three new objects: $x,f,e$ and two new
+hypothesis named \verb~H0~ and \verb~H1~.
+
+\item We use the continuity of $f$ with $e$, and we remove the  hypotheses
+H and H0 which will not be used anymore.\\
+\verb~%PhoX% apply H with H0. rmh H H0.~\\
+\verb~goal 1/1~\\
+\verb~G :=~ $\exists a{>}R0 \,\forall y (\hbox{d}\,x\,y < a \to \hbox{d} (f x) (f y) < e)$\\
+\verb~   |-~ $\exists a{>}R0 \,\forall y (\hbox{d}\,x\,y \leq a \to \hbox{d} (f x) (f y) \leq e)$
+
+The \verb~apply~ command is quite intuitive to use. But it is a complex
+command, performing unification (more precisely higher-order
+unification) to guess the value of some variables. 
+Sometimes you do not get the result you expected and you need
+to add extra information in the proper order.
+
+\item We {\em de-structure} hypothesis G by indicating that we want to consider all the
+ $\exists$ and all the  conjunctions (You can also use  \verb~lefts G~ twice with no more indication).\\
+\verb~%PhoX% lefts G $~$\exists$ \verb~$~$\land$\verb~.~\\
+\verb~goal 1/1~\\
+\verb~H :=~  $a > R0$\\
+\verb~H0 :=~ $\forall y (\hbox{d}\,x\,y < a \to \hbox{d} (f x) (f y) < e)$\\
+\verb~   |-~ $\exists a_0{>}R0 \,\forall y (\hbox{d}\,x\,y \leq a_0 \to \hbox{d} (f x) (f y) \leq e)$
+
+The \verb~left~ and \verb~lefts~ are introductions for an hypothesis:
+that is the way to use an hypothesis in a ``standalone'' way (not
+using the conclusion you want to prove or other hypothesis).
+
+We need to write a ``\verb~$~'' prefix, because $\exists$ and $\lor$ have
+a prefix syntax and need other informations. The ``\verb~$~'' prefix tells
+\AFD\ that you just want this
+symbol and nothing more.
+
+\item We use the second lemma with  H and we remove it.\\
+\verb~%PhoX% apply lemme2 with H. rmh H.~\\
+\verb~goal 1/1~\\
+\verb~H0 :=~ $\forall y (\hbox{d}\,x\,y < a \to \hbox{d} (f x) (f y) < e)$\\
+\verb~G :=~ $\exists y{>}R0 \, \forall z{\leq}y \;  z < a$\\
+\verb~   |-~ $\exists a_0{>}R0 \,\forall y (\hbox{d}\,x\,y \leq a_0 \to \hbox{d} (f x) (f y) \leq e)$
+
+\item We de-structure again G and we rename the variable $y$ created.\\
+\verb~%PhoX% lefts G $~$\exists$ \verb~$~$\land$\verb~. rename y a'.~\\
+\verb~goal 1/1~\\
+\verb~H0 :=~ $\forall y (\hbox{d}\,x\,y < a \to \hbox{d} (f x) (f y) < e)$\\
+\verb~H1 :=~ $a' > R0$\\
+\verb~H2 :=~ $\forall z{\leq}a' \; z < a$\\
+\verb~   |-~ $\exists a_0{>}R0 \, \forall y (\hbox{d}\,x\,y \leq a_0 \to \hbox{d} (f x) (f y) \leq e)$
+
+\item Now we know what is the  $a_0$ we are looking for. We do the necessary
+introductions for $\forall$, $\exists$, conjunctions and implications (again,
+you could use \verb~intros~ several times with no more indication). Two
+goals are created, as well as an existential variable (denoted by
+\verb~?1~)  for which we have to find a value.\\
+
+\verb~%PhoX% intros $~$\forall$ \verb~$~$\exists$ \verb~$~$\land$ \verb~$~$\to$\verb~.~\\
+\verb~goal 1/2~\\
+\verb~H0 :=~ $\forall y (\hbox{d}\,x\,y < a \to \hbox{d} (f x) (f y) < e)$\\
+\verb~H1 :=~ $a' > R0$\\
+\verb~H2 :=~ $\exists z{\leq}a' \; z < a$\\
+\verb~   |-~ $\hbox{?1} > R0$ \\
+\verb~goal 2/2~\\
+\verb~H0 :=~ $\forall y (\hbox{d}\,x\,y < a \to \hbox{d} (f x) (f y) < e)$\\
+\verb~H1 :=~ $a' > R0$\\
+\verb~H2 :=~ $\forall z{\leq}a' \; z < a$\\
+\verb~H3 :=~ $\hbox{d}\,x\,y \leq \hbox{?1}$\\
+\verb~   |-~ $\hbox{d} (f x) (f y) \leq e$
+
+\item The first goal is solved with the hypothesis  H1 indicating this way that
+\verb~?1~ is $a'$. The second is automatically solved by  PhoX
+by using lemma1, and this finishes the proof.\\
+\verb~%PhoX% axiom H1. auto +lemme1.~
+\end{itemize}
+
+\noindent {\em Remark.} Instead of the command \verb~auto +lemme1~ one could
+also say \verb~elim lemme1.~ \verb~elim H0. axiom H3.~ or
+\verb~apply H0 with H3. elim lemme1 with G.~ where \verb~G~ is an
+hypothesis produced by the first command. We could also give the value
+of the existential variable by typing \verb~instance ?1 a'~.
+
+\noindent A good exercise for the reader consists in understanding what these
+                             commands do. The appendix \ref{cmd} should help you !
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "doc"
+%%% End: 

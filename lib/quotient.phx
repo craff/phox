@@ -1,0 +1,133 @@
+(* $State: Exp $ $Date: 2004/11/22 13:38:04 $ $Revision: 1.10 $ *)
+(* Definition of quotient *)
+
+(*header
+	title = "Quotient"
+	author = "Christophe Raffalli"
+	institute = "Paris VII \\& Paris XII university"
+*)
+
+flag auto_lvl 1.
+
+Import bin_rel.
+
+(** Basic definitions *)
+
+Sort set.
+
+Cst D : set -> prop.
+
+Cst R : set -> set -> prop.
+
+claim refl.Q  reflexive D R.
+claim sym.Q   symmetric D R.
+claim trans.Q transitive D R.
+
+def Q X = \/x:D X x & /\x:X D x & 
+	  /\x,y:D (R x y -> X x -> X y) &
+          /\x,y (X x -> X y -> R x y).
+def class x y = D y & R x y. 
+
+proposition class.Q /\x:D Q(class x). 
+intros.
+intro.
+trivial +refl.Q.
+intros.
+trivial.
+trivial +trans.Q.
+trivial +sym.Q trans.Q.
+save.
+
+new_intro -c class class.Q.
+
+proposition equal.class.Q /\x,y:D (R x y -> class x = class y).
+intros.
+elim equal.extensional.
+intro.
+intro.
+trivial +refl.Q trans.Q sym.Q.
+save.
+
+new_equation equal.class.Q.
+
+proposition class.inj.Q /\x,y:D (class x = class y -> R x y).
+intros.
+prove class x x.
+trivial +refl.Q.
+prove class y x.
+axiom G.
+trivial +sym.Q.
+save.
+
+proposition class.elim /\X,x (/\z:D (
+  /\z':x D z' -> /\z':x R z z' -> x z -> x = class z -> X)-> Q x -> X).
+intros.
+elim H0.
+prove x = class x0.
+elim equal.extensional.
+trivial.
+trivial.
+save.
+
+new_elim -i Q rec class.elim.
+
+proposition equal.Q /\x,y:Q (/\x',y':D (x x' -> y y' -> R x' y') -> x = y).
+trivial 8.
+save.
+
+new_intro -i equal equal.Q.
+ 
+(** Compatible fonctions *)
+
+def Compatible f R = /\x,y:D (R x y -> f x = f y).
+def Lift f c z = /\x:c z = f x.
+
+proposition lift.compatible.Q 
+	/\f(Compatible f R -> /\c:Q \/!z Lift f c z).
+intros.
+left H0.
+intros.
+intros.
+from f z = f x.
+elim H.
+trivial.
+trivial +sym.Q.
+intros.
+trivial.
+save.
+
+def lift f c = Def (Lift f c).
+
+proposition lift.total.Q /\D'/\f:(D => D') (Compatible f R -> /\c:Q D'(lift f c)).
+intros.
+apply Def.axiom with Lift f c.
+apply lift.compatible.Q with H0 and H1.
+apply G with G0.
+unfold_hyp G1 Lift.
+left G0.
+unfold_hyp H2 Lift.
+trivial.
+save.
+
+new_intro -c total lift.total.Q.
+
+proposition lift.prop /\f (
+	Compatible f R -> /\x:D (lift f (class x) = f x)).
+intros.
+apply -1 (Lift f (class x)) Def.axiom.
+apply lift.compatible.Q with H and Q (class x).
+trivial.
+apply G with G0.
+elim G1.
+trivial +refl.Q.
+save.
+
+new_equation lift.prop.
+
+proposition class.eq.Q 
+ /\x:Q\/x':x x = class x'.
+trivial.
+save.
+
+close_def lift.
+close_def Q.

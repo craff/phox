@@ -1,0 +1,15 @@
+(* commutative ring : a ring whose multiplicative monoid is a group *)
+
+Use group with
+  op -> rInfix[3] x "*" y
+| e  -> R1
+| set -> _
+| G  -> K
+| i -> Prefix[1] "inv" x
+| _ -> _.prod
+.
+
+Use ring with
+  set -> _	
+| R  -> K
+.

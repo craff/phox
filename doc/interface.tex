@@ -1,0 +1,116 @@
+% $State: Exp $ $Date: 2002/03/21 20:57:31 $ $Revision: 1.5 $
+%; whizzy-master doc.tex
+
+\chapter{Emacs and XEmacs interface.}\label{interface}
+
+It is possible to use \AFD\ directly in a ``terminal''. But this is
+far from the best you can do. You can use the \AFD\ emacs mode developped by
+C. Raffalli and P. Roziere using D. Aspinall's ``Proof-General''.
+
+This interface works better with XEmacs 21.1 or later, but pre-releases 3.4 of
+Proof-General works reasonably well with gnu-emacs 21.
+
+You should also note that all it can be used under Windows (98 and
+XP have been successfully tested), using the win32 version of XEmacs and the specific
+windows version of \AFD.
+
+Proof-General is available from
+\begin{quote}
+\verb#http://www.proofgeneral.org/~proofgen#
+\end{quote}
+
+XEmacs (for Windows and Unix/Linux) is available from
+\begin{quote}
+\verb#http://www.xemacs.org#
+\end{quote}
+
+\section{Getting things to work.}
+
+First you need to have XEmacs 21.1 or later installed. Then you need
+to get and install Proof-General version 3.3 or later. Remember where
+you installed  Proof-General.
+
+Then you need to add the following line to the configuration file of
+XEmacs\footnote{
+This configuration file is (under Unix/Linux) named {\tt .emacs} and
+located in your home directory. Recent version of XEmacs used files in
+a {\tt .xemacs} subdirectory of your home directory.
+
+Your system administrator can also add lines in a general startup
+file to make \AFD\ available to all users.}:
+\begin{verbatim}
+(load-file
+  "/usr/share/emacs/site-lisp/ProofGeneral/generic/proof-site.el")
+\end{verbatim}
+
+This line is valid if Proof-General is installed in
+\verb#/usr/share/emacs/site-lisp#. Adapt it to your own setup.
+If later \AFD\ fails to start, you can also add a line
+
+\begin{verbatim}
+(set-variable 'phox-prog-name
+  "/usr/local/bin/phox -pg")
+\end{verbatim}
+
+The \verb#-pg# is essential when \AFD\ works with Proof-General.
+
+
+\section{Getting started.}
+
+To start \AFD, you only need to open with XEmacs a file whose name ends by the
+extension \verb#.phx#. Try it, you should see a screen similar to the
+figure \ref{ecran}.
+
+\begin{figure}
+\htmlimage{}
+\begin{latexonly}
+\hspace{-2cm}
+\end{latexonly}
+\input{ecran.pdf_t}
+\caption{Sample of a \AFD\ screen under XEmacs with Proof-General}\label{ecran}
+\end{figure}
+
+
+When using the interface, you use two ``buffers'' (division of a
+window where XEmacs displays text). One buffer represents your \AFD\
+file. The other contains the answer from the system.
+
+You should remark that under XEmacs (not Emacs) some symbols are
+displayed with a nice mathematical syntax. Moreover, when the mouse
+pointer moves above such symbol, you can see there ASCII equivalent.
+
+To use it, you simply type in the \AFD\ file and transmit command to
+the system using the navigation buttons. The command that have been
+transmitted are highlighted with a different background color and are
+locked (you can not edit them anymore). The main navigation button are:
+
+\begin{description}
+\item[Next] sends the next command to the system.
+\item[Undo] go back from one command.
+\item[Goto] enter (or undo) all the commands to move to a specific
+position in the file.
+\item[Restart] restart \AFD\ (sometimes very useful, because
+synchronisation between the \AFD\ system and XEmacs is lost. In this
+case you to Restart followed by Goto.
+\end{description}
+
+All these buttons are also associated to a menu and a keyboard
+equivalent (visible in the menu).
+
+\section{Tips.}
+
+Proof-General can only work with one active file at a time. The best
+is to use the Restart button when switching from one file to another,
+because command like Import or Use can not be undone (so the Undo
+or Retract button will not give the expected result).
+
+Sometimes, some information are missing in the answer window (this is
+very rare). You also may want to see the results of other commands than
+the last one. In this case, there is a buffer named \verb#*phox*#
+available from the \verb#Buffers# menu where you can see all the
+commands and answers since \AFD\ started.
+
+In some very rare cases, the Restart button may not be sufficient (for
+instance if you changed your version of \AFD). You
+can use the menu \verb#PhoX/Exit PhoX# to really stop the system and
+restart it.

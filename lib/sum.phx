@@ -1,0 +1,163 @@
+(* $State: Exp $ $Date: 2004/01/08 17:23:26 $ $Revision: 1.6 $ *)
+(*header 1999/02/04
+
+	title = "Sums"
+ 	author = "Christophe Raffalli, Paul Roziere"
+	institute = "Equipe de Logique, Université Chambéry, Paris VII"
+*)
+
+
+
+flag auto_lvl 3.
+
+(** Basic definitions *)
+
+(*texte To define the sums (disjoint union) of two predicates, we extend
+the language with two unary function symbols [inl x] and [inr x] .  *)
+
+Sort sum['a,'b].
+Cst inl : 'a -> sum['a, 'b].
+Cst inr : 'b -> sum['a, 'b].
+
+(*
+Then the sum of two unary predicates is defined by the following predicate:
+*)
+
+def (* Sum of predicates *)
+		Sum A B z = /\X (/\x (A x -> X (inl x)) ->
+	        		     /\y (B y -> X (inr y)) -> X z).
+tex_syntax Sum Infix[3] A "\\oplus" B.
+
+(*
+We assume the following :
+*)
+
+(*axiom *)
+claim (* inl is injective *) inl.injective.Sum /\x,y (inl x = inl y -> x = y).
+claim (* inr is injective *) inr.injective.Sum /\x,y (inr x = inr y -> x = y).
+claim (* inl x is not inr y *) inl_not_inr.Sum   /\x,y (inl x != inr y).
+(*endaxiom *)
+new_elim -i -n $= inl_not_inr inl_not_inr.Sum.
+(*note 
+The last claim is added as invertible elimination rule. 
+*)
+
+(*fact Introduction rules for sums *)
+fact intro_left.Sum /\A,B /\x:A Sum A B (inl x).
+trivial.
+save.
+
+fact intro_right.Sum /\A,B /\y:B Sum A B (inr y).
+trivial.
+save.
+
+new_intro -c l intro_left.Sum.
+new_intro -c r intro_right.Sum.
+(*endfact *)
+
+
+(*fact elimination rules for sums *)
+fact elim.Sum
+ /\X,A,B,z (/\x:A (z = inl x -> X) -> /\y:B (z = inr y -> X) -> 
+	Sum A B z -> X).
+intros.
+elim -1 \c (z = c -> X) H1.
+trivial.
+save.
+
+fact inl.injective_left.Sum /\X,x,y ((x = y -> X) -> inl x = inl y -> X). 
+trivial +inl.injective.Sum. 
+save.
+
+fact inr.injective_left.Sum /\X,x,y ((x = y -> X) -> inr x = inr y -> X). 
+trivial +inr.injective.Sum. 
+save.
+
+fact inr_not_inl.Sum /\x,y (inr x != inl y).
+trivial +inl_not_inr.Sum.
+save.
+new_elim -i Sum e elim.Sum.
+new_elim -i -n $= inr_not_inl inr_not_inl.Sum.
+new_elim -i -n $= inl.injective inl.injective_left.Sum.
+new_elim -i -n $= inr.injective inr.injective_left.Sum.
+(*endfact *)
+
+(*note 
+These four rules and  are added as invertible elimination rules. *)
+
+
+
+(** Matching *)
+
+(*texte 
+ We define 
+*)
+def caseP f g z r = /\x (z = inl x -> r = f x) &
+			 /\y (z = inr y -> r = g y).
+
+(*texte
+and we prove the following:
+*)
+
+Local lemma caseP.unique.Sum /\A,B,C/\f:(A => C)/\g:(B => C)/\z:(Sum A B)
+  \/!r caseP f g z r.
+trivial.
+save.
+
+(*texte
+Using the definite description, we define:
+*)
+def (* match function on sums *)  case f g z = Def (\r (caseP f g z r)).
+
+(*texte
+Then using the properties of the definite
+description, we prove the following propositions.
+*)
+
+(*fact Characteristic properties of case *)
+fact (* match left part of the sum *) case.left.Sum 
+  /\f,g/\x case f g (inl x) = f x.
+intros.
+prove caseP f g (inl x) (case f g (inl x)).
+intro.
+elim caseP.unique.Sum.
+trivial.
+trivial.
+intro.
+from true.intro.
+trivial.
+save.
+
+fact (* match right part of the sum *) case.right.Sum 
+  /\f,g/\y case f g (inr y) = g y.
+intros.
+prove caseP f g (inr y) (case f g (inr y)).
+intro.
+elim caseP.unique.Sum.
+trivial.
+trivial.
+intro.
+from true.intro.
+trivial.
+save.
+new_equation case.left.Sum.
+new_equation case.right.Sum.
+(*endfact *)
+
+close_def case.
+
+(*note 
+we add these facts as rewriting rules and we close the definition
+of $case .
+*)
+
+
+(*texte
+We also prove :
+*)
+fact (* case is well defined on sums *) case.total.Sum 
+	/\A,B,C/\f:(A => C)/\g:(B => C)/\z:(Sum A B) C (case f g z).
+trivial.
+save.
+
+new_intro -t case case.total.Sum.

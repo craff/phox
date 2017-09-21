@@ -1,0 +1,6 @@
+(* commutative group : 
+
+     it is a group and a commutative monoid *)
+
+Use group.
+Use com_monoid.

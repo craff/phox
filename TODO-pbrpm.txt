@@ -1,0 +1,22 @@
+
+- Indentation des phrases longues (ex: mlrev, 2eme preuve)
+- Les équations appliquables pour l'expression cliquée
+- plusieurs règle d'elim, au moins pour le symbole de tête.
+- renommage des variables et des noms d'hypothèses (pb de saisi et de
+couleur du fond).
+- structuration du texte pour les preuves à cas. 
+- trier le menu par taille de preuve ou autre (taille de la phrase).
+- intro jusqu'à une sous-formule sélectionnée.
+- renommage paresseux des variables liées.
+  en cours ... pb avec print_expr_env et default_name ...
+- elim with x <- t et l'interface associée.
+- ouvre la définition des symboles avec transformation par x-symbol.
+- pour "supprimer", ne pas mettre la phrase dans le texte.
+- D'après H avec  v0 extraite_de u et v0 converge  prouvons 
+   v0 converge puis on a v0 converge_vers l [G0] : éviter.
+- On ne peut pas cliquer dans une équation quand une hypothèse est
+sélectionnée pour faire rewrite_hyp (est-ce utile ?)
+- puis tel que -> et !!!
+- clic dans une sélection (supprime la sélection de la liste).
+- press a number to select a menu
+- bug rev1_rev1 dans mlrev_cor.pgx (can not rewrite rev1 (rev1 l))

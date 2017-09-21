@@ -1,0 +1,42 @@
+Import requis.
+Import reel.
+
+def limite u l = 
+  /\epsilon > 0 \/N in IN /\p in IN (p > N -> abs (u p - l) < epsilon).
+
+fact limite_plus /\u,v /\l,l' (limite u l -> limite v l' -> limite (u ++ v) (l + l')).
+intros.
+intros.
+local e = epsilon / 2.
+prove e > 0.
+elim div_pos.
+axiom H1.
+from deux_pos.
+apply H with G.
+lefts G0 $& $\/.
+apply H0 with G.
+lefts G0 $& $\/.
+apply max with H2 and H4.
+lefts G0 $& $\/.
+rename p N1.
+intros.
+instance ?1 N1.
+intro.
+axiom H6.
+intros.
+unfold $++.
+from abs ((u p - l) + (v p - l')) < epsilon.
+apply less_trans with H7 and H10.
+apply H3 with G0.
+axiom H9.
+apply less_trans with H8 and H10.
+apply H5 with G2.
+axiom H9.
+apply less_plus with G1 and G3.
+prove e + e = epsilon.
+trivial +less_diff deux_pos.
+elim less_trans.
+elim less_abs.
+axiom G4.
+save.
+

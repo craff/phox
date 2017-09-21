@@ -1,0 +1,46 @@
+Import nat.
+
+def Suite A = N => A. 
+
+def Periodique' f n = /\p:N f (p + n) = f p.
+def Periodique f = \/n:N (n != N0 & Periodique' f n).
+
+def Infix f "++" g = \x (f x + g x).
+
+lemma l1 /\A /\f:(Suite A)/\n:N (Periodique' f n -> /\p:N Periodique' f (n *p)).
+(*->*)
+intros.
+elim H2 with [rec].
+trivial.
+trivial.
+(*->*)
+save.
+
+goal /\A /\f,g:(Suite A) (Periodique f & Periodique g -> Periodique (f ++ g)).
+(*->*)
+intros.
+left H1.
+left H1.
+left H1.
+lefts H3.
+lefts H2.
+intro.
+intro.
+instance ?1 n*n0.
+trivial.
+intro.
+trivial.
+intros.
+unfold $++.
+apply l1 with A then H4.
+axiom H.
+axiom H1.
+apply l1 with A then H6.
+axiom H0.
+axiom H2.
+intro.
+(*->*)
+save th.
+
+depend th.
+

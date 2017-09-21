@@ -1,0 +1,982 @@
+(*
+I. La suite de Fibonacci
+Cst Fib : nat -> nat.
+claim Fib_0 Fib(N0) = N0.
+claim Fib_1 Fib(N1) = N1.
+claim Fib_n /\n Fib(S S n) = Fib(S n) + Fib(n).
+new_equation Fib_0.
+new_equation Fib_1.
+new_equation Fib_n.
+Fib_total = /\n:N  N (Fib n) : Theorem
+
+II. La valeur absolue de la différence
+Cst lInfix[3.5] x "|-|" y : nat -> nat -> nat.
+claim pm1 /\x,y:N (x <= y -> x |-| y = y - x).
+claim pm2 /\x,y:N (y <= x -> x |-| y = x - y).
+new_equation pm1.
+new_equation pm2.
+pm_total.N = /\x,y:N  N (x |-| y) : Theorem
+pm.comm.N = /\x,y:N  x |-| y = y |-| x : Theorem
+pm.add.N = /\x,y,z:N  (y <= x -> x |-| (y + z) = x - y |-| z) : Theorem
+new_equation pm.add.N.
+N2lesslesseq = /\x,x',z:N  (N2 <= x -> x' * x <= z * x + N1 -> x' <= z) : Theorem
+
+III. Le polynôme de Fibonacci
+def Pfib x y = (x * x + x*y) |-| y * y.
+Pfib_total = \/x,y:N  N (Pfib x y) : Theorem
+Pfib.rec = /\x,y:N  (x <= y -> Pfib x y = Pfib (y - x) x) : Theorem
+Pfibcond = /\x,y,z:N  (x <= y -> Pfib x y = z -> (y - x) * y <= x * x + z) : Theorem
+Pfibhyprec = /\x,y:N  (N2 <= x -> x <= y -> Pfib x y = N1 -> y - x < x) : Theorem
+/\x,y:N  (x <= y -> Pfib x y = N1 -> \/n:N  (x = Fib n & y = Fib (S n))) : Theorem
+*)
+(* ------------------------------------------------------------------------ *)
+Import nat.
+flag auto_lvl 2.
+flag auto_type true.
+
+
+(**  La suite de Fibonacci
+*)
+Cst Fib : nat -> nat.
+
+claim Fib_0 Fib(N0) = N0.
+claim Fib_1 Fib(N1) = N1.
+claim Fib_n /\n Fib(S S n) = Fib(S n) + Fib(n).
+
+new_equation Fib_0.
+new_equation Fib_1.
+new_equation Fib_n.
+
+goal /\n:N N (Fib n).
+intros.
+(*1 goal created.
+H := N n
+   |- N (Fib n)
+*)
+
+prove N (Fib n) & N (Fib (S n)).
+elim H.
+(*2 goals created.
+H := N n
+H0 := N y
+H1 := N (Fib y) & N (Fib (S y))
+   |- N (Fib (S y)) & N (Fib (S S y))
+
+
+H := N n
+   |- N (Fib N0) & N (Fib (S N0))
+*)
+
+trivial.
+(*0 goal created.
+H := N n
+H0 := N y
+H1 := N (Fib y) & N (Fib (S y))
+   |- N (Fib (S y)) & N (Fib (S S y))
+*)
+trivial.
+(*0 goal created.
+H := N n
+G := N (Fib n) & N (Fib (S n))
+   |- N (Fib n)
+*)
+trivial.
+(*0 goal created.
+proved
+*)
+save Fib_total.
+(*
+Fib_total = /\n:N  N (Fib n) : Theorem
+*)
+
+new_intro -i -t Fib Fib_total.
+
+
+(** La valeur absolue de la différence
+*)
+
+Cst lInfix[3.5] x "|-|" y : nat -> nat -> nat.
+
+claim pm1 /\x,y:N (x <= y -> x |-| y = y - x).
+claim pm2 /\x,y:N (y <= x -> x |-| y = x - y).
+
+new_equation pm1.
+new_equation pm2.
+
+goal /\x,y:N N(x |-| y).
+intros.
+(*1 goal created.
+H := N x
+H0 := N y
+   |- N (x |-| y)
+*)
+elim -1 x -3 y lesseq.case1.N.
+(*4 goals created, with 2 automatically solved.
+H1 := y < x
+  ou 
+H1 := x <= y
+*)
+rewrite pm1.
+(*1 goal created.
+...
+   |- N (y - x)
+intros.
+*)
+(*3 goals created, with 3 automatically solved.
+H := N x
+H0 := N y
+H1 := y < x
+   |- N (x |-| y)
+*)
+rewrite pm2.
+(*1 goal created.
+...
+   |- N (x - y)
+*)
+trivial.
+(*0 goal created.
+proved
+*)
+save pm_total.N.
+(*
+pm_total.N = /\x,y:N  N (x |-| y) : Theorem
+*)
+new_intro -t pm pm_total.N.
+
+
+goal  /\x,y:N (x |-| y = y |-| x).
+intros.
+(*1 goal created.
+H := N x
+H0 := N y
+   |- x |-| y = y |-| x
+*)
+elim -1 x -3 y lesseq.case1.N.
+(* 4 goals created, with 2 automatically solved.
+H1 := y < x
+ ou
+H1 := x <= y
+*)
+rewrite pm1 pm2.
+(*1 goal created.
+...
+   |- y - x = y - x
+*)
+trivial =.
+(*0 goal created.
+H := N x
+H0 := N y
+H1 := y < x
+   |- x |-| y = y |-| x
+*)
+
+rewrite pm1 pm2.
+(*1 goal created.
+...
+   |- x - y = x - y
+*)
+trivial =.
+(*0 goal created.
+proved
+*)
+save pm.comm.N.
+(*
+pm.comm.N = /\x,y:N  x |-| y = y |-| x : Theorem
+*)
+
+goal /\x,y,z:N (y <= x -> x  |-| (y + z) = (x - y) |-| z).
+intros.
+(*1 goal created.
+H := N x
+H0 := N y
+H1 := N z
+H2 := y <= x
+   |- x |-| (y + z) = x - y |-| z
+*)
+elim -1 x -3 (y+z) lesseq.case1.N.
+(*4 goals created, with 1 automatically solved.
+
+H3 := y + z < x
+  ou
+H3 := x <= y + z
+
+condition
+   |- N (y + z)
+intro.
+*)
+(*2 goals created, with 2 automatically solved.
+cas x <= y+z :
+...
+H3 := x <= y + z
+   |- x |-| (y + z) = x - y |-| z
+*)
+rewrite pm1.
+(*1 goal created.
+...
+   |- y + z - x = x - y |-| z
+Rappel :
+H0 := N y
+H2 := y <= x
+H3 := x <= y + z
+*)
+(* apply *)
+prove ?.
+elim -6 H0 -7 H3 -8 H2 lesseq.rrsub.N.
+(*2 goals created, with 1 automatically solved.
+Condition :
+...
+   |- N (y + z)
+intro.
+*)
+(*2 goals created, with 2 automatically solved.
+...
+G := x - y <= y + z - y
+   |- y + z - x = x - y |-| z
+
+*)
+rewrite_hyp G sub.ladd.N.
+(*1 goal created.
+...
+G := x - y <= z
+   |- y + z - x = x - y |-| z
+*)
+rewrite  pm1.
+(*1 goal created.
+...
+   |- y + z - x = z - (x - y)
+*)
+rewrite -nc sub.add.N;; trivial.
+(*0 goal created.
+cas y+z < x :
+
+H := N x
+H0 := N y
+H1 := N z
+H2 := y <= x
+H3 := y + z < x
+   |- x |-| (y + z) = x - y |-| z
+*)
+rewrite pm2.
+(*1 goal created.
+...
+   |- x - (y + z) = x - y |-| z
+*)
+(* lemme *)
+prove (y + z) -y < x -y.
+(*2 goals created.
+...
+   |- y + z - y < x - y
+*)
+elim  -7 H3    lesseq.rrsub.N.
+(*4 goals created, with 2 automatically solved.
+2 conditions :
+...
+   |- y <= S (y + z)
+...
+   |- N (S (y + z))
+intros.
+*)
+(*2 goals created, with 2 automatically solved.
+...
+   |- y <= S (y + z)
+Rappel :
+Current goal now is:
+H0 := N y
+H1 := N z
+*)
+trivial =H0 H1.
+(*0 goal created.
+...
+G := y + z - y < x - y
+   |- x - (y + z) = x - y |-| z
+*)
+rewrite_hyp G sub.ladd.N.
+(*1 goal created.
+...
+G := z < x - y
+   |- x - (y + z) = x - y |-| z
+*)
+rewrite -nc pm2;; trivial.
+save pm.add.N.
+(*
+pm.add.N = /\x,y,z:N  (y <= x -> x |-| (y + z) = x - y |-| z) : Theorem
+*)
+new_equation pm.add.N.
+
+goal  /\x,x',z:N(N2 <= x -> x' * x <= z * x + N1 -> x' <= z ).
+intros.
+(*1 goal created.
+H := N x
+H0 := N x'
+H1 := N z
+H2 := N2 <= x
+H3 := x' * x <= z * x + N1
+   |- x' <= z
+*)
+apply lesseq.lS.N with H3.
+(*1 goal created, with 1 automatically solved.
+...
+G := S (x' * x) <= S (z * x + N1)
+*)
+rewrite_hyp G -r add.rS.N.
+(*1 goal created.
+G2 := S (x' * x) <= z * x + S N1
+*)
+(* apply 
+Rappel :
+H2 := N2 <= x
+*)
+apply lesseq.add.N with z*x <= z*x and H2.
+(*5 goals created, with 3 automatically solved.
+2 conditions :
+...
+   |- z * x <= z * x
+*)
+intros.
+(*1 goal created, with 1 automatically solved.
+G0 := z * x + N2 <= z * x + x
+Rappel :
+G := S (x' * x) <= z * x + S N1
+*)
+(* apply *)
+apply lesseq.ltrans.N with G and G0.
+(*2 goals created, with 2 automatically solved.
+G1 := S (x' * x) <= z * x + x
+*)
+rewrite_hyp G1 -r mul.lS.N.
+(*1 goal created.
+G1 := S (x' * x) <= S z * x
+   |- x' <= z
+*)
+elim -1 x' -3 z lesseq.case1.N.
+(*4 goals created, with 3 automatically solved.
+
+deux cas x' <= z ou z < x': 
+
+cas x'<= z évident
+
+cas z < x' : on cherche une contradiction
+...
+G4 := S (x' * x) <= S z * x
+H4 := z < x'
+*)
+(* apply *)
+apply  lesseq.mul.N with H4 and x <= x.
+(*5 goals created, with 3 automatically solved.
+1 condition :
+...
+   |- x <= x
+*)
+intro.
+(*1 goal created, with 1 automatically solved.
+G1 := S (x' * x) <= S z * x
+G2 := S z * x <= x' * x
+*)
+(* apply *)
+apply lesseq.ltrans.N with G1 and G2.
+trivial.
+(*0 goal created.
+proved
+*)
+save N2lesslesseq.
+(*
+N2lesslesseq = /\x,x',z:N  (N2 <= x -> x' * x <= z * x + N1 -> x' <= z) : Theorem
+*)
+
+(* autre preuve 
+goal  /\x,x',z:N(N2 <= x -> x' * x <= z * x + N1 -> x' <= z ).
+intros.
+elim -1 x' -3 z lesseq.case1.N.
+prove S z <= x'.
+trivial = H4 H H1.
+prove ?.
+elim     -9 G -10(x <= x) lesseq.mul.N.
+trivial =H1.
+trivial =H.
+rewrite_hyp G0 mul.lS.N.
+rewrite_hyp G0 -l 1 add.commutative.N.
+prove ?.
+elim -9 (z*x <= z*x)  -10 H2 lesseq.add.N.
+trivial = H H1.
+trivial =.
+trivial = H1 H.
+trivial = H1 H.
+prove ?.
+elim -5 G1 -6 G0 lesseq.ltrans.N.
+trivial = H1 H.
+prove ?.
+elim -5 G2 -6 H3 lesseq.ltrans.N.
+trivial = H1 H.
+prove ?.
+elim -7 G3 lesseq.ladd_left.N.
+trivial = H1 H.
+trivial =.
+trivial =.
+trivial =G4.
+*)
+
+
+(** Le polynôme de Fibonacci
+*)
+
+def Pfib x y = (x * x + x*y) |-| y * y.
+
+goal \/x,y:N N (Pfib x y).
+intros $\/ $&.
+intro N0.
+intro N0.
+save Pfib_total.
+(*
+Pfib_total = \/x,y:N  N (Pfib x y) : Theorem
+*)
+new_intro -t Pfib Pfib_total.
+
+goal /\x,y:N(x <= y -> Pfib x y = Pfib (y - x) x ).
+intros.
+unfold Pfib.
+(*1 goal created.
+...
+   |- x * x + x * y |-| y * y = (y - x) * (y - x) + (y - x) * x |-| x * x
+*)
+rewrite mul.rsub.dist.N mul.lsub.dist.N.
+(*1 goal created.
+...
+   |- x * x + x * y |-| y * y =
+        (y * y - x * y - (y * x - x * x)) + (y * x - x * x) |-| x * x
+*)
+rewrite -nc add.rsub.N.
+(*4 goals created.
+3 conditions a vérifier ensuite :
+...
+   |- N (y * x - x * x)              : c3
+...
+   |- N (y * y - x * y)              : c2
+...
+   |- y * x - x * x <= y * y - x * y :c1
+Résultat :
+...
+   |- x * x + x * y |-| y * y = y * y - x * y |-| x * x
+*)
+rewrite -l 1 pm.comm.N.
+(*1 goal created.
+...
+   |- y * y |-| (x * x + x * y) = y * y - x * y |-| x * x
+*)
+rewrite -l 1 add.commutative.N.
+(*1 goal created.
+...
+   |- y * y |-| (x * y + x * x) = y * y - x * y |-| x * x
+*)
+rewrite pm.add.N.
+(*1 goal created.
+...
+   |- y * y - x * y |-| x * x = y * y - x * y |-| x * x
+*)
+elim equal.reflexive.
+(*0 goal created.
+Vérification des 3 conditions :
+condition c1 :
+...
+   |- y * x - x * x <= y * y - x * y   
+*)
+rewrite -r mul.lsub.dist.N.
+(*1 goal created.
+...
+   |- (y - x) * x <= (y - x) * y
+*)
+elim -1 (y-x) -3 x -5 (y-x) -7 y  lesseq.mul.N.
+(*6 goals created, with 5 automatically solved.
+
+1 nouvelle  condition à vérifier :
+...
+   |- y - x <= y - x
+*)
+intros.
+(*1 goal created, with 1 automatically solved.
+condition c2 :
+H := N x
+H0 := N y
+H1 := x <= y
+G := N (y - x)...
+   |- N (y * y - x * y)
+*)
+trivial.
+(*0 goal created.
+condition c2 :
+H := N x
+H0 := N y
+H1 := x <= y
+G := N (y - x)
+   |- N (y * x - x * x)
+*)
+trivial.
+(*0 goal created.
+proved
+*)
+save Pfib.rec.
+(*
+Pfib.rec = /\x,y:N  (x <= y -> Pfib x y = Pfib (y - x) x) : Theorem
+*)
+
+
+goal /\x,y,z:N (x <= y -> Pfib x y = z -> (y -x) * y <= x * x +z).
+intros.
+(*1 goal created.
+H := N x
+H0 := N y
+H1 := N z
+H2 := x <= y
+H3 := Pfib x y = z
+   |- (y - x) * y <= x * x + z
+*)
+rewrite  mul.lsub.dist.N.
+(*2 goals created, with 2 automatically solved.
+G1 := N (x * y)
+*)
+(* Rappel :
+H3 := Pfib x y = z
+*)
+unfold_hyp H3 Pfib.
+(*  Rappel :
+H3 := x * x + x * y |-| y * y = z
+deux cas pour |-| *)
+elim -1 (x * x + x * y) -3 (y * y) lesseq.case1.N.
+(*4 goals created, with 2 automatically solved.
+H4 := y * y < x * x + x * y
+ ou 
+H4 := x * x + x * y <= y * y
+*)
+
+(* premier cas  (x * x + x * y) <= (y * y) *)
+rewrite_hyp H3 pm1.
+(*1 goal created.
+...
+H3 := y * y - (x * x + x * y) = z
+   |- y * y - x * y <= x * x + z
+*)
+(* apply *)
+prove ?.
+elim -8 H3 sub_to_add.N. 
+(*4 goals created, with 4 automatically solved.
+...
+G5 := y * y = z + x * x + x * y
+   |- y * y - x * y <= x * x + z
+*)
+rewrite_hyp G add.associative.N.
+(*1 goal created.
+...
+G5 := y * y = (z + x * x) + x * y
+   |- y * y - x * y <= x * x + z
+*)
+(* apply *)
+prove ?.
+elim -3 G equal.symmetric.
+(*0 goal created.
+...
+G6 := (z + x * x) + x * y = y * y
+   |- y * y - x * y <= x * x + z
+*)
+(* apply *)
+prove ?.
+elim -7 G0 add_to_sub.N. 
+(*9 goals created, with 9 automatically solved.
+...
+G7 := z + x * x = y * y - x * y
+   |- y * y - x * y <= x * x + z
+*)
+rewrite -r G1.
+(*1 goal created.
+...
+   |- z + x * x <= x * x + z
+*)
+rewrite -l 1 add.commutative.N.
+(*1 goal created.
+...
+   |- x * x + z <= x * x + z
+*)
+intro.
+(*1 goal created, with 1 automatically solved.
+second cas :
+...
+H4 := y * y < x * x + x * y
+   |- y * y - x * y <= x * x + z
+Rappel :
+H3 := x * x + x * y |-| y * y = z
+*)
+
+(* second cas  (x * x + x * y) >= (y * y) *)
+prove x * x + x * y - y * y = z.
+trivial.
+(*1 goal created.
+H4 := y * y < x * x + x * y
+H3 := x * x + x * y - y * y = z
+*)
+prove (y * y <= x * x + x * y).
+(*2 goals created.
+...
+H4 := y * y < x * x + x * y
+   |- y * y <= x * x + x * y
+*)
+trivial =H4 H H0 H1.
+(*0 goal created.
+H4 := y * y < x * x + x * y
+H3 := x * x + x * y - y * y = z
+G5 := y * y <= x * x + x * y
+*)
+(* apply *)
+prove ?.
+elim  -8 G  sub_to_add.N.
+(*4 goals created, with 4 automatically solved.
+
+H4 := y * y < x * x + x * y
+G6 := x * x + x * y = z + y * y
+*)
+(* apply *)
+prove ?.
+elim -7 G1 add_to_sub.N.
+(*9 goals created, with 9 automatically solved.
+G7 := x * x = z + y * y - x * y
+*)
+prove ((x*y) <= (y *y)).
+(*2 goals created.
+...
+   |- x * y <= y * y
+Rappel :
+H2 := x <= y
+*)
+elim -9 H2 -10 (y<=y) lesseq.mul.N.
+(*5 goals created, with 4 automatically solved.
+une condition 
+...
+   |- y <= y
+*)
+intros.
+(*1 goal created, with 1 automatically solved.
+G8 := x * y <= y * y
+Rappel :
+G7 := x * x = z + y * y - x * y
+*)
+rewrite_hyp  G2 -r  sub.rass.N.
+(*1 goal created.
+G7 := x * x = z + (y * y - x * y)
+*)
+prove z <=  x * x.
+(* Rappel :
+G7 := x * x = z + (y * y - x * y)
+*)
+rewrite G2.
+intro.
+(*2 goals created, with 2 automatically solved.
+G10 := z <= x * x
+*)
+(* Rappel :
+G7 := x * x = z + (y * y - x * y)
+*)
+rewrite_hyp  G2 -l 1 add.commutative.N.
+(*1 goal created.
+G7 := x * x = (y * y - x * y) + z
+*)
+(* apply *)
+prove ?.
+elim -3 G2 equal.symmetric.
+(*0 goal created.
+G11 := (y * y - x * y) + z = x * x
+*)
+(* apply *)
+prove ?.
+elim -7 G5 add_to_sub.N.
+(*3 goals created, with 3 automatically solved.
+G12 := y * y - x * y = x * x - z
+*)
+prove ((x * x) -z <= (x * x)).
+elim  lesseq.rsub.N.
+(*3 goals created, with 3 automatically solved.
+G13 := x * x - z <= x * x
+*)
+rewrite_hyp G7 -r G6.
+(*1 goal created.
+...
+G13 := y * y - x * y <= x * x
+   |- y * y - x * y <= x * x + z
+*)
+elim -5 G7 lesseq.ltrans.N.
+intro.
+save Pfibcond.
+(*
+Pfibcond = /\x,y,z:N  (x <= y -> Pfib x y = z -> (y - x) * y <= x * x + z) : Theorem
+*)
+
+
+
+goal /\x,y:N (N2 <= x -> x <= y -> Pfib x y = N1 -> (y -x) < x).
+intros.
+(*1 goal created.
+H := N x
+H0 := N y
+H1 := N2 <= x
+H2 := x <= y
+H3 := Pfib x y = N1
+   |- y - x < x
+*)
+(* apply Pfibcond *)
+prove ?.
+elim -8 H3 Pfibcond.
+(*
+...
+G := (y - x) * y <= x * x + N1
+   |- y - x < x
+*)
+prove (y-x) * x <= (y -x) * y.
+elim   -10 H2 lesseq.mul.N. 
+(*5 goals created, with 4 automatically solved.
+1 condition :
+   |- y - x <= y - x
+*)
+intros.
+(* apply 
+Rappel :
+G := (y - x) * y <= x * x + N1
+G1 := (y - x) * x <= (y - x) * y
+*)
+prove ?.
+elim -5 G0 -6 G lesseq.ltrans.N.
+(*4 goals created, with 4 automatically solved.
+G2 := (y - x) * x <= x * x + N1
+*)
+(* apply *)
+prove ?.
+elim  -8 G1 N2lesslesseq.
+(*4 goals created, with 4 automatically solved.
+H3 := Pfib x y = N1
+G3 := y - x <= x
+   |- y - x < x
+*)
+
+elim -1 x -3 (y - x) lesseq.case1.N.
+(*4 goals created, with 3 automatically solved.
+Deux cas :
+ y - x  < x : évident 
+   ou 
+H4 := x <= y - x
+Rappel :
+G3 := y - x <= x
+*)
+prove ?.
+elim -5 H4 -6 G2 lesseq.anti_sym.N.
+(*2 goals created, with 2 automatically solved.
+G4 := x = y - x
+*)
+(* apply *)
+prove ?.
+elim -3 G3 equal.symmetric.
+(*0 goal created.
+...
+G5 := y - x = x
+*)
+(* apply *)
+prove ?.
+elim -8 G4 sub_to_add.N.
+(*4 goals created, with 4 automatically solved.
+G6 := y = x + x
+Rappel :
+H3 := Pfib x y = N1
+*)
+rewrite_hyp H3 G5.
+(*1 goal created.
+H3 := Pfib x (x + x) = N1
+*)
+unfold_hyp H3 Pfib.
+(*1 goal created.
+H3 := x * x + x * (x + x) |-| (x + x) * (x + x) = N1
+*)
+rewrite_hyp H3 mul.left.distributive.N.
+(*1 goal created.
+H3 := x * x + x * x + x * x |-| ((x + x) * x + (x + x) * x) = N1
+*)
+rewrite_hyp H3 mul.right.distributive.N.
+(*1 goal created.
+H3 := x * x + x * x + x * x |-| ((x * x + x * x) + x * x + x * x) = N1
+*)
+rewrite_hyp H3 add.associative.N.
+rewrite_hyp H3 pm1.
+(*1 goal created.
+H3 := x * x + x * x + x * x + x * x - (x * x + x * x + x * x) = N1
+*)
+rewrite_hyp H3 sub.ladd.N.
+(*0 goal created.
+Current goal now is:
+...
+H := N x
+H1 := N2 <= x
+H3 := x * x = N1
+G10 := N N2
+*)
+(* apply *)
+prove ?.
+elim -9 H1 -10 H1 lesseq.mul.N.
+(*4 goals created, with 4 automatically solved.
+...
+H3 := x * x = N1
+G10 := N N2
+G11 := N2 * N2 <= x * x
+*)
+rewrite_hyp G6 H3.
+trivial =G6.
+save Pfibhyprec.
+(*
+Pfibhyprec = /\x,y:N  (N2 <= x -> x <= y -> Pfib x y = N1 -> y - x < x) : Theorem
+*)
+
+
+theorem Fib.Pol /\ x,y:N (x<= y -> Pfib x y =N1 -> \/n:N(x = Fib n & y = Fib (S n))).
+intro 2.
+elim -4 H well_founded.N.
+intros.
+elim -1 a case.N.
+rewrite_hyp H4 H5.
+rewrite H5.
+rmh H3 H5.
+intro.
+instance ?1 N0.
+intros $&.
+intro.
+rewrite Fib_1.
+rewrite_hyp H4 Pfib mul.lN0.N add.lN0.N.
+rewrite_hyp  H4  pm1.
+rewrite_hyp H4 sub.rN0.N.
+elim -1 y -3 y  rmul.eq_N1.N.
+(* fin du cas 0 *)
+
+
+left H5.
+left H5.
+elim -1 z case.N.
+
+(* cas x = 1 *)
+rewrite_hyp H6 H7.
+rewrite_hyp H3 H6.
+rewrite_hyp H4 H6.
+rewrite H6.
+unfold_hyp H4 Pfib.
+rewrite_hyp H4 mul.lN1.N.
+elim -1 y case.N.
+
+(* cas x =1, y = 0 *)
+trivial = H3 H8 H2.
+(* fin du cas x =1, y = 0 *)
+left H8.
+left H8.
+elim -1 z0 case.N.
+(* cas x =1, y = 1 *)
+rewrite_hyp H9 H10.
+rewrite H9.
+intros.
+instance ?2 N1.
+intros.
+intro.
+(* fin du cas x =1, y = 1 *)
+
+(* cas  x = 1 , y >=2 *)
+lefts H10.
+rewrite_hyp H9 H11.
+prove S N0 + y <= y*y.
+prove S N0 + y <= y + y.
+trivial = H3 H2.
+prove  y + y <= y * y .
+rewrite H9.
+trivial = H10.
+trivial 4 = H2 G G0.
+rewrite_hyp H4 -l 1 pm1.
+rewrite_hyp H4 -l 1 sub.lass.N.
+prove y <= y * y.
+prove y <= S N0 + y.
+trivial = H2.
+elim -5 G0 -6 G lesseq.ltrans.N.
+
+elim -1 z1 case.N.
+(* cas x=1, y = 2 *)
+rewrite_hyp H9 H12.
+rewrite H9.
+intro.
+instance ?3 N2.
+intros.
+rewrite Fib_n Fib_1 Fib_0.
+trivial =.
+rewrite Fib_n Fib_1 Fib_0.
+trivial =.
+(* fin du cas x=1, y = 2 *)
+
+left H12.
+left H12.
+rewrite_hyp H9 H13.
+(* cas x=1, y >= 3 *)
+
+prove  N3 <= y * y - y.
+
+prove N3 <= y.
+rewrite H9.
+trivial = H12.
+prove y * N3 - y <= y * y -y. 
+elim -1 y lesseq.radd_left.N.
+trivial = H2.
+prove y <= y * N3.
+elim -1 y -3 N3 lesseq.lmul.N.
+trivial =.
+rewrite -nc add.rsub.N.
+elim -1 y -3 N3 -5 y -7 y lesseq.mul.N.
+trivial = H2.
+prove  y * N3 - y * N1 <= y * y - y.
+rewrite mul.rN1.N.
+prove N1 < N3.
+trivial =.
+rewrite_hyp  G3 -r -nc  mul.rsub.dist.N.
+prove N3 - N1 = N2.
+trivial =.
+rewrite_hyp G3 G5.
+prove y <= y * N2.
+rewrite  mul.rN2.N.
+intro.
+prove N3 <= y * N2.
+elim -5 G1 -6 G6 lesseq.ltrans.N.
+elim -5 G7 -6 G3 lesseq.ltrans.N.
+intros.
+prove N2 <= y * y - S N0 - y. 
+prove N (y * y - S N0 - y).
+rewrite H4.
+elim -1 N1 lesseq.radd_left.N.
+prove y * y >= N1.
+elim -6 G0 lesseq.ltrans.N.
+rewrite -r sub.lass.N.
+from N2 + N1 <= y * y - (y + S N0) + N1.
+rewrite -nc sub.lass.N.
+select 2.axiom G.
+rewrite -nc add.rsub.N.
+axiom G1.
+elim -5 (N1 <= N3) -6 G1 lesseq.ltrans.N.
+trivial =.
+rewrite_hyp G2 H4.
+trivial = G2.
+(* fin du cas x =1 *)
+
+(* cas x >= 2 *)
+lefts H7.
+rewrite_hyp H6 H8.
+apply -7 H4 Pfibhyprec.
+trivial = H6 H7.
+apply -5 H3 Pfib.rec.
+rewrite_hyp G0 H4.
+apply -3 G0 equal.symmetric.
+apply -3 G -5 H0  -7 G1  H1.
+trivial =G H2 H0 H3.
+lefts G2.
+apply -8 H10 sub_to_add.N.
+rewrite_hyp G2 H11.
+rewrite_hyp G2 -l 1 add.commutative.N.
+rewrite_hyp G2 -r Fib_n.
+intro.
+instance ?4 (S n).
+intros.
+save.
+(*
+/\x,y:N  (x <= y -> Pfib x y = N1 -> \/n:N  (x = Fib n & y = Fib (S n))) : Theorem
+*)

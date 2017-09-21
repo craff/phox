@@ -1,0 +1,44 @@
+
+(* un petit exercice très court ! C'est en fait la preuve que deux
+permutations à support disjoint commutent. *)
+
+flag auto_lvl 1.
+
+def injective f = /\x,y (f x = f y -> x = y).
+
+prop exo1 
+  /\h,g (injective h & injective g &  /\x (h x = x or g x = x) 
+      -> /\x (h (g x)) = (g (h x))).
+(*->*)
+(*  soit h, g et x supposons
+   injective h & injective g & /\x0 (h x0 = x0 or g x0 = x0)
+   [H] prouvons h (g x) = g (h x)  *)
+intros.
+(*  D'après H, on a injective h [H], injective g [H0] et
+   /\x0 (h x0 = x0 or g x0 = x0) [H1]   *)
+lefts H.
+(*  D'après H1 avec  x  distinguons 2 cas : supposons h x = x [H2] 
+   puis supposons g x = x [H2]   *)
+elim H1 with  x.
+(*  D'après H1 avec g x 
+   distinguons 2 cas : supposons h (g x) = g x [H3]  puis
+   supposons g (g x) = g x [H3]   *)
+elim H1 with g x.
+(*  immédiat  *)
+intros.
+(*  D'après H0 avec  g (g x) = g x  on a g x = x [G]   *)
+apply H0 with H3.
+(*  immédiat  *)
+intros.
+(*  D'après H1 avec h x 
+   distinguons 2 cas : supposons h (h x) = h x [H3]  puis
+   supposons g (h x) = h x [H3]   *)
+elim H1 with h x.
+(*  D'après H avec  h (h x) = h x  on a h x = x [G]   *)
+apply H with H3.
+(*  immédiat  *)
+intros.
+(*  immédiat  *)
+intros.
+(*->*)
+save.

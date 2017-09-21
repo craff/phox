@@ -1,0 +1,167 @@
+
+\chapter{Natural Commands}
+
+PhoX's natural commands are conceived as an intermediate language for
+a forthcoming natural language interface. But, they are also directly
+usable with the following advantages and disadvantages compared with
+the usual tactics:
+
+\begin{description}
+\item[advantages] Proof are readable and more robust (when you modify
+something in your theorems, less work is necessary to adapt your
+proofs).
+\item[disadvantages] The automatic reasoning of PhoX is pushed to the
+limit and in the current implementation it may be hard to do complex
+proofs with natural commands. You can greatly help the system by using
+the \verb#rmh# or \verb#slh# commands to select the hypotheses.  
+\end{description}
+
+Remark: some of the feature described here are signaled as not yet
+implemented.
+
+\section{Examples}
+
+Here are two examples:
+
+\begin{verbatim}
+def injective f = /\x,y (f x = f y -> x = y).
+
+prop exo1 
+  /\h,g (injective h & injective g &  /\x (h x = x or g x = x) 
+      -> /\x (h (g x)) = (g (h x))).
+
+let h, g assume injective h [H] and injective g [G] 
+              and /\x (h x = x or g x = x) [C] 
+  let x show h (g x) = g (h x).
+by C with x assume h x = x then assume g x = x.
+(* cas h x = x *)  
+  by C with g x assume h (g x) = g x trivial 
+           then assume g (g x) = g x [Eq].
+  by G with Eq deduce g x = x trivial.
+(* cas g x = x *)
+  by C with h x assume g (h x) = h x trivial 
+           then assume h (h x) = h x [Eq].
+  by H with Eq deduce h x = x trivial.
+save.
+\end{verbatim}
+
+\begin{verbatim}
+def inverse f A = \x (A (f x)).
+
+def ouvert O = /\ x (O x -> \/a > R0 /\y (d x y < a -> O y)).
+
+def continue1 f = /\ x  /\e > R0 \/a > R0
+  /\ y (d x y < a -> d (f x) (f y) < e).
+
+def continue2 f = /\ U ((ouvert U) -> (ouvert (inverse f U))).
+
+goal /\f (continue1 f -> continue2 f).
+let f assume continue1 f [F]
+  let U assume ouvert U [O] show ouvert (inverse f U).
+let x assume U (f x) [I] show \/b > R0  /\x' (d x x' < b -> U (f x')).
+by O with f x let a assume a > R0 [i] and /\y (d (f x) y < a -> U y) [ii].
+by F with x and i let b assume b > R0 [iii] and /\ x' (d x x' < b -> d (f x) (f x') < a) [iv].
+let x' assume d x x' < b [v] show U (f x').
+by ii with f x' show d (f x) (f x') < a.
+by iv with v trivial.
+save th1.
+\end{verbatim}
+
+\section{The syntax of the command}
+
+The command follow the following grammar:
+
+$$
+\begin{array}{lclr}
+\hbox{\it cmd } &:=& \hbox{\tt let }  \hbox{\it idlist }\hbox{\it cmd }
+\mid \cr
+&& \hbox{\tt assume } \hbox{\it expr } \hbox{\it naming }
+\{\hbox{\tt and }\hbox{\it expr } \hbox{\it naming}\} \hbox{ \it cmd } \mid \cr
+&& \hbox{\tt deduce } \hbox{\it expr } \hbox{\it naming }
+\{\hbox{\tt and }\hbox{\it expr } \hbox{\it naming}\} \hbox{ \it cmd }
+\mid \cr
+&& \hbox{\tt by } \hbox{\it alpha-ident } \{\hbox{\tt with }
+\hbox{\it with-args}\} \hbox{ \it cmd }  \mid \cr
+&& \hbox{\tt show } \hbox{\it expr } \hbox{\it cmd } \mid \cr
+&& \hbox{\tt trivial } \mid \cr
+&& \emptyset \mid  & \hbox{not allowed after \tt by}\cr
+&& \hbox{\it cmd } \hbox{\tt then } \hbox{\it cmd } \mid \cr
+&& \hbox{\tt begin } \hbox{\it cmd }  \hbox{\tt end } \mid \cr
+
+\hbox{\it idlist} &:=& \hbox{\it alpha-ident } \{, \hbox{\it
+alpha-ident }\} \{: \hbox{\it expr} \mid \hbox{\it infix-symbol }
+\hbox{\it expr}\} \mid \cr
+&& \hbox{\it alpha-ident } = \hbox{\it expr} \mid & \hbox{not implemented} \cr
+&& \hbox{\it idlist} \hbox{ \tt and }  \hbox{\it idlist} \cr
+
+\hbox{\it naming } &:=& \hbox{\tt named } \hbox{\it alpha-ident } \mid
+[ \hbox{\it alpha-ident } ]  \cr
+
+\hbox{\it with-args} &:=& \multicolumn{2}{l}{\hbox{see the documentation of the \hbox{\tt elim} and \hbox{\tt apply} commands in the appendix}}
+\end{array}
+$$
+
+Note: In the current implementation, only {\tt trivial} is allowed
+after {\tt show}. Naming using square brackets wont work if the
+opening square bracket is defined as a prefix symbol.
+
+\section{Semantics}
+
+\begin{definition} A natural command is simple if {\tt show} is
+followed by the empty command.
+\end{definition}
+
+A simple command in a goal is interpreted as a rule that needs to be
+proved derivable automatically by PhoX. A natural command can be seen as a tree of simple command and is
+therefore interpreted as a tree of derivable rule, that is a derivable
+rule itself.
+
+We will just describe the interpretation of a simple command:
+let us assume the current goal is $\Gamma \vdash A$ then a simple
+command is interpreted as a rule whose conclusion is $\Gamma \vdash A$
+and whose premises are defined by induction on the structure of the
+command. Thus, we only need to prove the premises to prove the current
+goal.
+
+First some syntactic sugar can be elliminated:
+\begin{itemize}
+\item $\hbox{\tt let } I \hbox{ \tt and } I'$ is interpreted as $\hbox{\tt let } I \hbox{ \tt let } I'$
+\item $\hbox{\tt let } x_1,\dots,x_n \star P$ (where $\star$ is $:$ or an infix
+symbol is interpreted as $\hbox{\tt let } x_1 \star P \dots \hbox{\tt let } x_n \star P$
+\item $\hbox{\tt let } x : P$ is interpreted as $\hbox{\tt let } x
+\hbox{ \tt assume } P x$
+\item $\hbox{\tt let } x \star P$ is interpreted as $\hbox{\tt let } x
+\hbox{ \tt assume } x \star P$ where
+$\star$ is an infix symbol.
+\item The keyword \hbox{\tt deduce} is interpreted as \hbox{\tt
+assume}.
+\item $\hbox{\tt assume } A_1 \hbox{ \tt and } \dots  \hbox{ \tt and }
+A_n$ is interpreted as $\hbox{\tt assume } A_1 \hbox{ \tt assume } \dots  \hbox{ \tt assume }
+A_n$
+\end{itemize}
+
+Then the set of premises $|C|$ associated to the simple command $C$ if
+the current goal is $\Gamma \vdash A$
+is
+defined by
+$$
+\begin{array}{lcl}
+|\hbox{\tt let } x \; C| &=& |C| \;\; \hbox{the variable $x$ may be used in
+$|C|$} \cr
+|\hbox{\tt assume } E\, \hbox{ \tt named } H \; C| &=& \{H := E,\Gamma_1 \vdash B_1,
+\dots, H := E,\Gamma_n \vdash B_n\}  \cr
+&& \hbox{if } |C| = \{\Gamma_1 \vdash B_1,
+\dots, \Gamma_n \vdash B_n\}\;\; \hbox{if $H$ is not given, it is
+chosen} \cr
+&& \hbox{by PhoX} \cr
+\hbox{\tt by } H \hbox{ \tt with } \dots C &=& |C| \;\; \hbox{the
+indication in by are used as
+hints by the automated} \cr
+&&\hbox{ when using $H$.}\cr
+|\hbox{\tt show } E| &=& \{\Gamma\vdash E\} \cr
+|\emptyset| &=& \{\Gamma\vdash A\} \cr
+|C \hbox{\tt  then } C'| &=& |C| \cup |C'| \cr
+|\hbox{\tt begin } C \hbox{\tt end }| &=& |C|
+\end{array}
+$$
+

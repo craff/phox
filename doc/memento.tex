@@ -1,0 +1,111 @@
+% $State: Exp $ $Date: 2003/01/31 12:44:43 $ $Revision: 1.3 $
+
+\documentclass{article}
+\usepackage{a4wide}
+\pagestyle{headings}
+\hfuzz=11pt
+        
+\title{The PhoX Proof checker Memento \\
+                {\footnotesize Version 0.7}}
+
+\date{\today}
+\author{}
+
+\newcommand{\idx}[1]{\index{\tt #1}}
+\newcommand{\tdx}[1]{\index{\sl #1}}
+
+\makeindex
+
+\begin{document}
+
+\maketitle
+
+\section{Command modifying the theory.}
+\begin{description}
+\item[claim] to claim an axiom.
+\item[Cst] to add a new constant to the language.
+\item[def] to add a new definition to the language.
+\item[Data] to define a data types.
+\item[goal | prop | proposition | lem  | lemma | fact | cor |
+corollary | theo | theorem] to start the proof of a theorem.
+\item[Inductive] to define an inductive predicate.
+\item[save] to save a proved theorem.
+\item[Sort] to add a new sort (constant or defined).
+\end{description}
+
+\section{Basic proof commands}
+\begin{description}
+\item[apply] to use a formula to deduce something else by applying
+elimination rules.
+\item[elim] to use a formula to deduce the current goal by applying
+elimination rules.
+\item[intro | intros] to apply introduction rules.
+\item[left | lefts] to apply elimination rules which are also left rules.
+\end{description}
+
+\section{General proof commands}
+\begin{description}
+\item[abort] to abort a proof.
+\item[absurd] to use the pierce law.
+\item[auto | trivial] automatic reasonning.
+\item[constraints] to print constaints about existential variables.
+\item[goals] to print the current goals.
+\item[next] to change the current goal.
+\item[rmh | slh] to add or select hypothesis.
+\item[undo] to undo.
+\item[use] to prove a formula and the use it (cut).
+\end{description}
+
+\section{Equationnal reasonning and definitions}
+\begin{description}
+\item[from] to try to transform the goal in something equal.
+\item[local] to define somthing local to the current goal.
+\item[rename] to rename symbols local to this goal.
+\item[rewrite] to use an equation to transform the goal.
+\item[rewrite\_hyp] to use an equation to transform an hypothesis.
+\item[unfold] to open a definition in the goal.
+\item[unfold\_hyp] to open a definition in an hypothesis.
+\end{description}
+
+\section{Hint.}
+\begin{description}
+\item[close\_def] to tell the system never to open the definition (it can
+still be open using unfold or unfold\_hyp.
+\item[flag] to print of change the value of system variables.
+\item[new\_elim] to add a theorem as an elimination rule.
+\item[new\_intro] to add a theorem as an introduction rule.
+\item[new\_equation] to add a theorem as an equation usable by the system.
+\end{description}
+
+\section{Module.}
+\begin{description}
+\item[Import] to import a module and use it.
+\item[Use] to make a module a part of the current module.
+\item[include] to load a text file.
+\end{description}
+
+
+\section{TeX.}
+\begin{description}
+\item[tex\_syntax] to define the TeX syntax of a symbol.
+\end{description}
+ 
+\section{Data mangagement.}
+\begin{description}
+\item[del] to delete something (and everything using it).
+\item[edel] to delete a theorem from a hint table (intro, elim or rewrite).
+\item[depend] to print the list of axiom used by a theorem. 
+\item[priority] to print the priority and syntax of symbols.
+\item[search] to search for symbols containing a string.
+\end{description}
+
+\section{Control command}
+\begin{description}
+\item[add\_path] to add a dir in the search path.
+\item[flag] to print of change the value of system variables.
+\item[quit] you didn't get it ?
+\end{description}
+
+\end{document}
+
+

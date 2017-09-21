@@ -1,0 +1,36 @@
+% $State: Exp $ $Date: 2002/03/12 12:52:47 $ $Revision: 1.3 $
+
+\input{pretty.tex}
+\DefineShortVerb{\¶} 
+\VerbatimFootnotes
+
+\def\text#1{\relax%
+  \mathchoice{\hbox{\everymath{\displaystyle}#1}}
+             {\hbox{\everymath{\textstyle}#1}}
+             {\hbox{\everymath{\scriptstyle}\small #1}}
+             {\hbox{\everymath{\scriptscriptstyle}\tiny #1}}}
+\def\setmuskip{\thinmuskip=0mu\medmuskip=0mu\thickmuskip=0mu}
+\def\afdumath{\relax\ifmmode%
+               \def\endafdmath{$\egroup}\def\action{\hbox\bgroup$\setmuskip}%
+             \else%
+               \def\endafdmath{$}\def\action{$\setmuskip}%
+             \fi\action}
+\def\afdmmath{\relax\ifmmode%
+                \def\endafdmmath{\endmmath\egroup}%
+                \def\action{\bgroup\setmuskip\mmath}%
+              \else%
+                \def\endafdmmath{\endmmath$$}%
+                \def\action{$$\setmuskip\mmath}%
+              \fi\action}
+\def\afdmath{\protect\afdumath}
+\def\endafdmath{\protect\endafdmath}
+
+\def\indentskip{1em}
+
+\def\includeafd#1{{%
+        \def\beginafdeux##1##2##3{}%
+        \def\endafdeux{}%
+        \input{#1}}}
+
+\newcommand{\AFD}{\hbox{PhoX}}
+

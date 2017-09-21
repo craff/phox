@@ -1,0 +1,105 @@
+(* monoid a semigroup with a neutral element *)
+tex
+  title = "Monoid"
+  author = "C. Raffalli"
+  institute = "Chalmers University of Technology"
+  documents = math doc
+.
+
+flag auto_lvl 3.
+
+Module monoid.
+
+  (*!math doc
+    \section{definition and basic properties.}
+  *)
+
+  Use semigroup.
+
+  Cst e : set.
+
+  claim neutre_total G e.
+  new_intro -t e neutre_total.
+
+  claim neutre_left /\x:G e op x = x.
+  claim neutre_right /\x:G x op e = x.
+  new_equation neutre_left.
+  new_equation neutre_right.
+  tex_syntax neutre_left "neutre left".
+  tex_syntax neutre_right "neutre right".
+
+  (*! math doc
+  \begin{definition}
+    A monoid is a semigroup with a constant \[ e \] , neutral element of the
+    operateur \[ x op y \]. This is exporessed by the axiom following axioms:
+      $$\begin{array}{ll}
+         \[ $$neutre_right \] &\hspace{2cm} (\[ neutre_right \])\cr
+         \[ $$neutre_left \] &\hspace{2cm} (\[ neutre_left \]) 
+      \end{array}$$
+  \end{definition}
+  *)
+
+end.
+
+Module sub.
+  Use monoid.
+  Use semigroup.sub.
+
+  claim neutre_total.H  H e.
+  new_intro e neutre_total.H.
+end.
+
+Module hmorph.
+
+  Use monoid with
+    _ -> _.D
+  .
+
+  Use monoid with
+    _ -> _.I
+  .
+
+  Use semigroup.hmorph.
+
+  claim neutre_compat.f f e.D = e.I.
+  new_equation neutre_compat.f.
+
+end.
+
+Module hmorph_comp.
+
+  Use hmorph with
+    _.D -> _.1
+  | _.I -> _.2
+  | f -> f
+  | _.f -> _.f
+  .
+
+  Use hmorph with
+    _.D -> _.2
+  | _.I -> _.3
+  | f -> g
+  | _.f -> _.g
+  .
+
+  Use semigroup.hmorph_comp.
+
+  edel equation neutre_compat.h.
+
+  goal h e.1 = e.3.
+  from g e.2 = e.3.
+  trivial.
+  save neutre_compat.h.
+  new_equation neutre_compat.h.
+
+  new_equation neutre_compat.h.
+
+  Use hmorph with
+    _.D -> _.1
+  | _.I -> _.3
+  | f -> h
+  | _.f -> _.h
+  .
+
+end.
+ 

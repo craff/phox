@@ -1,0 +1,711 @@
+(*
+===========================================================================
+
+                    An introduction to logic and PhoX
+
+                         C. Raffalli December 1997
+
+                          Updated October 2000
+
+                          Translated July 2002
+		            
+===========================================================================
+*)
+
+(*
+
+There are two goals for this tutorial:
+  - We introduce step by step the simplest commands of the PhoX
+    system, using simple examples of propositional or predicate logic.
+  - These examples can also be used as an illustration of a 
+    logic course.
+
+The general principles used to construct proofs are the following:
+  - We use the "goal" command to indicate the formula we want to prove.
+  - At every step we have some goals to prove. One of them is the "current"
+    goal (this is the goal number 1). We can print all the goals using the
+    command "goals" or the "State" button on the Emacs interface. Each
+    goal has hypotheses which are automatically named (we could also
+    chose the name of the hypotheses) and one conclusion that we shall
+    prove using the hypotheses.
+  - We use some commands to indicate one of more logical rules to
+    apply. Then, the system construct the new goals to prove if there
+    are any.
+  - When there are no more goals to prove, the proof is finished and we can
+    save it using the command "save".
+ 
+*)
+
+(*
+
+To start PhoX, open a file .phx under XEmacs with ProofGeneral, this is what
+you did if you are reading this file!
+
+Under XEmacs, we can directly send a command to PhoX using the button
+"next" or typing "LineFeed" or "Control-J". We can also send a piece
+of the file by moving to the desired position and pressing the button
+"goto". The line interpreted by the system appear on a blue
+background. We can go back using the "undo" button.
+
+In some (rare) cases, after a lot of "undo", the system is "lost"
+(this is caused by synchronization problems between PhoX and
+ProofGeneral). Then we use the "restart" button and the the "goto"
+button to go back where we were before the problem.
+
+When we are doing a proof, we can use the button "state" to print all
+the goals.
+
+For the first exercises, we use the constants "A", "B" and "C" and the 
+implication "->", the conjunction "&", the disjunction "or", the negation "~"
+and "False".
+
+Note: "~ A" is defined as "A -> False".
+
+First we define the propositional variables A, B, C.
+To do so enter the following lines:
+
+*)
+
+Cst A : prop.
+Cst B : prop.
+Cst C : prop.
+
+(*
+We can now prove a formula:
+*)
+
+goal A -> A.
+
+(* 
+
+The "goal" command indicates to PhoX that we want to prove the formula
+"A -> A" (It is important not to forget the point and the carriage
+return at the end of the command).
+
+PhoX answers:
+
+|- A -> A
+
+The sign "|-" precedes the formula to be proved.
+
+We can therefore indicate that we want to use an "introduction" rule:
+*)
+
+intro.
+
+(*
+ PhoX answers :
+
+1 goal created.
+New goal is:
+
+H := A
+   |- A
+
+The ligne H0 := A indicated that we have as an hypothesis the formula
+"A". "H0" is thename of this hypothesis. The formula to be proved
+using this hypothesis is "A".
+
+PhoX automatically detected the introduction rule to apply because the
+formula started with an implication and there is only one introduction
+rule for this connective.
+
+We can now end the proof with an axiom rule:
+*)
+
+axiom H.
+
+(*
+PhoX answers:
+
+0 goal created.
+proved
+
+The proof is finished!
+
+We can now save it by typing
+*)
+
+save my_first_theorem.
+
+(*
+PhoX answers:
+
+Building proof .... 
+Typing proof .... 
+Verifying proof .... 
+Saving proof ....
+my_first_theorem = A -> A : Theorem
+
+PhoX constructs and recheck the proof, then it saves it in the machine
+using the given name.
+
+Let us prove a more complex formula:
+*)
+
+goal ((A & B) -> C) -> A -> B -> C  .
+
+(* 
+We could type three times "intro", we can also type "intro 3":
+*)
+
+intro 3.
+
+(*
+PhoX answers:
+
+1 goal created.
+New goal is:
+
+H := A & B -> C
+H0 := A
+H1 := B
+   |- C
+
+We can use the hypothesis "H" to prove "C" using an elimination of the
+implication. It is enough to write:
+
+*)
+
+elim H.
+
+(* 
+PhoX tried to apply some introduction rules to obtain the formula
+"C" from "H" and thre was only one possibility (this is not always the
+case).
+
+As before, we use "intro" to apply one introduction rule:
+*)
+
+intro.
+
+(*
+PhoX answers:
+
+2 goals created.
+
+New goals are:
+goal 1/2
+H := A & B -> C
+H0 := A
+H1 := B
+   |- A
+
+goal 2/2
+H := A & B -> C
+H0 := A
+H1 := B
+   |- B
+
+We have now two goals to prove because the introduction rule for
+conjunction has two premices. The first printed goal is the current
+goal. We can solve it by an axiom rule, then we are left we the second
+goal to prove which is solved in the same way:
+
+*)
+
+axiom H0.
+axiom H1.
+save my_second_theorem.
+
+(*
+Remark: We just saw two kinds of rules:
+
+- Introdution rules, used to prove a formula without using the
+  hypothesis. These rules decompose the formula to be proven.
+- Elimination rules, which allow to use the hypothesis (or any other
+  formula which then must be proved too) to deduce other formulas.  
+- We will see soon the left rules which decompose an hypothesis without 
+  changing the conclusion.
+
+exercise: finish the following proof (replace the "...." 
+by the proper commands):
+
+*)
+
+goal ((((A -> B) -> A) -> A) -> B) -> B.
+(*->*)
+intro.
+elim H.
+intro.
+elim H0.
+intro.
+elim H.
+intro.
+axiom H1.
+(*->*)
+save th3.
+
+(*
+We can also prove the following:
+*)
+
+goal ((A or B) -> C) -> A -> C.
+intro 2.
+elim H.
+
+(*
+At this step, we can type "intro".
+*)
+intro.
+
+(*
+PhoX answers:
+
+1 goal created.
+New goal is:
+
+H0 := A or B -> C
+H1 := A
+   |- B
+
+and we will not be able to finish the proof ! what happened ? There
+are two introduction rules for the disjunction and PhoX chooses the
+wrong one. We can say intro l to choose the rule saying "A |- A or B"
+(l for left). To go back, we use the "undo" command and we replace
+"intro" by "intro l". We can then end the proof: 
+*)
+
+undo.
+intro l.
+axiom H0.
+save th4.
+
+(*
+
+Exercise: finish the following proof:
+
+*)
+
+goal (A or B -> C)  ->  (A -> C) & (B -> C).
+intro.
+intro.
+intro.
+elim H.
+(*->*)
+intro l.
+axiom H0.
+intro.
+elim H.
+intro r.
+axiom H0.
+(*->*)
+save th5.
+
+(*
+
+A similar problem can arise with conjunction: let us prove the following:
+
+*)
+
+goal (B -> C) & (A -> C)  ->  (A or B -> C).
+intro 2.
+
+(*
+
+PhoX answers:
+
+H0 := (A -> C) & (B -> C)
+H1 := A or B
+   |- C
+
+We can then do an elimination of the conjunction using the following:
+
+*)
+
+elim H0.
+
+(*
+Then we have two goals to prove:
+
+2 goals created.
+New goals are:
+
+H0 := (A -> C) & (B -> C)
+H1 := A or B
+H2 := A
+   |- C
+
+
+H0 := (A -> C) & (B -> C)
+H1 := A or B
+H2 := B
+   |- C
+
+In each case, we have to do an elimination of the conjunction and then
+an elimination of the implication. But we have to choose the correct
+side of the conjunction. To do so we use the following:
+
+*)
+
+elim H with [r].
+axiom H1.
+elim H with [l].
+axiom H1.
+save th6.
+
+(*
+
+The option "with [l]" indicates to use the rule saying "A & B |- A"
+for the first elimination.
+
+We could have use left rules to write the same proof:
+
+*)
+
+goal (B -> C) & (A -> C)  ->  (A or B -> C).
+intro 2.
+left H.
+left H0.
+elim H1.
+axiom H0.
+elim H.
+axiom H0.
+save th6.
+
+(*
+
+The "left" command allows to apply left rules (rules only changing
+hypotheses) for conjunction and disjunction.
+
+Exercises: prove the following formulas:
+*)
+
+
+goal (A -> C) or (B -> C)  ->  (A & B) -> C.
+(*->*)
+intros.
+left H.
+elim H.
+elim H0.
+elim H.
+elim H0.
+(*->*)
+save th7.
+
+goal (A -> B & C) -> (A -> B) & (A -> C).
+(*->*)
+intro 3.
+elim H.
+axiom H0.
+elim H.
+axiom H0.
+(*->*)
+save th8.
+
+(*
+
+PhoX also knows negation written " ~A " for "non A" and absurdum
+written "False".
+
+PhoX can also be used to do classical logic using absurdity reasonning
+and the law of excluded middle. To use absurdity reasonning, we use
+the command "by_absurd" as in the following proof:
+
+*)
+
+goal ~ (A & B) -> ~A or ~B.
+intro.
+by_absurd.
+intro l.
+intro.
+elim H0.
+intro r.
+intro.
+elim H.
+intro.
+axiom H1.
+axiom H2.
+save th9.
+
+(*
+
+Remark: when an hypothesis ends with a disjunction or a negation, we
+can always use the "elim" command. This makes the proof harder because
+we have more choices to finish the proof.
+
+We can also use the law of excluded middle:
+
+excluded_middle = /\X (X or ~ X) : Theorem
+
+To do so, we use the command "elim excluded_middle with A" to
+distinguish between the case A true and A false.
+
+Remark: The "/\X" indicates that the formula is true for any formula "X".
+
+Exercise: finish the following proof:
+*)
+
+goal (A & B -> C) -> (A -> C) or (B -> C).
+intro.
+by_absurd.
+(*->*)
+intro l.
+intro.
+elim H0.
+intro r.
+intro.
+elim H.
+intro.
+axiom H1.
+axiom H2.
+(*->*)
+save th10.
+
+(*
+
+We can tell which axioms is used by a given theorem by typing:
+
+*)
+
+depend th10.
+depend th3.
+
+(*
+
+We will now use predicate calculus to prove property of "objects" who
+are represented by "terms".
+
+These terms are constructed from variables "x", "y" ... and function
+symbols: if "f" is a unary function symbol and if "t" is a term then
+"f t" is a term. If "g" is a binary function symbol and "t, u" are two
+terms then "g t u" is a term.
+
+We can then construct formulas by applying predicate constants to
+terms: if "P" is a unary predicate constant and if "t" is a term then
+"P t" is a formula. If "R" is a binary predicate constant and if "t,
+u" are two terms then "R t u" is a formula.
+
+We can also construct formula using quantifiers: "/\x A x" means that
+for all object "x", "A x" is true and "\/x A x" means that there
+exists an object "x" such that "A x" is true.
+
+Remark: when we write "A x" this means that "x" can appear in the
+formula "A". When we write "A", "x" can not appear in "A".
+
+Remark: PhoX uses the abbreviation "/\x:D E x" which means  
+"/\x (D x -> E x)" and the abbreviation "\/x:D E x" which means
+"\/x (D x & E x)".
+
+The following exercises use the unary predicate constants "D x" and "E x",
+the binary predicate constants "T x y" and "R x y" and the unary function
+symbol "f x":
+
+*)
+
+Sort term.
+Cst D : term -> prop.
+Cst E : term -> prop.
+Cst R : term -> term -> prop.
+Cst T : term -> term -> prop.
+Cst f : term -> term.
+
+(* Cst D : term -> prop. means that "D" waits for a term as argument
+and gives a proposition (a formula) as a result: this is indeed the
+definition of a unary predicate.
+
+Enter this two proofs:
+
+*)
+
+goal /\x (D x & E x) -> /\x D x & /\x E x.
+intro.
+intro.
+intro.
+elim H.
+intro.
+elim H.
+save th11.
+
+goal \/x (D x or E x) -> \/x D x or \/x E x.
+intro.
+elim H.
+elim H0.
+intro l.
+intro.
+instance ?1 x.
+axiom H1.
+intro r.
+intro.
+instance ?2 x.
+axiom H1.
+save th12.
+
+(*
+
+Exercise: 
+
+Understand the two previous proofs yourself from what you know about
+logical rules. Remark that when we use the introduction rule for "there
+exists", a unkown variable written "?x" is introduced and we have to
+find the value of this variable. This is also the case of the "for
+all" elimination, but very often the elim tactic guesses the value of
+the variable. In fact, in the last proof, the instance command was
+useless because the "axiom" tactic would have guessed the value of the
+unknown variable.
+
+So, we remark that there are two kinds of variables:
+  - The existential variables ("x", "y", ...) (introduced by the 
+    elimination if an existential quantifier "\/x" or the
+    introduction of a universal quantifier "/\x"). These are constants
+    whose properties are given only by the hypothesis and we can not
+    change the value of these variables.
+  - The universal variables ("?1", "?2", ...) (introduced by the 
+    elimination if a universal quantifier "/\x" or the
+    introduction of an existantial quantifier "\/x"). These are
+    variables for which we have to find a value using the "instance"
+    command to finish the proof.
+  
+Important remark: the logical rules introduce some constraints like
+the variable "?1" can not use the constant "x". These constraints can
+be printed using the command "constraints". These constraints can
+prevent you to terminate a proof if you apply the rules in the wrong
+order.
+
+Exercise: 
+
+Prove the following theorem (using classical logic only if necessary):
+
+*)
+
+goal \/x (D x & E x) -> \/x D x & \/x E x.
+(*->*)
+intro.
+left H.
+left H.
+intro 2.
+axiom H.
+axiom H0.
+(*->*)
+save th13.
+
+goal \/x (B & D x) -> \/x D x & B.
+(*->*)
+intro.
+left H.
+left H.
+intro.
+intro.
+axiom H0.
+axiom H.
+(*->*)
+save th14.
+
+goal /\x D x or /\x E x -> /\x (D x or E x).
+(*->*)
+intro.
+left H.
+intro.
+intro l.
+elim H.
+intro.
+intro r.
+elim H.
+(*->*)
+save th15.
+
+(*
+
+The following exrecise show how to use the "prove" command and De
+Moargan's laws (you just have to finish the proof):
+
+*)
+
+goal (/\x D x -> \/x E x) -> \/x (D x -> E x).
+intro.
+elim excluded_middle with  /\x D x.
+select 2. (* change le but courant *)
+rewrite_hyp H0 demorgan.
+(*->*)
+left H0.
+intro 2.
+elim H0.
+axiom H1.
+elim H.
+axiom H0.
+intro 2.
+instance ?2 x.
+axiom H1.
+(*->*)
+save th16.
+
+(*
+
+Exercise: Prove the following formulas:
+
+*)
+
+goal \/x /\y (D x -> D y).
+(*->*)
+elim excluded_middle with /\x D x.
+intros.
+intros.
+elim H.
+rewrite_hyp H demorgan.
+left H.
+intros.
+intros.
+elim H.
+axiom H0.
+(*->*)
+save th17.
+
+goal /\x \/y \/z (D x -> R x y & T x z) <-> 
+ (/\x \/y  (D x -> R x y) & /\x \/y (D x -> T x y)).
+(*->*)
+intros.
+intros.
+intros.
+intros.
+apply H with x.
+lefts G.
+intros.
+intros.
+elim H0.
+axiom H1.
+intros.
+apply H with x.
+lefts G.
+intros.
+intros.
+elim H0.
+axiom H1.
+intros.
+left H.
+apply H with x.
+left G.
+apply H0 with x.
+left G.
+intros.
+intros.
+intros.
+elim H1.
+axiom H3.
+elim H2.
+axiom H3.
+(*->*)
+save th18.
+
+Cst a : term.
+Cst b : term.
+
+goal /\x /\x' \/y (R y x & R y x') ->
+     /\x (f x = a or f x = b) ->
+        /\x \/y (R y x & f y = a) or /\x \/y (R y x & f y = b).
+(*->*)
+intros.
+by_absurd.
+rewrite_hyp H1 demorganl.
+lefts H1 $& $\/.
+apply H with x and x0.
+lefts G $& $\/.
+apply H2 with H3.
+apply H1 with H4.
+elim H0 with y.
+elim G0.
+axiom H5.
+elim G.
+axiom H5.
+(*->*)
+save th19.
+

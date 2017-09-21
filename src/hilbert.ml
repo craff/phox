@@ -1,0 +1,393 @@
+open Basic
+open Data_base
+open Object
+open Types
+open Lambda_util
+open Af2_basic
+
+module type Key =
+  sig
+    type t
+    val compare : t -> t -> int
+    val coef : t -> float
+  end
+
+module type Hilbert =
+  sig 
+    type t
+    val zero : t
+    val (++) : t -> t -> t
+    val (--) : t -> t -> t
+    val upper : t -> t -> t
+    val (@@) : float -> t -> t
+    val scalar_product : t -> t -> float
+  end
+
+module type Full_Hilbert =
+  sig
+    include Hilbert
+    val norm2 : t -> float
+    val norm : t -> float
+    val distance2 : t -> t -> float
+    val distance : t -> t -> float
+    val angle : t -> t -> t -> float
+  end
+
+module type Embed_Hilbert =
+  sig
+    include Full_Hilbert
+    val term_to_vector : expr -> t
+  end
+
+module Make (H:Hilbert) =
+  struct
+    include H
+    let norm2 x = scalar_product x x
+    let norm x = sqrt (norm2 x)
+    let distance2 x y = norm2 (x -- y)
+    let distance x y = norm (x -- y)
+    let angle e f g =
+      let x = f -- e and y = g -- e in
+      let a = scalar_product x y /. (norm x *. norm y) in
+      let a = if a > 1.0 then 1.0 else if a < -1.0 then -1.0 else a in
+      acos a
+  end
+
+module Merge (Key : Key) =
+  struct
+    open Key
+
+    let rec merge_map f l l' = match l, l' with
+	[], l -> l
+      | l, [] -> l
+      | ((k,x as c)::l0), ((k',x' as c')::l0') ->
+	  match compare k k' with
+	    0 -> (k, f x x')::merge_map f l0 l0'
+	  | x when x < 0 -> c::merge_map f l0 l'
+	  | _ -> c'::merge_map f l l0'
+
+    let rec merge_fold a f l l' = match l, l' with
+	[], l | l, [] -> a
+      | ((k,x)::l0), ((k',x')::l0') ->
+	  match compare k k' with
+	    0 -> f (merge_fold a f l0 l0') k x x'
+	  | x when x < 0 -> merge_fold a f l0 l'
+	  | _ -> merge_fold a f l l0'
+
+  end
+
+module CartProd (Key : Key) (H:Hilbert) =
+  struct
+    type t = (Key.t * H.t) list
+    module M = Merge(Key)
+    open M
+    let zero = []
+    let (++) = merge_map H.(++)
+    let upper = merge_map H.upper
+    let (--) = merge_map H.(--)
+    let (@@) a = List.map (fun (k,x) -> k, H.(@@) a x)
+    let scalar_product = 
+      merge_fold 0.0 (fun a k x x' -> 
+	a +. Key.coef k *. H.scalar_product x x') 
+  end    
+
+type 'a tree = ('a * (float * 'a tree)) list
+
+module Tree (Key : Key) =
+  struct
+    type t = Key.t tree
+    module M = Merge(Key)
+    open M
+    let zero = []
+    let rec (++) t t' = 
+      merge_map (fun (x,t) (x',t') -> (x +. x', t ++ t')) t t'
+    let rec upper t t' = 
+      merge_map (fun (x,t) (x',t') -> (max x x', upper t t')) t t'
+    let rec (--) t t' = 
+      merge_map (fun (x,t) (x',t') -> (x -. x', t -- t')) t t'
+    let rec (@@) a t =
+      List.map (fun (k,(x,t)) -> (k, (a *. x, a @@ t))) t
+    let rec scalar_product t t' = 
+      merge_fold 0.0 
+	(fun a k (x,t) (x',t') -> 
+	  a +. x*.x' +. Key.coef k *. scalar_product t t') 
+	t t'
+  end
+
+type atom =
+    AtomVar of int
+  | AtomCst of int
+  | AtomUVar
+  | AtomAtom of af2_obj
+  | AtomAbs
+  | Root
+
+let compare_atom a a' = match a, a' with
+  | Root, Root -> 0
+  | Root, _ -> -1
+  |_, Root -> 1
+  | AtomVar n, AtomVar n' -> n - n'
+  | AtomVar _, _ -> -1
+  |_, AtomVar _ -> 1
+  | AtomCst n, AtomCst n' -> n - n'
+  | AtomCst _, _ -> -1
+  |_, AtomCst _ -> 1
+  | AtomUVar, AtomUVar -> 0
+  | AtomUVar, _ -> -1
+  |_, AtomUVar -> 1
+  | AtomAbs, AtomAbs -> 0
+  | AtomAbs, _ -> -1
+  |_, AtomAbs -> 1
+  | AtomAtom o, AtomAtom o' -> get_key o - get_key o'
+
+module AKey =
+  struct 
+    type  t = atom
+    let compare = compare_atom
+    let coef k = 1.0
+  end
+
+module FKey =
+  struct 
+    type  t = atom * int * int
+    let compare (o,a,p) (o',a',p') = 
+      match compare_atom o o', p - p' with
+	0, d | 
+        d, _ -> d 
+    let coef (o,a,p) = 1.0 /. float_of_int a
+  end
+
+module TermHilbert1 = struct
+  module TermHilbert =
+    Make(CartProd(AKey)(Tree(FKey)))
+
+  include TermHilbert
+
+  let term_to_vector' f t =
+    let rec fn a path = function
+	EVar n -> f a [AtomVar n, path] 
+      | EAtom(o,_) -> f a [AtomAtom o, path]
+      | UCst(n,_) -> f a [AtomCst n, path]
+      | UVar _ -> f a [AtomUVar, path]
+      | EAbs(_,e,_) -> fn a [(AtomAbs,1,0),(1.0,path)] e
+      | EApp _ as e ->
+	  let rec gn nb args = function
+	      EApp(t,u) -> gn (nb+1) ((nb,u)::args) t
+	    | t -> 
+		let hn = function      
+		    EVar n -> AtomVar n
+		  | EAtom(o,_) -> AtomAtom o
+		  | UCst(n,_) -> AtomCst n
+		  | UVar _ -> AtomUVar
+		  | _ -> assert false
+		in
+		let k = hn t in
+		List.fold_left 
+		  (fun a (p, u) -> fn a [(k,nb,p),(1.0,path)] u) 
+		  a args
+	  in gn 0 [] e
+      | FVar _ | Path _ | Syntax _ | EData _ -> assert false 
+    in fn zero [(Root,1,0),(1.0,[])] t
+
+  let term_to_vector = term_to_vector' upper
+
+end
+
+module GKey =
+  struct 
+    type  t = atom * int
+    let compare (o,p) (o',p') = 
+      match compare_atom o o', p - p' with
+	0, d | 
+        d, _ -> d 
+    let coef (o,p) = 1.0
+  end
+
+module TermHilbert2 = struct
+
+  module TermHilbert =
+    Make(Tree(GKey))
+      
+  include TermHilbert
+    
+  let term_to_vector t =
+    let rec fn = function
+	EVar n -> [(AtomVar n,0), (1.0,[])] 
+      | EAtom(o,_) ->[(AtomAtom o,0), (1.0,[])]
+      | UCst(n,_) -> [(AtomCst n,0), (1.0,[])]
+      | UVar _ -> [(AtomUVar,0), (1.0,[])]
+      | EAbs(_,e,_) -> [(AtomAbs,0),(1.0,fn e)] 
+      | EApp _ as e ->
+	  let rec gn nb args = function
+	      EApp(t,u) -> gn (nb+1) ((nb,u)::args) t
+	    | t -> 
+		let hn = function      
+		    EVar n -> AtomVar n
+		  | EAtom(o,_) -> AtomAtom o
+		  | UCst(n,_) -> AtomCst n
+		  | UVar _ -> AtomUVar
+		  | _ -> assert false
+		in
+		let k = hn t in
+		List.rev_map 
+		  (fun (p, u) -> (k,p),(1.0,fn u)) args
+	  in gn 0 [] e
+      | FVar _ | Path _ | Syntax _ | EData _ -> assert false 
+    in [(Root,0),(1.0, fn t)]
+
+end
+
+module TermHilbert3 =
+  struct
+    type path = (atom * int) list
+    type t = (atom * (path * float)) list
+    
+    let zero = []
+
+    let rec (++) l l' = 
+      match l, l' with
+	[], l -> l
+      | l, [] -> l
+      | ((k,x as c)::l0), ((k',x' as c')::l0') ->
+	  match compare k k' with
+	    0 -> 
+	      let rec f l l' =
+		match l, l' with
+		  [], l -> l
+		| l, [] -> l
+		| ((k,x as c)::l0), ((k',x' as c')::l0') ->
+		    begin
+		      match compare k k' with
+			0 -> 
+			  let y = x +. x' in
+			  if y = 0.0 then f l0 l0' else 
+			  (k, y)::f l0 l0'
+		      | x when x < 0 -> c::f l0 l'
+		      | _ -> c'::f l l0'
+		    end
+	      in
+	      let nl = f x x' in
+	      if nl = [] then (l0 ++ l0') else (k, nl)::(l0 ++ l0')
+	  | x when x < 0 -> c::(l0 ++ l')
+	  | _ -> c'::(l ++ l0')
+
+    let rec (--) l l' = 
+      match l, l' with
+	[], l -> l
+      | l, [] -> l
+      | ((k,x as c)::l0), ((k',x' as c')::l0') ->
+	  match compare k k' with
+	    0 -> 
+	      let rec f l l' =
+		match l, l' with
+		  [], l -> l
+		| l, [] -> l
+		| ((k,x as c)::l0), ((k',x' as c')::l0') ->
+		    begin
+		      match compare k k' with
+			0 -> 
+			  let y = x -. x' in
+			  if y = 0.0 then f l0 l0' else 
+			  (k, y)::f l0 l0'
+		      | x when x < 0 -> c::f l0 l'
+		      | _ -> c'::f l l0'
+		    end
+	      in
+	      let nl = f x x' in
+	      if nl = [] then (l0 -- l0') else (k, nl)::(l0 -- l0')
+	  | x when x < 0 -> c::(l0 -- l')
+	  | _ -> c'::(l -- l0')
+     
+    let rec upper l l' = 
+      match l, l' with
+	[], l -> l
+      | l, [] -> l
+      | ((k,x as c)::l0), ((k',x' as c')::l0') ->
+	  match compare k k' with
+	    0 -> 
+	      let rec f l l' =
+		match l, l' with
+		  [], l -> l
+		| l, [] -> l
+		| ((k,x as c)::l0), ((k',x' as c')::l0') ->
+		    begin
+		      match compare k k' with
+			0 -> 
+			  (k, max x x')::f l0 l0'
+		      | x when x < 0 -> c::f l0 l'
+		      | _ -> c'::f l l0'
+		    end
+	      in
+	      (k, f x x')::(upper l0 l0')
+	  | x when x < 0 -> c::(upper l0 l')
+	  | _ -> c'::(upper l l0')
+     
+    let (@@) x l =
+      List.map (fun l -> List.map (fun (p, y) -> p, x *. y) l) l
+
+    let levenshtein_dist a b =
+      let l1 = List.length a and l2 = List.length b in
+      let a,l1,b,l2 = if l1 <= l2 then a,l1,b,l2 else b,l2,a,l1 in
+      let tbl = Array.init (l1 + 1) (fun i -> i) in
+      
+      let rec fn b j = 
+	match b with
+	  [] -> tbl.(l1)
+	| l::b ->
+	    tbl.(0) <- j;
+	    let rec gn a i diag =
+	      match a with
+		[] -> fn b (j + 1)
+	      | l':: a ->
+		  let cost = if l = l' then 0 else 1 in
+		  let newdiag = tbl.(i) in
+		  let v1 = newdiag + 1 in
+		  let v2 = tbl.(i-1) + 1 in
+		  let v3 = diag + cost in
+		  tbl.(i) <- min (min v1 v2) v3;
+		  gn a (i + 1) newdiag
+	    in gn a 1 (j-1)
+      in fn b 1
+
+    let scalar_product l l' =
+      let rec f acc l =
+	match l with
+	  [] -> acc
+	| ((k,x)::l0) ->
+	    let rec g acc l' =
+	      match l' with [] -> 
+		f acc l0
+	      | ((k',x')::l0') ->
+		  let acc = acc +. x *. x'*.
+		      ( float (List.length k) *. float (List.length k) +.
+			  float (List.length k') *. float (List.length k') -.
+			  float (levenshtein_dist k k'))
+		  in
+		  g acc l0'
+	    in f (g acc l') l0 
+      in f 0.0 l
+     
+  end
+
+let distance match_local result e1 e2 =
+  let opend oe = 
+    if (List.memq oe match_local.local_close_tbl) then false else
+      try 
+	let _ = symhash_find tbl_close_def oe in 
+	false 
+      with Not_found -> not (Base.is_recursive oe)
+  in
+  let openc n =
+      try
+        Some (fst (List.assoc n match_local.cst_eq))
+      with Not_found -> None
+  in
+  let e1 = norm_ldexpr result opend openc e1 in
+  let e2 = norm_ldexpr result opend openc e2 in
+  let d1 =
+    TermHilbert1.distance (TermHilbert1.term_to_vector e1) (TermHilbert1.term_to_vector e2)
+  in
+  let d2 =
+    TermHilbert2.distance (TermHilbert2.term_to_vector e1) (TermHilbert2.term_to_vector e2)
+  in
+  sqrt (d1 *. d2)

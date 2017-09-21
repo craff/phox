@@ -1,0 +1,920 @@
+% $State: Exp $ $Date: 2006/02/22 19:34:34 $ $Revision: 1.17 $
+
+
+\section{Top-level commands.}
+
+In what follows curly braces denote an optional argument. You should
+note type them.
+
+\subsection{Control commands.}
+\begin{description}
+
+\item[\tt goal {\em formula}.\idx{goal}]
+
+  Start a proof of the given {\tt\em formula}. See the next section
+  about proof commands.
+
+\begin{verbatim}
+>phox> def fermat = 
+  /\x,y,z,n:N ((x^n + y^n = z^n) -> n <= S S O).
+/\ x,y,z,n : N (x ^ n + y ^ n = z ^ n -> n <= S S O) : Form
+>phox> goal fermat.
+.....
+
+.....
+>phox> proved
+\end{verbatim}
+
+\item[\tt prove\_claim {\em name} ]\ :
+
+  Start the proof of an axiom previously introduced by then {\tt
+claim} command. It is very useful with the module system to prove
+claims introduced by a module.
+
+\item[\tt quit. \idx{quit}]\ :
+
+  Exit the program.
+
+\begin{verbatim}
+>phox> quit.
+Bye
+%
+\end{verbatim}
+
+\item[\tt restart. \idx{restart}]\ : 
+  
+  Restart the program, does not stop it, process is stil the same.
+
+\item[\tt \{Local\} theorem {\em name} \{{\em "tex\_name"}\} {\em expression}\idx{theorem}]
+
+  Identical to goal except you give the name of the theorem and optionally
+  its TeX syntax (this TeX Syntax is used as in {\tt tex\_syntax {\em name}
+  {\em "tex\_name"}}). Therefore, you do not have to give a name when you use
+  the {\tt save} command.
+
+  Instead of {\tt theorem}, you can use the following names:
+  {\tt prop\idx{prop} | proposition\idx{proposition} | lem\idx{lem}  | lemma\idx{lemma}| fact\idx{fact} | cor\idx{cor} | corollary\idx{corollary} | theo\idx{theo}}.
+  
+  You can give the instruction {\tt Local} to indicate that this theorem
+  should not be exported. This means that if you use the {\tt Import} or {\tt
+  Use} command, only the exported theorem will be added.
+
+
+\end{description}
+
+\subsection{Commands modifying the theory.}\label{cmd-top-mdt}
+\begin{description}
+
+\item[\tt claim {\em name} \{{\em "tex\_name"}\} {\em formula}.\idx{claim}]
+
+  Add the {\tt\em formula} to the data-base as a theorem (claim) under the
+  given {\tt\em name}.
+  
+  You can give an optional TeX syntax (this TeX Syntax is used as in {\tt
+  tex\_syntax {\em name} {\em "tex\_name"}}).
+
+%\item[\tt cst {\em n} {\em syntax}.\idx{cst}]
+
+%  Define a first order constant of arity {\tt\em n} ({\tt\em n} is a
+%  natural number in decimal representation). {\tt\em syntax} can be an
+%  identifier name or a special syntax (see the chapter \ref{parser}.
+
+%\begin{verbatim}
+%>phox> cst 0 Zero.
+%Constant added.
+%>phox> cst 1 Prefix[2] "Succ" x.
+%Constant added.
+%>phox> cst 2 lInfix[1.5] x "+" y.
+%Constant added.
+%\end{verbatim}
+
+\item[\tt Cst {\em syntax} : {\em sort}.\idx{Cst}]
+
+  Defines a constant of any {\tt\em sort}.
+
+\begin{verbatim}
+>phox> Cst map : (nat -> nat) -> nat -> nat.
+Constant added.
+\end{verbatim}
+  
+  Default syntax is prefix.  You can give a prefix\idx{Prefix}, postfix
+  \idx{Postfix} or infix\idx{Infix} syntax for instance the following
+  declarations allow the usual syntaxes  for order  $x < y$ and factorial
+$n!$ :
+\begin{verbatim}
+Cst Infix x "<" y : nat -> nat -> prop.
+$< : d -> d -> prop
+Cst Postfix[1.5] x "!" : nat -> nat.
+$! : d -> d
+\end{verbatim}
+
+
+To avoid too many parenthesis, you can also give a {\em
+  priority} (a floating number) and, in case of infix notation, you can
+precise if the symbol associates to the right ({\tt rInfix}\idx{rInfix})
+or to the left ({\tt lInfix}\idx{lInfix}).
+
+For instance the following declarations\footnote{these declarations are
+  no more exactly the ones used in the \AFD\ library for integers.}
+\begin{verbatim}
+Cst Prefix[2] "S" x : nat -> nat.
+Cst rInfix[3.5] x "+" y : nat -> nat -> nat.
+Cst lInfix[3.5] x "-" y : nat -> nat -> nat.
+Cst Infix[5] x "<" y : nat -> nat -> prop.
+\end{verbatim}
+gives the following :
+\begin{itemize}
+\item {\tt S x + y}\ means \ {\tt (S x) + y}
+\ (parenthesis
+  around the expression with principal symbol of smaller weight) ;
+\item {\tt x - y < x + y}\  means \ {\tt (x - y) < (x + y)} 
+\ (same reason) ;
+ \item  {\tt x + y + z}\  means\  {\tt x + (y + z)}\  (right symbol first) ;
+\item  {\tt x - y - z}\ means\  {\tt (x - y) - z}\  (left symbol first).
+\end{itemize}
+More : the two symbols have the same priority and then \ {\tt x - y + z}\ 
+is not a valid expression.
+
+Arbitrary priorities are possible but can give a mess. You have ad least to
+follows these conventions (used in the libraries) :
+\begin{itemize}
+\item connectives : priority $>5$ ;
+\item predicates  : priority $=5$ ;
+\item functions : priority $<5$.
+\end{itemize} 
+
+You can even define more complex syntaxes, for instance :
+
+\begin{verbatim}
+Cst Infix[4.5]  x  "==" y "mod" p : nat -> nat -> nat-> nat.
+(* $== : nat -> nat -> nat -> nat *)
+print \a,b(a + b == a mod b).
+(* \a,b (a + b == a mod b) : nat -> nat -> nat *)
+\end{verbatim}
+
+you can define syntax for binders :
+
+\begin{verbatim}
+Cst Prefix[4.9] "{" \P\ "in" a "/" P "}" 
+:   'a -> ('a -> prop) -> prop.
+(* ${ : 'a -> ('a -> prop) -> prop *)
+print \a \P{ x in a / P}.
+(* \a,P {x in a / P } : ?a -> prop -> prop *)
+\end{verbatim}
+
+
+\item[\tt \{Local\} def {\em syntax} = {\em expression}.\idx{Local}\idx{def}]
+
+  Defines an abbreviation using a given {\tt\em syntax} for an {\tt\em
+    expression}.
+  
+  The prefix {\tt Local} tells that this definition should not be
+  exported. This means that if you use the {\tt Import} or {\tt Use} command,
+  only the exported definitions will be added.
+ 
+Here are some examples :
+\begin{verbatim}
+>phox> def rInfix[7]  X "&" Y = /\K ((X -> Y -> K) -> K).
+(\X (\Y /\ K ((X -> Y -> K) -> K))) : Form -> Form -> Form
+>phox> def rInfix[8]  X "or" Y = 
+  /\K ((X -> K) -> (Y -> K) -> K).
+(\X (\Y /\ K ((X -> K) -> (Y -> K) -> K))) : 
+  Form -> Form -> Form
+>phox> def Infix [8.5]  X "<->" Y = (X -> Y) & (Y -> X).
+(\X (\Y (X -> Y) & (Y -> X))) : Form -> Form -> Form
+>phox> def Prefix[5] "mu" \A\ \A\ A "<" t ">" = 
+  /\X (/\x (A X x -> X x) -> X t).
+(\A (\t /\ X (/\ x (A X x -> X x) -> X t))) : 
+  ((Term -> Form) -> Term -> Form) -> Term -> Form
+\end{verbatim}
+  
+  Defintion of the syntax follows the same rules and conventions as for
+  the command {\tt Cst} above.
+
+\item[\tt \{Local\} def\_thlist {\em name} = {\em th1} \dots {\em
+thn}.\idx{def\_thlist}]
+
+Defines {\tt\em name} to be the list of theorems {\tt {\em th1} \dots {\em
+thn}}. For the moment list of theorems are useful only with commands
+{\tt rewrite} and {\tt rewrite\_hyp}.
+
+\begin{verbatim}
+>phox> def_thlist demorgan =
+  negation.demorgan  disjunction.demorgan
+  forall.demorgan    arrow.demorgan
+  exists.demorgan    conjunction.demorgan.
+\end{verbatim}
+
+\item[\tt del {\em symbol}.\idx{del}] 
+  
+  Delete the given {\em symbol} from the data-base. All definitions,
+  theorems and rules using this {\em symbol} are deleted too.
+
+\begin{verbatim}
+>phox> del lesseq1.
+delete lesseq_refl
+delete inf_total from ##totality_axioms
+delete inf_total
+delete sup_total from ##totality_axioms
+delete sup_total
+delete less_total from ##totality_axioms
+delete less_total
+delete lesseq_total from ##totality_axioms
+delete lesseq_total
+delete lesseq1 from ##rewrite_rules
+delete lesseq1
+\end{verbatim}
+
+\item[\tt del\_proof {\em name}.\idx{del}] 
+	Delete the proof of the given theorem (the theorem becomes a
+claim).
+Useful mainly to undo the {\tt prove\_claim} command.
+
+\item[{\tt Sort \{['{\em a},'{\em b}, \dots]\} \{=  {\em sort}\}.\idx{Sort}}]
+  
+  Adds a new sort. The sort may have parameters or may be defined
+from another sort.
+
+\begin{verbatim}
+>phox> Sort real.
+Sort real defined
+>phox> Sort tree['a].
+Sort tree defined
+>phox> Sort bool = prop.
+Sort bool defined
+\end{verbatim}
+
+\end{description}
+
+\subsection{Commands  modifying proof commands.}
+These commands modify behaviour of the proof commands described in
+appendix~\ref{proof-commands}.  For instance the commands {\tt
+  new\_intro}, {\tt new\_elim} and {\tt new\_equation} by adding new
+rules, modify behaviour of the corresponding proof commands {\tt intro},
+{\tt elim}, {\tt rewrite} and commands that derive from its.
+
+In particular they can also modify the behaviour of automatic commands
+like {\tt trivial} and {\tt auto}. They are useful to make proofs of
+further theorems easier (but can also make them harder if not well
+used). You can find examples  in \AFD\ libraries, where they are
+systematically used.
+
+For good understanding recall that the underlying proof system is
+basically natural deduction, even if it is possible to add rules like
+lefts rules of sequent calculus, see below.
+
+\begin{description}
+\item[\tt \{Local\} close\_def {\em symbol}.\idx{Local}\idx{close\_def}]
+  
+  When {\em symbol} is defined, this ``closes'' the definition. This
+  means that the definition can no more be open by usual proof commands
+  unless you explicitly ask it by using for instance proof commands {\tt
+    unfold} or {\tt unfold\_hyp}. In particular unification does not use
+  the definition anymore. This can in some case increase the efficiency
+  of the unification algorithm and the automatic tactic (or decrease if
+  not well used).  When you have add enough properties and rules about a
+  given {\tt\em symbol} with new\_\dots commands, it can be a good thing to
+  ``close'' it. Note that the first {\tt new\_elim} command closes the
+  definition for elimination rules, the first {\tt new\_intro} command
+  closes the definition for introduction rules. In case these two
+  commands are used, {\tt close\_def} ends it by closing the definition
+  for unification.
+  
+  For (bad) implementation reasons the prefix {\tt Local} is necessary in
+  case it is used for the definition of the symbol (see {\tt def}
+  command). If not the definition will not be really local.
+
+\item[\tt edel {\em extension-list} {\em item}.\idx{edel}]
+  
+  Deletes the given {\tt\em item} from the {\tt\em extension-list}.
+  
+  Possible extension lists are: {\tt rewrite} (the list of rewriting
+  rules introduced by the {\tt new\_equation} command), {\tt elim}, {\tt
+    intro}, (the introduction and elimination rules introduced by the
+  {\tt new\_elim} and {\tt new\_intro \{-t\}} commands), {\tt closed}
+  (closed definitions introduced by the {\tt close\_def} command) and
+  {\tt tex} (introduced by the {\tt tex\_syntax} command). The {\em
+    items} can be names of theorems ({\tt new\_...}), or symbols ({\tt
+    close\_def} and {\tt tex\_syntax}). Use the {\tt eshow} command for
+  listing extension lists.
+
+\begin{verbatim}
+>phox> edel elim All_rec.  
+delete All_rec from ##elim_ext
+\end{verbatim}
+See also the {\tt del} command.
+
+ 
+\item [\tt elim\_after\_intro {\em symbol}.\idx{elim\_after\_intro}]
+
+  Warning: this command will disappear soon.
+
+  Tells the trivial tactic to try an elimination using an hypothesis starting
+  with the {\tt\em symbol} constructor only if no introduction rule can be
+  applied on the current goal. (This seems to be useful only for the
+  negation).
+  
+\begin{verbatim}
+>phox> def Prefix[6.3] "~" X = X -> False.
+\X (X -> False) : Form -> Form
+>phox> elim_after_intro $~.
+Symbol added to "elim_after_intro" list.
+\end{verbatim}
+
+\item[\tt \{Local\} new\_elim \{-i\} \{-n\} \{-t\} {\em symbol} {\em name} \{{\em
+    num}\} {\em theorem}.\idx{Local}\idx{new\_elim}]
+  
+  If the {\em theorem} has the following shape: $\forall \chi_1 ... \forall
+  \chi_n (A_1 \to \dots \to A_n \to B \to C)$
+  where {\em symbol} is the head of $B$ (the quantifier can be of any order
+  and intermixed with the implications if you wish).  Then this theorem can be
+  added as an elimination rule for this {\em symbol}. $B$ is the main
+  premise, $A_1, \dots, A_n$ are the other premises and $C$ is the conclusion
+  of the rule.
+
+  The {\em name} is used as an abbreviation when you want to precise which
+  rule to apply when using the {\tt  elim} command.
+  
+  The optional {\em num} tells that the principal premise is the {\em num}th
+  premise whose head is {\em symbol}. The default is to take the first so this
+  is useful only when the first premise whose head is {\em symbol} is not the
+  principal one. 
+  
+
+\begin{verbatim}
+>phox> goal /\X /\Y (X & Y -> X).
+
+   |- /\ X,Y (X & Y -> X)
+>phox> trivial.
+proved
+>phox> save and_elim_l.
+Building proof .... Done.
+Typing proof .... Done.
+Verifying proof .... Done.
+>phox> goal /\X /\Y (X & Y -> Y).
+
+   |- /\ X,Y (X & Y -> Y)
+>>phox> trivial.
+proved
+>phox> save and_elim_r.
+Building proof .... Done.
+Typing proof .... Done.
+Verifying proof .... Done.
+>phox> new_elim $& l and_elim_l.
+>phox> new_elim $& r and_elim_r.
+\end{verbatim}
+  
+  If the leftmost proposition of the theorem is a propositional variable
+  (and then positively universally quantified), the rule defined by {\tt
+    new\_elim} is called a {\em left} rule, that is like left rules of
+  sequent calculus.
+  
+  The option [-i] tells the tactic trivial not to backtrack on such a
+  left rule. This option will be refused by the system if the theorem
+  donnot define a left rule. The option should be used for an {\em
+    invertible} left rule, that is a rule that can commute with other
+  rules. A non sufficient condition is that premises of the rule are
+  equivalent to the conclusion.
+  
+  A somewhat degenerate (there is no premises) case is :
+
+\begin{verbatim}
+>phox> proposition false.elim 
+  /\X (False -> X).
+trivial.
+save.
+%phox% 0 goal created.
+proved
+%phox% Building proof ....Done
+Typing proof ....Done
+Verifying proof ....Done
+Saving proof ....Done
+>phox> new_elim -i False n false.elim.
+Theorem added to elimination rules.
+\end{verbatim}
+  
+  The option [-n] tells the trivial tactic not to try to use this rule,
+  except if [-i] is also used.  In this last case the two options [-i
+  -n] tell the tactic trivial to apply this rule first, and use it as
+  the {\tt left} proof command, that is only once.  Recall that in this
+  case the left rule should be invertible. For instance :
+
+\begin{verbatim}
+>phox> proposition conjunction.left 
+  /\X,Y,Z ((Y -> Z -> X) -> Y & Z -> X).
+trivial.
+save.
+>phox> 
+   |- /\X,Y,Z ((Y -> Z -> X) -> Y & Z -> X)
+
+%phox% 0 goal created.
+proved
+%phox% Building proof ....Done
+Typing proof ....Done
+Verifying proof ....Done
+Saving proof ....Done
+>phox> new_elim -n -i $& s conjunction.left.
+Theorem added to elimination rules.
+\end{verbatim}
+  
+  The option [-t] should be used for transitivity theorems. It gives
+  some optimisations for automatic tactics (subject to changes).
+ 
+
+  The prefix {\tt Local} tells that this rule should not be exported. This
+  means that if you use the {\tt Import} or {\tt Use} command, only the
+  exported rules will be added.
+  
+  You should also note that once one elimination rule has been
+  introduced, the {\tt\em symbol} definition is no more expanded by the
+  {\tt elim} tactic. The elim tactic only tries to apply each
+  elimination rule.  Thus if a connective needs more that one
+  elimination rules, you should prove all the corresponding theorems and
+  then use the {\tt new\_elim} command.
+
+  
+\item[\tt new\_equation \{-l|-r|-b\} {\em name} \dots.\idx{new\_equation}]
+  
+  Add the given equations or conditional equations to the
+  equational reasoning used in conjunction with the high order
+  unification algorithm. {\tt\em name} must be a claim or a theorem with
+  at least one equality as an atomic formula which is reachable from the
+  top of the formula by going under a universal quantifier or a
+  conjunction or to the right of an implication. This means that a
+  theorem like $\forall x (A x \to f(x) = t\;\&\;g(x) = u)$ can be added
+  as a conditional equation. Moreover equations of the form $x = y$
+  where $x$ and $y$ are variables are not allowed.
+  
+  the option ``-l'' (the default) tells to use the equation from left to
+  right. The option ``-r'' tells to use the equation from right to left. The
+  option ``-b'' tells to use the equation in both direction.
+
+\begin{verbatim}
+>phox> claim add_O /\y:N (O + y = y).
+>phox> claim add_S /\x,y:N (S x + y = S (x + y)).
+>phox> new_requation add_O.
+>phox> new_requation add_S.
+>phox> goal /\x:N (x = O + x).
+trivial.
+>phox> proved
+\end{verbatim}
+
+\item[\tt \{Local\} new\_intro \{-n\} \{-i\} \{-t\} \{-c\} {\em name} {\em theorem}.\idx{Local}\idx{new\_intro}]
+  
+  If the {\em theorem} has the following shape: $\forall \chi_1 ...
+  \forall \chi_n (A_1 \to \dots \to A_n \to C)$ (the quantifier can be
+  of any order and intermixed with the implications if you wish), then
+  this theorem can be added as an introduction rule for {\tt\em symbol},
+  where {\tt\em symbol} is the head of $C$. The formulae $A_1, \dots,
+  A_n$ are the premises and $C$ is the conclusion of the rule.
+
+  The {\em name} is used as an abbreviation when you want to precise which
+  rule to apply when using the {\tt intro} command.
+  
+  The option [-n] tells the trivial tactic not to try to use this rule.
+  The option [-i] tells the trivial tactic this rule is invertible. This
+  implies that the trivial tactic will not try other introduction rules
+  if an invertible one match the current goal, and will not backtrack on
+  these rules.
+ 
+  The option [-t] should be used when this rule is a totality theorem
+  for a function (like $\forall x,y (N x \to N y \to N (x + y))$), the
+  option [-c] for a totality theorem for a ``constructor'' like $0$ or
+  successor on natural numbers. It can give some optimisations on
+  automatic tactics (subject to changes). For the flag {\tt
+  auto\_type} to work properly we recommend to use the option [-i]
+  together with these two options (totality theorems are in general
+  invertible).
+
+
+  The prefix {\tt Local} tells that this rule should not be exported. This
+  means that if you use the {\tt Import} or {\tt Use} command, only the
+  exported rules will be added.
+  
+  You should also note that once one introduction rule has been
+  introduced, the {\tt\em symbol} (head of $C$) definition is no more
+  expanded by the {\tt intro} tactic. The intro tactic only tries to
+  apply each introduction rule. Thus if a connective has more that one
+  introduction rules, you should prove all the corresponding theorems
+  and then use the {\tt new\_intro command}.
+
+\begin{verbatim}
+>phox> goal /\X /\Y (X -> X or Y).
+
+   |- /\ X /\ Y (X -> X or Y)
+>phox> trivial.
+proved
+>phox> save or_intro_l.
+Building proof .... Done.
+Typing proof .... Done.
+Verifying proof .... Done.
+>phox> goal /\X /\Y (Y -> X or Y).
+
+   |- /\ X /\ Y (Y -> X or Y)
+>phox> trivial.
+proved
+>phox> save or_intro_r.
+Building proof .... Done.
+Typing proof .... Done.
+Verifying proof .... Done.
+>phox> new_intro l or_intro_l.
+>phox> new_intro r or_intro_r.
+\end{verbatim}
+
+\end{description}
+
+
+\subsection{Inductive definitions.}
+
+These macro-commands defines new theories with new rules.
+
+\begin{description}
+\item[\tt \{Local\} Data \dots.\idx{Data}]
+
+Defines an inductive data type. See the dedicated chapter.
+
+\begin{verbatim}
+Data Nat n =
+  N0  : Nat N0
+| S n : Nat n -> Nat (S n)
+.
+ 
+Data List A l =
+  nil : List A nil
+| [cons] rInfix[3.0] x "::" l : 
+    A x -> List A l -> List A (x::l)
+.
+
+Data Listn A n l =
+  nil : Listn A N0 nil
+| [cons] rInfix[3.0] x "::" l : 
+    /\n (A x -> Listn A n l -> Listn A (S n) (x::l))
+.
+
+Data Tree A B t =
+  leaf a   : A a -> Tree A B (leaf a)
+| node b l : 
+    B b -> List (Tree A B) l -> Tree A B (node b l)
+.
+\end{verbatim}
+ 
+
+
+\item[\tt \{Local\} Inductive \dots.\idx{Inductive}]
+
+Defines an inductive predicate. See the dedicated chapter.
+
+\begin{verbatim}
+Inductive And A B =
+  left  : A -> And A B
+| right : B -> And A B
+.
+
+Use nat.
+
+Inductive Less x y =
+  zero : /\x Less N0 x
+| succ : /\x,y (Less x y -> Less (S x) (S y))
+. 
+
+Inductive Less2 x y =
+  zero : Less2 x x
+| succ : /\y (Less2 x y -> Less2 x (S y))
+. 
+
+Inductive Add x y z =
+  zero : Add N0 y y
+| succ : /\x,z (Add x y z -> Add (S x) y (S z))
+. 
+
+Inductive [Eq] Infix[5] x "==" y =
+  zero : N0 == N0 
+| succ : /\x,y (x == y -> S x == S y)
+.
+\end{verbatim}
+
+\end{description}
+
+
+\subsection{Managing files and modules.}
+\begin{description}
+\item[\tt add\_path {\em string}.\idx{add\_path}]
+  
+  Add {\tt\em string} to the list of all path. This path list is used to find
+  files when using the {\tt Import, Use and include} commands. You can set the
+  environment variable $PHOXPATH$ to set your own path (separating each
+  directory with a column).
+
+\begin{verbatim}
+>phox> add_path "/users/raffalli/phox/examples".
+/users/raffalli/phox/examples/
+
+>phox> add_path "/users/raffalli/phox/work".
+/users/raffalli/phox/work/
+/users/raffalli/phox/examples/
+
+\end{verbatim}
+
+\item[\tt Import {\em module\_name}.\idx{Import}]
+  
+  Loads the interface file ``module\_name.afi'' (This file is produced by
+  compiling an \AFD\ file). Everything in this file is directly loaded, no
+  renaming applies and objects of the same name will be merged if this is
+  possible otherwise the command will fail.
+
+  A renaming applied to a module will not rename symbols added to the module
+  by the {\tt Import} command (unless the renaming explicitly forces it).
+ 
+  Beware, if {\tt Import} command fails when using \AFD\ interactively, the
+  file can be partially loaded which can be quite confusing !
+
+\item[\tt include "filename".\idx{include}]
+
+  Load an ASCII file as if all the characters in the file were typed
+  at the top-level.
+  
+\item[\tt Use \{-n\} {\em module\_name} \{{\em renaming}\}.\idx{Use}]
+  
+  Loads the interface file ``module\_name.afi'' (This file is produced by
+  compiling a \AFD\ file). If given, the renaming is applied. Objects of
+  the same name (after renaming) will be merged if this is possible otherwise
+  the command will fail.
+  
+  The option {\tt -n} tells {\tt Use} to check that the theory is not
+  extended. That is no new constant or axiom are added and no constant are
+  instantiated by a definition.
+ 
+  The syntax of renaming is the following: 
+  \begin{center}
+   {\tt {\em renaming}} := {\tt {\em renaming\_sentence} \{ |
+    {\em renaming} \}}
+  \end{center}
+  A {\tt\em renaming\_sentence} is one of the
+  following (the rule matching explicitly the longest part of the original
+  name applies):
+  \begin{itemize}
+  \item {\tt{\em name1} -> {\em name2}} : the symbol {\em name1} is renamed to
+    {\em named2}.
+  \item {\tt{\em \_.suffix1} -> {\em \_.suffix2}} : any symbol of the form {\em
+      xxx.suffix1} is renamed to {\em xxx.suffix2} (a suffix can contain some
+    dots).
+  \item {\tt{\em \_.suffix1} -> {\em \_}} : any symbol of the form {\em
+      xxx.suffix1} is renamed to {\em xxx}.
+  \item
+    {\tt{\em \_} -> {\em \_.suffix2}} : any symbol of the form {\em
+      xxx} is renamed to {\em xxx.suffix2}.
+  \item {\tt from {\em module\_name} with {\em renaming}.} : symbols created
+    using the command {\tt Import {\em module\_name}} will be renamed using
+    the given {\em renaming} (By default they would not have been renamed).
+  \end{itemize}
+  
+  A renaming applied to a module will rename symbols added to the module
+  by the {\tt Use} command.
+ 
+  Beware, if {\tt Use} command fails when using \AFD\ interactively, the
+  file can be partially imported which can be quite confusing !
+\end{description}
+
+\subsection{TeX.}
+\begin{description}
+\item[\tt \{Local\} tex\_syntax {\em symbol} {\em syntax}.\idx{Local}\idx{tex\_syntax}]
+  
+  Tells \AFD\ to use the given syntax for this {\em symbol} when producing TeX
+  formulas.
+
+  The prefix {\tt Local} tells that this definition should not be
+  exported. This means that if you use the {\tt Import} or {\tt Use} command,
+  only the exported definitions will be added.
+\end{description}
+
+\subsection{Obtaining some informations on the system.}
+\begin{description}
+
+\item[\tt depend {\em theorem}.\idx{depend}] 
+Gives the list of all axioms which have
+  been used to prove the {\tt\em theorem}.
+
+\begin{verbatim}
+>phox> depend add_total.
+add_S
+add_O
+\end{verbatim}
+
+\item[\tt eshow {\em extension-list}.\idx{eshow}]
+  
+  Shows the given {\tt\em extension-list}.  Possible extension lists are
+  (See {\tt edel}): {\tt equation} (the list of equations
+  introduced by the {\tt new\_equation} command), {\tt elim}, {\tt
+    intro}, (the introduction and elimination rules introduced by the
+  {\tt new\_elim} and {\tt new\_intro \{-t\}} commands), {\tt closed}
+  (closed definitions introduced by the {\tt close\_def} command) and
+  {\tt tex} (introduced by the {\tt tex\_syntax} command).
+
+\begin{verbatim}
+>phox> eshow elim.
+All_rec
+and_elim_l
+and_elim_r
+list_rec
+nat_rec
+\end{verbatim}
+
+\item[{\tt flag {\em name}.} or {\tt flag {\em name} {\em value}.}\idx{flag}]
+
+  Prints the value (in the first form) or modify an internal flags of the
+  system. The different flags are listed in the index \ref{flag}.
+
+\begin{verbatim}
+>phox> flag axiom_does_matching.
+axiom_does_matching = true
+>phox> flag axiom_does_matching false.
+axiom_does_matching = false
+\end{verbatim}
+
+\item[\tt path.\idx{path}]
+
+  Prints the list of all paths. This path list is used to find
+  files when using the {\tt include} command.
+
+\begin{verbatim}
+>phox> path.
+/users/raffalli/phox/work/
+/users/raffalli/phox/examples/
+
+\end{verbatim}
+
+
+  
+\item[\tt print {\em expression}.\idx{print}] In case {\em expression}
+  is a closed expression of the language in use, prints it and gives its
+  sort, gives an (occasionally) informative error message otherwise. In
+  case {\em expression} is a defined expression (constant, theorem
+  \dots) gives  the definition.
+  
+\begin{verbatim}
+>PhoX> print \x,y (y+x). 
+\x,y (y + x) : nat -> nat -> nat
+>PhoX> print \x (N x).
+N : nat -> prop
+>PhoX> print N.
+N = \x /\X (X N0 -> /\y:X  X (S y) -> X x) : nat -> prop
+>PhoX> print equal.extensional.
+equal.extensional = /\X,Y (/\x X x = Y x -> X = Y) : theorem
+\end{verbatim}
+  
+\item[\tt print\_sort {\em expression}.\idx{print\_sort}] Similar to
+  print, but gives more information on sorts of bounded variable in
+  expressions.
+\begin{verbatim}
+>PhoX> print_sort \x,y:<nat (y+x). 
+\x:<nat,y:<nat (y + x) : nat -> nat -> nat
+>PhoX> print_sort N.
+N = \x:<nat /\X:<nat -> prop (X N0 -> /\y:<nat X (S y) -> X x) 
+  : nat -> prop
+\end{verbatim}
+
+\item[\tt priority {\em list of symbols}.\idx{priority}]
+  Print the priority of the given {\tt\em symbols}. If no symbol are
+  given, print the priority of all infix and prefix symbols.
+
+\begin{verbatim}
+>PhoX> priority N0 $S $+ $*.
+S                   Prefix[2]           nat -> nat
+*                   rInfix[3]           nat -> nat -> nat
++                   rInfix[3.5]         nat -> nat -> nat
+N0                                      nat
+\end{verbatim}
+
+
+\item[\tt search {\em string} {\em type}.\idx{search}]
+
+  Prints the list of all symbols which have the {\tt\em type} and whose name
+  contains the {\tt\em string}. If no {\tt\em type} is given, it prints all symbols
+  whose name contains the {\tt\em string}. If the empty string is given, it prints
+  all symbols which have the {\tt\em type}.
+
+\begin{verbatim}
+>PhoX> Import nat.
+...
+>PhoX> search "trans"
+>PhoX> .
+equal.transitive                        theorem
+equivalence.transitive                      theorem
+lesseq.ltrans.N                         theorem
+lesseq.rtrans.N                         theorem
+>PhoX> search "" nat -> nat -> prop.
+!=                  Infix[5]            'a -> 'a -> prop
+<                   Infix[5]            nat -> nat -> prop
+<=                  Infix[5]            nat -> nat -> prop
+<>                  Infix[5]            nat -> nat -> prop
+=                   Infix[5]            'a -> 'a -> prop
+>                   Infix[5]            nat -> nat -> prop
+>=                  Infix[5]            nat -> nat -> prop
+predP                                   nat -> nat -> prop
+\end{verbatim}
+
+\end{description}
+
+
+\subsection{Term-extraction.}\label{extraction}
+Term-extraction is experimental. You need to launch {\tt phox} with
+option {\tt -f} to use it. At this moment (2001/02) there is a bug that
+prevents to use correctly command {\tt Import} with option {\\ -f}.
+
+A $\lambda\mu$-term is extracted from in proof in a way similar to the
+one explained in Krivine's book of lambda-calcul for system Af2. To
+summarise rules on universal quantifier and equational reasoning are
+forgotten by extraction.
+
+% syntaxe du terme à définir
+ 
+\begin{description}
+\item[\tt compile {\em theorem\_name}.\idx{compile}] This command
+  extracts a term from the current proof of the theorem {\tt {\em
+      theorem\_name}}. The extracted term has then the same name as the
+  theorem.
+  
+\item[\tt tdef {\em term\_name}= {\em term}.\idx{tdef}]
+This commands defines {\tt  {\em term\_name}} as {\tt {\em term}}.
+
+\item[\tt eval [-kvm] {\em term}.\idx{output}] This command normalises
+  the term in $\lambda\mu$-calcul, and print the result.  With {\tt
+    -kvm} option, Krivine's syntax is used for output.
+
+\item[\tt output [-kvm] \{{\em term\_name}$_1$ \dots {\em term\_name}$_n$\}.\idx{output}] This command prints
+  the given arguments  {\tt {\em term\_name}$_1$\dots{\em
+      term\_name}$_n$}, prints all defined terms (by
+{\tt compile} or {\tt tdef}) if no argument is given.
+With {\tt   -kvm} option, Krivine's syntax is used for output.
+
+\item[\tt tdel \{{\em term\_name}$_1$ \dots {\em term\_name}$_n$\}.\idx{tdef}]
+  This commands deletes the terms {\tt {\em term\_name}$_1$\dots{\em
+      term\_name}$_n$} given as arguments. If no argument is given, the
+  command deletes {\em all} terms, except {\tt  peirce\_law}.  These
+  terms are the ones defined by the commands {\tt compile} and {\tt tdef}.
+The term {\tt peirce\_law} is predefined, but can be explicitly 
+deleted with {\tt tdel  peirce\_law}.
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\item[\tt compile {\em theorem}.]\ :
+
+%  Extract a lambda-term from the proof of the given {\tt\em theorem}. The
+%  lambda-term is define in an environment machine. You can send command to
+%  this machine by prefixing your input with the character ``\verb$#$''.
+
+%\begin{verbatim}
+%>phox> compile isort_total.
+%Compiling isort_total .... 
+%Compiling th_nil .... 
+%Compiling list_rec .... 
+%Compiling and_intro .... 
+%Compiling th_cons .... 
+%Compiling insert_total .... 
+%Compiling FF_total .... 
+%Compiling if_total .... 
+%Compiling TT_total .... 
+%>phox> #isort_total.
+%isort_total >> \x0 \x1 (x1 \x2 (x2 th_nil th_nil) 
+%\x2 \x3 (x3 \x4 \x5 \x6 (x6 \x7 \x8 (x8 x2 (x4 x7
+%x8)) (x5 \x7 (x7 th_nil \x8 \x9 (x9 x2 x8)) \x7 
+%\x8 (x8 \x9 \x10 \x11 (x11 \x12 \x13 (x13 x7 (x9 
+%x12 x13)) (x0 x2 x7 \x12 \x13 (x13 x2 (x13 x7 (x9 
+%x12 x13))) \x12 \x13 (x13 x7 (x10 x12 x13))))) \x7
+%\x8 x8))) \x2 \x3 x3)
+%\end{verbatim}
+
+%\item[\tt compute {\em expr}.]\ :
+
+%  Try to prove the given formula using the ``{\tt trivial}'' tactic. Extract a
+%  lambda-term from the proof and normalize it.
+
+%\begin{verbatim}
+%>phox> compute List N (isort lesseq 
+%      (N4 ; N3 ; N10 ; N20 ; N5 ; N7 ; Nil)).
+%Proving .... 
+
+%   |- List N (isort lesseq 
+%               (N4 ; N3 ; N10 ; N20 ; N5 ; N7 ; Nil))
+%proved
+%Building proof .... Done.
+%Typing proof .... Done.
+%Verifying proof .... Done.
+%Saving proof .... Done .
+%Compiling #tmp .... 
+%Compiling lesseq_total .... 
+%Compiling nat_rec .... 
+%Compiling and_elim_r .... 
+%running the program .... 
+%\x0 \x1 (x1 th_N3 (x1 th_N4 (x1 th_N5 (x1 th_N7 
+%(x1 th_N10 (x1 th_N20 x0))))))
+%delete #tmp
+%\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "doc"
+%%% End: 

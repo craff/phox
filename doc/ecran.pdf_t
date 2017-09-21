@@ -1,0 +1,31 @@
+\begin{picture}(0,0)%
+\includegraphics{ecran.pdf}%
+\end{picture}%
+\setlength{\unitlength}{3947sp}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined%
+\gdef\SetFigFont#1#2#3#4#5{%
+  \reset@font\fontsize{#1}{#2pt}%
+  \fontfamily{#3}\fontseries{#4}\fontshape{#5}%
+  \selectfont}%
+\fi\endgroup%
+\begin{picture}(7247,5932)(-89,-5088)
+\put(-74,-950){\makebox(0,0)[lb]{\smash{{\SetFigFont{9}{10.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Interpreted}%
+}}}}
+\put(-74,-1127){\makebox(0,0)[lb]{\smash{{\SetFigFont{9}{10.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}commands}%
+}}}}
+\put(-74,-2429){\makebox(0,0)[lb]{\smash{{\SetFigFont{9}{10.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Uninterpreted}%
+}}}}
+\put(-74,-2606){\makebox(0,0)[lb]{\smash{{\SetFigFont{9}{10.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}commands}%
+}}}}
+\put(-74,-3779){\makebox(0,0)[lb]{\smash{{\SetFigFont{9}{10.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Answer}%
+}}}}
+\put(-74,-3956){\makebox(0,0)[lb]{\smash{{\SetFigFont{9}{10.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}from PhoX}%
+}}}}
+\put(1299,721){\makebox(0,0)[lb]{\smash{{\SetFigFont{9}{10.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}navigation buttons}%
+}}}}
+\put(2851,721){\makebox(0,0)[lb]{\smash{{\SetFigFont{9}{10.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Restart PhoX}%
+}}}}
+\put(4427,721){\makebox(0,0)[lb]{\smash{{\SetFigFont{9}{10.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Interrupt PhoX}%
+}}}}
+\end{picture}%

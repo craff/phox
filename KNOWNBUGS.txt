@@ -1,0 +1,9 @@
+# $State: Exp $ $Date: 2004/01/08 17:23:26 $ $Revision: 1.1 $
+
+The following problems/bugs are known:
+
+1) The documentation is a draft.
+
+2) The examples are still messy.
+
+3) Many other problems ...

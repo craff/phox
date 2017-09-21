@@ -1,0 +1,189 @@
+% $State: Exp $ $Date: 2002/03/21 20:57:31 $ $Revision: 1.10 $
+%; whizzy-master doc.tex
+ 
+\chapter{Introduction.}
+
+The ``\AFD{} Proof Checker'' is an implementation of higher order logic,
+inspired by Krivine's type system (see section \ref{motif}), and
+designed by Christophe Raffalli.
+ \AFD{} is a Proof assistant based on High Order logic and it is
+eXtensible. 
+
+One of the principle of this proof assistant is to be as
+user friendly as possible and so to need a minimal learning time. The
+current version is still experimental but starts to be really usable. It
+is a good idea to try it and make comments to improve the future
+releases.
+
+
+Actually \AFD{} is  mainly a proof editor
+for higher order logic.  It is used this way to teach logic in
+the mathematic department from ``Universit\'e de Savoie''.
+
+The implementation uses the Objective-Caml language.  You will find in
+the chapter~\ref{install} the instruction to install \AFD.
+
+\section{Motivation.}\label{motif}
+
+The aim of this implementation was first to implement Krivine's Af2
+\cite{Kri90,KP90,Par88} type system, that is a system which allows to
+derive programs for proofs of their specifications.
+
+The aim is now also to realize a Proof Checker used for teaching
+purposes in mathematical logic or even in ``usual'' mathematics.
+
+The requirements for this new {\em proof assistant} are (it will be very
+difficult to reach all of them):
+\begin{itemize}
+\item Most of the ``usual'' mathematics should be feasible in this
+  system. Actually \AFD\ is basically higher order classical logic, a
+  more expressive (but not stronger) extension of the theory of simple
+  types due to Ramsey \cite{Ra25}\footnote{which itself derives from the
+    type system of Russell and Whitehead}. Feasability is probably much
+  more a probleme of ``ergonomics'' than a probleme of logical strength.
+  
+  Anyway it is always possible to represent any first order theory, you
+  can add axioms and first order axiom's schematas are replaced by
+  second order axioms. You can represent this way set theory ZF in
+  \AFD\footnote{For now \AFD{} does not give the user any mechanical way to
+    control that you use only first order instances of these schematas}.
+  
+
+\item The manipulation of the system should be as intuitive as possible. Thus,
+we shall try to have a simple syntax and a comprehensive way to build proofs
+within our system. All of this should be accessible for any mathematician with
+a minimal learning.
+
+\item For programs extraction, we already know that \AFD\ provide enough
+  functions (all functions provably total in higher order arithmetics) but we
+  also need an efficient way to extract programs which should guaranty the
+  fidelity to the specified algorithm and a good efficiency. The system will
+  be credible only after bootstrapping which is the final (and long term) goal
+  of this implementation !
+
+\end{itemize}
+
+
+\section{Actual state.}
+
+Like some other systems, the user communicates with \AFD{} by an
+interaction loop. The user sends a command to the system. The prover
+checks it, and sends a response, that can be used by the user to carry
+on. A sequence of commands can be saved in a file. Such a file can be
+reevaluated, or compiled. This format is the same for libraries or
+user's files.
+
+The prover has basically two modes with two sets of commands : the top
+mode and the proof mode. In the top mode the user can load libraries,
+describe the theory etc. In the proof mode the user proves a given
+proposition.
+
+A proof is described by a sequence of commands (called a proof
+script), always constructed in an interactive way. The proof is
+constructed top-down : from the goal to ``evidences''.  In case the
+goal is not proved by the command, responses of the system gives
+subgoals that should be easier than the initial goal.  The system
+gives names for generated hyptothesis or variables. These names make
+writing easier, but the proof script cannot be understood without the
+responses of the system.
+
+The system implements essentially the construction of a natural
+deduction tree in higher order logic, but can be used without really
+knowing the formal system of natural deduction.
+
+The originality of the system is that the commands can be enhanced by
+the user, just declaring that some proved formulas of a particular form
+have to be interpreted as new rules.
+That allow the system to use few commands. Each command uses more or
+less automatic reasoning, and a generic automatic command composes
+the more basics ones.
+
+A module system allows reusing of theories with renaming, eliminating
+constants and axioms by replacing them with definitions and theorems.
+
+The existing libraries are almost all very basic ones (integers,
+lists\dots), but some examples have been developped that are not
+completly trivial : infinite version of Ramsey theorem, an abstract
+version of completness of predicate calculus, proof of Zorn lemma \dots
+
+
+
+
+In the current version programs extraction is possible but turned off by
+default and does not work with all features, see
+section~\ref{extraction}.  Extraction is possible for proofs using
+  intuitionistic or classical logic.  Programs extraction implements
+  what is described in \cite{Kri90} for intuitionistic functionnal second
+  order arithmetic, but extended to classical logic and
+  $\lambda\mu$-calcul : see \cite{Par92}.
+
+\section{Other sources of documentation}
+
+\begin{itemize}
+\item The web page of \AFD:
+
+\begin{quote}
+\verb#http://www.lama.univ-savoie.fr/~raffalli/phox.html#
+\end{quote}
+
+\item The documentation of the library (file \verb#doc/libdoc.dvi#).
+ You can also look at the PhoX files in the \verb#lib# directory 
+
+
+\item An article relating a teaching experiment with PhoX
+\cite{RD01}. This article gives a short presentation of PhoX giving
+one commented example and an appendix of the main commands. It is also
+ a good introduction to PhoX.
+
+It is available from the Internet in french and english:
+\begin{quote}
+\verb#ftp://www.lama.univ-savoie.fr/pub/users/RAFFALLI/Papers/arao-fr.ps.gz#
+\verb#ftp://www.lama.univ-savoie.fr/pub/users/RAFFALLI/Papers/arao-en.ps.gz#
+\end{quote}
+
+\item The folder \verb#tutorial/french# : it contains tutorial. 
+It is only in french. Each tutorial comes with two files:
+\verb#xxx_quest.phx# and \verb#xxx_cor.phx#. In the first one there are
+questions: 
+``dots'' that you need to replace by the proper sequence of
+commands. The second one contains valid answer to all the questions.
+
+There are three kinds of tutorials (see the ``README'' in
+\verb#tutorial/french# for a more detailed description):
+\begin{itemize}
+\item Tutorial intended to learn PhoX itself:
+\verb#tautologie_quest.phx#,
+\verb#intro_quest.phx# and
+\verb#sort_quest.phx#.
+\item Tutorial intended to learn standard mathematics:
+\verb#ideal_quest.phx#,
+               \verb#commutation_quest.phx#, \verb#topo_quest.phx#,
+               \verb#analyse_quest.phx# and \verb#group_quest.phx#.
+\item Tutorial intended to learn Elogic:
+\verb#tautologie_quest.phx# and \verb#minlog_quest.phx# (the latest
+tutorial is difficult).
+\end{itemize}
+
+We plan to translate these tutorials to english.
+
+
+\item The folder \verb#examples# and \verb#examples/mini# of the distribution : they contain a lot of
+examples of proof development. Beware that a lot of these examples
+were develop for some older version of PhoX and could be improved
+using recent features.
+
+
+\end{itemize}
+
+
+% \section{Plan.}\label{plan}
+
+% Yet to be written ...
+
+
+        
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "doc"
+%%% End: 
