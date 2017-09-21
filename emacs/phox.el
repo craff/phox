@@ -10,7 +10,7 @@
   "\\(prop\\(osition\\)?\\)\\|\\(lem\\(ma\\)?\\)\\|\\(fact\\)\\|\\(cor\\(ollary\\)?\\)\\(theo\\(rem\\)?\\)")
 
 (proof-easy-config
- 'phox "phox"
+ 'phox "PhoX"
  proof-prog-name		"phox"
  proof-terminal-string          "."
  proof-script-command-end-regexp"[.][ \n\t\r]"
