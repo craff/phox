@@ -4,21 +4,21 @@ open Genlex
 
 
 type pretty_tree =
-    Box of break array * pretty_tree list 
-      * (bool list,(float*float)) Hashtbl.t 
+    Box of break array * pretty_tree list
+      * (bool list,(float*float)) Hashtbl.t
   | VBox of pretty_tree list
   | Atom of size
   | IBreak of size * size * bool ref
   | LBreak of int * size * size
 
-and break = { 
-    name : string; 
+and break = {
+    name : string;
     state : bool ref }
 
 and size = float
 
 let fabs x = if x > 0.0 then x else -. x
- 
+
 let undo_list = ref []
 
 let set p = undo_list := p::!undo_list; p:= true
@@ -42,45 +42,45 @@ let restore_keep l =
   !keep
 
 let redo keep =
-  List.iter (function p -> set p) keep 
+  List.iter (function p -> set p) keep
 
 let look_for_name name lb =
   let ret = ref (-1) in
-  try 
+  try
     for i = 0 to Array.length lb - 1 do
       if lb.(i).name = name then (ret := i; raise Exit)
     done;
-    failwith (name ^ " not found") 
+    failwith (name ^ " not found")
   with Exit -> !ret
 
 
 let rec read_tree lb = parser
-    [<'Ident ("open" | "iopen"); 
-      lb = (fun strm -> Array.of_list (read_break_list strm)); 
+    [<'Ident ("open" | "iopen");
+      lb = (fun strm -> Array.of_list (read_break_list strm));
       lt = read_tree_list lb;
       'Ident ("close" | "iclose") >] -> Box(lb,lt,Hashtbl.create 23)
   | [<'Ident "max";
       lt = read_tree_list lb;
       'Ident "endmax" >] -> VBox lt
-  | [<'Ident "atom"; 
-      'Kwd":"; 
-      'Float width; 
+  | [<'Ident "atom";
+      'Kwd":";
+      'Float width;
       'Ident "pt" >] -> Atom width
-  | [<'Ident "imbreak"; 
-      'Kwd":"; 
-      'Float hwidth; 
+  | [<'Ident "imbreak";
+      'Kwd":";
+      'Float hwidth;
       'Ident "pt";
-      'Kwd","; 
-      'Float twidth; 
+      'Kwd",";
+      'Float twidth;
       'Ident "pt" >] -> IBreak(hwidth,twidth,ref false)
-  | [<'Ident "break"; 
-      'Kwd":"; 
+  | [<'Ident "break";
+      'Kwd":";
       'Ident name;
-      'Kwd","; 
-      'Float hwidth; 
+      'Kwd",";
+      'Float hwidth;
       'Ident "pt";
-      'Kwd","; 
-      'Float twidth; 
+      'Kwd",";
+      'Float twidth;
       'Ident "pt" >] -> LBreak(look_for_name name lb,hwidth,twidth)
 
 and read_tree_list lb = parser
@@ -91,16 +91,16 @@ and read_break_list = parser
     [<'Ident "newbreak";
       'Kwd ":";
       'Ident name;
-      lb = read_break_list >] -> 
+      lb = read_break_list >] ->
       	{name = name; state = ref false}::lb
   | [<>] -> []
-  
+
 let rec format_failed = function
-    Box(lb, lt, _) -> 
+    Box(lb, lt, _) ->
       Array.iter (function b -> b.state:=true) lb;
       format_failed_aux 0.0 0.0 lt
   | VBox(lt) ->
-      List.fold_left (fun m t -> 
+      List.fold_left (fun m t ->
 	let m' = format_failed t in
         max m m') 0.0 lt
   | Atom(size) -> size
@@ -108,7 +108,7 @@ let rec format_failed = function
 
 
 and  format_failed_aux maxi prev = function
-    IBreak(hw,tw,ptr)::suit -> 
+    IBreak(hw,tw,ptr)::suit ->
       if tw < prev+.hw then begin
         ptr := true;
         let maxi = max prev maxi in
@@ -117,7 +117,7 @@ and  format_failed_aux maxi prev = function
         let maxi = max prev maxi in
         format_failed_aux maxi (prev +. hw) suit
       end
-  | Atom(size)::suit -> 
+  | Atom(size)::suit ->
         format_failed_aux maxi (prev+.size) suit
   | t::suit ->
       let m = format_failed t in
@@ -127,13 +127,13 @@ and  format_failed_aux maxi prev = function
 let rec compute_size enc lb = function
     Box(lb,lt,memo) ->
       let l = List.map (fun p -> !p) enc in
-      (try 
+      (try
 	Hashtbl.find memo l
       with Not_found ->
         let r = compute_size_list enc lb 0.0 0.0 0.0 lt in
         Hashtbl.add memo l r; r)
   | VBox(lt) ->
-      List.fold_left (fun (mi,ma) t -> 
+      List.fold_left (fun (mi,ma) t ->
 	let (mi',ma') = compute_size enc lb t in
         max mi mi', max ma ma') (0.0, 0.0) lt
   | Atom(size) -> size, size
@@ -142,17 +142,17 @@ let rec compute_size enc lb = function
 and compute_size_list enc lb best prev aprev = function
     [] -> max best prev, aprev
   | IBreak(hw,tw,ptr)::suit ->
-      if tw < prev+.hw then 
+      if tw < prev+.hw then
         compute_size_list enc lb (max best prev) tw (aprev +. hw) suit
       else
         compute_size_list enc lb best (prev +. hw) (aprev +. hw) suit
   | LBreak(i,hw,tw)::suit ->
       let {state = ptr} = lb.(i) in
-      if (if List.memq ptr enc then !ptr else tw < prev+.hw) then 
+      if (if List.memq ptr enc then !ptr else tw < prev+.hw) then
         compute_size_list enc lb (max best prev) tw (aprev +. hw) suit
       else
         compute_size_list enc lb best (prev +. hw) (aprev +. hw) suit
-  |  x::suit -> 
+  |  x::suit ->
       let mi, ma = compute_size enc lb x in
       compute_size_list enc lb best (prev +. mi) (aprev +. ma) suit
 
@@ -164,16 +164,16 @@ let output_file chout t =
             Array.iter (fun b -> if !(b.state) then raise Exit) lb;
             let rec gn = function
               IBreak(_,_,ptr) when !ptr ->  raise Exit
-            | _ -> () in 
+            | _ -> () in
             List.iter gn lt;
             false
           with Exit -> true in
 	output_string chout (if bt then "\\iftrue\n" else "\\iffalse\n");
-      	Array.iter (fun b -> 
-	  output_string chout (if !(b.state) then "\\iftrue\n" 
+      	Array.iter (fun b ->
+	  output_string chout (if !(b.state) then "\\iftrue\n"
                                              else "\\iffalse\n")) lb;
         List.iter fn lt
-    | VBox(lt) -> 
+    | VBox(lt) ->
 	List.iter fn lt
     | IBreak(_,_,ptr) ->
 	  output_string chout (if !ptr then "\\iftrue\n" else "\\iffalse\n");
@@ -195,8 +195,8 @@ let eCoef = 5.0
 *)
 let rec format_tree width bp = function
     Box(lb,lt,_) ->
-      (try 
-        let b,p,cn,n = 
+      (try
+        let b,p,cn,n =
           format_tree_list width width [] bp bp lb lt in max b p, cn + n
       with Fail_format _ -> raise (Fail_format true))
   | VBox(lt) ->
@@ -205,8 +205,8 @@ let rec format_tree width bp = function
         max s s', n + n')
       	(0.0,0) lt
       with Fail_format _ -> raise (Fail_format true))
-  | Atom(size) -> 
-      if size > width then raise (Fail_format true); 
+  | Atom(size) ->
+      if size > width then raise (Fail_format true);
       size, 1
   | _ -> failwith "Illegal break"
 
@@ -229,63 +229,63 @@ and format_tree_list width cur enc bp0 bp lb = function
 
   | IBreak(hw,tw,ptr)::suit ->
       let s = save () in (
-      try 
+      try
 	if cur < hw then  raise (Fail_format true);
-        comp hw (format_tree_list width (cur -. hw) enc 
+        comp hw (format_tree_list width (cur -. hw) enc
 		 (bp -. tw) (bp +. hw) lb suit)
-      with 
+      with
         Fail_format b ->
           restore s;
-	  if width < tw or width -. cur +. hw +. eCoef <= tw or not b
+	  if width < tw || width -. cur +. hw +. eCoef <= tw || not b
 	  then raise (Fail_format false);
           set ptr;
-          try compr tw (format_tree_list width (width -. tw) 
+          try compr tw (format_tree_list width (width -. tw)
 			enc 0.0 tw lb suit)
-          with Fail_format _ -> raise (Fail_format false)) 
+          with Fail_format _ -> raise (Fail_format false))
 
   | LBreak(i,hw,tw)::suit ->
       let {state = ptr} = lb.(i) in
       let can_break = not (List.memq ptr enc) in
       let s = save () in (
-      try 
+      try
 	if cur < hw then raise (Fail_format true);
-        comp hw (format_tree_list width (cur -. hw) (ptr::enc) 
+        comp hw (format_tree_list width (cur -. hw) (ptr::enc)
 		 (bp -. tw) (bp +. hw) lb suit)
-      with 
+      with
         Fail_format b when can_break ->
           restore s;
 	  if width < tw then raise (Fail_format false);
           set ptr;
-          compr tw (format_tree_list width (width -. tw) (ptr::enc) 
+          compr tw (format_tree_list width (width -. tw) (ptr::enc)
 		    0.0 tw lb suit))
 
   | Atom(size)::suit ->
-      if cur < size then raise (Fail_format true); 
-      comp size (format_tree_list width (cur -. size) enc 
+      if cur < size then raise (Fail_format true);
+      comp size (format_tree_list width (cur -. size) enc
 	bp0 (bp +. size) lb suit)
 
   | t::suit ->
       let rec fn = function
-          Atom(size)::suit -> 
+          Atom(size)::suit ->
 	    compf (size, size) (fn suit)
-      	| (Box _ | VBox _) as t :: suit -> 
+      	| (Box _ | VBox _) as t :: suit ->
 	    compf (compute_size enc lb t) (fn suit)
-        | _ -> 
+        | _ ->
 	    (0.0, 0.0)
       in
       let mi, ts = fn suit in
       let mi', ts' = compute_size enc lb t in
-      if cur < mi +. mi' then raise (Fail_format true); 
+      if cur < mi +. mi' then raise (Fail_format true);
       let nw = min (cur *. (ts' /. (ts +. ts'))) (cur -. mi) in
       let sv = save () in
       let s, n = format_tree nw bp0 t in
       let s =
-        if n <= 1 then s else 
+        if n <= 1 then s else
         let best_s = ref nw and prev_s = ref 0.0 and
-	  keep = ref (restore_keep sv) in  
+	  keep = ref (restore_keep sv) in
       	while fabs (!best_s -. !prev_s) > dCoef do
           let nw = (!best_s +. !prev_s) /. 2.0 in
-          let sv = save () in       
+          let sv = save () in
           try
             let ns, n0 = format_tree nw bp0 t in
             if n0 <= n then begin
@@ -297,18 +297,18 @@ and format_tree_list width cur enc bp0 bp lb = function
 	    Fail_format _ ->
               restore sv; prev_s := nw
       	done;
-      	redo !keep; !best_s 
+      	redo !keep; !best_s
       in
-      if n >= 1 & (s +. bp0) /. s > xCoef then raise (Fail_format true); 
-      let b, s', cn, n' = format_tree_list width (cur -. s) enc 
+      if n >= 1 & (s +. bp0) /. s > xCoef then raise (Fail_format true);
+      let b, s', cn, n' = format_tree_list width (cur -. s) enc
 	bp0 (bp +. s) lb suit in
-      let s'' = s +. s' in max b s'', s'', max n cn, n' 
+      let s'' = s +. s' in max b s'', s'', max n cn, n'
 
 let do_tree chout width strm =
   let t = read_tree [||] strm in
-  (try 
+  (try
     let _ = format_tree width 0.0 t in ()
-  with 
+  with
     Fail_format _ ->
       prerr_endline "Fail to format one formula !";
       let f = format_failed t in
@@ -317,13 +317,13 @@ let do_tree chout width strm =
       prerr_float width;
       prerr_endline " !");
   output_file chout t
-      
+
 let do_all filename =
   let filename =
     let l =  String.length filename  in
     let lf = if l > 4 then String.sub filename (l - 4) 4 else "" in
-    if (lf = ".af2") or (lf = ".tex") or (lf = ".pout") or (lf = ".dvi")
-      then String.sub filename 0 (l - 4) else filename 
+    if (lf = ".af2") || (lf = ".tex") || (lf = ".pout") || (lf = ".dvi")
+      then String.sub filename 0 (l - 4) else filename
   in
   let chin = open_in (filename ^ ".pout") in
   let chout = open_out (filename ^ ".pin") in
@@ -331,20 +331,17 @@ let do_all filename =
   let strm = make_lexer [":";","] cstrm in
   let rec fn = parser
     [< 'Ident "start"; 'Kwd ":"; 'Float width; 'Ident "pt" >] ->
-      do_tree chout width strm; fn strm   
+      do_tree chout width strm; fn strm
   | [< >] -> ()
-  in 
+  in
   fn strm;
   close_in chin;
   output_string chout "\\prettyend";
   close_out chout
 
 let _ =
-  try 
+  try
     do_all Sys.argv.(1)
   with
     Failure s -> print_endline s
   | Sys_error s -> print_endline s
-
-
-

@@ -5,17 +5,17 @@
                 HISTORY OF THE PROOF SYSTEM PhoX
 
                               by
-     
+
                           C. Raffalli
 
-                Equipe de logique de Paris VII 
+                Equipe de logique de Paris VII
                               &
                      Universite de Savoie
 
 (**************************************************************)
 
 version 0.31b2
-  - Some convention have been chosen for the library in order to 
+  - Some convention have been chosen for the library in order to
     generate the documentation automatically.
   - New commands prop, theo, etc to start a proof.
     goal is now obsolete but still available.
@@ -25,19 +25,19 @@ version 0.31b1
   - added rename tactic
   - fixed a problem with new_elim -i
   - fixed a bug in test_seq function
-  - modified emacs mode with output possible in local buffer 
+  - modified emacs mode with output possible in local buffer
     (thanks to P. Roziere).
   - menu in emacs mode
 
 version 0.30b9
   - added apply tactic
   - added absurd tactic
-	
+
 version 0.30b8
   - fixed a bug in the bactracking (and undo) mechanism
 
 version 0.30b7 (not public)
-  - change in the installation procedure: 
+  - change in the installation procedure:
       the preprocessor is only used for main.ml
       the config file let you change DELIM and DEFAULT_PATH
   - fix in INSTALL and doc/intro.tex (the emacs stuff was not 100% clean)
@@ -75,14 +75,14 @@ version 0.6
 	  nat, list[s], ...
 	- bool.af2: now uses the sort prop instead of term.
 	  all the function on booleans are replaced by the connective.
-	- prop.af2: new axioms added: 
+	- prop.af2: new axioms added:
 	    claim equal.proposition /\X,Y (X <-> Y -> X = Y).
             claim equal.extensional /\X,Y (/\x (X x = Y x) -> X = Y).
-	    De Morgan law added as equations (no new_rewrite yet) 		  
+	    De Morgan law added as equations (no new_rewrite yet)
 	- change to devtools (developper only)
 	- check_locked rewritten to be useful
 	- lock and unlock can work on more than one files
-        - unrelock added (to propagate to the server and keep the file locked) 
+        - unrelock added (to propagate to the server and keep the file locked)
 
 version 0.7
    - the software if now called PhoX for Proof in Higher Order eXtensible Logic
@@ -157,7 +157,7 @@ version 0.85
      [n m ...] : apply cmd to goals n, m ...
      [*] (without spaces) : apply cmd to all goals
    - relaxed the semantics of "with" in apply and elim:
-     * "and" is now really commutative. 
+     * "and" is now really commutative.
      * the tactics backtracks more to try more combination
      * the tactics try to unify the arguments under conjunction,
      disjunction and existential. For instance, if the goal is
@@ -178,3 +178,8 @@ version 0.85
    - rename of hypothesis now works properly (there was a bug with undo)
    - added by_contradiction command corresponding to
      ~ A |- False     implies         |- A
+
+0.89
+   - compilation with recent OCaml
+   - new "cd" command
+   - updated proof general mode to version 4.4 of PG
