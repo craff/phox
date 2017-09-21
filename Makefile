@@ -110,19 +110,14 @@ distrib2:
 	cp config.distrib config
 	chmod u+w config
 	if test -d $(DISTRIBDIR); then : ; else mkdir -p $(DISTRIBDIR); fi
-	cp doc/doc.ps $(DISTRIBDIR)/phox.doc.ps
-	gzip $(DISTRIBDIR)/phox.doc.ps
-	cp doc/doc.dvi $(DISTRIBDIR)/phox.doc.dvi
-	gzip $(DISTRIBDIR)/phox.doc.dvi
-	cp doc/libdoc.ps $(DISTRIBDIR)/phox.libdoc.ps
-	gzip $(DISTRIBDIR)/phox.libdoc.ps
-	cp doc/libdoc.dvi $(DISTRIBDIR)/phox.libdoc.dvi
-	gzip $(DISTRIBDIR)/phox.libdoc.dvi
+	cp doc/doc.pdf $(DISTRIBDIR)/phox.doc.pdf
+	gzip $(DISTRIBDIR)/phox.doc.pdf
+	cp doc/libdoc.pdf $(DISTRIBDIR)/phox.libdoc.pdf
+	gzip $(DISTRIBDIR)/phox.libdoc.pdf
 	if test -L /tmp/$(DISTRIBTARDIR) ; then rm -f /tmp/$(DISTRIBTARDIR); fi
 	ln -s `pwd` /tmp/$(DISTRIBTARDIR)
-	tar --dereference --directory=/tmp \
-	    --exclude config.dev --exclude devtools \
-            --exclude .git  \
+	tar --dereference --directory=/tmp --exclude=archive \
+	    --exclude config.dev --exclude .git  \
 	    -cvf $(DISTRIBDIR)/phox.tar $(DISTRIBTARDIR)
 	rm -f /tmp/$(DISTRIBTARDIR)
 	gzip $(DISTRIBDIR)/phox.tar

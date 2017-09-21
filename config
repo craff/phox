@@ -5,18 +5,18 @@
 
 # main directory (can be use or not for the next variables).
 top=
-prefix=/usr/local
-# prefix = /usr
-# prefix = ${HOME}
+PREFIX=/usr/local
+# PREFIX = /usr
+# PREFIX = ${HOME}
 
 # where to put the binary files
-BINDIR = ${prefix}/bin
+BINDIR = ${PREFIX}/bin
 
 # where to put the PhoX library files
-LIBDIR = ${prefix}/lib/phox
+LIBDIR = ${PREFIX}/lib/phox
 
 # where to put the doc :
-DOCDIR = ${prefix}/doc/phox
+DOCDIR = ${PREFIX}/doc/phox
 
 # The name of the emacs comand you use (may be emacs, xemacs, ...)
 # Note: xemacs displays special symbols in an elegant way
@@ -24,11 +24,11 @@ EMACS = xemacs
 
 # Normally, the path for the emacs library is automatically computed.
 # If is fails set this variable:
-# EMACSDIR = ${prefix}/share/emacs/site-lisp
+# EMACSDIR = ${PREFIX}/share/emacs/site-lisp
 
 # The following directory must be in your TEXINPUTS path
 TEXDIR = /usr/share/texmf/tex/latex/phox
-# TEXDIR = ${prefix}/lib/texmf/tex/latex/phox
+# TEXDIR = ${PREFIX}/lib/texmf/tex/latex/phox
 
 # where to put documentation files needed by PhoX
 # (no reasons to change these four variables)
@@ -47,17 +47,20 @@ PHOXVERS = phoxopt     # use native-code compiler
 PRETTYVERS = prettyopt     # use native-code compiler
 # PRETTYVERS = prettyslow      # use byte-code compiler
 
-# Where to find ocaml and others (3.04 or later) :
-CAMLC = ocamlfind ocamlc -g
-CAMLDEP = ocamlfind ocamldep
-CAMLO = ocamlfind ocamlopt
+# Where to find ocaml and others :
+CAMLC = ocamlc -g
+CAMLDEP = ocamldep
+CAMLO = ocamlopt                     # if you are in hurry and find the
+#CAMLO = ocamlopt.opt               # native-code compiler too slow,
+#				     # change this to ocamlopt.opt
+#                                    # (if you have compiled it !)
 
 CAMLPREPRO = -pp camlp4o
 #                                    # Uncomment the previous line if you
 #                                    # use ocaml 3.04 or later
 
 # where to find sed
-SED = /usr/bin/sed
+SED = /sbin/sed
 
 # where to find AWK (used to build documentation and for creating tags
 # tables). As documentation is built in distribution, you need awk only
@@ -78,7 +81,7 @@ DELIM=:
 
 # where to create distributions (you probably do not need to use this
 # variable). This directory must not be in source directory.
-DISTRIBDIR = /home/raffalli/FTP/PhoX/$(VERSNUM)
+DISTRIBDIR = ./archive/$(VERSNUM)
 #DISTRIBDIR = /mnt/disk/PhoX
 
 # name of the root directory in the tar archive file for distribution

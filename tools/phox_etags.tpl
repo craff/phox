@@ -12,7 +12,7 @@ while getopts "o:" option
 	o)
 	    TAGSFILE=$OPTARG
 	    ;;
-	'?') 
+	'?')
 	    echo $usage
 	    exit 2
 	    ;;
@@ -21,15 +21,15 @@ while getopts "o:" option
 
 shift $(($OPTIND - 1))
 
- 
+
 
 case $# in
-    0) 
+    0)
     echo "au moins un argument, des  fichiers à tagger"
     echo $usage
     ;;
-    *)  if [ -f $dir/$TAGSFILE ] ; then 
-	    if rm $dir/$TAGSFILE ; then 
+    *)  if [ -f $dir/$TAGSFILE ] ; then
+	    if rm $dir/$TAGSFILE ; then
 			echo "rm $dir/$TAGSFILE"
 	    fi
 	    touch $TAGSFILE
@@ -38,6 +38,6 @@ case $# in
 	    echo $file
 	    $TAG $file >> $dir/$TAGSFILE
 	    echo "$dir/$TAGSFILE created"
-	done 
+	done
     ;;
 esac
