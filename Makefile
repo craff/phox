@@ -63,13 +63,11 @@ check:
 	cd examples; $(MAKE) check
 	cd tutorial/french; $(MAKE) check
 	cd tutorial/english; $(MAKE) check
-	if [ -d private ]; then cd private; $(MAKE) check; fi
 
 depend:
 	cd examples; $(MAKE) depend
 	cd tutorial/french; $(MAKE) depend
 	cd tutorial/english; $(MAKE) depend
-	if [ -d private ]; then cd private; $(MAKE) depend; fi
 
 clean:
 	./tools/cleandir .
@@ -123,9 +121,8 @@ distrib2:
 	if test -L /tmp/$(DISTRIBTARDIR) ; then rm -f /tmp/$(DISTRIBTARDIR); fi
 	ln -s `pwd` /tmp/$(DISTRIBTARDIR)
 	tar --dereference --directory=/tmp \
-	    --exclude RCS --exclude config.dev --exclude devtools \
-            --exclude CVS --exclude CVSROOT --exclude papers \
-	    --exclude private \
+	    --exclude config.dev --exclude devtools \
+            --exclude .git  \
 	    -cvf $(DISTRIBDIR)/phox.tar $(DISTRIBTARDIR)
 	rm -f /tmp/$(DISTRIBTARDIR)
 	gzip $(DISTRIBDIR)/phox.tar
