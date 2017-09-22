@@ -54,7 +54,6 @@ CAMLO = ocamlfind ocamlopt
 
 CAMLPREPRO = -pp camlp4o
 
-
 # where to find sed
 SED = /sbin/sed
 
