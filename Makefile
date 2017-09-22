@@ -114,5 +114,5 @@ distrib:
 
 release: distclean
 	git push origin
-	git tag -a phox_$(VERSNUM) -m "phox on github"
-	git push origin phox_$(VERSNUM)
+	git tag -a $(VERSNUM) -m "phox on github"
+	git push origin $(VERSNUM)
