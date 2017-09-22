@@ -28,29 +28,11 @@ install:
 	cp -r tutorial $(EXAMPLESDIR)
 	if [ ! -z `which texhash` ]; then texhash; fi
 
-installPG:
-	if test -f $(PGSRC)/$(PGVERSION).tar.gz ; \
-	  then if test -d $(PGDIR); \
-		 then cd $(PGDIR) ; \
-		      tar xzvf $(PGSRC)/$(PGVERSION).tar.gz ; \
-		       if test -L $(PGDIR)/ProofGeneral ; \
-			 then rm  $(PGDIR)/ProofGeneral ; \
-		       fi ; \
-                      ln -s $(PGDIR)/$(PGVERSION) $(PGDIR)/ProofGeneral;\
-                  else echo $(PGDIR) "doesn't exist"; exit 1 ; \
-	        fi ; \
-	  else echo "File " $(PGSRC)/$(PGVERSION)".tar.gz doesn't exists."; \
-	fi
-
-commit:
-	cvs update -d
-	cvs commit -m "" .
-	if [ -n "`cvs -n -q update`" ]; then echo Problem to solve ?; exit 1; fi
-	- rm version
-	echo "VERSMAJ=$(VERSMAJ)" >> version
-	echo "VERSNUM=$(VERSMAJ).`date +\"%y%m%d\"`" >> version
-	echo "VERSDAT=\"`date +\"%B %Y\"`\"" >> version
-	cvs tag "Release-$(shell echo $(VERSMAJ) | sed 's/\./-/g')-`date +\"%y%m%d\"`"
+uninstall:
+	- rm -rf $(LIBDIR) $(DOCDIR) $(TEXDIR)
+	- rm $(BINDIR)/phox$(EXE)
+	- rm $(BINDIR)/phoxdep
+	- rm $(BINDIR)/pretty$(EXE)
 
 tags:
 	cd lib; ../tools/phox_etags.sh *.phx
