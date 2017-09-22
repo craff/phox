@@ -48,16 +48,12 @@ PRETTYVERS = prettyopt     # use native-code compiler
 # PRETTYVERS = prettyslow      # use byte-code compiler
 
 # Where to find ocaml and others :
-CAMLC = ocamlc -g
-CAMLDEP = ocamldep
-CAMLO = ocamlopt                     # if you are in hurry and find the
-#CAMLO = ocamlopt.opt               # native-code compiler too slow,
-#				     # change this to ocamlopt.opt
-#                                    # (if you have compiled it !)
+CAMLC = ocamlfind ocamlc -g
+CAMLDEP = ocamlfind ocamldep
+CAMLO = ocamlfind ocamlopt
 
 CAMLPREPRO = -pp camlp4o
-#                                    # Uncomment the previous line if you
-#                                    # use ocaml 3.04 or later
+
 
 # where to find sed
 SED = /sbin/sed
