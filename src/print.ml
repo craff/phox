@@ -145,7 +145,7 @@ type parg =
 let default_name k env =
 let rec fn = function
   KAtom (n,_) ->
-    String.make 1 (Char.lowercase_ascii (get_name n).[0])
+    String.make 1 (Char.lowercase (get_name n).[0])
 | KArrow (_,k) -> fn k
 | _ -> "#"
 in free_name (fn k) env

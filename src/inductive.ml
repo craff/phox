@@ -688,7 +688,7 @@ let data export name sy kX go le tname intros =
   let first_char = sname.[0] in
   if 'A' > first_char || 'Z' < first_char then
     raise (Gen_error ("name of a data type must start with a capital letter"));
-  Bytes.set sname 0 (Char.lowercase_ascii first_char);
+  Bytes.set sname 0 (Char.lowercase first_char);
   let lt = ref (0, []) in
   let rec fn t = match norm2 t with
       KArrow(_,t) -> fn t
@@ -906,7 +906,7 @@ and parse_data_suit2 export o lo le tname l cname sy le' co tstr =
       let le' = if le' <> [] && List.length le' = List.length l then le' else
 	List.fold_right (fun e' le' ->
 	  let name = head_name e' in
-	  let name = String.lowercase_ascii (String.sub name 0 1) in
+	  let name = String.lowercase (String.sub name 0 1) in
 	  let name = free_name name (List.map fst (le@le')) in
 	  let k = mk_Var () in
 	  (name,k)::le')
