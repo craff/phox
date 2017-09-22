@@ -18,17 +18,8 @@ LIBDIR = ${PREFIX}/lib/phox
 # where to put the doc :
 DOCDIR = ${PREFIX}/doc/phox
 
-# The name of the emacs comand you use (may be emacs, xemacs, ...)
-# Note: xemacs displays special symbols in an elegant way
-EMACS = xemacs
-
-# Normally, the path for the emacs library is automatically computed.
-# If is fails set this variable:
-# EMACSDIR = ${PREFIX}/share/emacs/site-lisp
-
 # The following directory must be in your TEXINPUTS path
-TEXDIR = /usr/share/texmf/tex/latex/phox
-# TEXDIR = ${PREFIX}/lib/texmf/tex/latex/phox
+TEXDIR = ${PREFIX}/share/lib/texmf/tex/latex/phox
 
 # where to put documentation files needed by PhoX
 # (no reasons to change these four variables)
@@ -77,7 +68,6 @@ DELIM=:
 # where to create distributions (you probably do not need to use this
 # variable). This directory must not be in source directory.
 DISTRIBDIR = ./archive/$(VERSNUM)
-#DISTRIBDIR = /mnt/disk/PhoX
 
 # name of the root directory in the tar archive file for distribution
 # (you probably do not need to use this variable).

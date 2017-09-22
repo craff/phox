@@ -88,9 +88,6 @@ distrib2:
 	if test -f config.dev ; then echo Warning: config.dev exists; exit 1; fi
 	$(MAKE) clean
 	find . -name .\#\* -print -exec rm \{\} \;
-	mv config config.dev
-	cp config.distrib config
-	chmod u+w config
 	if test -d $(DISTRIBDIR); then : ; else mkdir -p $(DISTRIBDIR); fi
 	cp doc/doc.pdf $(DISTRIBDIR)/phox.doc.pdf
 	gzip $(DISTRIBDIR)/phox.doc.pdf
@@ -98,12 +95,10 @@ distrib2:
 	gzip $(DISTRIBDIR)/phox.libdoc.pdf
 	if test -L /tmp/$(DISTRIBTARDIR) ; then rm -f /tmp/$(DISTRIBTARDIR); fi
 	ln -s `pwd` /tmp/$(DISTRIBTARDIR)
-	tar --dereference --directory=/tmp --exclude=archive \
-	    --exclude config.dev --exclude .git  \
+	tar --dereference --directory=/tmp --exclude=archive --exclude .git  \
 	    -cvf $(DISTRIBDIR)/phox.tar $(DISTRIBTARDIR)
 	rm -f /tmp/$(DISTRIBTARDIR)
 	gzip $(DISTRIBDIR)/phox.tar
-	mv -f config.dev config
 #	tar --exclude RCS -cvf phox.doc.html.tar doc; \
 #       gzip phox.doc.html.tar; \
 
