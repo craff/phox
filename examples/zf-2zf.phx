@@ -49,21 +49,21 @@ utilisée et quelques conséquences de celle-ci utiles pour la suite.
 
 (*** Syntaxe *)
 
-(*texte 
-Le langage ne contient qu'un seul symbole de prédicat binaire, 
-l'appartenance $eps, dans le calcul des prédicats du premier ordre 
+(*texte
+Le langage ne contient qu'un seul symbole de prédicat binaire,
+l'appartenance $eps, dans le calcul des prédicats du premier ordre
 sans égalité. *)
 
 
 Sort set.
- 
+
 Cst (* appartenance "dure" *) Infix[2.5] x "eps" y : set -> set -> prop.
 (* x eps y *)
 tex_syntax $eps Infix[2.5] x "\\mathrel{\\varepsilon}" y.
 
 (*** Les  axiomes *)
 
-claim (* compréhension *) comp.ZF 
+claim (* compréhension *) comp.ZF
 	/\ F /\ a\/ b/\x(x eps b <->(x eps a & F x)).
 
 claim (* paire *) pair.ZF /\ x/\y\/z(x eps z & y eps z).
@@ -71,7 +71,7 @@ claim (* paire *) pair.ZF /\ x/\y\/z(x eps z & y eps z).
 
 claim (* réunion *) union.ZF /\a\/b /\x eps a /\ y eps x y eps b.
 
-claim (* Collection *) collec.ZF 
+claim (* Collection *) collec.ZF
 	/\F /\a \/ b /\ x eps a /\ y( F x y  -> \/ y' eps b F x y').
 
 (*note  L'axiome de collection a pour conséquence l'axiome de
@@ -114,7 +114,7 @@ intro.
 save.
 (* depend eq.leibniz.ZF. pair.ZF, comp.ZF *)
 
-(*note 
+(*note
 La démonstration précédente  se formalise dans le calcul des prédicats
 du premier ordre sans égalité.
 *)
@@ -128,7 +128,7 @@ save.
 def (* avoir même extension *) Infix[5] x "=~" y = /\ z (z eps x <-> z eps y).
 tex_syntax $=~ Infix[5] x "\\sim" y.
 
-(* texte 
+(* texte
 la relation $=~, "avoir même extension" est une relation d'équivalence.
 *)
 fact eq_ext.reflexive.ZF /\ x x =~ x.
@@ -143,7 +143,7 @@ fact eq_ext.transitive.ZF /\ x,y,z( x =~ y -> y =~ z -> x =~ z).
 trivial.
 save.
 
-(*texte 
+(*texte
 bien sûr : *)
 
 fact eq.eq_ext.ZF /\ x,y( x == y -> x =~ y).
@@ -157,7 +157,7 @@ save.
 def Infix[5] R "is_set" r  =  /\a(R a <-> a eps r).
 tex_syntax  $is_set Infix[5] R "\\sim" r.
 
-def Infix[5] R "is2_set" r  = /\a(R a -> \/a' eps r a =~ a') & 
+def Infix[5] R "is2_set" r  = /\a(R a -> \/a' eps r a =~ a') &
 /\a' eps r \/a (R a & a =~ a').
 tex_syntax $is2_set  Infix[5] R "\\sim_2" r.
 
@@ -180,7 +180,7 @@ fact (* existence d'une paire *) Paire.exists.ZF /\a,b\/c Paire c a b.
 intros.
 apply  pair.ZF with a and b.
 lefts G $\/ $&.
-elim  comp.ZF with \x(x= a or x =b) and  z. 
+elim  comp.ZF with \x(x= a or x =b) and  z.
 intro.
 instance ?1 b0.
 trivial.
@@ -191,7 +191,7 @@ fact (* [a] appartient à une paire [a,b] *) Paire.left.elim.ZF
 trivial.
 save.
 
-fact (* [b] appartient à une paire [a,b] *) Paire.right.elim.ZF 
+fact (* [b] appartient à une paire [a,b] *) Paire.right.elim.ZF
 /\a,b,c( Paire c a b -> b eps c).
 trivial.
 save.
@@ -205,12 +205,12 @@ tex_syntax $Singleton Infix[6] c "\\sim \\{" a "\\}" %as $Singleton c a.
 
 
 fact (* un singleton est une paire *) Singleton.Paire.ZF
-/\c,a(Singleton c a -> Paire c a a).
+  /\c,a(Singleton c a -> Paire c a a).
 trivial.
 save.
 
 fact (* une paire [a,a] est un singleton [a] *) Paire.Singleton.ZF
-/\c,a(Paire c a a -> Singleton c a).
+  /\c,a(Paire c a a -> Singleton c a).
 trivial.
 save.
 
@@ -233,13 +233,13 @@ save.
 
 
 fact (* a appartient à un singleton a *) Singleton.elim.ZF
- /\a,c( Singleton c a  -> a eps c).
+  /\a,c( Singleton c a  -> a eps c).
 trivial.
 save.
 
 
 fact (*  tout élément du singleton a est a *) Singleton.unic.ZF
- /\a,c,x( Singleton c a -> x eps c -> x =a ).
+  /\a,c,x( Singleton c a -> x eps c -> x =a ).
 trivial.
 save.
 
@@ -251,14 +251,15 @@ def Union b a = /\x (x eps b <-> \/ c eps a x eps c).
 tex_syntax $Union Infix[6] b "\\sim \\cup" a %as $Union b a.
 
 
-fact (* un élement de a est inclus dans une réunion des éléments de a *) Union.subset.ZF /\b,a (Union b a -> /\c eps a /\x eps c x eps b).
+fact (* un élement de a est inclus dans une réunion des éléments de a *) Union.subset.ZF
+  /\b,a (Union b a -> /\c eps a /\x eps c x eps b).
 trivial.
 save.
 
 fact (* existence de la réunion *) Union.exists.ZF /\a \/b Union b a.
-intros.	
-elim  union.ZF with a.	
-elim comp.ZF with(\x  \/ c eps a x eps c) and b.	
+intros.
+elim  union.ZF with a.
+elim comp.ZF with(\x  \/ c eps a x eps c) and b.
 intro.
 instance ?1 b0.
 trivial.
@@ -269,9 +270,9 @@ save.
 def Union2 c a b = /\x (x eps c <-> x eps a or x eps b).
 tex_syntax $Union2 Infix[6] c "\\sim" a "\\cup" b %as $Union2 c a b.
 
-fact (* existence de la réunion binaire *) Union2.exists.ZF 
-                          		 /\a /\b \/c Union2 c a b. 
-intros.	
+fact (* existence de la réunion binaire *) Union2.exists.ZF
+                          		 /\a /\b \/c Union2 c a b.
+intros.
 elim  Paire.exists.ZF with a and b.
 elim  Union.exists.ZF with c.
 intro.
@@ -297,17 +298,17 @@ rmh H1 H2.
 trivial.
 save.
 
-fact Union2l.subset.ZF 
+fact Union2l.subset.ZF
 /\c,a,b(Union2 c a b -> /\x eps a x eps c).
 trivial.
 save.
 
-fact Union2r.subset.ZF 
+fact Union2r.subset.ZF
 /\c,a,b(Union2 c a b -> /\x eps b x eps c).
 trivial.
 save.
 
-fact Union2.is.Union_Paire.ZF 
+fact Union2.is.Union_Paire.ZF
 /\a,x,y,c(Union2 a x y -> (Paire c x y) -> Union a c).
 intros.
 intro.
@@ -364,7 +365,7 @@ H0 := Paire c x y
 trivial =H0.
 (*§ 0 goal created. *)
 
-(* cas 1.2 : 
+(* cas 1.2 :
 H4 := x0 eps x
    |- \/c0 eps c  x0 eps c0
 *)
@@ -432,7 +433,7 @@ save.
 
 (**** Collection avec deux arguments  *)
 
-fact collec2.ZF  /\F /\a /\b \/c 
+fact collec2.ZF  /\F /\a /\b \/c
 		/\ x eps a /\ y eps b /\ z( F x y z
 					-> \/ z' eps c F x y z').
 intros.
@@ -458,7 +459,7 @@ slh H9 H7 H0.
 elim H0 with H7 and H9.
 save.
 
-def Collec2 F c a b =  /\ x eps a /\ y eps b /\ z( F x y z  
+def Collec2 F c a b =  /\ x eps a /\ y eps b /\ z( F x y z
 					-> \/ z' eps c F x y z')
 		       & /\ z eps c  \/x eps a \/ y eps b F x y z.
 
@@ -508,7 +509,7 @@ tex_syntax $in Infix[5] a "\\in" "_{" R "}" b %as $in R a b.
 tex_syntax $sub Infix[5] a "\\subset" "_{" R "}" b %as $sub R a b.
 tex_syntax $eqq Infix[5] a "\\simeq" "_{" R "}" b %as $eqq R a b.
 
-fact (* $eq étend $= *) eq.equal.ZF 
+fact (* $eq étend $= *) eq.equal.ZF
 /\R /\x,y( x = y -> eq R x y).
 trivial.
 save.
@@ -544,24 +545,24 @@ new_intro -n rel in.intro.ZF.
 
 (*** Propriétés de croissance *)
 
-fact (* $eq  est croissante *) eq.increasing.ZF 
+fact (* $eq  est croissante *) eq.increasing.ZF
 	/\R,R'(/\z(R z -> R' z) -> /\x,y(eq R x y -> eq R' x y)).
 trivial.
 save.
 
-fact (* $eq  est croissante, variante *) eq.increasing2.ZF 
+fact (* $eq  est croissante, variante *) eq.increasing2.ZF
 	/\R,R'(/\z/\e(e eps z -> R z -> R' z) -> /\x,y(eq R x y -> eq R' x y)).
 trivial.
 save.
 
 
 
-fact (* $in  est croissante *) in.increasing.ZF 
+fact (* $in  est croissante *) in.increasing.ZF
 	/\R,R'(/\z(R z -> R' z) -> /\x,y(in R x y -> in R' x y)).
 trivial.
 save.
 
-fact (* $sub est croissante *) sub.increasing.ZF 
+fact (* $sub est croissante *) sub.increasing.ZF
 	/\R,R'(/\z(R z -> R' z) -> /\x,y(sub R x y -> sub R' x y)).
 (* trivial fonctionne *)
 intros.
@@ -570,7 +571,7 @@ elim in.increasing.ZF with R and R'.
 elim H0.
 save.
 
-fact (* $eqq est croissante *) eqq.increasing.ZF 
+fact (* $eqq est croissante *) eqq.increasing.ZF
 	/\R,R'(/\z(R z -> R' z) -> /\x,y(eqq R x y -> eqq R' x y)).
 intros.
 left H0.
@@ -579,7 +580,7 @@ elim sub.increasing.ZF with  ? then ? then ? then H0.
 elim sub.increasing.ZF with ? then ? then ? then H1.
 save.
 
-fact (* $ext est croissante *) ext.increasing.ZF 
+fact (* $ext est croissante *) ext.increasing.ZF
 	/\R,R'(/\z(R z -> R' z) -> /\x(ext R x  -> ext R' x)).
 (* trivial + eqq.increasing.ZF. ne fonctionne pas ! *)
 intros.
@@ -600,7 +601,7 @@ alors [eq(R)] est inclus dans [eqq(R)] *)
 
 (*** Conditions à vérifier pour l'extensionalité *)
 
-lemma  (* Si [eq(R)] inclus [sub(R)] alors [eq(R)] inclus [eqq(R)] *) eq.sub.eqq.ZF 
+lemma  (* Si [eq(R)] inclus [sub(R)] alors [eq(R)] inclus [eqq(R)] *) eq.sub.eqq.ZF
 /\R(/\x,y(eq R x y -> sub R x y) -> /\x,y(eq R x y -> eqq R x y)).
 (* trivial. fonctionne *)
 intros.
@@ -617,7 +618,7 @@ rewrite H1.
 intro.
 save.
 
-lemma  (* Si [eq(R)] inclus [sub(R)] alors [R] inclus [ext(R)] *)  eq.sub.ext.ZF 
+lemma  (* Si [eq(R)] inclus [sub(R)] alors [R] inclus [ext(R)] *)  eq.sub.ext.ZF
 /\R(/\x,y(eq R x y -> sub R x y) -> /\z(R z -> ext R z)).
 (* trivial. fonctionne *)
 intros.
@@ -674,7 +675,7 @@ elim H with z.
 save.
 
 
-(*texte 
+(*texte
 Le lemme suivant montre qu'il suffit de résoudre [R] = [ext(R)] pour obtenir
 [eq(R)] = [eqq(R)].
 *)
@@ -771,7 +772,7 @@ trivial.
 trivial.
 (*§  0 goal created. *)
 
-(* cas 2.3 : 
+(* cas 2.3 :
    |- b eps c
 *)
 trivial.
@@ -780,10 +781,10 @@ save.
 depend ext.eq.eqq.ZF.
 pair.ZF
 comp.ZF
-equal.reflexive : en fait inutile 
+equal.reflexive : en fait inutile
 *)
 
-(* texte 
+(* texte
 Le lemme suivant permet d'assurer que [sub R] et bien la
 relation d'inclusion associée à [in R] si la relation [eq R] est
 transitive et donc sous cette hypothèse le lemme précédent donne bien
@@ -791,9 +792,9 @@ l'extensionalité pour [in R] et [eq R]. *)
 
 def transitiv E:< set -> set -> prop = /\a,b,c(E a b -> E b c -> E a c).
 
-lemma (* si $eq est transitive, $sub est l'inclusion associée à $in *) eq_trans.sub.in.ZF 
-/\R (transitiv (eq R) -> 
-/\ a,b(sub R a b <-> /\ z (in R z a -> in R z b))).  
+lemma (* si $eq est transitive, $sub est l'inclusion associée à $in *) eq_trans.sub.in.ZF
+/\R (transitiv (eq R) ->
+/\ a,b(sub R a b <-> /\ z (in R z a -> in R z b))).
 
 intros.
 intro.  (*§ 2 goals created. *)
@@ -881,7 +882,7 @@ new_intro  EQ EQ.intro.ZF.
 
 
 lemma (* tout ensemble [r] inclus dans [ext r] est inclus dans [ext EQ]
-*) Ext.ext_EQ.ZF 
+*) Ext.ext_EQ.ZF
 /\u /\r (Ext r -> ext \x(x eps r) u -> ext EQ u).
 intro 3.
 elim ext.increasing.ZF with \x(x eps r) and  EQ.
@@ -889,7 +890,7 @@ intros.
 elim EQ.intro.ZF with ? then r.
 save.
 
-fact (* $EQ est incluse dans [ext(EQ)] *) EQ.subset.ext_EQ.ZF 
+fact (* $EQ est incluse dans [ext(EQ)] *) EQ.subset.ext_EQ.ZF
 					/\ u (EQ u -> ext EQ u).
 intros.
 (*§ 1 goal created.
@@ -917,7 +918,7 @@ elim H.
 save.
 
 fact (* la propriété "[r] est inclus dans [ext r]" est vraie pour les
-singletons de singleton *) Ext.singleton.ZF 
+singletons de singleton *) Ext.singleton.ZF
 /\a,b,c(Singleton b a -> Singleton c b -> Ext c).
 intros.
 intros.
@@ -1222,7 +1223,7 @@ H := Collec2 \a,b,r (Ext r & eqq \x (x eps r) a b) c u u
 left H He Hu.
 (*§ 1 goal created.
 G := /\a,b eps u  \/r:Ext  eqq \x (x eps r) a b
-He := /\x,y eps u 
+He := /\x,y eps u
         /\z
           (Ext z & eqq \x0 (x0 eps z) x y ->
              \/z' eps c  (Ext z' & eqq \x0 (x0 eps z') x y))
@@ -1232,7 +1233,7 @@ Hu := /\z eps c  \/x,y eps u  (Ext z & eqq \x0 (x0 eps z) x y)
 elim Union.exists.ZF with c.
 (*§ 1 goal created.
 G := /\a,b0 eps u  \/r:Ext  eqq \x (x eps r) a b0
-He := /\x,y eps u 
+He := /\x,y eps u
         /\z
           (Ext z & eqq \x0 (x0 eps z) x y ->
              \/z' eps c  (Ext z' & eqq \x0 (x0 eps z') x y))
@@ -1243,7 +1244,7 @@ H := Union b c
 intro.
 (*§ 1 goal created.
 G := /\a,b0 eps u  \/r:Ext  eqq \x (x eps r) a b0
-He := /\x,y eps u 
+He := /\x,y eps u
         /\z
           (Ext z & eqq \x0 (x0 eps z) x y ->
              \/z' eps c  (Ext z' & eqq \x0 (x0 eps z') x y))
@@ -1255,7 +1256,7 @@ instance ?1 b.
 (*§ 1 goal possibly instanced.
 Current goal is:
 G := /\a,b0 eps u  \/r:Ext  eqq \x (x eps r) a b0
-He := /\x,y eps u 
+He := /\x,y eps u
         /\z
           (Ext z & eqq \x0 (x0 eps z) x y ->
              \/z' eps c  (Ext z' & eqq \x0 (x0 eps z') x y))
@@ -1266,7 +1267,7 @@ H := Union b c
 intro.
 (*§ 2 goals created.
 G := /\a,b0 eps u  \/r:Ext  eqq \x (x eps r) a b0
-He := /\x,y eps u 
+He := /\x,y eps u
         /\z
           (Ext z & eqq \x0 (x0 eps z) x y ->
              \/z' eps c  (Ext z' & eqq \x0 (x0 eps z') x y))
@@ -1274,7 +1275,7 @@ Hu := /\z eps c  \/x,y eps u  (Ext z & eqq \x0 (x0 eps z) x y)
 H := Union b c
    |- /\x,y eps u  eqq \x0 (x0 eps b) x y
 G := /\a,b0 eps u  \/r:Ext  eqq \x (x eps r) a b0
-He := /\x,y eps u 
+He := /\x,y eps u
         /\z
           (Ext z & eqq \x0 (x0 eps z) x y ->
              \/z' eps c  (Ext z' & eqq \x0 (x0 eps z') x y))
@@ -1285,7 +1286,7 @@ H := Union b c
 elim Ext.union.ZF with H.
 (*§ 1 goal created.
 G := /\a,b0 eps u  \/r:Ext  eqq \x (x eps r) a b0
-He := /\x,y eps u 
+He := /\x,y eps u
         /\z
           (Ext z & eqq \x0 (x0 eps z) x y ->
              \/z' eps c  (Ext z' & eqq \x0 (x0 eps z') x y))
@@ -1296,7 +1297,7 @@ H := Union b c
 intros.
 (*§ 1 goal created.
 G := /\a,b0 eps u  \/r:Ext  eqq \x0 (x0 eps r) a b0
-He := /\x0,y eps u 
+He := /\x0,y eps u
         /\z
           (Ext z & eqq \x1 (x1 eps z) x0 y ->
              \/z' eps c  (Ext z' & eqq \x1 (x1 eps z') x0 y))
@@ -1308,7 +1309,7 @@ H0 := x eps c
 elim Hu with H0.
 (*§ 1 goal created.
 G := /\a,b0 eps u  \/r:Ext  eqq \x1 (x1 eps r) a b0
-He := /\x1,y eps u 
+He := /\x1,y eps u
         /\z
           (Ext z & eqq \x2 (x2 eps z) x1 y ->
              \/z' eps c  (Ext z' & eqq \x2 (x2 eps z') x1 y))
@@ -1321,7 +1322,7 @@ H1 := x0 eps u & \/y eps u  (Ext x & eqq \x1 (x1 eps x) x0 y)
 lefts H1 $& $\/.
 (*§ 1 goal created, with 1 automatically solved.
 G := /\a,b0 eps u  \/r:Ext  eqq \x (x eps r) a b0
-He := /\x,y eps u 
+He := /\x,y eps u
         /\z
           (Ext z & eqq \x0 (x0 eps z) x y ->
              \/z' eps c  (Ext z' & eqq \x0 (x0 eps z') x y))
@@ -1332,7 +1333,7 @@ H := Union b c
 intros.
 (*§ 1 goal created.
 G := /\a,b0 eps u  \/r:Ext  eqq \x0 (x0 eps r) a b0
-He := /\x0,y0 eps u 
+He := /\x0,y0 eps u
         /\z
           (Ext z & eqq \x1 (x1 eps z) x0 y0 ->
              \/z' eps c  (Ext z' & eqq \x1 (x1 eps z') x0 y0))
@@ -1345,7 +1346,7 @@ H1 := y eps u
 elim G with H0 and H1.
 (*§ 1 goal created.
 G := /\a,b0 eps u  \/r0:Ext  eqq \x0 (x0 eps r0) a b0
-He := /\x0,y0 eps u 
+He := /\x0,y0 eps u
         /\z
           (Ext z & eqq \x1 (x1 eps z) x0 y0 ->
              \/z' eps c  (Ext z' & eqq \x1 (x1 eps z') x0 y0))
@@ -1374,9 +1375,9 @@ trivial =H H3.
 save.
 
 
-lemma Ext.ext.singleton.ZF 
-/\r/\a /\ b /\r'(Ext r -> ext \x(x eps r) a 
-	-> Singleton b a -> Union2 r' r b 
+lemma Ext.ext.singleton.ZF
+/\r/\a /\ b /\r'(Ext r -> ext \x(x eps r) a
+	-> Singleton b a -> Union2 r' r b
 	-> Ext  r').
 intros.
 intros.
@@ -1414,7 +1415,7 @@ save.
 
 theorem (* ext(EQ) = EQ *) ext_EQ.is.EQ.ZF  /\z(ext EQ z <-> EQ z).
 (* trivial + ext_EQ.subset.EQ.ZF EQ.subset.ext_EQ.ZF. ne fonctionne pas
-ou est tres long ! *) 
+ou est tres long ! *)
 (* trivial 1 + ext_EQ.subset.EQ.ZF EQ.subset.ext_EQ.ZF.
 fonctionne *)
 intros.
@@ -1426,12 +1427,12 @@ save.
 
 (*** Transitivité de l'égalité définie pour $EQ *)
 
-(*texte on introduit la relation [tr2 R], qui définit une relation 
+(*texte on introduit la relation [tr2 R], qui définit une relation
 [eq (tr2 R)] qui est la réunion de [eq R] et de l'itérée  deux fois de
 [eq R] *)
 
-def (* Réunion deux à deux des éléments de [R] d'intersection non vide  *) 
-tr2 R a = \/b,c:R(\/z( z eps b & z eps c) & 
+def (* Réunion deux à deux des éléments de [R] d'intersection non vide  *)
+tr2 R a = \/b,c:R(\/z( z eps b & z eps c) &
 		/\x(x eps a <-> (x eps b or x eps c))).
 
 
@@ -1470,7 +1471,7 @@ lefts H $eq $\/ $or $&.
 select 2.
 rewrite H.
 intro.
-instance ?1 z. 
+instance ?1 z.
 trivial.
 (* cas générique *)
 lefts H $tr2 $\/  $&.
@@ -1498,7 +1499,7 @@ intro rel.
 instance ?1 z1.
 save.
 
-lemma (* Si [r] est inclus dans [$ext(r)] alors [$tr2(r)] est inclus dans 
+lemma (* Si [r] est inclus dans [$ext(r)] alors [$tr2(r)] est inclus dans
 [$ext($tr2(r))] *) Ext.tr2.ZF
 /\r(Ext(r) -> /\z(tr2 \x(x eps r) z -> ext(tr2 \x(x eps r)) z)).
 intros.
@@ -1527,7 +1528,7 @@ intros.
 trivial.
 save.
 
-lemma is2_set.sub.ZF 
+lemma is2_set.sub.ZF
 /\R/\r (R is2_set r -> /\x,y(sub R x y <-> sub \z(z eps r) x y)).
 intros.
 trivial + is2_set.in.ZF.
@@ -1537,7 +1538,7 @@ save.
 lemma is2_set.eqq.ZF
 /\R/\r (R is2_set r -> /\x,y(eqq R x y <-> eqq \z(z eps r) x y)).
 intros.
-(* trivial + is2_set.sub.ZF.  très long 
+(* trivial + is2_set.sub.ZF.  très long
 a vérifier :
 A <-> B , C <-> D |- A & B <-> C & D
 *)
@@ -1673,5 +1674,3 @@ set theory with intuitionistic logic, Journal of Symbolic Logic, JSL
 
 [2] J. L. Krivine, Lambda-calcul typé dans ZF, manuscript.
 *)
-
-
