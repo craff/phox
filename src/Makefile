@@ -70,17 +70,16 @@ version.ml: ../version ../config Makefile
 	echo 'let default_path = "$(DEFAULT_PATH)"' >> version.ml;\
 	echo "let delim = '$(DELIM)'" >> version.ml;\
 
+#dependencies
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),veryclean)
 ifneq ($(MAKECMDGOALS),distclean)
 .depend:  $(FILESML) $(FILESMLI)
 	$(CAMLDEP) $(CAMLPREPRO) $(FILESML) $(FILESMLI) > .depend
+include .depend
 endif
 endif
 endif
 
 install: $(PHOXVERS)
 	cp $(PHOXVERS) $(BINDIR)/phox$(EXE)
-
-#dependencies
-include .depend

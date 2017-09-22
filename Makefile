@@ -111,3 +111,8 @@ distrib2:
 distrib:
 	$(MAKE) distrib1
 	$(MAKE) distrib2
+
+release: distclean
+	git push origin
+	git tag -a phox_$(VERSNUM) -m "phox on github"
+	git push origin phox_$(VERSNUM)
