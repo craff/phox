@@ -46,16 +46,16 @@ CAMLO = ocamlfind ocamlopt
 CAMLPREPRO = -pp camlp4o
 
 # where to find sed
-SED = /sbin/sed
+SED = `which sed`
 
 # where to find AWK (used to build documentation and for creating tags
 # tables). As documentation is built in distribution, you need awk only
 # if you want to create tags table for phox files. If needed, gnu awk is
 # required.
-AWK = /usr/bin/gawk
+AWK = `which awk`
 
 # where to find PERL (used by phoxdep in a #!... comment)
-PERL = /usr/bin/perl
+PERL = `which perl`
 
 # The default path used by PhoX (if the PHOXPATH variable is undefined)
 DEFAULT_PATH = $(LIBDIR)
