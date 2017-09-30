@@ -3,6 +3,13 @@ OPAM_DEPENDS="ocamlfind ocamlbuild"
 
 case "$OCAML_VERSION,$OPAM_VERSION" in
 4.02.0,1.2.0) ppa=avsm/ocaml42+opam12 ;;
+4.02.0,2.0.0) ppa=avsm/ocaml42+opam20 ;;
+4.03.0,1.2.0) ppa=avsm/ocaml43+opam12 ;;
+4.03.0,2.0.0) ppa=avsm/ocaml43+opam20 ;;
+4.04.0,1.2.0) ppa=avsm/ocaml44+opam12 ;;
+4.04.0,2.0.0) ppa=avsm/ocaml44+opam20 ;;
+4.05.0,1.2.0) ppa=avsm/ocaml45+opam12 ;;
+4.05.0,2.0.0) ppa=avsm/ocaml45+opam20 ;;
 *) echo Unknown $OCAML_VERSION,$OPAM_VERSION; exit 1 ;;
 esac
 
