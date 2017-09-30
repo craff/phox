@@ -1,5 +1,5 @@
 language: ocaml
 rvm:
-	- 4.05.0
-	- ocamlbuild
-	- ocamlfind
+  - 4.05.0
+  - ocamlbuild
+  - ocamlfind
