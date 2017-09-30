@@ -48,3 +48,5 @@ intro.
 elim H1.
 axiom H5.
 save.
+
+depend Add_unique.
