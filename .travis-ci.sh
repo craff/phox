@@ -4,3 +4,4 @@ OPAM_DEPENDS="ocamlfind ocamlbuild"
 opam install -y ${OPAM_DEPENDS}
 make
 sudo make install
+make check
