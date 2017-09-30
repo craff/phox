@@ -42,13 +42,6 @@ PHOXVERS = phoxopt     # use native-code compiler
 PRETTYVERS = prettyopt     # use native-code compiler
 # PRETTYVERS = prettyslow      # use byte-code compiler
 
-# Where to find ocaml and others :
-CAMLC = ocamlfind ocamlc -g
-CAMLDEP = ocamlfind ocamldep
-CAMLO = ocamlfind ocamlopt
-
-CAMLPREPRO = -pp camlp4o
-
 # where to find sed
 SED = `which sed`
 

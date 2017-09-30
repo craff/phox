@@ -7,13 +7,16 @@ all: $(PRETTYVERS)
 mall: all
 
 prettyslow$(EXE): pretty.ml
-	$(CAMLC) $(CAMLPREPRO) -o prettyslow pretty.ml
+	ocamlbuild -pp camlp4o pretty.byte
+	ln -f _build/pretty.byte $@
 
 prettyopt$(EXE): pretty.ml
-	$(CAMLO) $(CAMLPREPRO) -o prettyopt pretty.ml
+	ocamlbuild -pp camlp4o pretty.native
+	ln -f _build/pretty.native $@
 
 clean:
-	rm -f *.o *.cmx *.cmi *.cmo prettyslow prettyopt *.pout *.pin
+	ocamlbuild -clean
+	rm -f prettyslow$(EXE) prettyopt$(EXE) *.pout *.pin *~ \#*\#
 
 veryclean: clean
 
