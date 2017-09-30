@@ -14,3 +14,4 @@ depends:
   [ "ocamlfind" {build}
     "camlp4"    {build}
   ]
+build-test: [make check]
