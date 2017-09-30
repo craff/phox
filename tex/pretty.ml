@@ -299,7 +299,7 @@ and format_tree_list width cur enc bp0 bp lb = function
       	done;
       	redo !keep; !best_s
       in
-      if n >= 1 & (s +. bp0) /. s > xCoef then raise (Fail_format true);
+      if n >= 1 && (s +. bp0) /. s > xCoef then raise (Fail_format true);
       let b, s', cn, n' = format_tree_list width (cur -. s) enc
 	bp0 (bp +. s) lb suit in
       let s'' = s +. s' in max b s'', s'', max n cn, n'
