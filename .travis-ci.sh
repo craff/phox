@@ -14,3 +14,4 @@ opam init
 opam install ${OPAM_DEPENDS}
 eval `opam config env`
 make
+sudo make install
