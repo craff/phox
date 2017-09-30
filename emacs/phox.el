@@ -38,7 +38,7 @@
  proof-goal-command		"fact \"%s\"."
  proof-save-command		"save \"%s\"."
  proof-kill-goal-command	"abort."
- proof-showproof-command	"show."
+ proof-showproof-command	"goals."
  proof-undo-n-times-cmd		"undo %s."
  proof-auto-multiple-files	 t
  proof-shell-cd-cmd		 "cd \"%s\"."
@@ -48,7 +48,7 @@
  proof-shell-quit-cmd		 "quit."
  proof-assistant-home-page	 "http://www.lama.univ-savoie.fr/~raffalli/phox.html"
  proof-shell-annotated-prompt-regexp "^\\(>PhoX>\\)\\|\\(%PhoX%\\) "
-; proof-shell-error-regexp	 "\\*\\*\\*\\|^.*Error:\\|^uncaught exception \\|^Exception- "
+ proof-shell-error-regexp	 "^.*[Ee]rror:.*"
  proof-shell-init-cmd		 ""
 ; proof-shell-proof-completed-regexp "^No subgoals!"
  proof-script-font-lock-keywords
