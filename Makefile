@@ -20,8 +20,9 @@ install:
 	cd tools; $(MAKE) -S install
 	cd src; $(MAKE) -S install
 	cd lib; $(MAKE) -S install
+	cd emacs; $(MAKE) -S install
 	cd tex; $(MAKE) -S install
-	cd doc ; $(MAKE) -S install
+	cd doc; $(MAKE) -S install
 	if [ -f lib/TAGS ]; then cp lib/TAGS $(LIBDIR); fi
 	if [ -f doc/TAGS ]; then cp doc/TAGS $(TEXTDOCDIR); fi
 	cp -r examples/* $(EXAMPLESDIR)

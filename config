@@ -15,6 +15,10 @@ BINDIR = ${PREFIX}/bin
 # where to put the PhoX library files
 LIBDIR = ${PREFIX}/lib/phox
 
+# proof general folder
+PGDIR = ${PREFIX}/share/emacs/site-lisp/ProofGeneral
+PGPHOXDIR = ${PGDIR}/phox
+
 # where to put the doc :
 DOCDIR = ${PREFIX}/doc/phox
 
