@@ -1,18 +1,15 @@
 open Bindlib
-open Lexer
-open Lambda
+open Lex
+open Lambda_exp
 open Format
-open Types
-open Lambda_util
-open Af2_basic
 
 type pterm =
     PApp of pterm * pterm
   | PLam of string * pterm
   | PCro of string * pterm
   | PMu  of string * pterm
-  | PVar of string 
-  | PSide of string 
+  | PVar of string
+  | PSide of string
 
 
 let defs =
@@ -20,7 +17,7 @@ let defs =
     ref [name, {name = name; value = cc}]
 
 let output_all ?(kvm = false) () =
-  let rec fn (_,t) = 
+  let fn (_,t) =
     open_hovbox 2;
     print_string t.name;
     print_string " = ";
@@ -37,7 +34,7 @@ let output ?(kvm = false) s =
   if kvm then print_kvm_term t.value else print_term t.value ;
   close_box ()
 
-let outputs ?(kvm=false) l = 
+let outputs ?(kvm=false) l =
   if  l != []
   then List.iter (output ~kvm:kvm) l
   else output_all ~kvm:kvm ()
@@ -47,16 +44,16 @@ let cons_right a (l,l') = l, a::l'
 let get_def s = start_term (bDef (List.assoc s !defs))
 
 let add_def s t =
-  try 
+  try
     (List.assoc s !defs).value <- t;
     print_string ("Warning: redefining " ^ s);
     print_newline ()
-  with Not_found -> 
+  with Not_found ->
     defs := (s,{name = s; value = t})::!defs
 
-let del_def s = 
+let del_def s =
   try
-    let t = List.assoc s !defs in 
+    let t = List.assoc s !defs in
       defs := List.remove_assoc s !defs;
       open_hovbox 2;
       print_string (s ^ " = ");
@@ -64,11 +61,11 @@ let del_def s =
       print_string " deleted.";
       close_box ();
       print_newline()
-  with 
-      Not_found -> 
+  with
+      Not_found ->
 	failwith (s ^ " is not defined!")
 
-let del_def_all () = 
+let del_def_all () =
   let name = "peirce_law" in
     if List.mem_assoc name !defs
     then ( defs :=  [name, {name = name; value = cc}] ;
@@ -77,7 +74,7 @@ let del_def_all () =
     print_newline()
 
 
-let del_defs l = 
+let del_defs l =
   if  l != []
   then List.iter del_def l
   else ignore(del_def_all())
@@ -90,13 +87,13 @@ let rec pterm_to_term env = function
       (pterm_to_term env t2)
   | PMu(s, t) -> bMu (fun x -> pterm_to_term (cons_right (s, x) env) t)
   | PSide s -> unit (bSide s)
-  | PVar s ->       
+  | PVar s ->
       try List.assoc s (fst env) with Not_found ->
       try unit (get_def s) with Not_found ->
       raise (Failure ("Unbound identifier: "^s))
 
 let rec parse_lambda_aux = parser
-    [< 'Ident s >] -> 
+    [< 'Ident s >] ->
       PVar s
   | [< 'Kwd "\\"; 'Ident s; t = parse_lambda' >] ->
 	PLam(s, t)
@@ -107,10 +104,10 @@ let rec parse_lambda_aux = parser
   | [< 'Lpar; t = parse_lambda'; 'Rpar >] -> t
   | [< 'Kwd "["; 'Ident s ; 'Kwd "]"; u = parse_lambda' >] -> PCro(s,u)
 
- 
+
 and parse_lambda' = parser
     [< t = parse_lambda_aux; v = parse_lambda'' t >] -> v
- 	   
+
 and parse_lambda'' u = parser
     [< t = parse_lambda_aux; v = parse_lambda'' (PApp(u,t)) >] -> v
   | [< >] -> u

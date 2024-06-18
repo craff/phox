@@ -1,7 +1,7 @@
 (* un exo facile: 
-   si la réunion de deux groupes G1 et G2 est un groupe G alors
+   si la rÃ©union de deux groupes G1 et G2 est un groupe G alors
    G1 inclus dans G2 ou l'inverse.
-   On a gardé un minimum d'axiomes
+   On a gardÃ© un minimum d'axiomes
 *)
 Sort g.
 

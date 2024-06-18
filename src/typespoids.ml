@@ -82,7 +82,7 @@ let initpoids n = match n with
 (* les indices sont ceux des clauses *)
 (* les hist sont les historiques de la clause obtenue *)
 
-let pds_res ~n ~indice1 ~rhist ~chist ~c1w ~nc1 ~indice2 ~c2w ~nc2 ~l =
+let pds_res ~n ~indice1 ~rhist:_ ~chist ~c1w ~nc1 ~indice2 ~c2w ~nc2 ~l =
 
   if
     (nc1 = nc2 && nc1= 0)
@@ -145,7 +145,7 @@ let indice_res ~i1 ~i2 ~rhist ~chist =
 (* nbre est le nombre d'apparition *)
 (* de la règle dans la clause *)
 
-let pds_rule ~rindice ~rpds ~nbre ~indice ~pds =
+let pds_rule ~rindice ~rpds ~nbre ~indice:_ ~pds =
   let nbre = float_of_int nbre in
   let rpds = float_of_int rpds in
   let n = match rindice with None -> 0. | Some i -> (i-. val_lower_indice) in
@@ -157,7 +157,7 @@ let pds_rule ~rindice ~rpds ~nbre ~indice ~pds =
 
 (* poids après contraction *)
 
-let pds_cont ~wpere ~l =
+let pds_cont ~wpere ~l:_ =
   wpere
 
 

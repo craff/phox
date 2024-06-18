@@ -33,14 +33,9 @@ HTMLDOCDIR=${DOCDIR}/html
 EXAMPLESDIR = ${DOCDIR}/examples
 TUTORIALDIR = ${DOCDIR}/tutorial
 
-# Do you want the native code compiled version of PhoX (recommended) ?
-PHOXVERS = phoxopt     # use native-code compiler
-#PHOXVERS = phoxslow      # use byte-code compiler
-
 # Do you want the native code compiled version of pretty (recommended)
 # (the pretty formatter for TeX document) ?
 PRETTYVERS = prettyopt     # use native-code compiler
-# PRETTYVERS = prettyslow      # use byte-code compiler
 
 # where to find sed
 SED = `which sed`

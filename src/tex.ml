@@ -4,13 +4,11 @@
 (*######################################################*)
 
 open Basic
-open Stream
-open Types
-open Lexer
-open Parser
+open Type
+open Lex
+open Parse_base
 open Print
 open Format
-open Af2_basic
 open Interact
 open Flags
 open Option
@@ -106,7 +104,7 @@ let do_tex docs cstr =
     if !extra_dot then (outc '.'; extra_dot := false)
                   else eat_space ()
     in
-  let read_expr end_tok s =
+  let read_expr end_tok _ =
     let tstrm = stream_map next_token cstr in
     parse_tex_expr end_tok tstrm in
   let verb_expr n end_tok mmath s =
@@ -191,8 +189,8 @@ let do_tex docs cstr =
         | [< n = may_be_int >] -> do_math (verb_expr n "\\}") str)
       | [< ' ('\\'); str >] -> (
         match str with parser
-          [< ' ('['); str >] -> outs "\\["
-        | [< ' ('{'); str >] -> outs "\\{"
+          [< ' ('['); _ >] -> outs "\\["
+        | [< ' ('{'); _ >] -> outs "\\{"
         | [< >] -> outs "\\\\")
       | [< >] -> outc c)
   | [< ' ('*' as c); str >] -> (

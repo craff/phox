@@ -4,7 +4,7 @@
 (*######################################################*)
 
 
-open Lexer
+open Lex
 open Flags
 
 exception End_of_module

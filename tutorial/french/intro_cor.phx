@@ -1,7 +1,7 @@
 (*header 2003/03/06
-title="Introduction à  PhoX : deuxième partie"
-author="P. Rozière"
-institute="Université Paris VII" 
+title="Introduction Ã   PhoX : deuxiÃ¨me partie"
+author="P. RoziÃ¨re"
+institute="UniversitÃ© Paris VII" 
 *)
 (* -------------------------------------------------------------------  *)
 (*titre                 TP1 MT3062 2002/2003                            *)
@@ -9,29 +9,29 @@ institute="Université Paris VII"
 
 (** Introduction. *)
 
-(*note Quand ce texte fait référence à la documentation, il s'agit du
-polycopié d'introduction ("Quelques éléments pour débuter avec le
-vérificateur de preuves PhoX"). *)
+(*note Quand ce texte fait rÃ©fÃ©rence Ã  la documentation, il s'agit du
+polycopiÃ© d'introduction ("Quelques Ã©lÃ©ments pour dÃ©buter avec le
+vÃ©rificateur de preuves PhoX"). *)
 
-(*texte Le but de cette séance est de vous familiariser avec les
+(*texte Le but de cette sÃ©ance est de vous familiariser avec les
 principales commandes du logiciel PhoX. Tout d'abord remarquez que si
-vous lisez la version #.phx# de ce fichier, le texte que vous êtes en
+vous lisez la version #.phx# de ce fichier, le texte que vous Ãªtes en
 train de lire, est ce que l'on appelle du *commentaire*. Il n'est pas
-évalué par le logiciel (voir documentation §3 p. 4).  On va utiliser
-comme support la théorie de l'ordre.  Au début vous avez juste à évaluer
-au fur et à mesure les entrées qui vous sont proposées, et à comprendre
-leur fonctionnement en inspectant la sortie. Ensuite vous êtes invités à
-utiliser ces commandes pour compléter des preuves.  Le logiciel ne vous
-autorise pas à "passer" des entrées.  Les "...."  doivent être effacés,
-et remplacés par une preuve.  *)
+Ã©valuÃ© par le logiciel (voir documentation Â§3 p. 4).  On va utiliser
+comme support la thÃ©orie de l'ordre.  Au dÃ©but vous avez juste Ã  Ã©valuer
+au fur et Ã  mesure les entrÃ©es qui vous sont proposÃ©es, et Ã  comprendre
+leur fonctionnement en inspectant la sortie. Ensuite vous Ãªtes invitÃ©s Ã 
+utiliser ces commandes pour complÃ©ter des preuves.  Le logiciel ne vous
+autorise pas Ã  "passer" des entrÃ©es.  Les "...."  doivent Ãªtre effacÃ©s,
+et remplacÃ©s par une preuve.  *)
 
 (*------------------------------------------------------------------- *)
-(** Première partie.                                                  *)
+(** PremiÃ¨re partie.                                                  *)
 (* ------------------------------------------------------------------ *)
 (*** Signature. *)
 
-(*texte Nous devons tout d'abord définir la sorte pour les objets de
-base. Appelons-la #d#.  Entrez la commande suivante (lire le § 4 p. 5 de
+(*texte Nous devons tout d'abord dÃ©finir la sorte pour les objets de
+base. Appelons-la #d#.  Entrez la commande suivante (lire le Â§ 4 p. 5 de
 la documentation).  *)
 
 Sort d.  
@@ -39,7 +39,7 @@ Sort d.
 (*output Sort d defined. *)
 (*<-*)
 (*texte
-si la commande est acceptée, le système vous répond :
+si la commande est acceptÃ©e, le systÃ¨me vous rÃ©pond :
 Sort d defined                                            *)
 
 (*texte nous introduisons le symbole #<# (ordre strict) : *)
@@ -50,20 +50,20 @@ Cst Infix[5] x "<" y : d -> d -> prop.
 (*<-*)
 
 (*texte Le mot clef #Cst# signifie que l'on introduit un nouveau symbole
-du langage (#Cst# pour "constante" ce mot étant utilisé en un sens plus
-large que vu en cours). Après le ":" vous avez la *sorte* du symbole,
-c'est à dire le fait que c'est un prédicat d'arité 2 sur la sorte #d#. 
+du langage (#Cst# pour "constante" ce mot Ã©tant utilisÃ© en un sens plus
+large que vu en cours). AprÃ¨s le ":" vous avez la *sorte* du symbole,
+c'est Ã  dire le fait que c'est un prÃ©dicat d'aritÃ© 2 sur la sorte #d#. 
 Le mot clef #Infix# signifie que la syntaxe est celle usuelle (#x < y#
 et non par exemple #< x y#).                                           *)
 
 (*** Axiomes. *)
 
 (*texte Pour les axiomes nous n'utiliserons que la quantification
-universelle #/\x A x# l'implication #A -> B# et la négation #~ A#. Voir
-la documentation § 3.4 p. 5 pour les conventions d'écriture des
+universelle #/\x A x# l'implication #A -> B# et la nÃ©gation #~ A#. Voir
+la documentation Â§ 3.4 p. 5 pour les conventions d'Ã©criture des
 formules. Le mot-clef #claim# introduit les axiomes.                   *)
 
-(*note Les sortes et les formules utilisent la même notation #->#, dans
+(*note Les sortes et les formules utilisent la mÃªme notation #->#, dans
 deux sens distincts. *)
 
 claim ordre_transitif /\x,y,z(x < y -> y < z -> x < z).
@@ -71,21 +71,21 @@ claim ordre_transitif /\x,y,z(x < y -> y < z -> x < z).
 (*output ordre-transitif = /\x,y,z (x < y -> y < z -> x < z) : theorem *)
 (*<-*)
 
-(*texte Remarquez que l'implication "associe à droite" : [A -> B -> C]
-signifie [A -> (B -> C)]. Il s'agit bien de la transitivité, on pourrait
+(*texte Remarquez que l'implication "associe Ã  droite" : [A -> B -> C]
+signifie [A -> (B -> C)]. Il s'agit bien de la transitivitÃ©, on pourrait
 utiliser la conjonction : [ /\x,y,z((x < y & y < z) -> x < z) ], mais la
-première forme s'avère plus maniable dans les preuves.                 *)
+premiÃ¨re forme s'avÃ¨re plus maniable dans les preuves.                 *)
 
 claim ordre_antireflexif /\z ~ z < z.
 (*<-*)
 (*output antireflexivity = /\z ~ z < z : theorem *)
 (*<-*)
 
-(*texte En fait la négation [ ~ A ] est définie par "A implique une
-contradiction", [ A -> False ]. Ceci peut aider à comprendre son
+(*texte En fait la nÃ©gation [ ~ A ] est dÃ©finie par "A implique une
+contradiction", [ A -> False ]. Ceci peut aider Ã  comprendre son
 maniement dans les preuves.                                            *)
 
-(*texte Maintenant ces axiomes sont connus du système, comme le montre
+(*texte Maintenant ces axiomes sont connus du systÃ¨me, comme le montre
 ce qui suit : *)
 print ordre_transitif.
 print ordre_antireflexif.
@@ -94,38 +94,38 @@ print ordre_antireflexif.
 
 (*** Quelques preuves avec [ /\ ], [ -> ], [ ~ ]. *)
 
-(*texte On veut prouver l'antisymétrie qui pour un ordre strict
+(*texte On veut prouver l'antisymÃ©trie qui pour un ordre strict
 s'exprime par  "quelquesoient x et y, si [ x < y ] alors [ ~ y < x ]".
 
-On va commencer par prouver quelques énoncés très simples du calcul
-propositionnel et du calcul des prédicats pour illustrer les commandes
-de preuve utiles. Lire le début du § 4.3.1, et le § 4.3.2 p 8 de la
-documentation (le détail de l'exemple n'est pas utile pour le moment). *)
+On va commencer par prouver quelques Ã©noncÃ©s trÃ¨s simples du calcul
+propositionnel et du calcul des prÃ©dicats pour illustrer les commandes
+de preuve utiles. Lire le dÃ©but du Â§ 4.3.1, et le Â§ 4.3.2 p 8 de la
+documentation (le dÃ©tail de l'exemple n'est pas utile pour le moment). *)
 
-(*note ces énoncés ne sont pas du premier ordre ! *)
+(*note ces Ã©noncÃ©s ne sont pas du premier ordre ! *)
 
-(*texte Voici un premier exemple très simple utilisant essentiellement
-l'implication.  Vous pouvez vérifier dans la documentation le sens des
-commandes utilisées.                                                   *)
+(*texte Voici un premier exemple trÃ¨s simple utilisant essentiellement
+l'implication.  Vous pouvez vÃ©rifier dans la documentation le sens des
+commandes utilisÃ©es.                                                   *)
 
 prop taut1 /\ A (A -> A). 
 intro. (* soit A quelconque prouvons A -> A *)
 intro. (* Supposons A, prouvons A *)
-axiom H. (* c'est "évident" *)
+axiom H. (* c'est "Ã©vident" *)
 save.    (* cqfd *)
 
-(*texte un exemple utilisant la négation :                             *)
+(*texte un exemple utilisant la nÃ©gation :                             *)
 
 prop taut2 /\A(A -> ~ ~ A).
 intros. (* Supposons H:=A pour A quelconque, factorise les deux premiers intro,
-           on pourrait écrire aussi "intro 2" *)
+           on pourrait Ã©crire aussi "intro 2" *)
 intro. (* Supposons H0:=~A, prouvons une contradiction, 
           cf ci-dessus ~A signifie A -> false *)
-apply H0 with H. (* de ~A et A on déduit une contradiction *)
+apply H0 with H. (* de ~A et A on dÃ©duit une contradiction *)
 axiom G.         (* c'est ce que nous voulions *)
 save.            (* cqfd *)
 
-(*texte on aurait pu utiliser #elim# plutôt que #apply#, (voir
+(*texte on aurait pu utiliser #elim# plutÃ´t que #apply#, (voir
 documentation). *)
 
 prop taut3 /\A(A -> ~ ~ A).
@@ -142,7 +142,7 @@ axiom H.
 save.
 
 (*texte Enfin un exemple utilisant la quantification sur les objets du
-(premier ordre) et l'axiome de transitivité. Notez la forme :
+(premier ordre) et l'axiome de transitivitÃ©. Notez la forme :
 #apply ... with ... and ... # *)
 
 prop transitive3 /\x,y,z,t(x < y -> y < z -> z < t -> x <t).
@@ -154,21 +154,21 @@ elim ordre_transitif with G and H1.
 (*->*)
 save.
 
-(*texte Vous allez maintenant prouver l'antisymétrie de l'ordre en
-utilisant ces commandes. Commencez bien-sûr par réfléchir à la preuve
-que vous feriez sur papier, n'hésitez pas à l'écrire auparavant.       *)
+(*texte Vous allez maintenant prouver l'antisymÃ©trie de l'ordre en
+utilisant ces commandes. Commencez bien-sÃ»r par rÃ©flÃ©chir Ã  la preuve
+que vous feriez sur papier, n'hÃ©sitez pas Ã  l'Ã©crire auparavant.       *)
 (*<-*) 
 (*texte
   1. Supposons que [ x < y ] et [ y < x ]. Montrons une contradiction.
  
-  2. Par transitivité appliquée à [ x < y ], [ y < x ] on obtient [ x < x ].
+  2. Par transitivitÃ© appliquÃ©e Ã  [ x < y ], [ y < x ] on obtient [ x < x ].
 
-  3. Ceci contredit l'antireflexivité pour [ x ]: 
-     ce qu'il fallait démontrer.                                       *)
+  3. Ceci contredit l'antireflexivitÃ© pour [ x ]: 
+     ce qu'il fallait dÃ©montrer.                                       *)
 (*<-*)
 
 (*texte Dans cette preuve vous aurez besoin d'utiliser les axiomes, les
-commandes #apply# et #elim# le permettent avec la même syntaxe que
+commandes #apply# et #elim# le permettent avec la mÃªme syntaxe que
 ci-dessus, par exemple #apply ordre_transitif with ... #,  
 #elim ordre_antireflexif.#                                             *)
 
@@ -192,47 +192,47 @@ axiom G1.
 (*->*)
 save.
 
-(*texte On peut demander au prouveur de détecter automatiquement les
-axiomes, ce qui allège certaines preuves. C'est ce que fait la commande
-suivante. Elle prend effet pour toutes les preuves qui suivent, jusqu'à
+(*texte On peut demander au prouveur de dÃ©tecter automatiquement les
+axiomes, ce qui allÃ¨ge certaines preuves. C'est ce que fait la commande
+suivante. Elle prend effet pour toutes les preuves qui suivent, jusqu'Ã 
 une nouvelle  commande #flag auto_lvl ... #                             *)
 
 flag auto_lvl 1.
 
-(*texte recopiez le script de la preuve précédente et faites
-disparaître les commandes devenues inutiles.                          *)
+(*texte recopiez le script de la preuve prÃ©cÃ©dente et faites
+disparaÃ®tre les commandes devenues inutiles.                          *)
 
 (*** Des preuves utilisant [ or ] et [ = ] *)
 
 (*texte On veut maintenant montrer que les axiomes d'ordre strict pour
-"inférieur" entraînent les axiomes d'ordre large pour "inférieur ou égal".
-Introduisons tout d'abord une notation pour "inférieur ou égal". *)
+"infÃ©rieur" entraÃ®nent les axiomes d'ordre large pour "infÃ©rieur ou Ã©gal".
+Introduisons tout d'abord une notation pour "infÃ©rieur ou Ã©gal". *)
 
 def Infix[5] x "<=" y = x < y or x = y.
 
 (*texte les exemples propositionnels suivants illustrent comment l'on
-démontre une disjonction *)
+dÃ©montre une disjonction *)
 
 prop taut_orl /\A,B(A -> (A or B)).
 intros. (* Soient A et B, supposons A, montrons A ou B *) 
-intro l. (* A ou B se déduit de A, "l" est une abréviation de "left" *)
+intro l. (* A ou B se dÃ©duit de A, "l" est une abrÃ©viation de "left" *)
 save.
 
 prop taut_orr /\A,B(B -> (A or B)).
 intros. (* Soient A et B, supposons B, montrons A ou B *) 
-intro r. (* A ou B se déduit de B "r" est une abréviation de "right" *)
+intro r. (* A ou B se dÃ©duit de B "r" est une abrÃ©viation de "right" *)
 save.
 
-(*texte Vous aurez aussi besoin de propriétés simples de l'égalité,
+(*texte Vous aurez aussi besoin de propriÃ©tÃ©s simples de l'Ã©galitÃ©,
 comme celle-ci.                                                      *)
 
 prop eq_ref /\x x = x.
 intro. (* soit x quelconque  *)
-intro. (* on sait que "=" est réflexive et c'est une façon "standard" 
-          de montrer l'égalité *)
+intro. (* on sait que "=" est rÃ©flexive et c'est une faÃ§on "standard" 
+          de montrer l'Ã©galitÃ© *)
 save.
 
-(*texte Montrez que l'ordre est réflexif *)
+(*texte Montrez que l'ordre est rÃ©flexif *)
 fact ordre_reflexif /\x x <= x.
 (*->*)
 intro.
@@ -241,19 +241,19 @@ intro.
 (*->*)
 save.
 
-(*texte Pour l'antisymétrie vous aurez besoin d'un propriété de
-l'absurde, #False#, qui est que #l'absurde# entraîne n'importe quelle
+(*texte Pour l'antisymÃ©trie vous aurez besoin d'un propriÃ©tÃ© de
+l'absurde, #False#, qui est que #l'absurde# entraÃ®ne n'importe quelle
 proposition.                                                          *)
 
 prop taut_abs /\ A(False -> A).
 intros. (* supposons H:= False montrons A *)
-elim H.  (* False entraîne n'importe quoi, en particulier A *)
+elim H.  (* False entraÃ®ne n'importe quoi, en particulier A *)
 save.
 
-(*texte Vous avez également besoin d'utiliser une disjonction en
+(*texte Vous avez Ã©galement besoin d'utiliser une disjonction en
 *raisonnant par cas*. *)
 
-(*texte on comprend mieux ce qui suit en supprimant la détection
+(*texte on comprend mieux ce qui suit en supprimant la dÃ©tection
 automatique des axiomes : *) 
 flag auto_lvl 0.
 
@@ -261,14 +261,14 @@ prop taut5 /\A,B( (A or B) -> (~ A -> B)).
 intros. (* supposons H:= A or B, H0 := ~ A, montrons B *)
 elim H. (* deux cas suivant que l'on a A ou l'on a B *)
  (* cas H1:= A *)
- elim H0 with H1. (* de ~A et A on déduit n'importe quoi, en particulier B
-                     remarquez que l'on a "factorisé" plusieurs éliminations *)
+ elim H0 with H1. (* de ~A et A on dÃ©duit n'importe quoi, en particulier B
+                     remarquez que l'on a "factorisÃ©" plusieurs Ã©liminations *)
 
  (* cas H1:= B *)
- axiom H1. (* c'est évident *)
+ axiom H1. (* c'est Ã©vident *)
 save.
 
-(*texte Les réponses seraient moins lourdes avec la commande #left# *)
+(*texte Les rÃ©ponses seraient moins lourdes avec la commande #left# *)
 prop taut6 /\A,B( (A or B) -> (~ A -> B)).
 intros.
 left H.
@@ -278,30 +278,30 @@ left H.
   axiom H.
 save.
 
-(*texte Si l'on repasse en détection automatique des axiomes l'un des
-cas est traité automatiquement. *)
+(*texte Si l'on repasse en dÃ©tection automatique des axiomes l'un des
+cas est traitÃ© automatiquement. *)
 
 flag auto_lvl 1.
 
 prop taut7 /\A,B( (A or B) -> (~ A -> B)).
 intros.
 left H.
- (* cas H:= B traité automatiquement *)
+ (* cas H:= B traitÃ© automatiquement *)
  (* cas H:= A *)
   elim H0 with H.
 save.
 
-(*texte Vous pouvez avoir besoin aussi d'autres propriétés simples de
-l'égalité. *)
+(*texte Vous pouvez avoir besoin aussi d'autres propriÃ©tÃ©s simples de
+l'Ã©galitÃ©. *)
 
 prop eq_sym /\x,y (x=y -> y = x).
 intros. (* Soient x, y quelconques, supposons H:= x=y montrons y =x *)
-from H. (* PhoX sait que l'égalité est symétrique, 
+from H. (* PhoX sait que l'Ã©galitÃ© est symÃ©trique, 
            voir la documentation pour from *)
 save.
 
-(*texte Montrez maintenant que l'ordre est anti-symétrique.  Vous pouvez
-utiliser la proposition  déjà démontrée #ordre_strict_antisymetrique#. *)
+(*texte Montrez maintenant que l'ordre est anti-symÃ©trique.  Vous pouvez
+utiliser la proposition  dÃ©jÃ  dÃ©montrÃ©e #ordre_strict_antisymetrique#. *)
 
 prop ordre_large_antisymetrique
 /\x,y (x <= y -> y <= x -> x = y).
@@ -319,8 +319,8 @@ left H.
 (*->*)
 save.
 
-(*texte Pour la transitivité de l'ordre nous avons besoin d'une nouvelle
-propriété de l'égalité, qui est exprimée dans la proposition ci-dessous,
+(*texte Pour la transitivitÃ© de l'ordre nous avons besoin d'une nouvelle
+propriÃ©tÃ© de l'Ã©galitÃ©, qui est exprimÃ©e dans la proposition ci-dessous,
 par  la commande #rewrite# *)
 
 prop egalc /\A /\x,y(y=x -> A x -> A y).
@@ -328,7 +328,7 @@ intros. (* Supposons H:= y=x, H0:= A x, montrons A y *)
 rewrite H. (* A y est A x car y=x *)
 save.
 
-(*texte la commande #rewrite# utilise l'équation de gauche à droite, on
+(*texte la commande #rewrite# utilise l'Ã©quation de gauche Ã  droite, on
 peut lui demander de l'utiliser dans l'autre sens : *)
 
 prop egal /\A /\x,y(x=y -> A x -> A y).
@@ -336,7 +336,7 @@ intros. (* Supposons H:= x=y, H0:= A x, montrons A y *)
 rewrite -r H.
 save.
 
-(*texte on peut également vouloir transformer une hypothèse, ce que
+(*texte on peut Ã©galement vouloir transformer une hypothÃ¨se, ce que
 permet la commande #rewrite_hyp# *)
 
 prop egal1 /\A /\x,y(x=y -> A x -> A y).
@@ -352,7 +352,7 @@ save.
 (*note L'ordre des arguments est important : #-r# juste avant l'equation
 qu'il faut lire en sens inverse. *)
 
-(*texte Vous pouvez maintenant montrer la transitivité de l'ordre large *)
+(*texte Vous pouvez maintenant montrer la transitivitÃ© de l'ordre large *)
 
 fact ordre_large_transitif /\x,y,z (x<= y -> y <= z -> x <= z).
 (*->*)
@@ -375,23 +375,23 @@ save.
 (** Seconde Partie.                                                   *)
 (* ------------------------------------------------------------------ *)
 
-(*texte On va maintenant faire l'exercice inverse. Vous aller définir la
-théorie des ordres larges, avec le symbole #<=# comme symbole primitif,
-et les trois axiomes usuels, définir l'ordre strict #<# comme 
-#x <=y & x!= y#. Ici #x != y# est déjà défini comme #~ x=y#.  Vous montrerez
+(*texte On va maintenant faire l'exercice inverse. Vous aller dÃ©finir la
+thÃ©orie des ordres larges, avec le symbole #<=# comme symbole primitif,
+et les trois axiomes usuels, dÃ©finir l'ordre strict #<# comme 
+#x <=y & x!= y#. Ici #x != y# est dÃ©jÃ  dÃ©fini comme #~ x=y#.  Vous montrerez
 ensuite les deux axiomes pour l'ordre strict. Pour pouvoir faire ceci,
-comme nous souhaitons garder les mêmes noms avec un sens différent, il
-faut réinitialiser le système, ce que permettent les commandes : *)
+comme nous souhaitons garder les mÃªmes noms avec un sens diffÃ©rent, il
+faut rÃ©initialiser le systÃ¨me, ce que permettent les commandes : *)
 
 flag auto_lvl 0.
 del $<=. del $<.
 
 (*texte Ces commandes suppriment "<=" et "<" et tout ce qui les utilisent. 
-On enlève aussi la détection des axiomes pour les premières preuves.
+On enlÃ¨ve aussi la dÃ©tection des axiomes pour les premiÃ¨res preuves.
 *)
 
-(*texte Vous avez vu toutes les commandes nécessaires sauf celles qui
-utilisent la conjonction #&#. Voici des énoncés qui illustrent
+(*texte Vous avez vu toutes les commandes nÃ©cessaires sauf celles qui
+utilisent la conjonction #&#. Voici des Ã©noncÃ©s qui illustrent
 leur usage. *)
 
 prop taut_et /\A,B(A -> B -> (A & B)).
@@ -411,7 +411,7 @@ intros.
 elim H with[r].
 save.
 
-(*texte Très souvent on utilise plutôt la commande #left# *) 
+(*texte TrÃ¨s souvent on utilise plutÃ´t la commande #left# *) 
 
 prop taut_etl1 /\A,B((A & B) -> A).
 intros.
@@ -427,8 +427,8 @@ left H0.
 elim H with A and B.
 save.
 
-(*texte un exemple qui illustre la façon de prouver une conjonction, avec
-la détection automatique des axiomes : *)
+(*texte un exemple qui illustre la faÃ§on de prouver une conjonction, avec
+la dÃ©tection automatique des axiomes : *)
 
 prop taut_imp_et /\A,B,C (((A & B) -> C) -> (A -> B -> C)).
 intros.
@@ -436,8 +436,8 @@ elim H.
 intro.
 save.
 
-(*texte Répondez maintenant à la question. Certains lemmes peuvent être
-utiles comme l'antisymétrie de l'ordre strict ou plus simplement le
+(*texte RÃ©pondez maintenant Ã  la question. Certains lemmes peuvent Ãªtre
+utiles comme l'antisymÃ©trie de l'ordre strict ou plus simplement le
 lemme suivant :
 #lem ordre1 /\x,y (x <= y -> ~ y < x).#                                   *)
 

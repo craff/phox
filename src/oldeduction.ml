@@ -14,8 +14,6 @@ module Oldeduction(Logic:Logic) = struct
   module Ty = Types(Logic)
   open Ty
 
-  exception Proved
-
   exception Prooftree of ((litteral,contrainte) clause, litteral) tree
 
 
@@ -177,7 +175,7 @@ module Oldeduction(Logic:Logic) = struct
       aux l [] name bool
     in
 
-    let rec simplify oc =
+    let simplify oc =
 
       let rec simpl_quadr oc =
 	match oc.elts with

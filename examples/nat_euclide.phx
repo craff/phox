@@ -1,16 +1,16 @@
 (*header 2001/01/08
 
-        title = "Divisibilité dans les entiers naturels"
+        title = "DivisibilitÃ© dans les entiers naturels"
         author = "Paul Roziere"
         institute = "PPS Paris VII"
 *)
 
 
-(* version très provisoire. Fournit une tentative d'utilisation des
-règles de réécriture sur les formules, en l'occurrence les formules de
-divisibilité. La liste calcul.div.N est à compléter, il faut
-probablement supprimer les règles d'introduction trop ad hoc, les règles
-de réécriture étant plus efficaces. *)
+(* version trÃ¨s provisoire. Fournit une tentative d'utilisation des
+rÃ¨gles de rÃ©Ã©criture sur les formules, en l'occurrence les formules de
+divisibilitÃ©. La liste calcul.div.N est Ã  complÃ©ter, il faut
+probablement supprimer les rÃ¨gles d'introduction trop ad hoc, les rÃ¨gles
+de rÃ©Ã©criture Ã©tant plus efficaces. *)
 
 Import nat.
 flag auto_lvl 1.
@@ -186,10 +186,10 @@ new_intro -n add div.add.N.
 
 (*
 goal N2 | N6.
-trivial. échoue 
+trivial. Ã©choue 
 abort. 
 goal S S N0 | N6.
-trivial. réussit
+trivial. rÃ©ussit
 *)
 
 
@@ -281,7 +281,7 @@ elim -4H6  H2.
 save.
 
 new_elim $| case div.case.N.
-(* ne peut-être déclarée comme règle gauche
+(* ne peut-Ãªtre dÃ©clarÃ©e comme rÃ¨gle gauche
 : la tactique trivial devient aberrante
 goal /\x,y:N/\X,Y(x|y -> X ->(X->Y) -> Y).
 intros.
@@ -331,7 +331,7 @@ save.
 new_elim  -n $| less_is_zero div.less_is_zero.N.
 
 
-(* à ajouter dans la librairie nat *)
+(* Ã  ajouter dans la librairie nat *)
 fact (* if sum is N0 *) add.eq_N0.N
 /\X/\x,y:N ( (x =N0 -> y = N0 ->X)-> (x+y=N0 -> X)).
 intros.
@@ -403,7 +403,7 @@ elim -1[case] H2.
 intro.
 rmh H2.
 trivial.
-(* ne fonctionnait pas sans la règle gauche eq_N0 *)
+(* ne fonctionnait pas sans la rÃ¨gle gauche eq_N0 *)
 apply add.req.N with H4.
 rewrite G.
 save.
@@ -604,7 +604,7 @@ trivial.
 left H1 ;; Try trivial 0.
 left H1 ;; Try trivial 0. 
 select 2.
-(* le Try qui échoue interrompt la suite de calculs donc 
+(* le Try qui Ã©choue interrompt la suite de calculs donc 
 left H1 ;; Try trivial 0 ;; rewrite_hyp H0 H1 ;; rewrite_hyp H0 calcul.div.N ;; trivial.
 ne fonctionne pas. *)
 rewrite_hyp H0 H1 ;; rewrite_hyp H0 calcul.div.N ;; trivial.

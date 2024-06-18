@@ -21,7 +21,6 @@ module type Cache = sig
 end
 
 module Cache (Key_type : Key_type) = struct
-  open Key_type
   type key = Key_type.key
 
   module Myhashtbl = Myhashtbl.Hashtbl (Key_type)
@@ -31,8 +30,8 @@ module Cache (Key_type : Key_type) = struct
 
   type t = cache_tbl * cache_buck Queue.t * int ref * int
 
-  let create n = 
-    let tbl = Myhashtbl.create n in (tbl, Queue.create (), ref 0, n) 
+  let create n =
+    let tbl = Myhashtbl.create n in (tbl, Queue.create (), ref 0, n)
 
   let clear (tbl, q, ptr, _) =
     Myhashtbl.clear tbl;
@@ -46,7 +45,7 @@ module Cache (Key_type : Key_type) = struct
     in
 
     while !nb > max do
-      let buck = Queue.take qt in 
+      let buck = Queue.take qt in
       let (_,nr) = Myhashtbl.bucket_info buck in
       if !nr > 0 then (nr:= !nr - 1; Queue.add buck qt)
       else (Myhashtbl.fast_remove ht buck; nb := !nb - 1)

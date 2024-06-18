@@ -3,7 +3,7 @@
 
 	title = "Products"
  	author = "Christophe Raffalli, Paul Roziere"
-	institute = "Equipe de Logique, Université Chambéry, Paris VII"
+	institute = "Equipe de Logique, UniversitÃ© ChambÃ©ry, Paris VII"
 *)
 
 flag auto_lvl 3.

@@ -4,16 +4,12 @@
 (*######################################################*)
 
 open Format
-open Basic
-open Version 
+open Version
+open Type
+(* ouverture de type pour l'exception Error,
+   a par ca ce fichier est portable *)
 
 exception Quit
-exception Restart
-exception Pending_Input
-
-(* ouverture de type pour l'exception Error, 
-   a par ca ce fichier est portable *)
-open Types
 
 let cur_input = ref stdin
 let cur_line = ref 1
@@ -22,7 +18,7 @@ let cur_col = ref 0
 let stack_input = ref ([]:(in_channel * int * int) list)
 
 let pop_input0 = function
-  (c,lin,col)::s -> 
+  (c,lin,col)::s ->
     close_in !cur_input;
     cur_input := c;
     cur_line := lin;
@@ -43,11 +39,11 @@ let pop_all () =
 let path_list = ref []
 let ext = ".phx"
 
-let open_path filename = 
+let open_path filename =
   try open_in filename with Sys_error _ ->
   try open_in (filename^ext) with Sys_error _ ->
   let rec fn = function
-    [] -> 
+    [] ->
       open_hbox ();
       print_string "File error: impossible to open file \"";
       print_string filename;
@@ -55,28 +51,28 @@ let open_path filename =
       print_newline ();
       raise Error
   | path::l ->
-     try 
+     try
        open_in (Filename.concat path filename)
-     with Sys_error _ -> 
+     with Sys_error _ ->
        try open_in (Filename.concat path (filename^ext))
      with Sys_error _ -> fn l
   in fn !path_list
 
-let read_file filename = 
+let read_file filename =
   let old_input = !cur_input in
   cur_input := open_path filename;
   stack_input := (old_input,!cur_line,!cur_col)::!stack_input;
   cur_line := 1;
   cur_col := 0
 
-let print_path () = 
+let print_path () =
   open_vbox 0;
   print_string "Here is the path list:";
   print_cut ();
   List.iter (fun x -> print_string x; print_cut ()) !path_list;
   print_newline ()
 
-let add_path s = 
+let add_path s =
   if not (List.mem s !path_list) then path_list := s::!path_list
 
 let split str c =
@@ -87,7 +83,7 @@ let split str c =
       s:=i+1;
     end
   done;
-  if String.length str > !s then 
+  if String.length str > !s then
     l := String.sub str !s (String.length str - !s) :: !l;
   !l
 
@@ -99,4 +95,3 @@ let set_path () =
     with Not_found ->
       List.iter add_path (split default_path delim)
   end
-

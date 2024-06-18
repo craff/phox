@@ -1,33 +1,33 @@
 flag auto_lvl 1.
 (* Le but de ce tutorial est de faire un peu d'analyse ! *)
 
-Sort real. (* la sorte des réels *)
+Sort real. (* la sorte des rÃ©els *)
 
 Cst d : real -> real -> real. (* la fonction distance *)
 
-Cst R0 : real. (* Le réel zero *)
+Cst R0 : real. (* Le rÃ©el zero *)
 
-(* les realtions d'ordre sur les réels *)
+(* les realtions d'ordre sur les rÃ©els *)
 Cst Infix[5] x "<=" y : real -> real -> prop.
 def Infix[5] x ">" y = ~(x <= y). 
 def Infix[5] x ">=" y = y <= x. 
 def Infix[5] x "<" y = y > x. 
 
-(* quelques définition: *)
+(* quelques dÃ©finition: *)
 
 (* image f A est l'image directe de A par f, image f A y veut dire
-   que y appartient à image f A *)
+   que y appartient Ã  image f A *)
 def image f A = \y \/ x ((A x) & (f x) = y).
 
 (* inverse f A est l'image inverse de A par f, inverse f A x veut dire
-   que x appartient à inverse f A *)
+   que x appartient Ã  inverse f A *)
 def inverse f A = \x (A (f x)).
 
 (* U et V sont d'intersection vide *)
 def intervide U V  = ~ \/ x ((U x) & (V x)).
 
-(* union U V est la réunion de U et V, union U V x veut dire
-   que x appartient à union U V. *)
+(* union U V est la rÃ©union de U et V, union U V x veut dire
+   que x appartient Ã  union U V. *)
 def Infix U "union" V = \x (U x or V x).
 
 (* A est inclus dans B *)
@@ -36,11 +36,11 @@ def Infix[5] A "subset" B = /\ x ((A x) -> (B x)).
 (* O est un ouvert *)
 def ouvert O = /\ x (O x -> \/a > R0 /\y (d x y < a -> O y)).
 
-(* première définition de continue *)
+(* premiÃ¨re dÃ©finition de continue *)
 def continue1 f = /\ x  /\e > R0 \/a > R0
   /\ y (d x y < a -> d (f x) (f y) < e).
 
-(* seconde définition de continue *)
+(* seconde dÃ©finition de continue *)
 def continue2 f = /\ U ((ouvert U) -> (ouvert (inverse f U))).
 
 goal /\f (continue1 f -> continue2 f).
@@ -152,15 +152,15 @@ claim ordre_transitif /\x,y,z (x <= y -> y <= z -> x <= z).
 claim ordre_antisymetrique /\x,y (x <= y -> y <= x -> x = y).
 claim ordre_dense /\x,y (x < y -> \/z (x < z & z < y)).
 
-(* définition de majorant et borne supérieur *)
+(* dÃ©finition de majorant et borne supÃ©rieur *)
 
 def maj m X = /\y (X y -> y <= m).
 def sup m X = maj m X & /\y (maj y X -> m <= y).
 claim axiome_borne_sup /\X (\/x X x -> \/m maj m X  -> \/m sup m X).
 
 (* lemme sur l'ordre, avec des new_elim pour faciliter 
-   le raisonnement sur les inéquations.
-   Ce n'est pas parfait. Notemment, la transitivité stricte 
+   le raisonnement sur les inÃ©quations.
+   Ce n'est pas parfait. Notemment, la transitivitÃ© stricte 
    (x < y -> y < z -> x < z) ne marche pas avec trivial.
 *)
 
@@ -243,7 +243,7 @@ trivial.
 (*->*)
 save.
 
-(* dernier axiome sur la distance et l'ordre et leurs conséquences : *)
+(* dernier axiome sur la distance et l'ordre et leurs consÃ©quences : *)
 
 claim d_increasing_left /\x,y,z (x > y -> y > z -> d x z > d x y).
 claim d_increasing_right /\x,y,z (x > y -> y > z -> d x z > d y z).
@@ -626,7 +626,7 @@ apply H5 with H0.
 trivial =H2 G1.
 save.
 
-(* On va maintenant prouver le théorèmes des valeurs intermédiares *)
+(* On va maintenant prouver le thÃ©orÃ¨mes des valeurs intermÃ©diares *)
 
 theo valeur_intermediare /\f,a,b,c (
   a < b ->

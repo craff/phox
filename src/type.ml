@@ -358,7 +358,7 @@ let sp_del link e =
   let found = ref false in
   match get_ext_tbl e with
     Equations tbl ->
-      let rec tr = function Eq_theo o -> [o]
+      let tr = function Eq_theo o -> [o]
         | _ -> raise (Failure "bug in special del") in
       eqhash_do_table (
 	fun k l ->
@@ -419,10 +419,16 @@ type af2_obj = symbol o_object
 type ext = (symbol,tbl_types) o_extern
 
 let imported_modules = ref ([] : (string * renaming) list)
-let tmp_modules = ref ([] : (string * renaming) list)
 
-let sp_write ch = output_value ch !imported_modules
-let sp_read ch = tmp_modules := input_value ch
+let sp_write ch =
+  let str = Marshal.to_string !imported_modules [] in
+  output_binary_int ch (String.length str);
+  output_string ch str
+
+let sp_read ch =
+  let size = input_binary_int ch in
+  let str = really_input_string ch size  in
+  (Marshal.from_string str 0 : (string * renaming) list)
 
 module Symbol = struct
   type stmp = symbol
@@ -431,6 +437,7 @@ module Symbol = struct
   type ttmp = tbl_types
   type tbl_types = ttmp
   type extern = ext
+  type nonrec renaming = renaming
 
   let sub_obj = sub_sym
   let sp_del = sp_del

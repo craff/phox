@@ -4,16 +4,15 @@
 (*######################################################*)
 
 open Stream
-open Lexer
-open Types
-open Types.Base
+open Lex
+open Type
+open Type.Base
 open Basic
 open Local
 open Lambda_util
 open Typing
 open Flags
 open Print
-open Format
 
 exception Syntax_error
 exception Unbound of string
@@ -162,22 +161,22 @@ in function
 | _ -> false
 
 let is_infix ll lr =
-let f s =
-  try
-    let o = (sym_get s) in
-    last_obj := o;
-    let sy = get_syntax o in (
-    match sy with
-      Infix (ll',lr',_,_,_,_) -> (level_leq lr' lr) && (level_leq ll ll')
-    | _ -> false)
-  with Not_found -> false
-in function
-  Ident s -> f s
-| Kwd s -> f s
-| _ -> false
+  let f s =
+    try
+      let o = (sym_get s) in
+      last_obj := o;
+      let sy = get_syntax o in (
+          match sy with
+            Infix (ll',lr',_,_,_,_) -> (level_leq lr' lr) && (level_leq ll ll')
+          | _ -> false)
+    with Not_found -> false
+  in function
+    Ident s -> f s
+  | Kwd s -> f s
+  | _ -> false
 
 let sy_prefix =
-let f s =
+let f _ =
     let sy = get_syntax !last_obj in
     match sy with
       Prefix (sy,perm) -> (sy,!last_obj,perm)
@@ -188,7 +187,7 @@ in function
 | _ -> (failwith "bug in sy_prefix")
 
 let sy_infix =
-let f s =
+let f _ =
     let sy = get_syntax !last_obj in
     match sy with
       Infix (_,lr,sy,perm,_,_) -> (sy,!last_obj,lr,perm)
@@ -228,7 +227,7 @@ and parse_infix lt ll lr s =
 
 and parse_infix_bind lt s =
   let tok  = stream_check (is_infix min_level max_level) s in
-  let (sy,o,lr,perm) = sy_infix tok in
+  let (sy,o,_,perm) = sy_infix tok in
   (build_prefix o perm (do_bind o ((PArg lt)::(parse_syntax_bind sy s))))
 
 and parse_syntax sy s = match sy with
@@ -244,7 +243,7 @@ and parse_syntax_bind sy s = match sy with
   (Bind (a1,a2,a3))::sy ->
     let a = (fPBind (parse_bind (a1,a2,a3) s)) in
       a::(parse_syntax_bind sy s)
-| [Arg lvl] -> [PArg (parse_atom s)]
+| [Arg _] -> [PArg (parse_atom s)]
 | (Arg lvl)::sy -> let a = (PArg (parse_aux lvl s)) in
     a::(parse_syntax_bind sy s)
 | (Key str)::sy -> (parse_key str s); (parse_syntax_bind sy s)
@@ -364,7 +363,7 @@ and treat_pattern stack stack_term tstr  =
     [], [] -> EAbs("_fail", parse_right_member tstr, mk_Var ())
   | (k::stack as all), (e::stack_term) ->
       begin
-	let get_case o k =
+	let get_case o _ =
 	  let s = "case_" ^ get_name o in
 	  let e = aobj (sym_get s) in
 	  let k0 = get_safe_kind o in
@@ -376,7 +375,7 @@ and treat_pattern stack stack_term tstr  =
 	in
 	match e with
 	  EApp(e1, e2) -> treat_pattern all (e1::e2::stack_term) tstr
-	| EAtom(o,ks) ->
+	| EAtom(o,_) ->
 	    let e,l = get_case o k in
 	    let e' = treat_pattern (l@stack) stack_term tstr in
 	    EApp(e,e')
@@ -409,7 +408,7 @@ and parse_function tstr = match tstr with parser
 
 and in_left_member = ref false
 
-and parse_aux_match l str =
+and parse_aux_match _ str =
   in_left_member := true;
   try
     let r = parse_aux 5.0 str in
@@ -578,7 +577,7 @@ let rec get_arg_list = function
 | _ :: l -> get_arg_list l
 
 let build_perm l1 l2 =
-  let rec pos s l =
+  let pos s l =
     let rec fn p = function
       [] -> raise Not_found
     | s'::_ when s = s' -> p
@@ -604,7 +603,7 @@ let build_perm l1 l2 =
   with Not_found ->
     raise (Stream.Error "invalid permutation")
 
-let check_space infix lvl sy =
+let check_space _ lvl sy =
   let default_bind = space_of_int !binder_tex_space in
   let default_indent = space_of_int !tex_indent in
   let default =
@@ -758,7 +757,7 @@ and parse_seargs tstr = match tstr with parser
   [< 'Kwd ":"; se = parse_atomexpr ?? serror "an expression" tstr>] -> Semi se
 | [< >] -> Nosemi
 
-and parse_perm name il tstr = match tstr with parser
+and parse_perm _ il tstr = match tstr with parser
   [< 'Kwd "%"; 'Ident "as" ?? serror "%as" tstr;
      'Dol ?? serror ("$xxx") tstr;
      _ = (parser

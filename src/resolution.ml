@@ -14,9 +14,9 @@
 
 open Basic
 open Format
-open Types.Base
+open Type.Base
 open Data_base.Object
-open Types
+open Type
 open Parser
 open Lambda_util
 open Af2_basic
@@ -34,7 +34,7 @@ open Poids
 (* clause vide *)
 
 let initclause =
-  { 
+  {
     literals = [];
     weight = initweight;
   }
@@ -132,7 +132,7 @@ let add_elt elt liste = elt::liste
 (* en sorte de ne pas remettre e si sa négation est b *)
 (* plus tard c'est ici que l'on fera le tri *)
 
-let add_elt_s elt liste e b = let (exp,n,_)=elt in if (exp=e & n=b) then liste else elt::liste 
+let add_elt_s elt liste e b = let (exp,n,_)=elt in if (exp=e & n=b) then liste else elt::liste
 
 (* Ajoute un litteral dans une clause, en éliminant les double négations *)
 (* b doit être false (pas de négation) , sauf à l'ajout d'un but à l'initialisation *)
@@ -147,14 +147,14 @@ let add_literal clause b e =
 	{clause with literals = add_elt ((EApp(e,a)),b,true) clause.literals}
     | EAtom(o,_),[a] when o = !not_obj ->
 	fn [] (not b) a
-    | EAtom(o,k),[] -> 
+    | EAtom(o,k),[] ->
 	begin
 	  try
 	    if !fis_close o then raise Not_found;
 	    let e = kind_inst o k in
 	    fn stack b e
 	  with
-	  Not_found -> 	
+	  Not_found ->
             {clause with literals = add_elt (e,b,true) clause.literals}
 	end
     |  EAtom(o,k),[a] ->
@@ -180,8 +180,8 @@ let add_literal clause b e =
 	assert false
     | _,_ ->
 	{clause with literals = add_elt (e,b,true) clause.literals}
-	    
-  in 
+
+  in
   fn [] b e
 
 
@@ -197,7 +197,7 @@ let rec generalize_formule renaming expr =
       else renaming, EApp(e1',e2')
   | UVar(n,k) ->
       begin
-	try 
+	try
 	   generalize_formule renaming (getuvar n)
 	with Not_found -> begin
 	  try
@@ -219,7 +219,7 @@ let rec generalize_formule renaming expr =
 (* Généralise une clause en donnant de nouveaux noms aux variables d'unification *)
 
 let generalize_clause renaming clause =
- 
+
   let rec fn renaming lcl clause =
     match lcl with
     | [] -> renaming,clause
@@ -237,18 +237,18 @@ let generalize_clause renaming clause =
 (* on triera ici par poids croissant la liste des hypothèses *)
 
 let initsetclauses hyps concl =
-  
+
   let rec add_hyp hyps clause =
     match hyps with
     | [] -> []
     | e::hyps
       ->(add_literal clause false e)::(add_hyp hyps clause)
   in
-  
+
   let add_concl concl clause =
-    add_literal clause true concl 
-  in  
-  
+    add_literal clause true concl
+  in
+
   let hypsclauses = add_hyp (List.rev hyps) initclause in
   hypsclauses,[add_concl concl initclause]
 
@@ -258,7 +258,7 @@ let initsetclauses hyps concl =
 (* On suppose que e est positif pour c1 et négatif pour c2 *)
 
 let merge c1 c2 e =
-  
+
   let l1 = List.fold_right (fun a b -> add_elt_s a b e true) c2.literals [] in
   let l = List.fold_right (fun a b -> add_elt_s a b e false) c1.literals l1 in
   let w =  weight_merge c1.weight c2.weight e in
@@ -273,10 +273,10 @@ let merge c1 c2 e =
 (* lève l'exception Clash sinon *)
 (* e est utile pour merge *)
 
-let build_resolvante clause1 e1 clause2 e2  =   
-  let save_ulocal = get_ulocal () in 
+let build_resolvante clause1 e1 clause2 e2  =
+  let save_ulocal = get_ulocal () in
   let upos = get_undo_pos () in
-  try 
+  try
     let _ = smatch !localdefs e1 e2 in
     let renaming,clause1 = generalize_clause [] clause1 in
     let renaming,clause2 = generalize_clause renaming clause2 in
@@ -292,7 +292,7 @@ let build_resolvante clause1 e1 clause2 e2  =
 (* Fait la contraction quand c'est possible sinon lève l'exception Clash *)
 
 let build_contract accg e1 accd e cd =
-  let save_ulocal = get_ulocal () in 
+  let save_ulocal = get_ulocal () in
   let upos = get_undo_pos () in
   let rec map renaming acc list =
     match list with
@@ -302,7 +302,7 @@ let build_contract accg e1 accd e cd =
 	let renaming,e = generalize_formule renaming e in
 	map renaming ((e,n,r)::acc) list
   in
-  try 
+  try
     let _ = smatch !localdefs e e1 in
     let renaming,accg = map  [] [] accg in
     let renaming,accd = map renaming [] accd in
@@ -321,11 +321,11 @@ let build_contract accg e1 accd e cd =
 (* Attention : flexible a changé... *)
 
 let rec iter1 lit c f =
-  
+
   (*
   let iter_resolved_rule c1 c2 e = * c1 est le reste de la clause de règle, c2 est c après résolution,
 					e est l'expression de lit après resolution *
-    
+
     let rec aux_p cg e cd =
     match cd with
     | []
@@ -356,17 +356,17 @@ let rec iter1 lit c f =
     in
 
     let l = c1.literals in
-    
+
     (match l with
     | [] -> ()
     | hd::tl -> aux [] hd tl);
 
   in
   *)
-  
+
   f lit c;
   ()
-  
+
 
 
 (* Itère iter1 sur une clause *)
@@ -384,9 +384,9 @@ let iter2 c f =
 	iter1 l {c with literals = ((List.rev cg)@cd)} f;
 	aux (l::cg) cd
   in
-  
+
   let l = c.literals in
-  
+
   match l with
   | [] -> raise Vraie
   | l -> aux [] l
@@ -399,9 +399,9 @@ let iter2 c f =
 (* en effet, les poids ne le disent pas à priori *)
 
 let update_cndats clause =
-  
+
   let b = ref true in (* indique si l'on doit encore ajouter clause *)
-  
+
   let not_tauto a = (* A faire *)
     if false
     then
@@ -455,9 +455,9 @@ let update_cndats clause =
 	      a::(add_cdt c reste (n-1))
 	| _ -> assert false
   in
-  
+
   let updt cdt =
-    match cdt with 
+    match cdt with
     | c when List.mem c !cndats
       ->()
     | c when List.mem c !seen
@@ -465,7 +465,7 @@ let update_cndats clause =
     | _
       ->cndats:=(add_cdt cdt !cndats !cndats_max_length)
   in
-  
+
   b:=true;
   if
     clause.literals = []
@@ -494,8 +494,8 @@ let update_cndats clause =
 (* et e2 est négatif pour r2 *)
 
 let add_resol r1 e1 r2 e2 =
-  
-  try 
+
+  try
     let r1,r2,e = build_resolvante r1 e1 r2 e2 in
     let clause = merge r1 r2 e in
     update_cndats clause
@@ -512,7 +512,7 @@ let all_resol c1 c2 =
     (fun l1 r1
       ->iter2
 	  c2
-	  (fun l2 r2 
+	  (fun l2 r2
 	    ->
 	      let (e1,n1,ri1)=l1 in
 	      let (e2,n2,ri2)=l2 in
@@ -530,7 +530,7 @@ let all_resol c1 c2 =
 let contraction c =
 
   let rec aux cg cd =
-    
+
     let rec fn accg accd e cd =
       match accd with
       | []-> (List.rev accg),e,cd
@@ -546,7 +546,7 @@ let contraction c =
 	  else
 	    fn (l::accg) accd e cd
     in
-    
+
     match cd with
     | []
       ->assert false
@@ -569,7 +569,7 @@ let contraction c =
 	else
 	  aux (l::cg) cd
   in
-  
+
   match c.literals with
   | [] -> raise Vraie
   | l -> aux [] l
@@ -579,7 +579,7 @@ let contraction c =
 (* plus tard enlèvera les clauses de seen qu'elle subsume *)
 
 let add_to_seen cdt =
-  
+
   let rec aux a l =
     l
       (*
@@ -592,11 +592,11 @@ let add_to_seen cdt =
 	 EnsForm.subset a e.litteraux
 	 then
 	 aux a reste
-	 else 
+	 else
 	 e::(aux a reste)
        *)
   in
-  
+
   cdt::(aux cdt !seen)
 
 
@@ -611,7 +611,7 @@ let rule_resolution gl st =
   let _ = seen := se in
   let _ = cndats := cdts in
   let _ = cndats_length := 1 in
-  
+
   let rec res () =
     if
       !resol_verbose=1
@@ -627,7 +627,7 @@ let rule_resolution gl st =
 	let cdt = contraction (List.hd cdts) in
 	let _ = cndats := List.tl cdts in
 	try
-	  (let _ = seen:= add_to_seen cdt in 
+	  (let _ = seen:= add_to_seen cdt in
 	  List.iter
 	    (fun a -> all_resol a cdt)
             (!seen);
@@ -635,7 +635,7 @@ let rule_resolution gl st =
 	with
 	| Vraie -> print_string "La formule est vraie\n")
   in
-  
+
   res ();
-  
+
   [gl,st],[]

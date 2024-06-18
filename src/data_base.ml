@@ -42,7 +42,7 @@ module Object = struct
 
   let get_value x = x.value
   let get_name x  = x.name
-  let get_link x = x.link
+  (*  let get_link x = x.link*)
   let get_key x = x.key
   let is_locked x = x.locked
 
@@ -54,9 +54,9 @@ module Object = struct
 end
 
 module type Data = sig
-  open Object
   type symbol
   type tbl_types
+  type renaming
   type obj = symbol Object.o_object
   type extern = (symbol,tbl_types) Object.o_extern
 
@@ -66,16 +66,15 @@ module type Data = sig
   val sp_del : obj list -> extern -> unit
 
   val sp_write : out_channel -> unit
-  val sp_read : in_channel -> unit
+  val sp_read : in_channel -> (string * renaming) list
   val recursive : bool ref
 
 end
 
 module type Base = sig
-  open Object
-
   type symbol
   type tbl_types
+  type renaming
   type obj = symbol Object.o_object
   type extern = (symbol,tbl_types) Object.o_extern
 
@@ -92,7 +91,7 @@ module type Base = sig
 
   val dummy_base : unit -> base
 
-  val load_base : string list -> string -> base
+  val load_base : string list -> string -> base * (string * renaming) list
   val new_base :  unit -> base
   val save_base : base -> string -> unit
 
@@ -121,6 +120,7 @@ module Base (Data:Data) = struct
   type obj = Data.obj
   type extern = Data.extern
   type symbol = Data.symbol
+  type renaming = Data.renaming
   type tbl_types = Data.tbl_types
 
   type base = {
@@ -174,11 +174,13 @@ module Base (Data:Data) = struct
   let load_base path_list base_name =
     let f base_name =
       let ch = open_in_bin base_name in
-      sp_read ch;
-      let base_root,extern = input_value ch in
-      let key = input_value ch in
+      let deps = sp_read ch in
+      let size = input_binary_int ch in
+      let str = really_input_string ch size in
+      let base_root,extern = Marshal.from_string str 0 in
+      let key = input_binary_int ch in
       close_in ch;
-      {objs = base_root; externs = extern; next_key = key}
+      {objs = base_root; externs = extern; next_key = key}, deps
     in
     let rec g = function
       [] -> raise (Base_failure ("Fail to load base \""^base_name^"\""))
@@ -191,8 +193,10 @@ module Base (Data:Data) = struct
     try
       let ch = open_out_bin base_name in
       sp_write ch;
-      output_value ch (base.objs,base.externs);
-      output_value ch base.next_key;
+      let str = Marshal.(to_string (base.objs,base.externs) []) in
+      output_binary_int ch (String.length str);
+      output_string ch str;
+      output_binary_int ch base.next_key;
       close_out ch
     with Sys_error s ->
       raise (Base_failure ("Fail to write base \""^base_name^"\" : "^s))
@@ -302,7 +306,7 @@ module Base (Data:Data) = struct
   let is_recursive o =
     not (non_recursive o.link o)
 
-  let set_value base o v =
+  let set_value _base o v =
     let link = sub_obj v in
     if !Data.recursive || non_recursive link o then (
       o.value <- v;

@@ -4,10 +4,8 @@
 (*######################################################*)
 
 open Basic
-open Format
-open Types.Base
-open Types
-open Flags
+open Type.Base
+open Type
 open Local
 open Lambda_util
 open Print
@@ -21,21 +19,27 @@ open Safe_add
 
 let left_over = ref []
 
-let match_complete loc unfold e stack () =
+type env = E of ((expr * env) list) [@@unboced]
+
+let push a (E env) = E(a::env)
+let length (E env) = List.length env
+let nth (E env) n = List.nth env n
+
+let match_complete loc _unfold e stack () =
   let one_match = ref false in
-  let rec fn t1 env stack =
+  let rec fn t1 (env:env) stack =
     match t1 with
       EApp(t1,a) -> fn t1 env ((a,env)::stack)
     | EAbs(_,t1,_) ->
 	begin
 	  match stack with
-	    a::stack -> fn t1 (a::env) stack
+	    a::stack -> fn t1 (push a env) stack
 	  | _ -> true
 	end
     | EVar n ->
-	if List.length env <= n then false
+	if length env <= n then false
 	else begin
-	  match List.nth env n with v, env ->
+	  match nth env n with v, env ->
 	    fn v env stack
 	end
     | EAtom(o',_) when o' == match_object -> (
@@ -58,56 +62,56 @@ let match_complete loc unfold e stack () =
 		with
 		  Not_found -> false
 	      in
-	      let rec gn nb v env stack = match v with
+	      let rec gn nb v (env:env) stack = match v with
 		EAtom(o',_) when o' == ob ->
 		  let rec hn n e = if (n > 0)
 		      then EAbs("x",lift (hn (n-1) e),mk_Var ()) else e
 		  in
 		  let f = EApp(EVar 0, EVar 1) in
-		  let envf = [cf;cv] in
+		  let envf = E[cf;cv] in
 		  let cf = hn nb f, envf in
 		  fn s envs (cf::stack)
 	      | EAtom(o',_) when has_case o' ->
 		  fn f envf stack0
 	      | EVar n ->
-		  if List.length env <= n then false
+		  if length env <= n then false
 		  else begin
-		    match List.nth env n with v, env ->
+		    match nth env n with v, env ->
 		      gn nb v env stack
 		  end
 	      | EApp(v,a) ->
 		  gn (nb+1) v env ((a,env)::stack)
-	      | EAtom(o,k) -> (
+	      | EAtom(o,_) -> (
 		  match get_value o with
-		    Def e -> gn nb e [] stack
+		    Def e -> gn nb e (E[]) stack
 		  | _ -> false)
 	      |	UCst(n,_) -> (
 		  try
 		    let e, _ = List.assoc n loc.cst_eq in
-		    gn nb e [] stack
+		    gn nb e (E[]) stack
 		  with Not_found -> false)
 	      | _ -> false
 	      in
 	      gn 0 v envv stack
 	  | _ -> false
 	end
-    | EAtom(o,k) -> (
+    | EAtom(o,_) -> (
 	match get_value o with
-	  Def e -> fn e [] stack
+	  Def e -> fn e (E[]) stack
 	| _ -> true)
     |  UCst(n,_) -> (
 	try
 	  let e, _ = List.assoc n loc.cst_eq in
-	  fn e [] stack
+	  fn e (E[]) stack
 	with Not_found -> true)
     | _ -> true
   in
-  fn e [] (List.map (fun e -> e,[]) stack)
+  fn e (E[]) (List.map (fun e -> e,(E[])) stack)
 
 let analyse_one_theorem eqn unfold ld copt qq e =
-  let l0, nd = decompose_eq [] e in
+  let l0, _ = decompose_eq [] e in
   let find = ref false in
-  let rec gn eqn (e1,e2,nl,andpath,nc,keq) =
+  let gn eqn (e1,e2,nl,andpath,nc,keq) =
     let v = mk_Var() in
       (try
          type_strong e1 v;
@@ -184,7 +188,7 @@ let rec analyse_input gl = function
 	      res
 	  | _ -> failwith "bug 131 in analyse_input"
 	in fn (eqn, unfold) l
-    | Def t -> begin
+    | Def _ -> begin
 	let s = get_name o in
 	try
 	  let (e,n,b,_,_) = List.assoc s gl.hyp in
@@ -205,7 +209,7 @@ let call_trivial copt tri (gl0,st0,nl0) glsts =
   let tri = {nlim = tri.nlim; eqlvl = 0;
              from_trivial = true; first_order = true;
 	    auto_elim = not tri.from_trivial; eqflvl = 1} in
-  let rec fn (ref1,st2,e) (las,gl0,st0,nl0) =
+  let fn (ref1,st2,e) (las,gl0,st0,nl0) =
     if mem_expr false e gl0.done_list then
       raise (Ill_rule "call_trivial already failed");
     try
@@ -231,7 +235,7 @@ let call_trivial copt tri (gl0,st0,nl0) glsts =
      left_over := las @ !left_over;
      gl, st, nl)
    else
-     let nr, nl1 = mult_trivial tri las in
+     let _, nl1 = mult_trivial tri las in
      gl, st, nl1@nl
 
 let dep_path path p =
@@ -248,8 +252,8 @@ let try_eq test tri gst head stack env path eqns =
   let k0 = fast_type_infer env t in
   let rec hn = function
     [] -> raise Not_found
-  | (o1,k1,(o2,e1,e2,nl,k,sy,eqtl as eqns))::suit ->
-      let o2,e1,e2,nl,k,sy,eqtl =
+  | (o1,k1,eqns)::suit ->
+      let _,e1,e2,nl,k,_,eqtl =
 	match generalize_for_equations [eqns] with
           [o2,e1,e2,nl,k,sy,eqtl] ->
 	    o2,e1,e2,nl,k,sy,eqtl
@@ -271,7 +275,7 @@ let try_eq test tri gst head stack env path eqns =
       let pos = get_undo_pos () in
       try
 	fix_head e1 [];
-        let (_,largs,t',t'') = saturate e1 e2 nl k k0 env in
+        let (_,largs,t',_) = saturate e1 e2 nl k k0 env in
 (*
 	let rec truncate largs e1 =
 	  match largs, e1 with
@@ -326,14 +330,14 @@ let try_eq test tri gst head stack env path eqns =
                              next = Fin (new_fin ())} in
 		  st0.next <- Fol st1;
 		  fn las acc st1 nperm andpath (norm_sexpr e [es])
-            | EApp(EApp(EAtom(o,ks),e1),e2) when o == arrow_obj ->
+            | EApp(EApp(EAtom(o,_),e1),e2) when o == arrow_obj ->
 		  let ref1 = new_ref () and ref2 = new_ref () in
 		  let st2 = {sref = ref2; rule = Arrow_elim(st0.sref, ref1);
                              next = Fin (new_fin ())} in
 		  st0.next <- Fol st2;
 		  type_strong e1 kForm;
 		  fn ((ref1,Fol st2,e1)::las) acc st2 perm andpath e2
-            | EApp(EApp(EAtom(o,ks),e1),e2) when o == !and_obj ->
+            | EApp(EApp(EAtom(o,_),e1),e2) when o == !and_obj ->
 		  let ref3 = new_ref () in
 		  let b, nandpath = match andpath with
                       [] -> failwith "bug 5 in apply_eqn"
@@ -357,7 +361,7 @@ let try_eq test tri gst head stack env path eqns =
 		  fn las (Fol st1::acc) st4 perm nandpath (match b with
 		    Left_and -> e1 | Right_and -> e2 | _ ->
 		      failwith "bug path in apply_eqn")
-            | EApp(EApp(EAtom(o,ks),e1),e2) when o == equal_obj ->
+            | EApp(EApp(EAtom(o,_),e1),e2) when o == equal_obj ->
 		  (if ld then (e2,e1) else (e1,e2)), st0, acc, las
             | e ->
 
@@ -436,7 +440,7 @@ let rec ipath_to_path l e =
       | n::l ->
         let rec fn n args = match n, args with
           1, e::args -> RApp::gn e args
-        | n, e::args when n > 1 -> fn (n-1) args
+        | n, _::args when n > 1 -> fn (n-1) args
         | _ -> raise (Gen_error "bad path")
         and gn e = function
           [] -> ipath_to_path l e
@@ -499,7 +503,7 @@ let rewrite_one tri gst eqn unfold in_unfold under_lam e =
 	  match get_value o with
 	    Def e' when not (!fis_close o) -> (
 	      try
-		let f, head, k, stack = decom' (norm_sexpr e' stack) in
+		let _, head, k, stack = decom' (norm_sexpr e' stack) in
 		get_eqns do_case acc head k stack
 	      with Not_found -> acc)
 	  |  _ -> acc)
@@ -512,7 +516,7 @@ let rewrite_one tri gst eqn unfold in_unfold under_lam e =
     try
       let rec fn path stack env e =
 	match e with
-        EAtom (o,k) when match get_value o with
+        EAtom (o,_) when match get_value o with
           Prg _ -> true | _ -> false -> (
             match get_value o with
               Prg e ->  fn path stack env e
@@ -520,7 +524,7 @@ let rewrite_one tri gst eqn unfold in_unfold under_lam e =
       | EAtom (o,k) as e ->
           if List.memq o unfold then
             match get_value o with
-              Def e ->
+              Def _ ->
                 if in_unfold then test_opt path 1 else test_opt path 0;
                 [Rdef(eat_LApp path,None,o,k,stack,false)], gst
             | _ -> failwith "bug in rewrite_one"
@@ -577,9 +581,9 @@ let rule_rewrite tri args opt in_unfold under_lam gl st =
       | _ -> opt);
     let eqn, unfold = analyse_input gl args in
     check_recurive unfold in_unfold opt;
-    let one_step (gl,st,nl as gst) =
+    let one_step (gl,_,_ as gst) =
       let r, (gl,st,nl)  = rewrite_one tri gst eqn unfold in_unfold under_lam gl.concl in
-      let (gl,st,nl) as res = apply_rewrite true nl gl st r in
+      let (gl,_,_) as res = apply_rewrite true nl gl st r in
       type_strong gl.concl kForm;
       res
     in
@@ -595,7 +599,7 @@ let rule_rewrite tri args opt in_unfold under_lam gl st =
     end;
     let r = ([gl,st] @ !left_over),nl in
     left_over := save; r
-  with e ->
+  with _ -> (* FIXME *)
     left_over := save;
     raise (Ill_rule "rewrite failed")
 
@@ -603,25 +607,25 @@ let apply_rewrite_hyp e0 ls =
   if ls = [] then e0 else
   let rec fn e0 = function
     [] -> e0
-  | (Req(path,context,None,e1,_,stc,st,dir))::ls ->
+  | (Req(path,context,None,e1,_,_,_,_))::ls ->
         let path = List.rev path in
         let e0 = path_subst path e0 (norm_expr(EApp(context,e1))) in
         fn e0 ls
-  | (Req(path,context,Some stic,e1,_,stc,st,dir))::ls ->
+  | (Req(_,_,Some _,_,_,_,_,_))::ls ->
         fn e0 ls
   | (Rdef(path,None,oe,kind,l,dir))::ls ->
         let path = List.rev path in
         let e = EAtom(oe,kind) in
-        let akind, fe = build_subterm oe kind l in
+        let _, fe = build_subterm oe kind l in
         let e0 = path_subst path e0
           (if not dir then
             try EApp(fe,kind_inst oe kind)
             with Not_found -> raise (Failure "bug in apply_rewrite")
           else EApp(fe,e)) in
         fn e0 ls
-  | (Rdef(path,Some stic,oe,kind,l,dir))::ls ->
+  | (Rdef(_,Some _,_,_,_,_))::ls ->
         fn e0 ls
-  | (Insert st1)::ls ->
+  | (Insert _)::ls ->
         fn e0 ls
   in fn e0 ls
 
@@ -641,7 +645,7 @@ let rule_rewrite_hyp tri args hypname opt in_unfold under_lam gl st =
     let gl,st = match rule_rm true [hypname] gl st with
       [c],[] -> c | _ -> failwith "bug 1 in rewrite_hyp"
     in
-    let one_step (rwt, (gl,st,nl as gst), e) =
+    let one_step (rwt, gst, e) =
       let r, gst  = rewrite_one tri gst eqn unfold in_unfold under_lam e in
       let e = apply_rewrite_hyp e r in
       type_strong e kForm;
@@ -665,7 +669,7 @@ let rule_rewrite_hyp tri args hypname opt in_unfold under_lam gl st =
          next = st1}::nl) in
     let r = ([gl2,st2] @ !left_over),nl in
     left_over := save; r
-  with e ->
+  with _ -> (* FIXME *)
     left_over := save;
     raise (Ill_rule "rewrite failed")
 

@@ -3,8 +3,8 @@
 (*			parser.mli			*)
 (*######################################################*)
 
-open Lexer
-open Types
+open Lex
+open Type
 
 exception Syntax_error
 exception Unbound of string
@@ -36,14 +36,14 @@ val parse_bound_expr : (string * kind) list -> token Stream.t -> expr
 val parse_bound_atomexpr : string list -> token Stream.t -> expr
 
 (* parse the definition of a syntax *)
-val parse_syntax_def : 
+val parse_syntax_def :
   bool -> token Stream.t -> (string * syntax * (string * kind) list)
 
 (* parse a legal identifier *)
 val parse_ident : token Stream.t -> string
 val parse_ident_list : token Stream.t -> string list
 val parse_ass_ident : token Stream.t -> string * kind
-type isass = 
+type isass =
   Noass
 | Ass of kind
 | IAss of expr

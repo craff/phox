@@ -1,5 +1,4 @@
-open Lexer
-open Types
+open Lex
 open Interact
 
 type new_cmd

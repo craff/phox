@@ -3,7 +3,7 @@
 (*			type_check.ml			*)
 (*######################################################*)
 
-open Types
+open Type
 
 exception Bad_proof of int
 

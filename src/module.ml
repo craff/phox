@@ -6,18 +6,14 @@
 open Format
 open Basic
 open Data_base.Object
-open Types.Base
-open Types
-open Typunif
+open Type.Base
+open Type
 open Typing
-open Local
 open Lambda_util
 open Af2_basic
 open Print
 open Files
-open Data_info
 open Safe_add
-open Flags
 open Option
 
 let local_modules = ref []
@@ -27,7 +23,7 @@ let concat_module_names s1 s2 =
 
 let is_claim o =
   match get_value o with
-    Def (EApp(EApp(EAtom(o1,k), _), EAtom(p,_))) ->
+    Def (EApp(EApp(EAtom(o1,_), _), EAtom(p,_))) ->
       (o1 == theorem_obj) && (p == claim_obj)
   | _ -> false
 
@@ -41,7 +37,7 @@ let do_export copy =
   | Infix (lr,ll,l,perm,spb,spa) -> Infix (lr,ll,h l,perm,spb,spa)
   | e -> e
   and h l = List.map (function
-    Bind (n,Nocoma,Nosemi) as e -> e
+    Bind (_,Nocoma,Nosemi) as e -> e
   | Bind (n,Coma e,Nosemi) -> Bind (n,Coma (g e),Nosemi)
   | Bind (n,Nocoma,Semi e) -> Bind (n,Nocoma,Semi (g e))
   | Bind (n,Coma e,Semi e') -> Bind (n,Coma (g e),Semi (g e'))
@@ -56,7 +52,7 @@ let do_export copy =
       | KDef k -> KDef (g' k)
       | Prg e -> Prg (g e)
       | Def e -> Def (match e with
-          (EApp(EApp(EAtom(o,k),c),EAtom(o',k'))) when
+          (EApp(EApp(EAtom(o,_),_),EAtom(o',_))) when
             o == theorem_obj && o' == claim_obj -> g e
         | (EApp(EApp(EAtom(o,k),c),p)) when o == theorem_obj  ->
             let dep = get_rlink is_claim obj in
@@ -67,7 +63,7 @@ let do_export copy =
               if !phi then type_strong cl kProof;
               g (EApp(EApp(EAtom(o,k),c),cl))
         | _ -> g e)
-      |	AImp o -> failwith "bug: AImp in do_export")
+      |	AImp _ -> failwith "bug: AImp in do_export")
     | _ -> Imp
     in
      {fkind = g' sym.fkind; fvalue = nv;
@@ -75,7 +71,7 @@ let do_export copy =
       origin = sym.origin}),
   (fun sy -> f sy)
 
-let copy_external copy copys newtbl ne =
+let copy_external copy copys _newtbl ne =
   let g = mod_copy copy in
   let g' k = mod_kind_copy copy k in
   let oe = get_ext_tbl (get_table (get_ext_name ne)) in
@@ -83,7 +79,7 @@ let copy_external copy copys newtbl ne =
       Equations tbl ->
         eqhash_do_table (fun rf l ->
           List.iter (fun (o2,e1,e2,nl,k,sy,eqtl) ->
-            List.iter (fun (e3,perm,andpath,dir,nc,exported) ->
+            List.iter (fun (e3,_,andpath,dir,nc,exported) ->
               match e3 with
                 Eq_theo e0 ->
                   if exported then
@@ -154,7 +150,7 @@ let rec do_import copy =
   | Infix (lr,ll,l,perm,spb,spa) -> Infix (lr,ll,h l,perm,spb,spa)
   | e -> e
   and h l = List.map (function
-    Bind (n,Nocoma,Nosemi) as e -> e
+    Bind (_,Nocoma,Nosemi) as e -> e
   | Bind (n,Coma e,Nosemi) -> Bind (n,Coma (g e),Nosemi)
   | Bind (n,Nocoma,Semi e) -> Bind (n,Nocoma,Semi (g e))
   | Bind (n,Coma e,Semi e') -> Bind (n,Coma (g e),Semi (g e'))
@@ -168,7 +164,7 @@ let rec do_import copy =
     | KDef k -> KDef (g' k)
     | Prg e -> Prg (g e)
     | Def e -> Def (g e)
-    | AImp o -> failwith "bug: AImp in do_import"
+    | AImp _ -> failwith "bug: AImp in do_import"
     in
        {fkind = g' sym.fkind; fvalue = nv;
         syntax = f nsy; poly=sym.poly; exported = true;
@@ -183,7 +179,7 @@ and import_external renaming copy copys oe =
       Equations tbl ->
         eqhash_do_table (fun rf l ->
           List.iter (fun (o2,e1,e2,nl,k,sy,eqtl) ->
-            List.iter (fun (e3,perm,andpath,dir,nc,ex) ->
+            List.iter (fun (e3,_,andpath,dir,nc,ex) ->
               match e3 with
                 Eq_theo e0 ->
                     let nrf = match rf with
@@ -242,15 +238,15 @@ and claim_list = ref []
 and tex_list = ref []
 
 and load_intf origin_list renaming intf_name =
-  let base =
+  let base, local_module =
     if List.mem intf_name !local_modules then
       load_base [] (Filename.concat dirname
         ((concat_module_names root intf_name)^
          (if keep_proof then ".pho" else ".phi")))
     else
       load_base !path_list
-	(intf_name^(if keep_proof then ".pho" else ".phi")) in
-  let local_module = !tmp_modules in
+	(intf_name^(if keep_proof then ".pho" else ".phi"))
+  in
   let module_def = intf_name,renaming in
   if List.mem module_def origin_list then raise
     (Failure ("Module \""^intf_name^"\" is recursive !"));

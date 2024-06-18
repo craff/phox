@@ -5,8 +5,8 @@
 
 open Format
 open Data_base.Object
-open Types.Base
-open Types
+open Type.Base
+open Type
 open List
 open Basic
 open Cache
@@ -74,7 +74,7 @@ let bind_atom s o e k =
 
 let evaluable k =
  let rec fn b t = match (norm t) with
-   KAtom (n,l) ->
+   KAtom (_,l) ->
      List.for_all (fn b) l
  | KArrow (t,t') ->
      fn (not b) t && fn b t'
@@ -149,7 +149,7 @@ let generalize_for_rules o e1 e2 =
 
 let generalize_for_equation (pos, e1, e2, nl, k, sy, eqtl as eq) =
   let poly =
-    List.fold_left (fun max (eqt, p, c, d, b ,e) ->
+    List.fold_left (fun max (eqt, _, _, _, _ ,_) ->
 		      match eqt with
 			Eq_theo o ->
 			  let v = Data_base.Object.get_value o in
@@ -181,8 +181,8 @@ let get_kind_value o =
 
 let rec term_size = function
     EApp (e1,e2) -> term_size e1 + term_size e2
-  | EAbs (s,e,k) -> term_size e
-  | Path (path,e) -> term_size e
+  | EAbs (_,e,_) -> term_size e
+  | Path (_,e) -> term_size e
   | UVar (p,_) -> (try term_size (getuvar p) with Not_found -> 1)
   | _  -> 1
 
@@ -193,8 +193,8 @@ let rec term_size_rec e =
     EApp (e1,e2) ->
       let n = fn e1 in
       n + term_size_rec e2
-  | EAbs (s,e,k) -> term_size_rec e
-  | Path (path,e) -> term_size_rec e
+  | EAbs (_,e,_) -> term_size_rec e
+  | Path (_,e) -> term_size_rec e
   | UVar (p,_) -> (try term_size_rec (getuvar p) with Not_found -> raise Exit)
   | EAtom (o,_) -> (match get_value o with
       Def e -> if !fis_close o || is_recursive o then 1 else term_size_rec e
@@ -272,7 +272,7 @@ let norm_expr, norm_sexpr, norm_env_expr, norm_st_expr, norm_lexpr, norm_ldexpr,
       A (e,l,o) -> did_red := true; env:=l; odepth:= o;f did_red e
     | B n -> g did_red (EVar (!depth - n - 1)) !depth !stack
     with Not_found -> g did_red (EVar (n + !depth - !odepth)) !depth !stack)
-  | EAtom(o,k) as e -> (
+  | EAtom(o,_) as e -> (
       match get_value o with
         Prg e -> did_red := true; f did_red e
       | Fun i ->
@@ -294,7 +294,7 @@ let norm_expr, norm_sexpr, norm_env_expr, norm_st_expr, norm_lexpr, norm_ldexpr,
   | EAbs (s,t,k) -> (odepth:=!odepth+1; match !stack with
       (ea,la,oa)::l -> did_red := true; env:=(A (ea,la,oa))::!env; stack:=l; f did_red t
     | [] -> env:=(B !depth)::!env; depth:=!depth+1; EAbs(s,f did_red t,k))
-  | UCst (n,k) as e ->
+  | UCst (n,_) as e ->
       (match !open_cst n with
 	None -> g did_red e !depth !stack
       | Some t -> did_red := true; f did_red t)
@@ -375,7 +375,7 @@ let not_norm_info = ref (FVar "")
 let not_norm_atom o t0 =
   match get_value o with
     Prg e -> not_norm_info := e; true
-  | Fun e -> not_norm_info := t0; true
+  | Fun _ -> not_norm_info := t0; true
   | Def e -> not_norm_info := e; is_capsule o
   | _ -> false
 
@@ -383,7 +383,7 @@ let list_uvar t =
   let rec g acc stack = function
     EApp (t,t') ->
      g acc (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g acc [] (norm_sexpr t0 stack) else g acc [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g acc [] (norm_sexpr !not_norm_info stack)
@@ -399,7 +399,7 @@ let list_ucst t =
   let rec g acc stack = function
     EApp (t,t') ->
      g acc (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g acc [] (norm_sexpr t0 stack) else g acc [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g acc [] (norm_sexpr !not_norm_info stack)
@@ -417,7 +417,7 @@ let list_ucst' t =
   let rec g acc stack = function
     EApp (t,t') ->
      g acc (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g acc [] (norm_sexpr t0 stack) else g acc [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g acc [] (norm_sexpr !not_norm_info stack)
@@ -451,12 +451,12 @@ let has_uvar subst t =
   let rec g stack = function
     EApp (t,t') ->
      g (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g [] (norm_sexpr t0 stack) else g [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g [] (norm_sexpr !not_norm_info stack)
   | UVar (p,_)  -> (try g stack (Map.find p subst) with Not_found -> true)
-  | e ->
+  | _ ->
      List.exists (g []) stack
   in g [] t
 
@@ -464,7 +464,7 @@ let occur d t =
   let rec g stack = function
     EApp (t,t') ->
      g (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g [] (norm_sexpr t0 stack) else g [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g [] (norm_sexpr !not_norm_info stack)
@@ -479,11 +479,11 @@ let occur_uvar d t =
   let rec g stack = function
     EApp (t,t') ->
      g (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g [] (norm_sexpr t0 stack) else g [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g [] (norm_sexpr !not_norm_info stack)
-  | UCst (n,_) -> List.exists (g []) stack
+  | UCst (_,_) -> List.exists (g []) stack
   | UVar (p,_)  -> if p = d then true else
       (try g stack (getuvar p) with Not_found -> false)
   | _ ->
@@ -494,7 +494,7 @@ let occur_evar t =
   let rec g depth stack = function
     EApp (t,t') ->
      g depth (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g depth [] (norm_sexpr t0 stack) else g (depth+1)  [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g depth [] (norm_sexpr !not_norm_info stack)
@@ -509,7 +509,7 @@ let occur' d t =
   let rec g stack = function
     EApp (t,t') ->
      g (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g [] (norm_sexpr t0 stack) else g [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g [] (norm_sexpr !not_norm_info stack)
@@ -527,7 +527,7 @@ let occur_set result s t =
   let rec g stack = function
     EApp (t,t') ->
      g (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g [] (norm_sexpr t0 stack) else g [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g [] (norm_sexpr !not_norm_info stack)
@@ -545,7 +545,7 @@ let depth_uvar subst t =
   let rec g d stack = function
     EApp (t,t') ->
      g d (t'::stack) t
-  | EAbs (s,t,k) as t0 ->
+  | EAbs (_,t,_) as t0 ->
      if stack <> [] then g d [] (norm_sexpr t0 stack) else g d [] t
   | EAtom (o,_) as t0 when not_norm_atom o t0 ->
       g d [] (norm_sexpr !not_norm_info stack)
@@ -554,17 +554,17 @@ let depth_uvar subst t =
      List.fold_left (fun n x -> min n (g (d+1) [] x)) max_int stack
   in g 0 [] t
 
-let rec linear_uvar t =
+let linear_uvar t =
   let rec g n = function
-    EAbs (s,t,k) -> g (n + 1) t
+    EAbs (_,t,_) -> g (n + 1) t
   | UVar (p,_) as e -> (try g n (getuvar p) with Not_found -> e,0)
   | e -> (e,n) in
   let e,n = g 0 (norm_expr t) in
   let rec f q = function
     EVar p -> (p - q >= 0) && (p - q < n)
-  | EAtom (o,k) -> false
+  | EAtom _ -> false
   | EApp (t,t') -> (f q  t) || (f q t')
-  | EAbs (s,t,k) -> f (q + 1) t
+  | EAbs (_,t,_) -> f (q + 1) t
   | Path (path,t) -> f (q + path_count path) t
   | UVar (p,_) -> (try f q (getuvar p) with Not_found -> false)
   | _ -> false in
@@ -714,7 +714,7 @@ fn e1 e1' && fn e2 e2'
 let rec cmp_kind t1 t2 = match norm t1, norm t2 with
   | Unknown, Unknown ->
       0
-  | KVar p1, KVar p2 -> compare p1 p2
+  | KVar p1, KVar p2 -> Stdlib.compare p1 p2
   | KAtom (n, ln), KAtom (m, lm) ->
       let r = get_key n - get_key m in
       if r <> 0 then r else
@@ -739,8 +739,8 @@ let rec cmp_kind t1 t2 = match norm t1, norm t2 with
 
 let rec cmp_path p1 p2 = match p1,p2 with
   [], [] -> 0
-| [], _::l -> -1
-| _::l, [] -> 1
+| [], _::_ -> -1
+| _::_, [] -> 1
 | (LApp::l), (LApp::l') -> cmp_path l l'
 | (RApp::l), (RApp::l') -> cmp_path l l'
 | ((PAbs (_,k))::l), ((PAbs (_,k'))::l') ->
@@ -805,7 +805,7 @@ let rec cmp_expr e1 e2 = match e1, e2 with
 
 let _ = fcmp_expr := cmp_expr
 
-let rec hash_kind d k =
+let hash_kind d k =
   let hashval = ref 0 in
   let combine_small x = hashval := abs (!hashval * 7 + x)
   and combine_big x = hashval := abs (!hashval * 65599 + x) in
@@ -822,7 +822,7 @@ let rec hash_kind d k =
       if d > 0 then (fn (d - 1) t1; fn (d - 1) t2)
   in fn d k; !hashval
 
-let rec hash_path d p =
+let hash_path d p =
   let hashval = ref 0 in
   let combine_small x = hashval := abs (!hashval * 7 + x)
   and combine_big x = hashval := abs (!hashval * 65599 + x) in
@@ -835,7 +835,7 @@ let rec hash_path d p =
        combine_big (hash_kind (d - 1) k); fn (d - 1) l)
   in fn d p; !hashval
 
-let rec hash_expr d e =
+let hash_expr d e =
   let hashval = ref 0 in
   let combine_small x = hashval := abs (!hashval * 7 + x)
   and combine_medium x = hashval := abs (!hashval * 11 + x)
@@ -863,13 +863,13 @@ let rec hash_expr d e =
   | (EAbs (_,t1,_)) ->
                     combine_small 6;
                     if d > 0 then fn (d-1) t1
-  | (Syntax s) -> combine_small 7
+  | (Syntax _) -> combine_small 7
   | (EData n) -> combine_medium 8; combine_big (Hashtbl.hash n)
   | (FVar _) -> raise (Failure "bug: illegal argument hash_expr")
   in fn d e;
   !hashval
 
-let rec hashv_expr d e =
+let hashv_expr d e =
   let hashval = ref 0 in
   let combine_small x = hashval := abs (!hashval * 7 + x)
   and combine_medium x = hashval := abs (!hashval * 11 + x)
@@ -897,13 +897,13 @@ let rec hashv_expr d e =
   | (EAbs (s,t1,_)) ->
                     combine_small 6; combine_big (Hashtbl.hash s);
                     if d > 0 then fn (d-1) t1
-  | (Syntax s) -> combine_small 7
+  | (Syntax _) -> combine_small 7
   | (EData n) -> combine_medium 8; combine_big (Hashtbl.hash n)
   | (FVar _) -> raise (Failure "bug: illegal argument hash_expr")
   in fn d e;
   !hashval
 
-let rec hashi_expr d e =
+let hashi_expr d e =
   let hashval = ref 0 in
   let combine_small x = hashval := abs (!hashval * 7 + x)
   and combine_medium x = hashval := abs (!hashval * 11 + x)
@@ -931,12 +931,12 @@ let rec hashi_expr d e =
       hash_kind_list (d-1) k
   | (EApp(t1,t2)) -> combine_small 5;
                      if d > 0 then (fn (d-1) t1; fn (d-1) t2)
-  | (EAbs(_,t1,_)) -> (match eta_red e with
+  | (EAbs _) -> (match eta_red e with
                        EAbs(_,t1,_) ->
                          combine_small 6;
                          if d > 0 then fn (d-1) t1
                      | e -> fn d e)
-  | (Syntax s) -> combine_small 7
+  | (Syntax _) -> combine_small 7
   | (EData n) -> combine_medium 8; combine_big (Hashtbl.hash n)
   | (FVar _) -> raise (Failure "bug: illegal argument hash_expr")
   in fn d e;
@@ -985,17 +985,17 @@ let expr_local s =
 let rec head  = function
   EApp(t,_) -> head t
 | EAbs(_,t,_) -> head t
-| EAtom(o,k) -> (Oneq o,o)
+| EAtom(o,_) -> (Oneq o,o)
 | UVar (p,_) -> (try head (getuvar p) with Not_found -> (Uveq,dummy_obj))
 | UCst (p,_) -> (Uneq p,dummy_obj)
 | _ -> (Alleq,dummy_obj)
 
 let rec assoc_eq o l = match o, l with
   (_, []) -> raise Not_found
-| Uneq n, (Uneq n',x)::l when n == n' -> x
-| Oneq o, (Oneq o',x)::l when o == o' -> x
-| Alleq, (Alleq,x)::l -> x
-| Uveq, (Uveq,x)::l -> x
+| Uneq n, (Uneq n',x)::_ when n == n' -> x
+| Oneq o, (Oneq o',x)::_ when o == o' -> x
+| Alleq, (Alleq,x)::_ -> x
+| Uveq, (Uveq,x)::_ -> x
 | _, _:: l -> assoc_eq o l
 
 let rec count_lambdas =  function
@@ -1012,9 +1012,9 @@ let rec advance_in_arrow n k =
 let rec head_length  = function
   EApp(t,_) -> head_length t - 1
 | EAbs(_,t,_) -> head_length t + 1
-| EAtom(o,k) -> 0
+| EAtom(_,_) -> 0
 | UVar (p,_) -> (try head_length (getuvar p) with Not_found -> 0)
-| UCst (p,_) -> 0
+| UCst (_,_) -> 0
 | _ -> 0
 
 let rec head_kind  = function
@@ -1194,7 +1194,7 @@ let rec fn e1 e2 =
   (EVar n), (EVar m) -> n = m
 | (EData n), (EData m) -> Data.eq_data n m
 | (UCst (n,_)), (UCst (m,_)) -> n = m
-| (Path (path,e)), (Path (path',e')) ->
+| (Path _), (Path _) ->
     raise (Failure "bug in simpl match")
 | (UVar (n,_) as t1), (UVar (m,_) as t2) ->
     (try fn (getuvar n) t2 with Not_found ->
@@ -1216,10 +1216,10 @@ let rec fn e1 e2 =
     try fn (List.assoc n !subst) t2 with Not_found ->
     if n < 0 && n > umax && not (occur_uvar n t2) then
       (subst:=(n,t2)::!subst; true) else false)
-| (EAtom (o,k)), (EAtom (o',k')) -> o == o'
+| (EAtom (o,_)), (EAtom (o',_)) -> o == o'
 | (EApp(t1,t2)), (EApp(t1',t2')) ->
     (fn t1 t1') && (fn t2 t2')
-| (EAbs (_,t,k)), (EAbs (_,t',k')) -> fn t t'
+| (EAbs (_,t,_)), (EAbs (_,t',_)) -> fn t t'
 | (EAbs (_,EApp(t,t''),_)), t' ->
     (fn t'' (EVar 0)) && (fn t (lift t'))
 | t', (EAbs (_,EApp(t,t''),_)) ->
@@ -1237,7 +1237,7 @@ let eqcmp e1 e2 e3 e4 =
   let lu = fn n0 e1 in
   let n1 = n0 - List.length lu in
   let rec check e l = match e,l with
-    EAbs(_,e,k), (UVar(d, k')::l) ->
+    EAbs(_,e,k), (UVar(d, _)::l) ->
       UCst(n0-d,k)::check e l
   | (EAbs _, _) | (_, (_::_)) -> raise Not_found
   | _, [] -> []
@@ -1308,7 +1308,7 @@ let equal_rule_option o1 o2 =
   match o1, o2 with
     Elim_opt l1, Elim_opt l2 -> l1 = l2
   | Intro_opt(n1,None), Intro_opt(n2,None) -> n1 = n2
-  | Intro_opt(n1,Some o1), Intro_opt(n2,Some o2) -> o1 == o2
+  | Intro_opt(_,Some o1), Intro_opt(_,Some o2) -> o1 == o2
   | _ -> false
 
 let add_Rules sym rf s expr expr' pat n ln order exported =
@@ -1318,7 +1318,7 @@ let add_Rules sym rf s expr expr' pat n ln order exported =
     let l = symhash_find old rf in
     symhash_remove old rf;
     try
-      let oexpr,oexpr',opat,on,oln,order,oex = List.assoc s l in
+      let _oexpr,oexpr',_opat,on,oln,_order,oex = List.assoc s l in
       if not
          (oexpr' == expr' &&
           n = on && equal_rule_option ln oln && (oex || not exported)) then
@@ -1367,10 +1367,10 @@ let apply_perm p l =
   let rec fn = function
     [] -> []
   | n::p ->
-      (try List.nth l n with e -> failwith "bug nth 2")::fn p
+      (try List.nth l n with Failure _ | Invalid_argument _ -> failwith "bug nth 2")::fn p
   in fn p
 
-let rec add_to_tbl ctxt maxvar tbl e1 e2 =
+let add_to_tbl ctxt maxvar tbl e1 e2 =
   let rec gn tbl (e01, e02) =
     let rec fn acc tbl e1 e2 = match e1, e2 with
       (EVar n), (EVar m) when n = m ->
@@ -1403,10 +1403,10 @@ let rec add_to_tbl ctxt maxvar tbl e1 e2 =
                 Map.add m ((e01,e02)::l) tbl
               with Not_found -> Map.add m [e01,e02] tbl
             else tbl)
-    | (EAtom (o,k)), (EAtom (o',k')) when
+    | (EAtom (o,_)), (EAtom (o',_)) when
         (o == o') && (!fis_close o || get_value o = Cst) ->
          List.fold_left gn tbl acc
-    | (EAtom (o,k)), _ when
+    | (EAtom (o,_)), _ when
         (match get_value o with
            Def _ -> not (!fis_close o) && not (is_recursive o)
          | Prg _ -> true
@@ -1416,7 +1416,7 @@ let rec add_to_tbl ctxt maxvar tbl e1 e2 =
          | Prg ne1 -> ne1
          | _ -> raise Exit in
          fn acc tbl ne1 e2
-    | _, (EAtom (o,k)) when
+    | _, (EAtom (o,_)) when
         (match get_value o with
            Def _ -> not (!fis_close o)  && not (is_recursive o)
          | Prg _ -> true
@@ -1431,7 +1431,7 @@ let rec add_to_tbl ctxt maxvar tbl e1 e2 =
     | (EAbs _, _) | (_, EAbs _) when acc <> [] ->
         fn [] tbl (norm_lsexpr ctxt e1 (List.map fst acc))
                   (norm_lsexpr ctxt e2 (List.map snd acc))
-    | (EAbs (_,t,k)), (EAbs (_,t',k')) ->
+    | (EAbs (_,t,_)), (EAbs (_,t',_)) ->
         fn []  tbl t t'
     | t, (EAbs (_,t',_)) ->
         fn [] tbl (EApp((lift t),EVar 0)) t'

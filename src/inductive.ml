@@ -4,12 +4,10 @@
 (*######################################################*)
 
 open Basic
-open Format
-open Lexer
-open Types.Base
-open Data_base.Object
-open Types
-open Parser
+open Lex
+open Type.Base
+open Type
+open Parse_base
 open Lambda_util
 open Af2_basic
 open Local
@@ -17,10 +15,8 @@ open Print
 open Typunif
 open Typing
 open Safe_add
-open Type_check
 open Pattern
 open Flags
-open Undo
 open Interact
 open Rewrite
 open Option
@@ -45,7 +41,7 @@ let check_args kX le intros =
   | t -> t
   in
 
-  let rec gn (_, intro) =
+  let gn (_, intro) =
     let intro = EApp(intro, UCst(-1,kX)) in
     hn 0 (norm_expr intro)
   in
@@ -65,7 +61,7 @@ let check_args kX le intros =
 	   done
         | EVar p::l when p = n + depth ->
             fn (n-1) l
-        | u::l ->
+        | _::l ->
            tbl := Set.add n !tbl;
            fn (n-1) l
         in fn (arity-1) stack
@@ -123,13 +119,13 @@ let build_elim op kX le intros =
       EAbs(n,fn [] t,k)
   | UCst(-1,_) as t ->
       List.fold_left (fun t u -> EApp(t,u)) t stack
-  | EAtom(o,k) as f when o == forall_obj ->
+  | EAtom(o,_) as f when o == forall_obj ->
       begin
 	match stack with
 	  [t] -> EApp(f, fn [] t)
 	| _ -> failwith "bug 2 in build_elim"
       end
-  | EAtom(o,k) as f when o == arrow_obj ->
+  | EAtom(o,_) as f when o == arrow_obj ->
       begin
 	match stack with
 	  [t; u] ->
@@ -144,12 +140,12 @@ let build_elim op kX le intros =
   | _ -> failwith "bug 4 in build_elim"
 
   in
-  let rec gn (n, intro) =
+  let gn (n, intro) =
     let intro = EApp(intro, UCst(-1,kX)) in
     (n, bind_cst "X" (-1) (fn [] (norm_expr intro)) kX)
   in
 
-  let nkX, nle, cintros = check_args kX le (List.map gn intros) in
+  let _, _, cintros = check_args kX le (List.map gn intros) in
   cintros
 
 let build_case op kX le intros =
@@ -177,7 +173,7 @@ let build_case op kX le intros =
 	| _ -> eq v, n+1
       in
       fst (List.fold_right (fun u t -> teq u t) stack (t0, depth) )
-  | EAtom(o,k) as f when o == forall_obj ->
+  | EAtom(o,_) as f when o == forall_obj ->
       begin
 	match stack with
 	  [t] ->
@@ -189,7 +185,7 @@ let build_case op kX le intros =
 	      EApp(f, next))
 	| _ -> failwith "bug 2 in build_elim"
       end
-  | EAtom(o,k) as f when o == arrow_obj ->
+  | EAtom(o,_) as f when o == arrow_obj ->
       begin
 	match stack with
 	  [t; u] ->
@@ -204,7 +200,7 @@ let build_case op kX le intros =
   | _ -> failwith "bug 4 in build_elim"
 
   in
-  let rec gn (n, intro) =
+  let gn (n, intro) =
     let intro = EApp(intro, UCst(-1,kX)) in
     (n, (forget := []; bind_cst "X" (-1) (fn 0 0 [] (norm_expr intro)) kX))
   in
@@ -229,7 +225,7 @@ let inductive export name sy go kX le tname intros =
   in
   let rec gn = function
     [] -> nle
-  | (name, ei)::l ->
+  | (_, ei)::l ->
 	EApp(EApp(aobj(arrow_obj), hn' ei), gn l)
   in
   let pred = kn (EApp(aobj(forall_obj), bind_cst "X" (-1) (gn cintros) nkX)) le in
@@ -273,7 +269,7 @@ let inductive export name sy go kX le tname intros =
   in
   let intro_theos, intro_objs = List.split (List.map fn intros) in
   const := (List.map snd intro_objs) @ !const;
-  let rec adds ((_, lo), intro) (name, th) =
+  let adds ((_, lo), _) (name, th) =
     let invertible = List.mem Invertible lo in
     let constructor = List.mem Constructor lo in
     let totality = constructor || List.mem Constructor lo in
@@ -294,7 +290,7 @@ let inductive export name sy go kX le tname intros =
   in
   let rec gn = function
     [] -> EApp(EApp(aobj(arrow_obj), hn 0 (aobj o) le), unlift nle)
-  | (name, ei)::l ->
+  | (_, ei)::l ->
 	EApp(EApp(aobj(arrow_obj), hn' ei), gn l)
   in
   let rec knf e = function
@@ -313,7 +309,7 @@ let inductive export name sy go kX le tname intros =
 	       auto_elim = true; eqflvl = 0} in
     let _ = do_rule 1 "intros" [1] (rule_intro (ref false) tri Default) in
     let gl = match !cur_proof with
-	A_proof {remain = [gl,_]} -> gl
+	A_proof {remain = [gl,_]; _} -> gl
       | _ -> failwith "bug in Inductive (proving elim)"
   in
     let (hypname, (hyp,_,_,_,_)) = List.hd gl.hyp in
@@ -357,7 +353,7 @@ let inductive export name sy go kX le tname intros =
   in
   let rec gn = function
     [] -> EApp(EApp(aobj(arrow_obj), hn 0 (aobj o) le), unlift nle)
-  | (name, ei)::l ->
+  | (_, ei)::l ->
 	EApp(EApp(aobj(arrow_obj), hn' ei), gn l)
   in
   let rec knf e = function
@@ -376,10 +372,10 @@ let inductive export name sy go kX le tname intros =
 	       auto_elim = true; eqflvl = 0} in
     let _ = do_rule 1 "intros" [1] (rule_intro (ref false) tri Default) in
     let gl = match !cur_proof with
-	A_proof {remain = [gl,_]} -> gl
+	A_proof {remain = [gl,_]; _} -> gl
       | _ -> failwith "bug in Inductive (proving elim)"
     in
-    let (hypname, (hyp,_,_,_,_)) = List.hd gl.hyp in
+    let (hypname, _) = List.hd gl.hyp in
     let cutform = List.fold_left (fun t (_, (hyp,_,_,_,_)) ->
 				    EApp(EApp(aobj arrow_obj, hyp), t)) gl.concl (List.tl gl.hyp) in
     let _ = do_rule 1 "use" [1] (rule_use true tri "" cutform) in
@@ -401,7 +397,7 @@ let inductive export name sy go kX le tname intros =
     List.iter (rec_remove false !the_base) !const;
     raise e
 
-let make_case typed export tname ((name, lo), intro) co intros objs =
+let make_case typed export _ (_, intro) co intros objs =
   let cname = get_name co in
   let case_name = "case_" ^ cname in
   let k = mk_Var () in
@@ -418,7 +414,7 @@ let make_case typed export tname ((name, lo), intro) co intros objs =
   let rec decom l = function
       EApp(t,u) ->
 	decom (u::l) t
-    | EAtom(o,k) -> l
+    | EAtom(_,_) -> l
     | _ -> failwith "bug in make_injective"
   in
   let rec fn = function
@@ -457,10 +453,10 @@ let make_case typed export tname ((name, lo), intro) co intros objs =
 
   let rec md acc intros objs =
     match intros, objs with
-      (((name', lo'), intro')::suit), (co'::suit') when co == co' ->
+      (_::suit), (co'::suit') when co == co' ->
 	md acc suit suit'
     | [], [] -> acc
-    | (((name', lo'), intro')::suit), (co'::suit') ->
+    | ((_, intro')::suit), (co'::suit') ->
 	let rec fn = function
 	    EApp(EAtom(o,k),EAbs(s,t,k')) when o == forall_obj ->
 	      let t = fn t in
@@ -502,7 +498,7 @@ let make_injective typed export tname ((name, lo), intro) = try
   let rec decom l = function
       EApp(t,u) ->
 	decom (u::l) t
-    | EAtom(o,k) -> l
+    | EAtom(_,_) -> l
     | _ -> failwith "bug in make_injective"
   in
   let rec fn = function
@@ -575,19 +571,19 @@ let make_injective typed export tname ((name, lo), intro) = try
   let _ = do_rule 1 "use" [1] (rule_use true tri "" (aobj claim)) in
   let _ = do_rule 1 "intros" [1] (rule_intro (ref false) tri Default) in
   let gl = match !cur_proof with
-      A_proof {remain = [gl,_]} -> gl
+      A_proof {remain = [gl,_]; _} -> gl
     | _ -> failwith "bug in Data (proving inj')"
   in
-  let (hypname1, (hyp,_,_,_,_)) = List.hd gl.hyp in
+  let (hypname1, _) = List.hd gl.hyp in
   let eform1 = aobj (sym_get hypname1) in
-  let (hypname2, (hyp,_,_,_,_)) = List.hd (List.tl gl.hyp) in
+  let (hypname2, _) = List.hd (List.tl gl.hyp) in
   let eform2 = aobj (sym_get hypname2) in
-  let (hypnamen, (hyp,_,_,_,_)) = last gl.hyp in
+  let (hypnamen, _) = last gl.hyp in
   let eformn = aobj (sym_get hypnamen) in
   let rec count = function
-      EApp(EAtom(o,k),EAbs(s,t,k')) when o == forall_obj ->
+      EApp(EAtom(o,_),EAbs(_,t,_)) when o == forall_obj ->
 	1 + count t
-    | EApp(EApp(EAtom(o,k),t),u) when o == arrow_obj ->
+    | EApp(EApp(EAtom(o,_),_),u) when o == arrow_obj ->
 	1 + count u
     | EAtom(o,k) ->
 	(try
@@ -662,10 +658,10 @@ let make_distinct typed export tname ((name1, _), intro1) ((name2, _), intro2) =
   let _ = do_rule 1 "intros" [1] (rule_intro (ref false) tri Default) in
   let _ = do_rule 1 "intros" [1] (try_rule (rule_intro (ref false) tri Default)) in
   let gl = match !cur_proof with
-      A_proof {remain = [gl,_]} -> gl
+      A_proof {remain = [gl,_]; _} -> gl
     | _ -> failwith "bug in Data (proving inj')"
   in
-  let (hypnamen, (hyp,_,_,_,_)) = last gl.hyp in
+  let (hypnamen, _) = last gl.hyp in
   let eformn = aobj (sym_get hypnamen) in
   let _ = do_rule 1 "elim+auto" [1]
 	    (compose_rule
@@ -679,16 +675,17 @@ let make_distinct typed export tname ((name1, _), intro1) ((name2, _), intro2) =
 let data export name sy kX go le tname intros =
 
   let all_kind =
-    List.map (fun (name, _, e) ->
+    List.map (fun (_, _, e) ->
       let k = mk_Var () in
       type_strong e (KArrow(kX,(KArrow(k,mk_Var ()))));
       k) intros
   in
-  let sname = Bytes.copy tname in
-  let first_char = sname.[0] in
+  let sname = Bytes.of_string tname in
+  let first_char = Bytes.get sname 0 in
   if 'A' > first_char || 'Z' < first_char then
     raise (Gen_error ("name of a data type must start with a capital letter"));
-  Bytes.set sname 0 (Char.lowercase first_char);
+  Bytes.set sname 0 (Char.lowercase_ascii first_char);
+  let sname = Bytes.to_string sname in
   let lt = ref (0, []) in
   let rec fn t = match norm2 t with
       KArrow(_,t) -> fn t
@@ -811,7 +808,7 @@ let parse_inductive export tstr = match tstr with parser
     let tname =
       match tname with
         Some n -> n
-      | none -> s
+      | None -> s
     in
     try
       let intros = parse_inductive_suit export o le tname [] tstr in
@@ -851,7 +848,7 @@ let rec parse_data_suit export o le tname l tstr = match tstr with parser
       let cname =
 	match cname with
           Some n -> n
-        | none -> s
+        | None -> s
       in
       parse_data_suit2 export o lo le tname l cname (s,sy) le' co tstr
 
@@ -876,7 +873,7 @@ and parse_of tstr = match tstr with parser
 and head_name  = function
   EApp(t,_) -> head_name t
 | EAbs(_,t,_) -> head_name t
-| EAtom(o,k) -> get_name o
+| EAtom(o,_) -> get_name o
 | FVar s -> s
 | _ -> assert false
 
@@ -906,7 +903,7 @@ and parse_data_suit2 export o lo le tname l cname sy le' co tstr =
       let le' = if le' <> [] && List.length le' = List.length l then le' else
 	List.fold_right (fun e' le' ->
 	  let name = head_name e' in
-	  let name = String.lowercase (String.sub name 0 1) in
+	  let name = String.lowercase_ascii (String.sub name 0 1) in
 	  let name = free_name name (List.map fst (le@le')) in
 	  let k = mk_Var () in
 	  (name,k)::le')
@@ -915,7 +912,7 @@ and parse_data_suit2 export o lo le tname l cname sy le' co tstr =
       let e0 =
 	let rec fn acc = function
 	    [] -> acc
-	  | (n,k)::l -> fn (EApp(acc,FVar n)) l
+	  | (n,_)::l -> fn (EApp(acc,FVar n)) l
 	in
 	let e1 = fn (aobj co) le' in
 	let e0 = fn (aobj o) (liat le) in

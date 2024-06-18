@@ -1,6 +1,6 @@
 
-(* un petit exercice très court ! C'est en fait la preuve que deux
-permutations à support disjoint commutent. *)
+(* un petit exercice trÃ¨s court ! C'est en fait la preuve que deux
+permutations Ã  support disjoint commutent. *)
 
 flag auto_lvl 1.
 
@@ -14,31 +14,31 @@ prop exo1
    injective h & injective g & /\x0 (h x0 = x0 or g x0 = x0)
    [H] prouvons h (g x) = g (h x)  *)
 intros.
-(*  D'après H, on a injective h [H], injective g [H0] et
+(*  D'aprÃ¨s H, on a injective h [H], injective g [H0] et
    /\x0 (h x0 = x0 or g x0 = x0) [H1]   *)
 lefts H.
-(*  D'après H1 avec  x  distinguons 2 cas : supposons h x = x [H2] 
+(*  D'aprÃ¨s H1 avec  x  distinguons 2 cas : supposons h x = x [H2] 
    puis supposons g x = x [H2]   *)
 elim H1 with  x.
-(*  D'après H1 avec g x 
+(*  D'aprÃ¨s H1 avec g x 
    distinguons 2 cas : supposons h (g x) = g x [H3]  puis
    supposons g (g x) = g x [H3]   *)
 elim H1 with g x.
-(*  immédiat  *)
+(*  immÃ©diat  *)
 intros.
-(*  D'après H0 avec  g (g x) = g x  on a g x = x [G]   *)
+(*  D'aprÃ¨s H0 avec  g (g x) = g x  on a g x = x [G]   *)
 apply H0 with H3.
-(*  immédiat  *)
+(*  immÃ©diat  *)
 intros.
-(*  D'après H1 avec h x 
+(*  D'aprÃ¨s H1 avec h x 
    distinguons 2 cas : supposons h (h x) = h x [H3]  puis
    supposons g (h x) = h x [H3]   *)
 elim H1 with h x.
-(*  D'après H avec  h (h x) = h x  on a h x = x [G]   *)
+(*  D'aprÃ¨s H avec  h (h x) = h x  on a h x = x [G]   *)
 apply H with H3.
-(*  immédiat  *)
+(*  immÃ©diat  *)
 intros.
-(*  immédiat  *)
+(*  immÃ©diat  *)
 intros.
 (*->*)
 save.

@@ -52,7 +52,7 @@ new_intro -i -c S S.total.N.
 fact (* Induction on $N *) rec.N 
  /\X (X N0 -> /\y:N (X y -> X (S y)) -> /\x:N X x).
 intro 5.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 H := X N0
 H0 := /\y:N  (X y -> X (S y))
 H1 := N x
@@ -62,7 +62,7 @@ elim -1 [r] N x & X x.
 elim H1.
 intros.
 intro.
-(*ง ...
+(*ยง ...
    |- /\y (N y & X y -> N (S y) & X (S y))
 *)
 trivial.

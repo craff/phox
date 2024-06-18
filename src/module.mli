@@ -3,7 +3,7 @@
 (*			module.mli			*)
 (*######################################################*)
 
-open Types
+open Type
 
 val local_modules : string list ref
 val concat_module_names : string -> string -> string

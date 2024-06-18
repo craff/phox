@@ -3,7 +3,7 @@
 (*		      af2_basic.mlip			*)
 (*######################################################*)
 
-open Types
+open Type
 
 val type_form : expr -> unit
 val init_data_af2 : Base.base -> unit
@@ -71,18 +71,18 @@ val fun_cons_obj : af2_obj
 val fun_fix_obj : af2_obj
 val fun_unit_obj : af2_obj
 val fun_add_obj : af2_obj
-val fun_sub_obj : af2_obj 
-val fun_mul_obj : af2_obj 
-val fun_div_obj : af2_obj 
-val fun_eq_obj : af2_obj 
-val fun_less_obj : af2_obj 
-val fun_lesseq_obj : af2_obj 
-val fun_gt_obj : af2_obj 
-val fun_gteq_obj : af2_obj 
-val fun_if_obj : af2_obj 
-val fun_raise_obj : af2_obj 
-val fun_catch_obj : af2_obj 
-val fun_call_obj : af2_obj 
+val fun_sub_obj : af2_obj
+val fun_mul_obj : af2_obj
+val fun_div_obj : af2_obj
+val fun_eq_obj : af2_obj
+val fun_less_obj : af2_obj
+val fun_lesseq_obj : af2_obj
+val fun_gt_obj : af2_obj
+val fun_gteq_obj : af2_obj
+val fun_if_obj : af2_obj
+val fun_raise_obj : af2_obj
+val fun_catch_obj : af2_obj
+val fun_call_obj : af2_obj
 val fun_new_elim_obj : af2_obj
 val fun_new_intro_obj : af2_obj
 val fun_close_def_obj : af2_obj
@@ -152,7 +152,7 @@ val add_close_def : int list -> af2_obj -> bool -> unit
 val fdo_add_syntax : (int list -> af2_obj -> string -> syntax -> unit) ref
 val add_tex_syntax : int list -> af2_obj -> string -> syntax -> bool -> unit
 exception Dont_Know_Eq
-val decompose_eq : eqpath list list -> 
+val decompose_eq : eqpath list list ->
   expr -> (expr * expr * int * eqpath list * int * kind) list * bool
 val add_rewrite : int -> af2_obj -> bool -> unit
 val delete_special : string -> af2_obj -> unit
@@ -163,4 +163,3 @@ val decom' : expr -> expr option * pos_eq * kind list * expr list
 val decom'' : expr -> expr option * pos_eq * kind list * expr list
 
 val print_proof : string -> unit
-

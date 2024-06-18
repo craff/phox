@@ -1,9 +1,6 @@
 open Basic
-open Data_base.Object
-open Types.Base
-open Types
-open Lexer
-open Parser
+open Type.Base
+open Type
 open Lambda_util
 open Af2_basic
 open Interact
@@ -11,8 +8,6 @@ open Local
 open Print
 open Typing
 open Pattern
-open Flags
-open Format
 
 module AL = struct
 
@@ -30,9 +25,9 @@ module AL = struct
 
   let print_constraints _ = ()
 
-  let rename_constraints x c = c
+  let rename_constraints _ c = c
 
-  let get_renaming_constraints x c = x
+  let get_renaming_constraints x _ = x
 
   let empty_constraints _ = ()
 
@@ -41,7 +36,7 @@ module AL = struct
   let negative_formula f =
     let rec fn b s = function
 	EApp(t,u) -> fn b (u::s) t
-      | EAbs(_,t,_) -> assert false
+      | EAbs _ -> assert false
       | EAtom(o,k) ->
 	  if o == !not_obj then
 	    match s with
@@ -56,15 +51,15 @@ module AL = struct
 	    | _ -> not b
 	  end
       | UVar (p,_) -> (try fn b s (getuvar p) with Not_found -> raise Metavar)
-      | UCst (p,_) -> not b
+      | UCst (_,_) -> not b
       | _ -> not b
 
     in fn true [] f
 
   let negate_formula f =
     match f with
-      EAtom(o,k) when o == !true_obj -> aobj(!false_obj)
-    | EAtom(o,k) when o == !false_obj -> aobj(!true_obj)
+      EAtom(o,_) when o == !true_obj -> aobj(!false_obj)
+    | EAtom(o,_) when o == !false_obj -> aobj(!true_obj)
     | _ -> EApp(aobj !not_obj, f)
 
   type unif_kind = Contraction of constraints | Unification of (constraints * constraints) | Subsume
@@ -90,7 +85,7 @@ module AL = struct
   let elim_all_neg f =
     let rec fn s = function
 	EApp(t,u) -> fn (u::s) t
-      | EAbs(_,t,_) -> assert false
+      | EAbs _ -> assert false
       | EAtom(o,k) as e ->
 	  if o == !not_obj then
 	    match s with
@@ -128,7 +123,7 @@ module AL = struct
   let not_norm_atom o t0 =
     match get_value o with
       Prg e -> not_norm_info := e; true
-    | Fun e -> not_norm_info := t0; true
+    | Fun _ -> not_norm_info := t0; true
     | Def e -> not_norm_info := e; is_capsule o
   | _ -> false
 
@@ -136,7 +131,7 @@ module AL = struct
     let rec g acc stack = function
 	EApp (t,t') ->
 	  g acc (t'::stack) t
-      | EAbs (s,t,k) as t0 ->
+      | EAbs (_,t,_) as t0 ->
 	  if stack <> [] then g acc [] (norm_sexpr t0 stack) else g acc [] t
       | EAtom (o,_) as t0 when not_norm_atom o t0 ->
 	  g acc [] (norm_sexpr !not_norm_info stack)
@@ -183,7 +178,7 @@ module AL = struct
     in
     let gl0 =
       match !cur_proof with
-	A_proof ({ remain = (gl0, _)::_ }) -> gl0
+	A_proof ({ remain = (gl0, _)::_ ; _}) -> gl0
       | _ -> raise Not_found
     in
     let size_f = term_size_rec f in
@@ -231,7 +226,7 @@ module AL = struct
       let h = (hypname, (f,0,Hypo,Dont_know [], (false, []))) in
       let gl = { gl0 with hyp = h::gl0.hyp; concl = aobj !false_obj } in
       let lefts =
-	let hyp, nhyp, bt, status, lefts =
+	let _, _, _, _, lefts =
 	  get_lefts None tri.from_trivial Default hypname gl in
 	List.map fst (fst (List.split lefts))
       in
@@ -287,7 +282,7 @@ module AL = struct
   end
 
   let head_symbol f =
-    let _,h,k = head_kind f in
+    let _,h,_ = head_kind f in
     h
 
   type varset = Set.t
@@ -314,7 +309,7 @@ end
 let rule_resolve methode gl st =
   let module Prv = Prover.Prover(AL) in
   try
-    let hyps = List.map (fun (s,(e,_,_,_,_)) ->
+    let hyps = List.map (fun (_,(e,_,_,_,_)) ->
       e, None, (), 2) gl.hyp
     in
     Ptypes.timemax := 0;

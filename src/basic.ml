@@ -11,7 +11,7 @@ let print_endline str =
 
 module Int_ord = struct
   type t = int
-  let compare = compare
+  let compare = (-)
 end
 module Map = Map.Make(Int_ord)
 module Set = Set.Make(Int_ord)
@@ -23,13 +23,13 @@ module Set = Set.Make(Int_ord)
 
 (* ce fichier n'a pas d'interface ! *)
 
-let rec union l l0 =
+let union l l0 =
   let rec f = function
     [] -> l
   | a::l0 -> if mem a l then f l0 else a::f l0
   in f l0
 
-let rec inter l l0 =
+let inter l l0 =
   let rec f = function
     [] -> []
   | a::l0 -> if mem a l then a::f l0 else f l0
@@ -43,13 +43,13 @@ let subtract l0 l =
 
 (* operation ensembliste "physique" sur les listes *)
 
-let rec unionq l l0 =
+let unionq l l0 =
   let rec f = function
     [] -> l
   | a::l0 -> if memq a l then f l0 else a::f l0
   in f l0
 
-let rec interq l l0 =
+let interq l l0 =
   let rec f = function
     [] -> []
   | a::l0 -> if memq a l then a::f l0 else f l0
@@ -63,7 +63,7 @@ let subtractq l0 l =
 
 (* operation ensembliste sur les listes d'assotiations *)
 
-let rec uniona l l0 =
+let uniona l l0 =
   let rec f = function
     [] -> l
   | (a,_) as c::l0 -> if List.mem_assoc a l then raise (Invalid_argument "uniona")
@@ -97,9 +97,9 @@ let best f l =
 (* nth n [a0;...;ap] = an, raise Invalid_argument "nth" si n > p ou n < 0 *)
 
 let rec nth_try n l = match (n,l) with
-  0, (x::l) -> x
-| n, (x::l) -> nth_try (n - 1) l
-| n, [] -> raise Not_found
+  0, (x::_) -> x
+| n, (_::l) -> nth_try (n - 1) l
+| _, [] -> raise Not_found
 
 (* cons_fst a (l,x) = (a::l),x *)
 
@@ -117,7 +117,7 @@ let select f l =
 
 (* generation de nom de variable a partir d'un entier *)
 
-let rec int_to_alpha b i =
+let int_to_alpha b i =
   let c = if b then 65 else 97 in
   let rec f_aux i =
     if i < 26
@@ -127,19 +127,19 @@ let rec int_to_alpha b i =
 
 (* quelques variations sur la fonction List.assoc *)
 
-let rec cossa a l0 =
+let cossa a l0 =
   let rec f = function
     [] -> raise Not_found
   | (b,c)::l -> if a = c then b else f l
   in f l0
 
-let rec cossaf a l0 =
+let cossaf a l0 =
   let rec f = function
     [] -> raise Not_found
   | (b,(c,_))::l -> if a = c then b else f l
   in f l0
 
-let rec cossas a l0 =
+let cossas a l0 =
   let rec f = function
     [] -> raise Not_found
   | (_,(c,b))::l -> if a = c then b else f l
@@ -161,7 +161,7 @@ let rec last = function
 
 (* cons a l'envers (snoc) *)
 
-let rec snoc a l0 =
+let snoc a l0 =
   let rec f = function
     [] -> [a]
   | b::l -> b::(f l)
@@ -235,9 +235,6 @@ let list_bcount f l =
     | [] -> ()
   in fn 1 l
 
-let stream_map f str =
-  Stream.from (fun _ -> Some (f str))
-
 let cons_option a b = match a with
     None -> b
   | Some x -> x::b
@@ -256,13 +253,3 @@ let flat_select_map gn nl l =
   | _ -> raise Not_found
   in
   fn 1 nl l
-
-let exc_select_revmap f l =
-  let rec fn acc = function
-    | [] -> acc
-    | x::l ->
-	try
-	  fn ((f x)::acc) l
-	with _ ->
-	  fn acc l
-  in fn [] l

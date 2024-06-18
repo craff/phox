@@ -4,7 +4,7 @@
 (*######################################################*)
 
 
-open Types
+open Type
 
 exception Clash
 exception Type_Clash of expr * kind * kind * string list

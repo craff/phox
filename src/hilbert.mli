@@ -1,7 +1,4 @@
-open Basic
-open Data_base
-open Object
-open Types
+open Type
 
 module type Key =
   sig
@@ -11,7 +8,7 @@ module type Key =
   end
 
 module type Hilbert =
-  sig 
+  sig
     type t
     val zero : t
     val (++) : t -> t -> t
@@ -53,13 +50,13 @@ module Merge :
 
 module CartProd :
   functor (Key : Key) ->
-    functor (H : Hilbert) -> Hilbert 
+    functor (H : Hilbert) -> Hilbert
       with type t = (Key.t * H.t) list
 
-type 'a tree = ('a * (float * 'a tree)) list
+type 'a tree = T of ('a * (float * 'a tree)) list [@@unboxed]
 
 module Tree :
-  functor (Key : Key) -> Hilbert 
+  functor (Key : Key) -> Hilbert
     with type t = Key.t tree
 
 type atom =
@@ -74,10 +71,10 @@ module AKey : Key with type t = atom
 module FKey : Key with type t = atom * int * int
 module GKey : Key with type t = atom * int
 
-module TermHilbert1 : Embed_Hilbert 
+module TermHilbert1 : Embed_Hilbert
   with type t = CartProd(AKey)(Tree(FKey)).t
 
-module TermHilbert2 : Embed_Hilbert 
+module TermHilbert2 : Embed_Hilbert
   with type t = Tree(GKey).t
 
 val distance : local_defs -> expr Basic.Map.t -> expr -> expr -> float

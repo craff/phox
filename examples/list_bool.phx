@@ -1,13 +1,13 @@
 (*header 99/03/18
 	title = "Lists and booleans"
 	author = "Christophe Raffalli"
-	institute = "Chambéry University"
+	institute = "ChambÃ©ry University"
 *)
 
 tex
 	title = "Lists and booleans"
 	author = "Christophe Raffalli"
-	institute = "Chambéry University"
+	institute = "ChambÃ©ry University"
 	 documents = math doc
 .
 

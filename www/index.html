@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Phox En Ligne</title>
+    <meta charset="UTF-8">
+    <script src="editor.js"></script>
+    <script src="files.js"></script>
+    <script src="phox.js"></script>
+    <style>
+      #input { width: 85ch; height: 80vh; border:1px solid blue;}
+      #output { width: 82ch; height: 25vh; border:1px solid black;}
+      #goals { width: 82ch; height: 50vh; border:1px solid black;}
+      .editor {
+	  outline: none;
+	  overflow-y: auto;
+	  overflow-x: auto;
+	  padding-left: 48px;
+	  padding-top: 5px;
+	  counter-reset: line;
+	  border:2px solid blue;
+      }
+      .editor div {
+	  display: block;
+	  position: relative;
+	  white-space: pre-wrap;
+	  min-height: 2.5ex;
+      }
+      .editor div::before {
+	  content: counter(line);
+	  counter-increment: line;
+	  position: absolute;
+	  right: calc(100% + 16px);
+	  opacity: 0.5;
+      }
+      .container {
+	  display: flex;
+	  flex-direction: row;
+	  flex-wrap: wrap;
+      }
+      .flex {
+	  font-family: monospace;
+	  font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <button onclick="sendNextCommand();">Next</button>
+      <button onclick="undo();">Undo</button>
+      <button onclick="goTo();">GoTo</button>
+      <button onclick="restart();">Restart</button>
+    </div>
+    <div class="container">
+      <div class="flex">
+	<div class="editor" id="input" contenteditable="true" spellcheck="false">
+	  <div>goal /\X (X -> X).</div>
+	  <div>intro.</div>
+	  <div>intro. axiom H.</div>
+	  <div>save th.</div>
+	</div>
+      </div>
+      <div class="flex">
+	<textarea class="out" disabled style="display:none" id="goals"></textarea>
+	<textarea class="out" disabled id="output"></textarea>
+      </div>
+    </div>
+  </body>
+</html>

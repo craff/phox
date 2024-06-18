@@ -3,26 +3,26 @@ Import requis.
 
 (* Le but de ce tutorial est de faire un peu d'analyse ! *)
 
-Sort real. (* la sorte des réels *)
+Sort real. (* la sorte des rÃ©els *)
 
 Cst d : real -> real -> real. (* la fonction distance *)
 
-Cst R0 : real. (* Le réel zero *)
+Cst R0 : real. (* Le rÃ©el zero *)
 
-(* les realtions d'ordre sur les réels *)
+(* les realtions d'ordre sur les rÃ©els *)
 Cst Infix[5] x "<=" y : real -> real -> prop.
 def Infix[5] x ">" y = ~(x <= y). 
 def Infix[5] x ">=" y = y <= x. 
 def Infix[5] x "<" y = y > x. 
 
-(* quelques définition: *)
+(* quelques dÃ©finition: *)
 
 (* image f A est l'image directe de A par f, image f A y veut dire
-   que y appartient à image f A *)
+   que y appartient Ã  image f A *)
 def image f A = { y | \/ x (x in A & (f x) = y) }.
 
 (* inverse f A est l'image inverse de A par f, inverse f A x veut dire
-   que x appartient à inverse f A *)
+   que x appartient Ã  inverse f A *)
 def inverse f A = { x | f x in A }.
 
 (* U et V sont d'intersection vide *)
@@ -34,11 +34,11 @@ def Infix[5] A "subset" B = /\ x (x in A  -> x in B).
 (* O est un ouvert *)
 def ouvert O = /\ x (x in O -> \/a > R0 /\y (d x y < a -> y in O)).
 
-(* première définition de continue *)
+(* premiÃ¨re dÃ©finition de continue *)
 def continue1 f = /\ x  /\e > R0 \/a > R0
   /\ y (d x y < a -> d (f x) (f y) < e).
 
-(* seconde définition de continue *)
+(* seconde dÃ©finition de continue *)
 def continue2 f = /\ U ((ouvert U) -> (ouvert (inverse f U))).
 
 goal /\f (continue1 f -> continue2 f).
@@ -50,19 +50,19 @@ intros.
 (*  soit x supposons x in inverse f U [H1]
    prouvons \/a > R0  /\y (d x y < a -> y in inverse f U)  *)
 intros.
-(*  Ouvre la définition : inverse  *)
+(*  Ouvre la dÃ©finition : inverse  *)
 unfold_hyp H1 $inverse. .
-(*  D'après H0 avec x in inverse f U  soit a tel que
+(*  D'aprÃ¨s H0 avec x in inverse f U  soit a tel que
    a > R0 & /\y (d (f x) y < a -> y in U) [H2] 
      *)
 elim H0 with H1.
-(*  D'après H2, on a a > R0 [H2] et /\y (d (f x) y < a -> y in U) [H3]   *)
+(*  D'aprÃ¨s H2, on a a > R0 [H2] et /\y (d (f x) y < a -> y in U) [H3]   *)
 lefts H2.
-(*  D'après H avec a > R0 et  x  soit a0 tel que
+(*  D'aprÃ¨s H avec a > R0 et  x  soit a0 tel que
    a0 > R0 & /\y (d x y < a0 -> d (f x) (f y) < a) [H4] 
      *)
 elim H with H2 and  x.
-(*  D'après H4, on a a0 > R0 [H4] et /\y (d x y < a0 -> d (f x) (f y) < a)
+(*  D'aprÃ¨s H4, on a a0 > R0 [H4] et /\y (d x y < a0 -> d (f x) (f y) < a)
    [H5]   *)
 lefts H4.
 (*  prouvons a0 > R0 & /\y (d x y < a0 -> y in inverse f U)  *)
@@ -71,7 +71,7 @@ intro [n with  a0].
 intros.
 (*  soit y supposons d x y < a0 [H6] prouvons y in inverse f U  *)
 intros.
-(*  Ouvre la définition : {  *)
+(*  Ouvre la dÃ©finition : {  *)
 unfold_hyp H1 ${. .
 (*  soit x supposons inverse f U x [H1]
    prouvons \/a > R0  /\y (d x y < a -> inverse f U y)  *)
@@ -184,15 +184,15 @@ claim ordre_transitif /\x,y,z (x <= y -> y <= z -> x <= z).
 claim ordre_antisymetrique /\x,y (x <= y -> y <= x -> x = y).
 claim ordre_dense /\x,y (x < y -> \/z (x < z & z < y)).
 
-(* définition de majorant et borne supérieur *)
+(* dÃ©finition de majorant et borne supÃ©rieur *)
 
 def maj m X = /\y (X y -> y <= m).
 def sup m X = maj m X & /\y (maj y X -> m <= y).
 claim axiome_borne_sup /\X (\/x X x -> \/m maj m X  -> \/m sup m X).
 
 (* lemme sur l'ordre, avec des new_elim pour faciliter 
-   le raisonnement sur les inéquations.
-   Ce n'est pas parfait. Notemment, la transitivité stricte 
+   le raisonnement sur les inÃ©quations.
+   Ce n'est pas parfait. Notemment, la transitivitÃ© stricte 
    (x < y -> y < z -> x < z) ne marche pas avec trivial.
 *)
 
@@ -275,7 +275,7 @@ trivial.
 (*->*)
 save.
 
-(* dernier axiome sur la distance et l'ordre et leurs conséquences : *)
+(* dernier axiome sur la distance et l'ordre et leurs consÃ©quences : *)
 
 claim d_increasing_left /\x,y,z (x > y -> y > z -> d x z > d x y).
 claim d_increasing_right /\x,y,z (x > y -> y > z -> d x z > d y z).
@@ -658,7 +658,7 @@ apply H5 with H0.
 trivial =H2 G1.
 save.
 
-(* On va maintenant prouver le théorèmes des valeurs intermédiares *)
+(* On va maintenant prouver le thÃ©orÃ¨mes des valeurs intermÃ©diares *)
 
 theo valeur_intermediare /\f,a,b,c (
   a < b ->

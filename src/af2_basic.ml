@@ -13,23 +13,24 @@
 open Format
 open Basic
 open Data_base.Object
-open Types.Base
-open Types
-open Parser
+open Type.Base
+open Type
+open Parse_base
 open Lambda_util
 open Typunif
 open Typing
 open Safe_add
 open Print
 open Local
-open Files
 open Option
 open Data
 
+(*
 let rec lArrow = function
   [x] -> x
 | t::l -> KArrow(t, lArrow l)
 | _ -> failwith "bug in lArrow"
+ *)
 
 let init_data_af2 b =
   the_base := b;
@@ -195,7 +196,7 @@ let init_data_af2 b =
     in
     let l0 = fn n l in !rl, l0
   in
-  let eval_bin_int f h cont ret stack _ =
+  let eval_bin_int f _ cont ret stack _ =
     match cont_stack 2 cont stack with
       [], [a1; a2] ->
 	ret [] (EData (EInt (f (decode_int a1) (decode_int a2))))
@@ -461,7 +462,7 @@ let _ = the_base :=
       init_data_af2 b;
       b
     end else
-      load_base [""] (Filename.concat dirname base_name)
+      fst (load_base [""] (Filename.concat dirname base_name))
 
 
 let tsym_get s =
@@ -695,21 +696,13 @@ let fNONE = lnot 0x00
 let fALLE = lnot 0x01
 let fTOT =  lnot 0x02   (* -t option *)
 let fNEC  = lnot 0x04  (* -n option *)
-let fCST  = lnot 0x40
-let fVAR  = lnot 0x80
-let fMUL  = lnot 0x100
 let fINV  = lnot 0x1000       (* invertible rule *)
-let fNEQ  = lnot 0x2000       (* no equation *)
 let fREM  = lnot 0x4000       (* remove hyp in trivial for invertible *)
 
 let isALLE x = x land 0x01 = 0
 let isTOT x = x land 0x02 = 0
 let isNEC x = x land 0x04 = 0
-let isCST x = x land 0x40 = 0
-let isVAR x = x land 0x80 = 0
-let isMUL x = x land 0x100 = 0
 let isINV x = x land 0x1000 = 0
-let isNEQ x = x land 0x2000 = 0
 let isREM x = x land 0x4000 = 0
 
 let add_intro constructor total nec inv s e order exported =
@@ -725,7 +718,7 @@ let add_intro constructor total nec inv s e order exported =
 	      when o' == arrow_obj ->
             fn de (d+1) e
       | e ->
-          let k,o' = head e in
+          let k, _ = head e in
           (match k with
             Oneq o -> head_pred := Some o
           | _ -> ());
@@ -849,7 +842,7 @@ let add_elim o abbrev n e opti order exported =
           | EVar (-1) -> -4
           | e when fst(head e) = Uneq cn ->
               d
-          | e -> -1
+          | _ -> -1
           in
           let l = List.map (gn 0) las in
           let ctd = !ctd && List.for_all (fun x -> x < 0) l in
@@ -894,7 +887,7 @@ let decompose_eq ad e =
   (* REMARQUE: e est-il normal ?  on le suppose *)
   let find_var = ref false in
   let rec fn nc acc cl = function
-    EApp(EAtom(o1,k1),EAbs(s,a1,k)) when o1 == forall_obj ->
+    EApp(EAtom(o1,_),EAbs(s,a1,k)) when o1 == forall_obj ->
       let l = fn nc [] cl (get_inst a1) in
       let l = List.map (function e1,e2,nl,cl,nc,keq ->
         (EAbs(s,e1,k)),(EAbs(s,e2,k)),(nl+1),cl,nc,keq) l in
@@ -906,9 +899,9 @@ let decompose_eq ad e =
         then (find_var:=true; acc)
       else
       (a1,a2,0,cl,nc,List.hd k1)::acc
-  | EApp(EApp(EAtom(o1,k1),a1),a2) when o1 == arrow_obj ->
+  | EApp(EApp(EAtom(o1,_),_),a2) when o1 == arrow_obj ->
       fn (nc+1) acc cl a2
-  | EApp(EApp(EAtom(o1,k1),a1),a2) when o1 == !and_obj ->
+  | EApp(EApp(EAtom(o1,_),a1),a2) when o1 == !and_obj ->
       fn nc (fn nc acc (Left_and::cl) a1) (Right_and::cl) a2
   | UVar (n,_) -> (try fn nc acc cl (getuvar n)
                   with Not_found -> find_var:= true; acc)
@@ -918,7 +911,7 @@ let decompose_eq ad e =
 	match f with
 	  None -> raise Not_found
 	| Some f ->
-            let akind, fe = build_subterm o k u in
+            let _, fe = build_subterm o k u in
             let ne = norm_expr (EApp(fe,f)) in
 	    fn nc acc (Open_def::cl) ne
       with Not_found -> acc
@@ -989,7 +982,7 @@ let print_proof s =
     try
       let v = get_value (sym_get s) in
       match v with
-        Def (EApp(EApp(EAtom(o,_),e),prf)) when o == theorem_obj ->
+        Def (EApp(EApp(EAtom(o,_),_),prf)) when o == theorem_obj ->
           let pr sy =
             open_hovbox 0;
             print_string s;

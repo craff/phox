@@ -1,0 +1,9 @@
+
+(include_subdirs unqualified)
+
+(executable
+  (name pretty)
+;  (public_name phox)
+  (modules :standard)
+  (preprocess (action (run camlp5o %{input-file})))
+  (libraries camlp5))

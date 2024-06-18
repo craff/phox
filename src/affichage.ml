@@ -7,8 +7,7 @@ open Splitting
 module Affichage(Logic:Logic) = struct
   open Logic
   module Ty = Types(Logic)
-  open Ty
-  
+
   let print_clause c =
 
     let rec afflist l b =
@@ -170,9 +169,9 @@ module Affichage(Logic:Logic) = struct
            Format.close_box ();
            Format.print_newline ();
 	   tree_printer (string^" ") (string_size+1) t1)
-	  
+
     in
-			      
+
     tree_printer " " 1 tree ; Format.print_newline ()
 
 end

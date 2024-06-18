@@ -5,8 +5,8 @@
 
 open Basic
 open Lang
-open Types
-open Parser
+open Type
+open Parse_base
 open Lambda_util
 open Interact
 open Af2_basic
@@ -14,7 +14,6 @@ open Local
 open Format
 open Pattern
 open Flags
-open Undo
 open Print
 open Rewrite
 open Typing
@@ -30,13 +29,12 @@ let is_definition n s =
       match e with
 	EAtom(o,_) ->
 	  (match get_value o with
-	    Def e ->
+	    Def _ ->
 	      if not (!fis_close o) then print_string "true" else print_string "false";
 	      print_newline ()
 	  | _ -> raise Exit)
       | _ -> raise Exit
-    with
-      e ->
+    with Exit | Not_found -> (* FIXME, was a catch all *)
 	print_string "false";
 	print_newline ()
   end;
@@ -56,7 +54,7 @@ let is_equation n s =
 	  | _ -> e)
       | e -> e
       in
-      let fn (e1,e2,nl,cl,nc,keq) =
+      let fn (e1,e2,_,_,_,_) =
 	let o1,_ = head e1 and o2,_ = head e2 in
 	(o1 != Alleq) || (o2 != Alleq)
       in
@@ -65,7 +63,7 @@ let is_equation n s =
       print_string "true";
       print_newline ();
     with
-      e ->
+      Exit | Not_found -> (* FIXME *)
 	print_string "false";
 	print_newline ()
   end;
@@ -75,14 +73,14 @@ let is_equation n s =
 let is_hypothesis n s =
   try
     match !cur_proof with
-      A_proof ({goal = f0;remain = remain; leaf = leaf}) ->
-	let (gl, st) = List.nth remain (n-1) in
+      A_proof ({remain = remain; _}) ->
+	let (gl, _) = List.nth remain (n-1) in
 	ignore (List.assoc s gl.hyp);
 	print_string "true";
 	print_newline ();
     | _ -> raise Exit
   with
-    e ->
+    Exit | Not_found | Failure _ -> (* FIXME *)
       print_string "false";
       print_newline ()
 
@@ -140,7 +138,7 @@ let menu_cmd eqstrong prefix make_cmd do_rule n =
     set_local n;
     set_margin 75;
     match !cur_proof with
-      A_proof ({goal = f0;remain = remain; leaf = leaf}) ->
+      A_proof ({remain = remain; _}) ->
 	let (goal, st) = List.nth remain n in
 	let l = make_cmd goal_prefix goal st in
 	let tri = {nlim = !pgtrdepth; eqlvl = !eqdepth;
@@ -226,8 +224,8 @@ let menu_cmd eqstrong prefix make_cmd do_rule n =
 			  fn (c::fh1) l (List.map (fun (gl,n,c,v,h,cl) ->
 			    match h with
 			      [] -> raise Exit
-			    | (sy,y)::l' when equal_expr x y -> (gl,n,c,v,l',cl)
-			    | (sy,y)::l' -> raise Exit) other)
+			    | (_,y)::l' when equal_expr x y -> (gl,n,c,v,l',cl)
+			    | _::_ -> raise Exit) other)
 		    with
 		      Exit -> fh1, h1, other
 		in
@@ -343,7 +341,7 @@ let menu_cmd eqstrong prefix make_cmd do_rule n =
 	    cur_local := save_local;
 	    incr total
 	  with
-	    e ->
+	    Exit | Not_found | Failure _ ->
 	      cur_local := save_local;
 	      restore_to mark;
 	  end;
@@ -367,7 +365,7 @@ let menu_evaluate n =
   let mark = store_mark "" in
   let save_local = !cur_local in
   try match !cur_proof with
-    A_proof ({goal = f0;remain = remain; leaf = leaf}) ->
+    A_proof ({remain = remain; _}) ->
       set_local (n - 1);
       let (gl, st) = List.nth remain (n-1) in
       let tri = {nlim = 1; eqlvl = !eqdepth;
@@ -375,7 +373,7 @@ let menu_evaluate n =
 		 auto_elim = true; eqflvl = !eqflvl}
       in
       let goal_prefix = if n = 1 then "" else "["^string_of_int n^"] " in
-      let (gl1,st1) =
+      let (gl1,_) =
         match rule_rewrite tri [true, false, sym_get "eval"] Ad_lib false false gl st with
         | [gl1,st1],_ -> (gl1,st1)
         | _ -> assert false
@@ -405,7 +403,7 @@ let menu_evaluate_hyp n hypname =
   let mark = store_mark "" in
   let save_local = !cur_local in
   try match !cur_proof with
-    A_proof ({goal = f0;remain = remain; leaf = leaf}) ->
+    A_proof ({remain = remain; _}) ->
       set_local (n - 1);
       let (gl, st) = List.nth remain (n-1) in
       let (e,_,_,_,_) = List.assoc hypname gl.hyp in
@@ -414,7 +412,7 @@ let menu_evaluate_hyp n hypname =
 		 auto_elim = true; eqflvl = !eqflvl}
       in
       let goal_prefix = if n = 1 then "" else "["^string_of_int n^"] " in
-      let (gl1,st1) =
+      let (gl1,_) =
         match  rule_rewrite_hyp tri [true, false, sym_get "eval"]
                                 hypname Ad_lib false false gl st with
         | [gl1,st1],_ -> (gl1,st1)
@@ -441,7 +439,7 @@ let menu_evaluate_hyp n hypname =
     restore_to mark;
     0
 
-let make_cmd_intro ahyps goal_prefix gl st =
+let make_cmd_intro ahyps goal_prefix gl _ =
   let hyps, opts = hyps_to_opt gl ahyps in
   let b, l = get_intros false
       gl.eqns gl.local true gl.concl in
@@ -463,7 +461,7 @@ let menu_intro n hyps =
   reset_first ();
   menu_cmd true "" (make_cmd_intro hyps) (rule_intro (ref false)) n
 
-let make_cmd_left hypname goal_prefix gl st =
+let make_cmd_left hypname goal_prefix gl _ =
   try
     let _,_,_,_,l = get_lefts None false Default hypname gl in
     (goal_prefix^"lefts"^tri_opt ()^" "^hypname, Default) ::
@@ -477,23 +475,23 @@ let menu_left hypname n =
   menu_cmd true ((get_message `From)^" "^hypname^",") (make_cmd_left hypname)
     (fun tri opt -> rule_left tri hypname opt None) n
 
-let make_cmd_elim hypname goal_prefix gl st =
+let make_cmd_elim hypname goal_prefix _ _ =
   [(goal_prefix^"elim"^tri_opt ()^" "^hypname, [])]
 
-let make_cmd_elim_case hypname goal_prefix gl st =
+let make_cmd_elim_case hypname goal_prefix _ _ =
   [(goal_prefix^"elim"^tri_opt ()^" -1 [case] "^hypname, [1, OptDf("case",[])] )]
 
-let make_cmd_elim_rec hypname goal_prefix gl st =
+let make_cmd_elim_rec hypname goal_prefix _ _ =
   [(goal_prefix^"elim"^tri_opt ()^" -1 [rec] "^hypname, [1, OptDf("rec",[])] )]
 
-let make_cmd_axiom hypname goal_prefix gl st =
+let make_cmd_axiom hypname goal_prefix _ _ =
   [goal_prefix^"from"^tri_opt ()^" "^hypname, ()]
 
-let make_cmd_demorgan hypname goal_prefix gl st =
+let make_cmd_demorgan hypname goal_prefix _ _ =
   [goal_prefix^"rewrite_hyp "^hypname^" "^tri_opt ()^" demorganl", Ad_lib;
    goal_prefix^"rewrite_hyp "^hypname^" "^tri_opt ()^" -l 1 demorganl", Lim 1]
 
-let make_cmd_rewrite hyps goal_prefix gl st =
+let make_cmd_rewrite hyps goal_prefix _ _ =
   [goal_prefix^"rewrite"^tri_opt ()^" -ortho "^List.fold_right
        (fun x a -> x^(if a = "" then "" else " ")^a) hyps "", (Ortho [], true);
    goal_prefix^"rewrite"^tri_opt ()^" -l 1 "^List.fold_right
@@ -503,7 +501,7 @@ let make_cmd_rewrite hyps goal_prefix gl st =
    goal_prefix^"rewrite"^tri_opt ()^" -l 1 "^List.fold_right
        (fun x a -> "-r "^x^(if a = "" then "" else " ")^a) hyps "", (Lim 1, false)]
 
-let make_cmd_rewrite_hyp hypname hyps goal_prefix gl st =
+let make_cmd_rewrite_hyp hypname hyps goal_prefix _ _ =
   [goal_prefix^"rewrite_hyp "^hypname^" "^tri_opt ()^" -ortho "^List.fold_right
        (fun x a -> x^(if a = "" then "" else " ")^a) hyps "", (Ortho [], true);
    goal_prefix^"rewrite_hyp "^hypname^" "^tri_opt ()^" -l 1 "^List.fold_right
@@ -521,8 +519,8 @@ let menu_elim hypname n =
   let did_rec =
     try
       match !cur_proof with
-	A_proof ({goal = f0;remain = remain; leaf = leaf}) ->
-	  let (gl, st) = List.nth remain (n-1) in
+	A_proof ({remain = remain; _}) ->
+	  let (gl, _) = List.nth remain (n-1) in
 	  let (ehyp,_,_,_,_) = List.assoc hypname gl.hyp in
 	  let hypstring = print_to_string print_expr ehyp in
 	  let prefix = (get_message `Induction)^" "^hypstring^"," in
@@ -531,7 +529,7 @@ let menu_elim hypname n =
 	    (fun tri opt ->
 	      rule_elim false tri false false true opt 1 hypexpr) n
       | _ -> raise Not_found
-    with e -> 0
+    with Not_found | Exit | Failure _ -> 0
   in
   did_rec +
   (if did_rec > 0 then 0 else menu_cmd true prefix
@@ -544,7 +542,7 @@ let menu_elim hypname n =
       rule_elim false tri false false true opt 1 hypexpr) n +
   menu_cmd true prefix
     (make_cmd_axiom hypname)
-    (fun tri opt -> rule_elim false tri false false true [] 0 hypexpr) n +
+    (fun tri _ -> rule_elim false tri false false true [] 0 hypexpr) n +
   menu_cmd true prefix
       (make_cmd_demorgan hypname)
       (fun tri opt -> rule_rewrite_hyp tri [true, false, sym_get "demorganl"] hypname opt false true) n +
@@ -553,11 +551,11 @@ let menu_elim hypname n =
       (fun tri opt -> rule_rewrite tri [snd opt, false, sym_get hypname] (fst opt) false true) n
 
 
-let make_cmd_apply hypname hyps goal_prefix gl st =
+let make_cmd_apply hypname hyps goal_prefix _ _ =
   [goal_prefix^"apply"^tri_opt ()^" "^hypname^" with "^List.fold_right
        (fun x a -> x^(if a = "" then "" else (" and "^a))) hyps "", ()]
 
-let make_cmd_elim_with hypname hyps goal_prefix gl st =
+let make_cmd_elim_with hypname hyps goal_prefix _ _ =
   [goal_prefix^"elim"^tri_opt ()^" "^hypname^" with "^List.fold_right
        (fun x a -> x^(if a = "" then "" else (" and "^a))) hyps "", ()]
 
@@ -571,19 +569,19 @@ let menu_apply hypname hyps n =
     in
     let hyps, opts =
       match !cur_proof with
-	A_proof ({goal = f0;remain = remain; leaf = leaf}) ->
-	  let (gl, st) = List.nth remain (n-1) in
+	A_proof ({remain = remain; _}) ->
+	  let (gl, _) = List.nth remain (n-1) in
 	  hyps_to_opt gl hyps
       | _ -> raise Exit
     in
     menu_cmd true prefix
       (make_cmd_apply hypname hyps)
-      (fun tri opt gl st ->
+      (fun tri _ gl st ->
 	let e = expr_of_string hypname in
 	rule_apply tri "" [0, OptWith opts] 1 e gl st) n +
       menu_cmd true prefix
       (make_cmd_elim_with hypname hyps)
-      (fun tri opt gl st ->
+      (fun tri _ gl st ->
 	let e = expr_of_string hypname in
 	rule_elim  false tri false false false [0, OptWith opts] 1 e gl st) n
   with Exit -> 0
@@ -593,8 +591,8 @@ let menu_rewrite hyps n =
     reset_first ();
     let hyps, _ =
       match !cur_proof with
-	A_proof ({goal = f0;remain = remain; leaf = leaf}) ->
-	  let (gl, st) = List.nth remain (n-1) in
+	A_proof ({remain = remain; _}) ->
+	  let (gl, _) = List.nth remain (n-1) in
 	  hyps_to_opt gl hyps
       | _ -> raise Exit
     in
@@ -612,8 +610,8 @@ let menu_rewrite_hyp hypname hyps n =
     reset_first ();
     let hyps, _ =
       match !cur_proof with
-	A_proof ({goal = f0;remain = remain; leaf = leaf}) ->
-	  let (gl, st) = List.nth remain (n-1) in
+	A_proof ({remain = remain; _}) ->
+	  let (gl, _) = List.nth remain (n-1) in
 	  hyps_to_opt gl hyps
       | _ -> raise Exit
     in

@@ -1,7 +1,7 @@
 (*header 99/03/18
 	title = "Lists and integers"
  	author = "Christophe Raffalli, Paul Roziere"
-	institute = "Equipe de Logique, Université Chambéry, Paris VII"
+	institute = "Equipe de Logique, UniversitÃ© ChambÃ©ry, Paris VII"
 *)
 
 Use nat_ax.
@@ -32,7 +32,7 @@ new_equation length.cons.List.
 
 close_def length.
 
-fact (* totality of $length *) length.total.List 
+fact (* totality of $length *) length.total.List
 				/\l:(List \x True) N (length l).
 trivial.
 save.
@@ -87,16 +87,16 @@ given list (the first element is at position 0).
 Cst (* l truncated before n-th element  *) nthl : list['a] -> nat -> list['a].
 Cst  (* (n-1)-th element of l *) nth : list['a] -> nat -> 'a.
 
-(*axiom characteristic properties of nthl and nth *) 
+(*axiom characteristic properties of nthl and nth *)
 claim nthl.N0.List /\D/\l:(List D) /\n:N (nthl l N0)= l.
 
-claim nthl.S.List 
+claim nthl.S.List
 /\D/\l:(List D)/\a:D /\n:N (nthl (a::l) (S n))=nthl l n.
 
 
 claim nth.N0.List /\D/\l:(List D)/\a:D /\n:N (nth (a::l) N0)= a.
 
-claim nth.S.List 
+claim nth.S.List
 /\D/\l:(List D)/\a:D /\n:N (nth (a::l) (S n))=nth l n.
 
 new_equation nthl.N0.List.
@@ -106,7 +106,7 @@ new_equation nth.S.List.
 (*endaxiom *)
 
 (* doit etre faux sans autre condition
-fact nthl.tail.List  
+fact nthl.tail.List
 /\D/\l:(List D)/\a:D /\n:N tail (nthl (a::l) n) =(nthl l n).
 intros.
 elim H1.
@@ -181,11 +181,11 @@ save.
 
 new_intro -t -i nth nth.total.List.
 
-fact lenght_induction.List 
+fact lenght_induction.List
   /\A,X (/\l:(List A) (/\l':(List A) (length l' < length l -> X l') -> X l) ->
      /\l:(List A) X l).
 intros.
-elim well_founded.N with N (length l) and \n (/\l:(List A) (length l = n -> X l)) ;; Try trivial 2. 
+elim well_founded.N with N (length l) and \n (/\l:(List A) (length l = n -> X l)) ;; Try trivial 2.
 intros.
 rmh H0.
 elim H3 with [case].
@@ -199,4 +199,3 @@ elim H2 with H8.
 trivial.
 intro.
 save.
-

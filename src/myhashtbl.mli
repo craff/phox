@@ -53,7 +53,7 @@ module type Hashtbl = sig
            restoring the previous binding if it List.exists.
            It does nothing if [x] is not bound in [tbl]. *)
 
-  val do_table : (key -> 'a -> 'c) -> 'a t -> unit
+  val do_table : (key -> 'a -> unit) -> 'a t -> unit
         (* [Hashtbl.iter f tbl] applies [f] to all bindings in table [tbl],
 	   discarding all the results.
            [f] receives the key as first argument, and the associated val
@@ -61,13 +61,13 @@ module type Hashtbl = sig
            [f] is unpredictable. Each binding is presented one time to [f]. *)
 
   val it_table : ('c -> key -> 'a -> 'c) -> 'c -> 'a t -> 'c
-        (* [Hashtbl.iter f a tbl] is similar to fold_left2 f a l1 l2 where 
+        (* [Hashtbl.iter f a tbl] is similar to fold_left2 f a l1 l2 where
            l1 is the list of all key in tbl and l2 the list of all data.
            The order in which bindings are passed to [f] is unpredictable. *)
 
   val add_find : 'a t -> key -> 'a -> ('a -> 'c) -> ('a bucket -> 'c) -> 'c
-        (* [add_find tbl x y f g] if the key [x] is bound to [z] in [tbl] 
-            then [f z] is called otherwise a new binding from [x] to [y] is 
+        (* [add_find tbl x y f g] if the key [x] is bound to [z] in [tbl]
+            then [f z] is called otherwise a new binding from [x] to [y] is
             added to [tbl] hand [g] is called on the newly created bucket. *)
 
   val bucket_info : 'a bucket -> 'a
@@ -75,10 +75,8 @@ module type Hashtbl = sig
 
 end
 
-module Hashtbl (Key_type : Key_type) : Hashtbl 
+module Hashtbl (Key_type : Key_type) : Hashtbl
   with type key = Key_type.key
 
-module Poly_Hashtbl (Type : sig type key end) : Hashtbl 
+module Poly_Hashtbl (Type : sig type key end) : Hashtbl
   with type key = Type.key
-
-

@@ -1,44 +1,44 @@
 
-Ce répertoire contient des exemples pour vous permettre 
+Ce rÃ©pertoire contient des exemples pour vous permettre 
 d'apprendre le logiciel.
 
-Chaque exemple comprends un fichier "à trou" nommer xxx_quest.phx, a
-qui contient des indications pour compléter les trous et un corrigé 
+Chaque exemple comprends un fichier "Ã  trou" nommer xxx_quest.phx, a
+qui contient des indications pour complÃ©ter les trous et un corrigÃ© 
 xxx_cor.phx.
 
-Ces exemples couvrent des points précis que voici:
+Ces exemples couvrent des points prÃ©cis que voici:
 
 
 - tautologie_quest.phx
 
   Le but de cet exemple est double: 
   - on introduit progressivement les commandes les plus simples du
-    système PhoX sur des exemples simples de logique propositionnelle ou
-    du calcul des prédicats. 
+    systÃ¨me PhoX sur des exemples simples de logique propositionnelle ou
+    du calcul des prÃ©dicats. 
   - Ces exemples peuvent aussi servir d'illustration pour pour une introduction
-    à la logique auprès des étudiants. 
+    Ã  la logique auprÃ¨s des Ã©tudiants. 
 
 - intro_quest.phx
 
-  Le but de ce fichier est également d'introduire aux principales
-  commandes de preuve de PhoX à travers des résultats très élémentaires
-  sur les ordres (équivalence entre les axiomatisation d'ordre strict et
+  Le but de ce fichier est Ã©galement d'introduire aux principales
+  commandes de preuve de PhoX Ã  travers des rÃ©sultats trÃ¨s Ã©lÃ©mentaires
+  sur les ordres (Ã©quivalence entre les axiomatisation d'ordre strict et
   d'ordre large). Les commandes de preuve concernant les connecteurs
-  usuels, le quantificateur universel et l'égalité sont abordées (mais pas
+  usuels, le quantificateur universel et l'Ã©galitÃ© sont abordÃ©es (mais pas
   le raisonnement par l'absurde).
 
 - intro2_quest.phx
 
-  La suite du précédent : les commandes de preuves concernant
-  le quantificateur existentiel sont abordées, ainsi qu'un exemple
-  d'utilisation de l'opérateur de description définie (qui ne couvre
+  La suite du prÃ©cÃ©dent : les commandes de preuves concernant
+  le quantificateur existentiel sont abordÃ©es, ainsi qu'un exemple
+  d'utilisation de l'opÃ©rateur de description dÃ©finie (qui ne couvre
   qu'une partie de son usage).
 
 - sort_quest.phx
   
-  Couvre une utilisation assez avancé du logiciel avec les 
+  Couvre une utilisation assez avancÃ© du logiciel avec les 
   commanded new_intro, new_elim et new_rewrite qui permettent 
-  d'étendre et de controler les tactiques de preuves (intro, elim, left
+  d'Ã©tendre et de controler les tactiques de preuves (intro, elim, left
   trivial, ...)
 
 - Exo de math (fichiers ideal_quest.phx,
@@ -46,10 +46,10 @@ Ces exemples couvrent des points précis que voici:
                analyse_quest.phx et group_quest.phx)
 
   Des exercices pour apprendre les math en utilisant PhoX (on apprend
-  PhoX en même temps, mais le but réel est d'apprendre des maths !)
+  PhoX en mÃªme temps, mais le but rÃ©el est d'apprendre des maths !)
   
 - Logique Minimale (fichier minlog_quest.phx )
 
-  But similaire au précédent, mais le sujet s'adresse plus à un logicien
+  But similaire au prÃ©cÃ©dent, mais le sujet s'adresse plus Ã  un logicien
   de bon niveau. 
 

@@ -4,8 +4,7 @@
 (*######################################################*)
 
 open Basic
-open Data_base
-open Types
+open Type
 
 exception Free_match
 exception Wrong_path
@@ -32,7 +31,7 @@ val term_size : expr -> int
 val term_size_rec : expr -> int
 val fis_close : (af2_obj -> bool) ref
 
-(* get the kind and the val of an object in the context. 
+(* get the kind and the val of an object in the context.
    ALWAYS use the last form if you need both. *)
 val get_kind : af2_obj -> kind
 val get_safe_kind : af2_obj -> kind
@@ -75,10 +74,10 @@ val hashi_expr : int -> expr -> int
 
 (* Test equality of two pairs of [expr] up to renaming of unbound unification
    variables *)
-val uni_expr : expr Map.t * expr * expr -> 
+val uni_expr : expr Map.t * expr * expr ->
                  expr Map.t * expr * expr -> bool
 
-val eqi_expr : expr Map.t * expr * expr -> 
+val eqi_expr : expr Map.t * expr * expr ->
                  expr Map.t * expr * expr -> bool
 
 (* uniformise a pair of [expr] so that equal_expr and uni_expr coincide *)
@@ -106,10 +105,10 @@ val eta_red : expr -> expr
 val path_subst : path list -> expr -> expr -> expr
 (* test equality after substitution *)
 val path_test : path list -> expr -> expr -> expr -> bool
-(* path_diff k k': checks if k' is final in k and compute the path length difference *) 
+(* path_diff k k': checks if k' is final in k and compute the path length difference *)
 val path_diff : kind -> kind -> int
 
-(* test if an expression starting with some "lambdas" use at least one 
+(* test if an expression starting with some "lambdas" use at least one
    of its argument *)
 val linear_uvar : expr -> bool
 
@@ -127,13 +126,13 @@ val assoc_eq : pos_eq -> (pos_eq * 'a) list -> 'a
 val count_lambdas : expr -> int
 val advance_in_arrow : int -> kind -> kind
 val head_length : expr -> int
-val head_kind : expr -> (pos_eq * af2_obj * kind list) 
+val head_kind : expr -> (pos_eq * af2_obj * kind list)
 
 val lArrow : kind list -> kind -> kind
- 
+
 (* saturation of two abstractions with unification variables *)
 exception Fail_saturate
-val saturate : expr -> expr -> int -> kind -> kind -> kind list -> 
+val saturate : expr -> expr -> int -> kind -> kind -> kind list ->
   int * (expr*kind) list * expr * expr
 
 val eqcmp : expr -> expr -> expr -> expr -> int list
@@ -142,14 +141,14 @@ val add_Equations :
   ext -> pos_eq -> pos_eq -> bool ->
   expr -> expr -> int ->  eq_type -> kind -> eqpath list -> bool -> int -> bool -> unit
 val add_Rules :
-  ext -> af2_obj -> string -> expr -> af2_obj -> 
+  ext -> af2_obj -> string -> expr -> af2_obj ->
     expr -> int -> rule_option -> float -> bool -> unit
 val add_Trivial_Hacks :
   ext -> af2_obj -> int -> bool -> unit
 val add_Tex_syntax :
   ext -> af2_obj -> string -> syntax -> bool -> unit
 
-val apply_perm : 
+val apply_perm :
   int list -> 'a list -> 'a list
 
 val simpl_match : int -> expr -> expr -> (int * expr) list
@@ -161,11 +160,11 @@ val occur_set : expr Map.t -> Set.t -> expr -> bool
 type stack = (expr * env * int) list
 exception Efun_error of string
 
-val efun_table : ((stack -> env -> int -> expr -> expr) -> 
-                  (stack -> expr -> expr) -> 
+val efun_table : ((stack -> env -> int -> expr -> expr) ->
+                  (stack -> expr -> expr) ->
                     stack -> int -> expr) array
-val add_fun : ((stack -> env -> int -> expr -> expr) -> 
-               (stack -> expr -> expr) -> 
+val add_fun : ((stack -> env -> int -> expr -> expr) ->
+               (stack -> expr -> expr) ->
                   stack -> int -> expr) -> sym_value
 val evaluable : kind -> bool
 val space_of_int : int -> string
@@ -177,4 +176,3 @@ val saturate_pattern : expr -> expr
 val generalize_for_rules : af2_obj -> expr -> expr -> expr * expr * expr
 
 val generalize_for_equations : eqns -> eqns
-

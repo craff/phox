@@ -3,10 +3,8 @@
 (*			local.mli			*)
 (*######################################################*)
 
-open Types
-open Typunif
-open Types.Base
-open Data_base
+open Type
+open Type.Base
 
 exception Fail_propagate
 
@@ -18,7 +16,7 @@ open Basic
 type adone = expr list * expr list * int Exprmap.t
 
 type state_c =
-  { mutable sref : int; mutable rule : rule; mutable next : state} 
+  { mutable sref : int; mutable rule : rule; mutable next : state}
 
 and rule =
   Axiom of int
@@ -43,7 +41,7 @@ and state =
   Fin of int
 | Fol of state_c
 
-and hyp_state = 
+and hyp_state =
   Not_eq
 | An_eq
 | Dont_know of eqpath list list
@@ -57,37 +55,37 @@ and leqns = (pos_eq * eqns) list
 
 and rules = af2_obj list
 
-and hyp_type =  
+and hyp_type =
   (string * (expr * int * hyp_kind * hyp_state * (bool * rules))) list
 
-and goal = 
-  { mutable gref : int; 
+and goal =
+  { mutable gref : int;
     mutable hyp : hyp_type;
-    concl : expr; 
+    concl : expr;
     oldhyp : hyp_type;
     eqns : leqns;
     local : local_defs;
-    mutable ax_test : bool; 
+    mutable ax_test : bool;
     mutable left_test : bool;
     mutable done_list : adone }
 
 (* unification context *)
 
-type rig = {head : expr; 
+type rig = {head : expr;
             args : (expr * kind) list;
             nbargs : int;
             order : int;
 	    kind : kind;
             allt : expr}
 
-type eqn = rig * rig * kind list * path list * state_c option * int * 
+type eqn = rig * rig * kind list * path list * state_c option * int *
       (af2_obj list * af2_obj list) *
 	   (path list option * int * bool * bool)
 
-type nonunifs = 
+type nonunifs =
          (expr * expr) list Map.t
 
-type contxt = 
+type contxt =
       expr Map.t          (* value of unified variables *)
     * Set.t Map.t    (* skolem constraints associate to the variable number $n$ the set of numbers the variable can not use *)
     * eqn list    (* high order unification constraints (flex-flex equations) *)
@@ -107,7 +105,7 @@ val add_local_close : local_defs -> obj -> local_defs
 val remove_local_cst : local_defs -> string list -> int list -> local_defs
 val rename_local_cst : local_defs -> string -> string -> local_defs
 val rename_caps_def : local_defs -> string -> string -> local_defs
-val add_cst_eq : local_defs -> int -> expr -> 
+val add_cst_eq : local_defs -> int -> expr ->
 	(int * expr * expr * bool * bool) list -> local_defs
 
 val set_ulocal : contxt -> unit
@@ -135,10 +133,9 @@ val fadd_to_tbl :  (expr Map.t -> (int * int) option -> nonunifs ->
                     expr -> expr -> nonunifs) ref
 
 val fcmp_expr : (expr -> expr -> int) ref
-val ulocal_defs : (Types.expr Basic.Map.t * Basic.Set.t Basic.Map.t * eqn list *
-     (Types.expr * Types.expr) list Basic.Map.t list) ref
+val ulocal_defs : (Type.expr Basic.Map.t * Basic.Set.t Basic.Map.t * eqn list *
+     (Type.expr * Type.expr) list Basic.Map.t list) ref
 
 val name_uvar : int -> string -> unit
 val get_uvar_name : int -> string
 val get_uvar_by_name : string -> int
-

@@ -3,7 +3,7 @@
 
 	title = "Natural numbers (2nd part)"
 	author = "Christophe Raffalli and Paul Roziere"
-	institute = "Equipe de Logique, Universit้ Chamb้ry, Paris VII"
+	institute = "Equipe de Logique, Universitรฉ Chambรฉry, Paris VII"
 *)
 
 flag auto_lvl 1.
@@ -50,7 +50,7 @@ tex_syntax N10 Math "10".
 (*fact some case elimination rules *)
 fact case2.N /\X,x ((x = N0 -> X N0) -> (x = N1 -> X N1) -> /\y:N (x = S S y -> X (S S y)) -> N x -> X x).
 intro 6.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 H := X N0
 H0 := X N1
 H1 := /\y:N  X (S S y)
@@ -58,7 +58,7 @@ H2 := N x
    |- X x
 *)
 elim H2 with [case].
-(*ง 2 goals created, with 1 automatically solved.
+(*ยง 2 goals created, with 1 automatically solved.
 ...
 H3 := N y
    |- X (S y)
@@ -73,12 +73,12 @@ new_elim -n  N case2 case2.N.
 new_elim  N case1 case_left.N.
 
 
-fact case3.N /\ X,x((x = N0 -> X N0) -> 
-                  (x = N1 -> X N1) -> 
-		  (x = N2 -> X N2) -> 
+fact case3.N /\ X,x((x = N0 -> X N0) ->
+                  (x = N1 -> X N1) ->
+		  (x = N2 -> X N2) ->
 		   /\y:N (x = S S S y -> X (S S S y)) -> N x -> X x).
 intro 7.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 H := X N0
 H0 := X N1
 H1 := X N2
@@ -89,13 +89,13 @@ H3 := N x
 elim -1  [case2] H3.
 trivial.
 trivial.
-(*ง 3 goals created, with 2 automatically solved.
+(*ยง 3 goals created, with 2 automatically solved.
 ...
 H4 := N y
    |- X (S S y)
 *)
 elim -1 [case1] H4.
-(*ง 2 goals created.
+(*ยง 2 goals created.
 ...
 H5 := N y0
    |- X (S S S y0)
@@ -103,12 +103,12 @@ H5 := N y0
    |- X (S S N0)
 *)
 trivial.
-(*ง 0 goal created.
+(*ยง 0 goal created.
 ...
    |- X (S S S y0)
 *)
 trivial.
-(*ง 1 goal created, with 1 automatically solved.
+(*ยง 1 goal created, with 1 automatically solved.
 proved
 *)
 save.
@@ -167,13 +167,13 @@ new_equation add.commutative.N.
 
 
 
-fact (* Associativity of addition *) add.associative.N 
+fact (* Associativity of addition *) add.associative.N
 				/\x,y,z:N x + (y + z) = (x + y) + z.
 trivial.
 save.
 new_equation -b add.associative.N. (*note added in both direction ! *)
 
-(*texte Following facts are useful for the performance of rewriting. *) 
+(*texte Following facts are useful for the performance of rewriting. *)
 
 
 (*fact More on associativity and commutativity of addition *)
@@ -227,7 +227,7 @@ new_equation add.lN2.N.
 
 
 (*fact regularity of addition *)
-fact (* left regularity of addition *) add.leq.N 
+fact (* left regularity of addition *) add.leq.N
               /\x,y,y': N (x + y = x + y' -> y = y').
 intro 2.
 elim H.
@@ -237,7 +237,7 @@ elim H1.
 left H4.
 save.
 
-fact (* left regularity of addition, left side *) add.leq_left.N 
+fact (* left regularity of addition, left side *) add.leq_left.N
 		/\X/\x,y,y': N ((y = y' -> X) -> x + y = x + y' -> X).
 intros.
 elim H2.
@@ -246,14 +246,14 @@ save.
 new_elim -i -rm -n $= add.leq add.leq_left.N.(*note added as invertible left
                                                                       rule. *)
 
-fact (* right regularity of addition *) add.req.N 
+fact (* right regularity of addition *) add.req.N
 	          /\x,y,y': N (y + x = y' + x -> y = y').
 intros.
 elim add.leq.N with x.
 from H2.
 save.
 
-fact (* right regularity of addition, left side *) add.req_left.N 
+fact (* right regularity of addition, left side *) add.req_left.N
 		/\X/\x,y,y': N ((y = y' -> X) -> y + x = y' + x -> X).
 intros.
 elim H2.
@@ -283,7 +283,7 @@ new_equation mul.lS.N.
 
 
 
-fact (* Totality of multiplication *) mul.total.N 
+fact (* Totality of multiplication *) mul.total.N
 					/\x,y:N N(x * y).
 trivial.
 save.
@@ -321,7 +321,7 @@ new_equation mul.rS.N.
 
 (*texte These facts are used to prove commutativity. *)
 
-fact (* Commutativity of multiplication *) mul.commutative.N 
+fact (* Commutativity of multiplication *) mul.commutative.N
 			/\x,y:N (x * y = y * x).
 trivial.
 save.
@@ -331,7 +331,7 @@ new_equation mul.commutative.N.
 
 
 fact (* Left distributivity of multiplication on
-				addition *) mul.left.distributive.N 
+				addition *) mul.left.distributive.N
 				/\x,y,z:N x * (y + z) = x * y + x * z.
 trivial.
 save.
@@ -341,7 +341,7 @@ new_equation mul.left.distributive.N.
 
 
 fact (* Right distributivity of multiplication on
-				 addition *) mul.right.distributive.N 
+				 addition *) mul.right.distributive.N
 				/\x,y,z:N (y + z) * x = y * x + z * x.
 trivial.
 save.
@@ -349,13 +349,13 @@ new_equation mul.right.distributive.N.
 
 
 
-fact (* Associativity of multiplication *) mul.associative.N 
+fact (* Associativity of multiplication *) mul.associative.N
 			   /\x,y,z : N x * (y * z) = (x * y) * z.
 trivial.
 save.
 new_equation -b mul.associative.N.
 
-(*texte Following facts are useful for the performance of rewriting. *) 
+(*texte Following facts are useful for the performance of rewriting. *)
 
 
 (*fact More on associativity and commutativity of multiplication *)
@@ -403,7 +403,7 @@ new_equation mul.lN2.N.
 (*endfact *)
 
 
-fact (* Integrity for multiplication in $N *) mul.integr.N 
+fact (* Integrity for multiplication in $N *) mul.integr.N
 		       /\x,y:N (x * y = N0 -> x= N0 or y = N0).
 intros.
 elim -1 [case1] H.
@@ -414,21 +414,21 @@ rewrite_hyp H1 mul.lS.N mul.rS.N  add.lS.N.
 trivial.
 save.
 
-fact (* Integrity for multiplication in $N *) mul.lintegr.N 
+fact (* Integrity for multiplication in $N *) mul.lintegr.N
 		       /\x,y:N (x * y = N0 -> y != N0 -> x = N0).
 intros.
 elim mul.integr.N with H1.
 trivial.
 save.
 
-fact (* Integrity for multiplication in $N *) mul.rintegr.N 
+fact (* Integrity for multiplication in $N *) mul.rintegr.N
 		       /\x,y:N (x * y = N0 -> x != N0 -> y = N0).
 intros.
 elim mul.integr.N with H1.
 trivial.
 save.
 
-fact (* Integrity for multiplication in $N as left rule *) mul.integr_left.N 
+fact (* Integrity for multiplication in $N as left rule *) mul.integr_left.N
 		       /\X /\x,y:N ((x= N0 -> X) ->(y = N0 -> X) -> x * y = N0 -> X ).
 intros.
 apply mul.integr.N with H3.
@@ -438,7 +438,7 @@ save.
 new_elim -i -n $= mul.integr mul.integr_left.N.
 
 
-fact (* Integrity for multiplication in $N as left rule *) mul.integr_left'.N 
+fact (* Integrity for multiplication in $N as left rule *) mul.integr_left'.N
 		       /\X /\x,y:N ((x= N0 -> X) ->(y = N0 -> X) -> N0 = x * y -> X ).
 intros.
 prove x * y = N0.
@@ -452,7 +452,7 @@ new_elim -i -n $= mul.integr' mul.integr_left'.N.
 
 (*fact regularity of multiplication *)
 
-fact (* left regularity of multiplication *) mul.leq.N 
+fact (* left regularity of multiplication *) mul.leq.N
 		 /\y,y',x: N (x != N0 -> x * y = x * y' -> y = y').
 intro 2.
 elim H.
@@ -462,28 +462,28 @@ trivial.
 intros.
 elim -1 [case1] H2.
 trivial.
-rewrite_hyp H5 mul.rS.N. 
+rewrite_hyp H5 mul.rS.N.
 prove x * y0 = x * y1.
 trivial.
 apply H1 with G.
 intro.
 save.
 
-fact (* left regularity of multiplication on left side *) mul.leq_left.N 
+fact (* left regularity of multiplication on left side *) mul.leq_left.N
 	     /\X/\x,y,y': N ((y = y' -> X) -> x != N0 -> x * y = x * y' -> X).
 trivial +mul.leq.N.
 save.
 new_elim -i -rm -n $= mul.leq mul.leq_left.N.
                                       (*note added as invertible left rule. *)
 
-fact (* right regularity of multiplication *) mul.req.N 
+fact (* right regularity of multiplication *) mul.req.N
         /\x,y,y': N (x != N0 -> y * x = y' * x -> y = y').
 trivial +mul.leq.N.
 save.
 
 
 
-fact (* right regularity of multiplication on left side *) mul.req_left.N 
+fact (* right regularity of multiplication on left side *) mul.req_left.N
 	/\X/\x,y,y': N ((y = y' -> X) -> x != N0 -> y * x = y' * x -> X).
 trivial +mul.req.N.
 save.
@@ -516,7 +516,7 @@ new_equation exp.rS.N.
 #nat.phx# *)
 
 
-fact (* totality of the exponentiation *) exp.total.N 
+fact (* totality of the exponentiation *) exp.total.N
         					/\x,y:N N(x^y).
 trivial.
 save.
@@ -529,7 +529,7 @@ We add this theorem as a totality rule (using the command
 
 
 
-fact (* left "distributivity" of exponentiation *) exp.left.distributive.N 
+fact (* left "distributivity" of exponentiation *) exp.left.distributive.N
 					      /\x,y,z:N x^(y + z) = x^y * x^z.
 trivial.
 save.
@@ -537,7 +537,7 @@ new_equation exp.left.distributive.N.
 
 (*fact properties of exponentiation on multiplication *)
 
-fact (* product in exposant *) exp.composition.N 
+fact (* product in exposant *) exp.composition.N
 				 /\x,y,z:N x^(y * z) = (x^y)^z.
 intros.
 elim H1.
@@ -548,7 +548,7 @@ intro.
 save.
 new_equation exp.composition.N.
 
-fact (* exponentiation of a product *) exp.right.distributive.N 
+fact (* exponentiation of a product *) exp.right.distributive.N
                                       /\x,y,z:N (x * y) ^ z = x^z * y^z.
 intros.
 elim H1.
@@ -636,20 +636,20 @@ tex_syntax N1000 Math "1000".
 (*** Ordering on N. *)
 
 (*definition  ordering relations on natural numbers *)
-def Infix[5] x "<=" y = /\X (X x -> /\z (X z -> X S z) -> X y).
+def Infix[5.0] x "<=" y = /\X (X x -> /\z (X z -> X S z) -> X y).
 (* x <= y = /\X (X x -> /\z (X z -> X S z) -> X y) *)
-def Infix[5] x "<" y = S x <= y.
+def Infix[5.0] x "<" y = S x <= y.
 (* x < y = S x <= y *)
-def Infix[5] x ">=" y = y <= x.
+def Infix[5.0] x ">=" y = y <= x.
 (* x >= y = y <= x *)
-def Infix[5] x ">" y = y < x.
+def Infix[5.0] x ">" y = y < x.
 (* x > y = y < x *)
 (*enddefinition *)
 
-tex_syntax $< Infix[5] x "<" y.
-tex_syntax $> Infix[5] x ">" y.
-tex_syntax $<= Infix[5] x "\\leq" y.
-tex_syntax $>= Infix[5] x "\\geq" y.
+tex_syntax $< Infix[5.0] x "<" y.
+tex_syntax $> Infix[5.0] x ">" y.
+tex_syntax $<= Infix[5.0] x "\\leq" y.
+tex_syntax $>= Infix[5.0] x "\\geq" y.
 
 (*texte
 Now we will prove some properties of these ordering relations. In
@@ -687,8 +687,8 @@ new_intro -i refl lesseq.refl.N.
 (*endfact *)
 
 (*fact elimination rules for $<= *)
-fact lesseq.rec.N 
-	/\X/\x,y:N (X x -> /\z:N (x <= z -> X z -> X (S z)) -> x <= y -> X y). 
+fact lesseq.rec.N
+	/\X/\x,y:N (X x -> /\z:N (x <= z -> X z -> X (S z)) -> x <= y -> X y).
 intros.
 prove x <= y & N y & X y.
 elim H3. (* H3 := x <= y *)
@@ -706,8 +706,8 @@ fact lesseq.rtrans.N /\x:N/\y,z
 trivial.
 save.
 
-(* new_elim $<= Sl  lesseq.Sl.N. 
- useless: ltrans and rtrans are enough, and moreover loops if 
+(* new_elim $<= Sl  lesseq.Sl.N.
+ useless: ltrans and rtrans are enough, and moreover loops if
  there is an hypothesis of the shape x = S x *)
 new_elim -n $<= rec lesseq.rec.N.
 new_elim -t $<= ltrans 2 lesseq.ltrans.N.
@@ -749,7 +749,7 @@ intros.
 elim -1 [case] H. (* H := N x *)
 trivial.
 elim -1 [rec -1 \x (~ N0 = x)] H0. (* H0 := x <= N0 *)
-(*ง 5 goals created, with 1 automatically solved. *)
+(*ยง 5 goals created, with 1 automatically solved. *)
 (*  |- N N0 *)
 trivial.
 (* H2 := x = S z |- ~ N0 = x *)
@@ -786,7 +786,7 @@ elim -1 [case1] H.
 		intro.
 save.
 
-fact lesseq.or_eq_S_left.N 
+fact lesseq.or_eq_S_left.N
 	/\ X /\ x,y : N((x <= y -> X) ->(x = S y -> X) -> x<= S y -> X).
 intros.
 elim lesseq.or_eq_S.N.
@@ -806,7 +806,7 @@ properties like \[/\ x :N (x <= N2 -> x= N0 or x= N1 or x =N2)\] become
 provable with tactic trivial.
 *)
 
-fact (* antisymmetry of lesseq on N *) lesseq.anti_sym.N 
+fact (* antisymmetry of lesseq on N *) lesseq.anti_sym.N
 			/\x,y:N (x <= y -> y <= x -> x = y).
 intro 2.
 elim H.
@@ -851,7 +851,7 @@ trivial =H.
 trivial =H H4.
 save.
 
-fact lesseq.S_is_S_left.N 
+fact lesseq.S_is_S_left.N
              /\X/\x,y:N (/\z:N (y = S z -> x <= z -> X) -> S x <= y -> X).
 trivial +lesseq.S_is_S.N.
 save.
@@ -916,8 +916,8 @@ save.
 
 fact less.case.N /\Q/\x,y:N ((x < y -> Q) -> (x=y -> Q) -> (y < x -> Q) -> Q).
 intros.
-elim -1 x -3 y lesseq.case3.N. 
-elim H1. 
+elim -1 x -3 y lesseq.case3.N.
+elim H1.
 elim H4.
 elim H2. (* H2 := x = y -> P, H5 := x = y *)
 elim H3. (* H3 := y < x -> P, H4 := y < x *)
@@ -997,7 +997,7 @@ save.
 
 fact less_S.imply.lesseq.N /\x,y:N (x < S y -> x <= y).
 intros.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 H := N x
 H0 := N y
 H1 := x < S y
@@ -1008,7 +1008,7 @@ save.
 
 fact lesseq.imply.less_S.N /\x,y:N (x <= y -> x < S y).
 intros.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 H := N x
 H0 := N y
 H1 := x <= y
@@ -1022,7 +1022,7 @@ save.
 (*fact A slightly more powerful induction rule on $<= *)
 
 fact lesseq.rec2.N /\X/\x,y:N (X x -> /\z:N (x <= z -> z < y -> X z -> X (S z)) ->
-  x <= y -> X y). 
+  x <= y -> X y).
 intros.
 prove X y or y < y.
 next 1.
@@ -1040,8 +1040,8 @@ save.
 (*endfact *)
 
 
-fact  (* <= is well-founded on N, 
-         this is an induction principle on N *) well_founded.N 
+fact  (* <= is well-founded on N,
+         this is an induction principle on N *) well_founded.N
 well.founded N $<.
 intros.
 prove /\b:N (b <= a -> X b).
@@ -1055,13 +1055,13 @@ new_elim -n N wf well_founded.N.
 
 (**** Ordering and equality *)
 
-(* texte 
-It can be useful to deal with this definition, in place of $!= . 
+(* texte
+It can be useful to deal with this definition, in place of $!= .
 *)
 
-def Infix[5] x "<>" y = (x < y or y < x) .
+def Infix[5.0] x "<>" y = (x < y or y < x) .
 (* x <> y = (x < y or y < x) *)
-tex_syntax $<> Infix[5] x "\\mathrel{{<}{>}}" y.
+tex_syntax $<> Infix[5.0] x "\\mathrel{{<}{>}}" y.
 
 
 
@@ -1077,10 +1077,10 @@ rewrite_hyp H1 H2.
 trivial.
 save.
 
-(*texte 
+(*texte
 Totality of order become :
 *)
-fact (* $!= implies $<> *) neq.less_or_sup.N 
+fact (* $!= implies $<> *) neq.less_or_sup.N
 /\x,y:N (x != y -> x <> y).
 intros.
 elim -2x -4y less.case.N.
@@ -1092,7 +1092,7 @@ save.
 
 
 (**** Ordering and addition *)
- 
+
 (*fact Introducing operation $+ in a relation using $<=  *)
 fact lesseq.ladd.N /\x,y:N (x <= x + y).
 intro 2.
@@ -1119,7 +1119,7 @@ intro.
 trivial.
 elim H6.
 prove ?.
-elim -1 y -3 y' 5 G. 
+elim -1 y -3 y' 5 G.
 prove /\x,x':N (x <= x' -> x + y' <= x' + y').
 elim H2 with [rec].
 intros.
@@ -1130,7 +1130,7 @@ intro.
 trivial.
 elim H6.
 prove ?.
-elim -1 x -3 x' 5 G1. 
+elim -1 x -3 x' 5 G1.
 elim -5 G0 -6 G2 lesseq.ltrans.N.
 intro.
 save.
@@ -1141,8 +1141,6 @@ save.
 new_intro lesseq.add lesseq.add.N.
 new_intro -i lesseq.ladd lesseq.ladd.N.
 new_intro -i lesseq.radd lesseq.radd.N.
-
-
 
 
 (*fact Eliminating operation $+ in a relation using  $<= *)
@@ -1164,8 +1162,8 @@ elim lesseq.ladd_left.N.
 axiom H.
 save.
 
-new_elim $<= ladd lesseq.ladd_left.N. 
-new_elim -i -n $<= laddi lesseq.ladd_rleft.N. 
+new_elim $<= ladd lesseq.ladd_left.N.
+new_elim -i -n $<= laddi lesseq.ladd_rleft.N.
 (*note  added as invertible elimination rule. *)
 
 
@@ -1183,8 +1181,8 @@ elim lesseq.radd_left.N.
 axiom H.
 save.
 
-new_elim $<= radd lesseq.radd_left.N. 
-new_elim -i -n $<= raddi lesseq.radd_rleft.N. 
+new_elim $<= radd lesseq.radd_left.N.
+new_elim -i -n $<= raddi lesseq.radd_rleft.N.
 (*note  added as invertible elimination rule. *)
 (*endfact *)
 
@@ -1230,7 +1228,7 @@ trivial.
 trivial.
 elim H6.
 prove ?.
-elim -1 y -3 y' 5 G. 
+elim -1 y -3 y' 5 G.
 prove /\x,x':N (x <= x' -> x * y' <= x' * y').
 elim H2 with [rec].
 trivial.
@@ -1241,7 +1239,7 @@ trivial -G0.
 trivial -G0.
 elim H6.
 prove ?.
-elim -1 x -3 x' 5 G1. 
+elim -1 x -3 x' 5 G1.
 elim -5 G0 -6 G2 lesseq.ltrans.N.
 intro.
 save.
@@ -1256,17 +1254,17 @@ new_intro -i lesseq.rmul lesseq.rmul.N.
 
 fact lesseq.lmul_left.N /\y',y,x:N (x != N0 -> x * y <= x * y' -> y <= y').
 intro 2.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 H := N y'
    |- /\y,x:N  (x != N0 -> x * y <= x * y' -> y <= y')
 *)
 elim H.
-(*ง 2 goals created.
+(*ยง 2 goals created.
 ...
    |- /\y,x:N  (x != N0 -> x * y <= x * N0 -> y <= N0)
 *)
 intros.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H0 := N y
 H1 := N x
@@ -1275,13 +1273,13 @@ H3 := x * y <= x * N0
    |- y <= N0
 *)
 rewrite_hyp H3 mul.rN0.N.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H3 := x * y <= N0
 ...
 *)
 left H3.
-(*ง 2 goals created.
+(*ยง 2 goals created.
 ...
 
    |- N (x * y)
@@ -1290,7 +1288,7 @@ H3 := x * y = N0
    |- y <= N0
 *)
 elim -1 y case.N.
-(*ง 3 goals created, with 1 automatically solved.
+(*ยง 3 goals created, with 1 automatically solved.
 ...
 H4 := \/z:N  y = S z
    |- y <= N0
@@ -1299,35 +1297,35 @@ H4 := y = N0
    |- y <= N0
 *).
 trivial.
-(*ง 1 goal created, with 1 automatically solved.
+(*ยง 1 goal created, with 1 automatically solved.
 ...
 H4 := \/z:N  y = S z
    |- y <= N0
 *)
 lefts H4 $\/ $&.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H4 := N z
 H5 := y = S z
    |- y <= N0
 *)
 elim -1 x case.N.
-(*ง 3 goals created, with 1 automatically solved.
+(*ยง 3 goals created, with 1 automatically solved.
 ...
 H6 := \/z0:N  x = S z0
    |- y <= N0
-...  
+...
 H6 := x = N0, ( H2 := x != N0 )
    |- y <= N0
 *)
-trivial =H2 H6. 
-(*ง 0 goal created.
+trivial =H2 H6.
+(*ยง 0 goal created.
 ...
 H6 := \/z0:N  x = S z0
    |- y <= N0
 *)
 lefts H6 $\/ $&.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H3 := x * y = N0
 ...
@@ -1336,20 +1334,20 @@ H7 := x = S z0
    |- y <= N0
 *)
 rewrite_hyp H3 mul.rS.N add.lS.N.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H3 := S (z0 + x * z) = N0
 ...
 *)
 trivial.
-(*ง 2 goals created, with 2 automatically solved.
+(*ยง 2 goals created, with 2 automatically solved.
 H := N y'
 H0 := N y
 H1 := /\y0,x:N  (x != N0 -> x * y0 <= x * y -> y0 <= y)
    |- /\y0,x:N  (x != N0 -> x * y0 <= x * S y -> y0 <= S y)
 *)
 intros.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H2 := N y0
 H3 := N x
@@ -1358,55 +1356,55 @@ H5 := x * y0 <= x * S y
    |- y0 <= S y
 *)
 elim -1 y case.N.
-(*ง 3 goals created, with 1 automatically solved.
+(*ยง 3 goals created, with 1 automatically solved.
 ...
 H6 := y = N0
    |- y0 <= S y
 *)
 rewrite_hyp H5 mul.rS.N mul.rN0.N add.rN0.N.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H5 := x * y0 <= x
 ...
 *)
 elim -1 y0 case.N.
-(*ง 3 goals created, with 1 automatically solved.
+(*ยง 3 goals created, with 1 automatically solved.
 ...
 H7 := y0 = N0
    |- y0 <= S y
 *)
 intro.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
    |- N (S y)
 *)
 intro.
-(*ง 1 goal created, with 1 automatically solved.
+(*ยง 1 goal created, with 1 automatically solved.
 ...
 H7 := \/z:N  y0 = S z
    |- y0 <= S y
 *)
 lefts H7 $\/ $&.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H7 := N z
 H8 := y0 = S z
    |- y0 <= S y
 *)
 elim -1 z case.N.
-(*ง 3 goals created, with 1 automatically solved.
+(*ยง 3 goals created, with 1 automatically solved.
 ...
 H9 := z = N0
    |- y0 <= S y
 *)
 intros.
-(*ง 2 goals created, with 2 automatically solved.
+(*ยง 2 goals created, with 2 automatically solved.
 ...
 H9 := \/z0:N  z = S z0
    |- y0 <= S y
 *)
 lefts H9 $\/ $&.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H5 := x * y0 <= x
 ...
@@ -1416,13 +1414,13 @@ H10 := z = S z0
    |- y0 <= S y
 *)
 rewrite_hyp H5 mul.rS.N mul.rN0.N add.rN0.N.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H5 := x + x + x * z0 <= x
 ...
 *)
 elim -1 x case.N.
-(*ง 3 goals created, with 1 automatically solved.
+(*ยง 3 goals created, with 1 automatically solved.
 ...
 H4 := x != N0
 ...
@@ -1430,13 +1428,13 @@ H11 := x = N0
 ...
 *)
 trivial =H4 H11.
-(*ง 0 goal created.
+(*ยง 0 goal created.
 ...
 H11 := \/z1:N  x = S z1
    |- y0 <= S y
 *)
 lefts H11 $\/ $&.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H11 := N z1
 H12 := x = S z1
@@ -1445,31 +1443,31 @@ H12 := x = S z1
 lefts H5.
 left H5.
 lefts H6 $\/ $&.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H6 := N z
 H7 := y = S z
    |- y0 <= S y
 *)
 elim -1 y0 case.N.
-(*ง 3 goals created, with 1 automatically solved.
+(*ยง 3 goals created, with 1 automatically solved.
 ...
 H8 := y0 = N0
    |- y0 <= S y
 *)
 intro.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
    |- N (S y)
 *)
 intro.
-(*ง 1 goal created, with 1 automatically solved.
+(*ยง 1 goal created, with 1 automatically solved.
 ...
 H8 := \/z0:N  y0 = S z0
    |- y0 <= S y
 *)
 lefts H8 $\/ $&.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H1 := /\y1,x0:N  (x0 != N0 -> x0 * y1 <= x0 * y -> y1 <= y)
 ...
@@ -1479,7 +1477,7 @@ H9 := y0 = S z0
 *)
 intro.
 elim -1 z0 -3 x H1.
-(*ง 8 goals created, with 5 automatically solved.
+(*ยง 8 goals created, with 5 automatically solved.
 ...
 H5 := x * y0 <= x * S y
 ...
@@ -1488,7 +1486,7 @@ H9 := y0 = S z0
    |- x * z0 <= x * y
 *)
 rewrite_hyp H5 -l 3 mul.rS.N.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
 H5 := x + x * z0 <= x + x * y
    |- x * z0 <= x * y
@@ -1498,7 +1496,7 @@ axiom H5.
 save.
 
 
-fact lesseq.lmul_rleft.N 
+fact lesseq.lmul_rleft.N
      /\X/\y',y,x:N ((y <= y' -> X) -> x != N0 -> x * y <= x * y' -> X).
 intros.
 elim H2.
@@ -1517,7 +1515,7 @@ from H3.
 save.
 (*note  added as invertible elimination rule. *)
 
-fact lesseq.rmul_rleft.N 
+fact lesseq.rmul_rleft.N
 	 /\X/\y',y,x:N ((y <= y' -> X) -> x != N0 -> y * x <= y' * x  -> X).
 intros.
 elim H2.
@@ -1530,7 +1528,7 @@ new_elim -i -n $<= rmuli lesseq.rmul_rleft.N.
 (*note  added as invertible elimination rule. *)
 (*endfact *)
 
-(*** Predecessor, defined as a partial function on $N 
+(*** Predecessor, defined as a partial function on $N
 *)
 
 
@@ -1543,12 +1541,12 @@ new_equation pred.rS.N.
 (*endaxiom *)
 
 
-fact (* "Totality" of predecessor (on its definition set) *) pred.total.N 
+fact (* "Totality" of predecessor (on its definition set) *) pred.total.N
 /\x:N (N0 < x -> N (P x)).
 trivial.
 save.
 new_intro -t P pred.total.N.
-(*texte 
+(*texte
 This property is added as a totality rule (using the command
 #new_intro -t#) with the given abbreviation. Therefore we can use
 #intro pred# instead of #elim pred.total.N#
@@ -1562,12 +1560,12 @@ elim -1 [case] H.
 save.
 new_equation pred.lS.N.
 (*texte
- This property is added as a rewriting rule. 
+ This property is added as a rewriting rule.
 *)
 
 
 
-(*** Subtraction, defined as a partial function on $N 
+(*** Subtraction, defined as a partial function on $N
 *)
 
 Cst lInfix[3.5] x "-" y : nat -> nat -> nat.
@@ -1577,13 +1575,13 @@ tex_syntax $- lInfix[3.5] x "-" y.
 (*axiom axioms defining predecessor  *)
 claim sub.rN0.N /\x:N x - N0 = x.
 claim sub.S.N /\x,y:N (y <= x -> (S x) - (S y) = x - y).
-new_equation sub.rN0.N. 
-new_equation sub.S.N.  
+new_equation sub.rN0.N.
+new_equation sub.S.N.
 (*endaxiom *)
 
 (* "Totality"  proof *)
 
-fact (* "Totality" of subtraction, on its definition set *) sub.total.N 
+fact (* "Totality" of subtraction, on its definition set *) sub.total.N
   /\y,x:N (y <= x -> N (x - y)).
 intro 2.
 elim H.
@@ -1594,14 +1592,14 @@ trivial.
 trivial.
 save.
 new_intro -i -t sub sub.total.N.
-(*texte 
+(*texte
 This property is added as a totality rule (using the command
 #new_intro -t#) with the given abbreviation. Therefore we can use
 #intro sub# instead of #elim sub#
 *)
 
 
-(*fact Some useful rewriting properties on subtraction 
+(*fact Some useful rewriting properties on subtraction
 *)
 
 fact sub.inv.N /\ a:N(a - a = N0).
@@ -1743,7 +1741,7 @@ save.
 new_intro -i S_rsub lesseq.S_rsub.N.
 
 
-		     
+
 fact lesseq.rrsub.N /\x,y,z:N (x <= y -> z <= x -> x - z <= y - z).
 (* trivial  8. fonctionne ! *)
 intros.
@@ -1793,7 +1791,6 @@ trivial.
 save.
 new_elim $<= sub_ladd 2 lesseq.sub_ladd.N.
 
-
 (*endfact *)
 
 
@@ -1805,7 +1802,7 @@ These three properties are added as introduction rules.
 
 
 
-(*** Some more properties on addition and subtraction in $N 
+(*** Some more properties on addition and subtraction in $N
 *)
 
 (*fact From addition to subtraction and converse *)
@@ -1823,11 +1820,11 @@ save.
 (*fact Permutations in expressions using $+ and $- *)
 fact sub.rass.N /\x,y,z:N(z <= y -> x +(y-z) = x+y -z).
 intros.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 H := N x
 ...
 *)
-elim  H. 
+elim  H.
 (*2 goals created : induction on x *)
 (* x:= 0 :
 	...
@@ -1868,7 +1865,7 @@ elim H1. (* induction on z *)
 	H4 := y + N0 <= x0
 	   |- x0 - (y + N0) = x0 - y - N0
 	*)
-	intro.	
+	intro.
 
 (* z:= y0 -> z:= S y0 :
 	...
@@ -1884,7 +1881,7 @@ elim H1. (* induction on z *)
 	   |- x0 - (y + S y0) = x0 - y - S y0
 	*)
 	apply 5 -1 (y + y0) -3 x0 lesseq.S_is_S.N.
-	(*ง 4 goals created, with 1 automatically solved. *)
+	(*ยง 4 goals created, with 1 automatically solved. *)
 	(*  1 :	...
 		   |- N (y + y0)
 		*)
@@ -1895,7 +1892,7 @@ elim H1. (* induction on z *)
 		*)
 		from H6.
 
-	(*  3 : 	
+	(*  3 :
 	G := \/z0:N  (x0 = S z0 & y + y0 <= z0)
    	  |- x0 - (y + S y0) = x0 - y - S y0
 	*)
@@ -1949,7 +1946,7 @@ elim H1. (* induction on z *)
 		*)
 		elim lesseq.rrsub.N.
 		(* 5 goals created, with 3 automatically solved. *)
-		(* 1 : 
+		(* 1 :
 			...
 			   |- N (y + y0)
 			*)
@@ -1970,7 +1967,7 @@ elim H1. (* induction on z *)
 		   |- y <= z0
 		*)
 		elim -3 (y + y0) lesseq.ltrans.N.
-		(* 3 goals created, with 2 automatically solved. 
+		(* 3 goals created, with 2 automatically solved.
 		...
 		   |- y <= y + y0
 		*)
@@ -1986,7 +1983,7 @@ new_equation sub.lass.N.
 
 fact sub.comm.N /\x,y,z:N (z <= x -> x + y - z = (x - z) + y).
 intros.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 H := N x
 H0 := N y
 H1 := N z
@@ -2010,12 +2007,12 @@ elim H0.
 save.
 new_equation sub.comm.N.
 
-fact sub.add.N 
+fact sub.add.N
 	/\x,y,z:N( y <= x + z  -> z <= y ->  x - (y -z)  =  (x + z) - y).
 intro 6.
 prove  /\y:N( y <= x + z  -> z <= y ->  x - (y -z)  =  (x + z) - y).
 next.
-(* 
+(*
 ...
 G := /\y0:N  (y0 <= x + z -> z <= y0 -> x - (y0 - z) = x + z - y0)
    |- y <= x + z -> z <= y -> x - (y - z) = x + z - y
@@ -2034,48 +2031,48 @@ elim H1.
 	   |- /\y0:N  (y0 <= x + N0 -> N0 <= y0 -> x - (y0 - N0) = x + N0 - y0)
 	*)
 	intros.
-	(*ง 1 goal created.
+	(*ยง 1 goal created.
 	...
 	H3 := y0 <= x + N0
 	H4 := N0 <= y0
 	   |- x - (y0 - N0) = x + N0 - y0
 	*)
 	intros.
-(* z:= y0 -> z:= y0 + 1 
+(* z:= y0 -> z:= y0 + 1
 	...
 	H2 := N y0
 	H3 := /\y1:N  (y1 <= x + y0 -> y0 <= y1 -> x - (y1 - y0) = x + y0 - y1)
-	   |- /\y1:N  (y1 <= x + S y0 -> S y0 <= y1 
+	   |- /\y1:N  (y1 <= x + S y0 -> S y0 <= y1
 					    -> x - (y1 - S y0) = x + S y0 - y1)
 	*)
 	intro 2.
-	(*ง 1 goal created.
+	(*ยง 1 goal created.
 	...
 	H4 := N y1
 	   |- y1 <= x + S y0 -> S y0 <= y1 -> x - (y1 - S y0) = x + S y0 - y1
 	*)
 	rewrite  add.rS.N.
-	(*ง 1 goal created.
+	(*ยง 1 goal created.
 	...
-	   |- y1 <= S (x + y0) -> S y0 <= y1 
+	   |- y1 <= S (x + y0) -> S y0 <= y1
 					 -> x - (y1 - S y0) = S (x + y0) - y1
 	*)
 	elim -2 H4 case.N.
-	(*ง 2 goals created. *)
+	(*ยง 2 goals created. *)
 	(* y1 := 0
 		...
 		H5 := y1 = N0
-		   |- y1 <= S (x + y0) -> S y0 <= y1 
+		   |- y1 <= S (x + y0) -> S y0 <= y1
 					 -> x - (y1 - S y0) = S (x + y0) - y1
 		*)
 		rewrite H5.
-		(*ง 1 goal created.
+		(*ยง 1 goal created.
 		...
-		   |- N0 <= S (x + y0) -> S y0 <= N0 
+		   |- N0 <= S (x + y0) -> S y0 <= N0
 					 -> x - (N0 - S y0) = S (x + y0) - N0
 		*)
 		intros.
-		(*ง 1 goal created.
+		(*ยง 1 goal created.
 		...
 		H7 := S y0 <= N0
 		...
@@ -2084,39 +2081,39 @@ elim H1.
 	(* y1 := S z0
 		...
 		H5 := \/z0:N  y1 = S z0
-		   |- y1 <= S (x + y0) -> S y0 <= y1 
+		   |- y1 <= S (x + y0) -> S y0 <= y1
 					-> x - (y1 - S y0) = S (x + y0) - y1
 		*)
 		left H5.
 		left H5.
-		(*ง 1 goal created.
+		(*ยง 1 goal created.
 		...
 		H5 := N z0
 		H6 := y1 = S z0
 		...
 		*)
 		rewrite H6.
-		(*ง 1 goal created.
+		(*ยง 1 goal created.
 		...
-		   |- S z0 <= S (x + y0) -> S y0 <= S z0 
+		   |- S z0 <= S (x + y0) -> S y0 <= S z0
 				     -> x - (S z0 - S y0) = S (x + y0) - S z0
 		*)
 		intros.
-		(*ง 1 goal created.
+		(*ยง 1 goal created.
 		...
 		H7 := S z0 <= S (x + y0)
 		H8 := S y0 <= S z0
 		   |- x - (S z0 - S y0) = S (x + y0) - S z0
 		*)
 		rewrite sub.S.N.
-		(*ง 1 goal created.
+		(*ยง 1 goal created.
 		...
 		   |- x - (z0 - y0) = x + y0 - z0
-		H3 := /\y2:N  (y2 <= x + y0 -> y0 <= y2 
+		H3 := /\y2:N  (y2 <= x + y0 -> y0 <= y2
 						-> x - (y2 - y0) = x + y0 - y2)
 		*)
 		elim -1 z0 H3.
-		(*ง 3 goals created, with 1 automatically solved. *)
+		(*ยง 3 goals created, with 1 automatically solved. *)
 		(*  1 : ...
 		           |- z0 <= x + y0
 			H7 := S z0 <= S (x + y0)
@@ -2130,7 +2127,7 @@ elim H1.
 save.
 new_equation sub.add.N.
 (*endfact *)
-(*texte 
+(*texte
 All these properties are added as rewriting rules.
 *)
 
@@ -2142,7 +2139,7 @@ intros.
 elim -1 [rec] H1.
 (* 2 goals created. *)
 (* z:= 0 :
-	...	
+	...
 	   |- (y - x) * N0 = y * N0 - x * N0
 	*)
 	intros.
@@ -2174,7 +2171,7 @@ new_equation mul.lsub.dist.N.
 
 goal /\x,y,z:N(x <= y ->  z * (y -x) = z * y - z * x).
 intros.
-(*ง 1 goal created.
+(*ยง 1 goal created.
 ...
    |- z * (y - x) = z * y - z * x
 *)
@@ -2189,7 +2186,7 @@ new_equation mul.rsub.dist.N.
 
 
 
-fact (* All naturals are even or odd *) odd_or_even.N 
+fact (* All naturals are even or odd *) odd_or_even.N
 	  /\x:N \/y:N (x = N2 * y or x = N1 + N2 * y).
 intro 2.
 elim H.
@@ -2325,7 +2322,7 @@ elim H0.
 (*2 goals created.
 New goals are:
 
-cas y0 --> y0 +1 
+cas y0 --> y0 +1
 
 H := N x
 H0 := N y

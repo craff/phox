@@ -1,0 +1,79 @@
+
+open Js_of_ocaml
+
+let load_file ~prefix:_ ~path =
+  let path = Js.string path in
+  let xhr = XmlHttpRequest.create () in
+  xhr##_open (Js.string "GET") path (Js.bool false);
+  xhr##overrideMimeType(Js.string "text/plain; charset=x-user-defined");
+  xhr##send Js.null;
+  if xhr##.status = 200 then
+    let resp = Js.Opt.to_option (File.CoerceTo.string xhr##.response) in
+    Stdlib.Option.map Js.to_bytestring resp
+  else
+    None
+
+type _ Effect.t += WaitInput : unit Effect.t
+
+let input_char, add_chars, set_cont, reset_cont =
+  let buf = ref "" in
+  let index = ref 0 in
+  let cont = ref None in
+  (fun _ ->
+    if !index < String.length !buf then
+      begin
+        let r = !buf.[!index] in
+        incr index;
+        r
+      end
+    else
+      begin
+        Effect.perform WaitInput;
+        assert (!buf <> "");
+        let r = !buf.[0] in
+        index := 1;
+        r
+      end),
+  (fun e ->
+      Firebug.console##log_2 (Js.string "receive:") e;
+      let s = Js.to_string e in
+      buf := String.sub !buf !index (String.length !buf - !index) ^ s;
+      index := 0;
+      match !cont with
+      | None -> Firebug.console##log (Js.string "no continuation");
+                ()
+      | Some k ->
+         cont := None; Effect.Deep.continue k ()),
+  (fun k ->
+    cont := Some k),
+  (fun () ->
+    match !cont with
+    | None -> ()
+    | Some k ->
+       cont := None; Effect.Deep.discontinue k Files.Quit)
+
+let set_path () =
+  Files.path_list := "/phox/lib" :: "/phox/examples" :: [];
+  Files.set_path()
+
+let start_phox () =
+  set_path ();
+  Sys_js.set_channel_flusher stdout
+    (fun s ->
+      let s = Js.string s in
+      Firebug.console##log s;
+      Worker.post_message s);
+  Sys_js.mount ~path:"/phox" load_file;
+  Worker.set_onmessage add_chars;
+  Effect.Deep.try_with Phox_main.main input_char {
+      Effect.Deep.effc =
+        (fun (type a) (eff : a Effect.t) ->
+          match eff with
+          | WaitInput -> Some (fun (k : (a, unit) Effect.Deep.continuation) -> set_cont k)
+          | _ -> None);
+
+      }
+
+
+let _ =
+  start_phox()

@@ -1,3 +1,0 @@
-true: rectypes
-"parser.ml" :pp(camlp4o)
-"parser_cmd.ml":pp(camlp4o)

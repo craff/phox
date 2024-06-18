@@ -7,8 +7,8 @@ open Format
 open Basic
 open Lexer
 open Local
-open Types.Base
-open Types
+open Type.Base
+open Type
 open Parser
 open Print
 open Typing
@@ -50,13 +50,13 @@ let decode_option f a1 = match a1 with
 
 let rec decode_list f a1 = match a1 with
     EAtom(o,_) when o == fun_nil_obj -> []
-  | EApp(EApp(EAtom(o,_), e), l) when o == fun_cons_obj -> 
+  | EApp(EApp(EAtom(o,_), e), l) when o == fun_cons_obj ->
       (f e)::(decode_list f l)
   | EVar _ -> raise Exit
   | _ -> failwith "bug in decode_list"
 
 let rec decode_pair df ds a1 = match a1 with
-    EApp(EApp(EAtom(o,_), f), s) when o == fun_pair_obj -> 
+    EApp(EApp(EAtom(o,_), f), s) when o == fun_pair_obj ->
       (df f), (ds s)
   | EVar _ -> raise Exit
   | _ -> failwith "bug in decode_list"
@@ -66,9 +66,9 @@ type ('a,'b) sum =
 | Inr of 'b
 
 let rec decode_sum dl dr a1 = match a1 with
-    EApp(EAtom(o,_), l) when o == fun_inl_obj -> 
+    EApp(EAtom(o,_), l) when o == fun_inl_obj ->
       Inl (dl l)
-  | EApp(EAtom(o,_), r) when o == fun_inr_obj -> 
+  | EApp(EAtom(o,_), r) when o == fun_inr_obj ->
       Inr (dr r)
   | EVar _ -> raise Exit
   | _ -> failwith "bug in decode_list"
@@ -95,11 +95,11 @@ let cont_stack n cont l =
      0, _ -> rl := l; []
   |  n, ((a1,e1,d1)::l)  -> (cont [] e1 d1 a1)::(fn (n-1) l)
   | _ ->  failwith "bug in cont_stack"
-  in 
+  in
   let l0 = fn n l in !rl, l0
 
 let eval_bin_int f h cont ret stack _ =
-  match cont_stack 2 cont stack with 
+  match cont_stack 2 cont stack with
     [], [a1; a2] ->
   ret [] (EInt (f (decode_int a1) (decode_int a2)))
   | _ -> failwith "bug in eval_bin_int"
@@ -113,23 +113,23 @@ let ftrue = aobj fun_true_obj
 let ffalse = aobj fun_false_obj
 
 let eval_bin_test f h cont ret stack _ =
-  match cont_stack 2 cont stack with 
+  match cont_stack 2 cont stack with
     [], [a1; a2] ->
   if f a1 a2 then ret [] ftrue else ret [] ffalse
   | _ -> failwith "bug in eval_bin_test"
 
-let _ = add_fun (eval_bin_test equal_expr fun_eq_obj)           (* 4 *) 
-let _ = add_fun (eval_bin_test (fun x y -> cmp_expr x y < 0) fun_less_obj)   
-                                                                (* 5 *) 
+let _ = add_fun (eval_bin_test equal_expr fun_eq_obj)           (* 4 *)
+let _ = add_fun (eval_bin_test (fun x y -> cmp_expr x y < 0) fun_less_obj)
+                                                                (* 5 *)
 let _ = add_fun (eval_bin_test (fun x y -> cmp_expr x y <= 0) fun_lesseq_obj)
-                                                                (* 6 *) 
+                                                                (* 6 *)
 let _ = add_fun (eval_bin_test (fun x y -> cmp_expr x y > 0) fun_gt_obj)
-                                                                (* 7 *) 
+                                                                (* 7 *)
 let _ = add_fun (eval_bin_test (fun x y -> cmp_expr x y >= 0) fun_gteq_obj)
-                                                                (* 8 *) 
+                                                                (* 8 *)
 
-let ifthenelse cont ret stack _ = 
-  match stack with 
+let ifthenelse cont ret stack _ =
+  match stack with
     [] | [_] | [_;_] -> raise Exit
   | (a1,e1,d1):: (a2,e2,d2):: (a3,e3,d3):: l ->
   let a1 = decode_bool (cont [] e1 d1 a1) in
@@ -137,11 +137,11 @@ let ifthenelse cont ret stack _ =
 
 let _ = add_fun ifthenelse                                      (* 9 *)
 
-let fixpoint cont ret stack _ = 
-  match stack with 
+let fixpoint cont ret stack _ =
+  match stack with
     [] -> raise Exit
   | (a1,e1,d1)::l ->
-  let nstack = (EApp(aobj fun_fix_obj, a1), e1, d1)::l in 
+  let nstack = (EApp(aobj fun_fix_obj, a1), e1, d1)::l in
   cont nstack e1 d1 a1
 
 let _ = add_fun fixpoint                                        (* 10 *)
@@ -152,7 +152,7 @@ let fraise cont ret stack _ =
   | (a1,e1,d1)::_ ->
   let a1 = decode_string (cont [] e1 d1 a1) in
   raise (Efun_error a1)
-  
+
 let catch cont ret stack _ =
   match stack with
     [] | [_]  -> raise Exit
@@ -161,11 +161,11 @@ let catch cont ret stack _ =
     cont l e1 d1 a1
   with
     e ->
-      let exn = match e with 
+      let exn = match e with
         Ill_rule _ -> EString "rule failed"
       | Fail_matching -> EString "matching failed"
       | Efun_error s -> EString s
-      | e -> raise e 
+      | e -> raise e
       in
       cont ((exn,[],0)::l) e2 d2 a2
 
@@ -190,7 +190,7 @@ let fun_new_elim cont ret stack odepth =
         (decode_string abbrev)
 	(decode_int pos)
 	(decode_obj theo)
-	(if (decode_bool opti) then fINV else fNONE land 
+	(if (decode_bool opti) then fINV else fNONE land
          if (decode_bool optn) then fNEC else fNONE)
         (decode_bool export);
       ret [] funit
@@ -199,18 +199,18 @@ let fun_new_elim cont ret stack odepth =
 let _ = add_fun fun_new_elim                                     (* 14 *)
 
 let decode_tri tri =
-  match decode_option 
-    (fun x -> decode_pair 
-       decode_int 
-       (fun x -> decode_pair 
-          decode_int (fun x -> decode_pair 
+  match decode_option
+    (fun x -> decode_pair
+       decode_int
+       (fun x -> decode_pair
+          decode_int (fun x -> decode_pair
              decode_bool decode_bool x) x) x) tri with
-    None -> 
-      {nlim = !trdepth; eqlvl = !eqdepth; 
+    None ->
+      {nlim = !trdepth; eqlvl = !eqdepth;
        	from_trivial = false; first_order = false;
       	auto_elim =true; eqflvl = !eqflvl}
   | Some (nlim,(eqlvl,(from_trivial,first_order))) ->
-      {nlim = nlim; eqlvl = eqlvl; 
+      {nlim = nlim; eqlvl = eqlvl;
        	from_trivial = from_trivial; first_order = first_order;
 	auto_elim =true; eqflvl = !eqflvl}
 
@@ -256,7 +256,7 @@ let _ = add_fun fun_elim_after_intro                              (* 17 *)
 let fun_tex_syntax cont ret stack odepth =
   match cont_stack 4 cont stack with
     [], [e; sn; sy; export] ->
-      (try 
+      (try
         let o = decode_obj e in
         add_tex_syntax
           o
@@ -311,10 +311,10 @@ let fun_new_rewrite cont ret stack odepth =
   match cont_stack 4 cont stack with
     [], [lr; rl; e; export] ->
       add_rewrite
-        (if (decode_bool lr) then 
-           if (decode_bool rl) then 2 else 0 
+        (if (decode_bool lr) then
+           if (decode_bool rl) then 2 else 0
          else
-           if (decode_bool rl) then 1 
+           if (decode_bool rl) then 1
                                else failwith "bad options for #new_rewrite")
         (decode_obj e)
         (decode_bool export);
@@ -375,7 +375,7 @@ let fun_goal cont ret stack odepth =
   match cont_stack 1 cont stack with
     [], [e;s;ts;b] ->
       do_goal e (decode_option decode_string s)
-	(decode_option decode_string ts) (decode_bool b); 
+	(decode_option decode_string ts) (decode_bool b);
       ret [] funit
   | _ -> failwith "bug in #goal"
 
@@ -384,7 +384,7 @@ let _ = add_fun fun_goal                                          (* 26 *)
 let fun_intro_num cont ret stack odepth =
   match cont_stack 2 cont stack with
     [], [tri; n] ->
-      let n = do_rule 0 "intros" (rule_intro (ref false) (decode_tri tri) 
+      let n = do_rule 0 "intros" (rule_intro (ref false) (decode_tri tri)
                                            (Num (decode_int n))) in
       ret [] (EInt n)
   | _ -> failwith "bug in #intro_num"
@@ -424,10 +424,10 @@ let fun_trivial cont ret stack odepth =
   match cont_stack 4 cont stack with
     [], [min; l1; l2; tri] ->
       let min = decode_bool min in
-      let l1 = decode_list decode_string l1 in 
-      let l2 = decode_list decode_string l2 in 
+      let l1 = decode_list decode_string l1 in
+      let l2 = decode_list decode_string l2 in
       let tri = decode_tri tri in
-      let n = do_rule 0 "trivial" (rule_trivial min l1 l2 tri) in      
+      let n = do_rule 0 "trivial" (rule_trivial min l1 l2 tri) in
       ret [] (EInt n)
   | _ -> failwith "bug in #trivial"
 
@@ -437,10 +437,10 @@ let fun_auto cont ret stack odepth =
   match cont_stack 4 cont stack with
     [], [min; l1; l2; tri] ->
       let min = decode_bool min in
-      let l1 = decode_list decode_string l1 in 
-      let l2 = decode_list decode_string l2 in 
+      let l1 = decode_list decode_string l1 in
+      let l2 = decode_list decode_string l2 in
       let tri = decode_tri tri in
-      let n = do_rule 0 "auto" (rule_auto min l1 l2 tri) in      
+      let n = do_rule 0 "auto" (rule_auto min l1 l2 tri) in
       ret [] (EInt n)
   | _ -> failwith "bug in #auto"
 
@@ -450,7 +450,7 @@ let fun_use cont ret stack odepth =
   match cont_stack 3 cont stack with
     [], [tri; s; e] ->
       let s = decode_string s in
-      let n = do_rule 0 "use" (rule_use (decode_tri tri) s e) in      
+      let n = do_rule 0 "use" (rule_use (decode_tri tri) s e) in
       ret [] (EInt n)
   | _ -> failwith "bug in #use"
 
@@ -460,7 +460,7 @@ let fun_rmh cont ret stack odepth =
   match cont_stack 1 cont stack with
     [], [l] ->
       let l = decode_list decode_string l in
-      let n = do_rule 0 "rmh" (rule_rm true l) in      
+      let n = do_rule 0 "rmh" (rule_rm true l) in
       ret [] (EInt n)
   | _ -> failwith "bug in #rmh"
 
@@ -470,7 +470,7 @@ let fun_slh cont ret stack odepth =
   match cont_stack 1 cont stack with
     [], [l] ->
       let l = decode_list decode_string l in
-      let n = do_rule 0 "slh" (rule_rm false l) in      
+      let n = do_rule 0 "slh" (rule_rm false l) in
       ret [] (EInt n)
   | _ -> failwith "bug in #slh"
 
@@ -480,7 +480,7 @@ let fun_axiom cont ret stack odepth =
   match cont_stack 2 cont stack with
     [], [tri; s] ->
       let s = decode_string s in
-      let n = do_rule 0 "axiom" (rule_axiom false (decode_tri tri) s) in      
+      let n = do_rule 0 "axiom" (rule_axiom false (decode_tri tri) s) in
       ret [] (EInt n)
   | _ -> failwith "bug in #axiom"
 
@@ -501,15 +501,5 @@ let fun_snd cont ret stack odepth =
       let c = decode_pair (fun x -> x) (fun x -> x) s in
       if l = [] then ret [] (snd c) else cont l [] 0 (snd c)
   | _ -> failwith "bug in #snd"
- 
+
 let _ = add_fun fun_snd                                             (* 38 *)
- 
-
-
-
-
-
-
-
-
-

@@ -9,47 +9,47 @@ flag auto_lvl 1.
 
 (** Introduction. *)
 
-(* texte Une fonction d'Ackermann peut être vue comme une suite de
-fonctions primitives récursives telle que toute fonction primitive
-récursive est majorée à partir d'un certain rang par une fonction de
+(* texte Une fonction d'Ackermann peut Ãªtre vue comme une suite de
+fonctions primitives rÃ©cursives telle que toute fonction primitive
+rÃ©cursive est majorÃ©e Ã  partir d'un certain rang par une fonction de
 cette suite. En particulier la fonction diagonale de la fonction
-d'Ackermann majore toutes les fonctions primitives récursives, et donc
-n'est pas primitive récursive.
+d'Ackermann majore toutes les fonctions primitives rÃ©cursives, et donc
+n'est pas primitive rÃ©cursive.
 
-Le principal résultat de de fichier est la proposition
-$acksn_domine_Ackpn qui montre que n'importe quelle itération d'une
-fonction de la suite est majorée à partir d'un certain rang par la
-fonction suivante. C'est le lemme essentiel pour démontrer ce qui est
-indiqué dans le précédent paragraphe.
+Le principal rÃ©sultat de de fichier est la proposition
+$acksn_domine_Ackpn qui montre que n'importe quelle itÃ©ration d'une
+fonction de la suite est majorÃ©e Ã  partir d'un certain rang par la
+fonction suivante. C'est le lemme essentiel pour dÃ©montrer ce qui est
+indiquÃ© dans le prÃ©cÃ©dent paragraphe.
 
-On a besoin tout d'abord de quelques résultats élémentaires
+On a besoin tout d'abord de quelques rÃ©sultats Ã©lÃ©mentaires
 essentiellement de majoration et croissance.
 
-La preuve de la dernière proposition ($acksn_domine_Ackpn) met en
-évidence l'utilisation des méta-variables ou variables existentielles
+La preuve de la derniÃ¨re proposition ($acksn_domine_Ackpn) met en
+Ã©vidence l'utilisation des mÃ©ta-variables ou variables existentielles
 dans phox, et probablement que leur usage n'est pas encore pleinement
 satisfaisant.
 *)
 
 
-(** Définition. *)
+(** DÃ©finition. *)
 Import nat.
 
 
-(*texte On propose une définition axiomatique de la fonction d'Ackermann. Une
-définition par récurrence serait possible, mais assez lourde dans l'état
+(*texte On propose une dÃ©finition axiomatique de la fonction d'Ackermann. Une
+dÃ©finition par rÃ©currence serait possible, mais assez lourde dans l'Ã©tat
 actuel. *)
 
 
-(*définition Fonction d'Ackermann. *) 
+(*dÃ©finition Fonction d'Ackermann. *) 
 
 (*texte Il y a plusieurs version de la fonction d'Ackermann. La fonction
-originale avait 3 arguments. On utilise une version simplifiée à deux
-arguments introduite par Rozsa Péters. La caractéristique essentielle est
-la clause  utilisant une récurrence double avec imbrication
-des deux appels récursifs.
+originale avait 3 arguments. On utilise une version simplifiÃ©e Ã  deux
+arguments introduite par Rozsa PÃ©ters. La caractÃ©ristique essentielle est
+la clause  utilisant une rÃ©currence double avec imbrication
+des deux appels rÃ©cursifs.
 
-Celle qui suit est initialisée de façon que les premières fonctions de la
+Celle qui suit est initialisÃ©e de faÃ§on que les premiÃ¨res fonctions de la
 suite soient simples (x -> x+2, x-> 2x, x -> 2^x, ...). *)
 
 Cst ack : nat -> nat -> nat.
@@ -61,14 +61,14 @@ claim acknx /\n,x:N ack (S n) (S x) = ack n (ack (S n) x).
 (*enddefinition *)
 
 (*texte On indique aux tactiques de PhoX d'utiliser les clauses de
-définitions comme des règles de réécriture.  *)
+dÃ©finitions comme des rÃ¨gles de rÃ©Ã©criture.  *)
 
 new_equation ack0x.
 new_equation ack10.
 new_equation ackn0.
 new_equation acknx.
 
-fact (* totalité de la fonction d'Ackermann *)
+fact (* totalitÃ© de la fonction d'Ackermann *)
 ack_total /\n,x:N N (ack n x).
 intro 2.
 elim H.
@@ -90,7 +90,7 @@ new_intro -t -i total ack_total.
 
 (** Quelques valeurs de la fonction d'Ackermann. *)
 
-(*** Une égalité utile pour la réécriture. *)
+(*** Une Ã©galitÃ© utile pour la rÃ©Ã©criture. *)
 fact (* ack n+1 2 = 2 *) ackn1 /\n:N(ack (S n) N1 = N2).
 intros.
 elim  H.
@@ -99,12 +99,12 @@ rewrite acknx.
 rewrite  ackn0.
 save.
 
-(*texte Les tactiques de PhoX pourront aussi utiliser le précedent
-résultat comme règle de réécriture. *) 
+(*texte Les tactiques de PhoX pourront aussi utiliser le prÃ©cedent
+rÃ©sultat comme rÃ¨gle de rÃ©Ã©criture. *) 
 new_equation ackn1.
 
 
-def_thlist (* Une liste de règles pour la réécriture sur la fonction
+def_thlist (* Une liste de rÃ¨gles pour la rÃ©Ã©criture sur la fonction
 d'Ackermann *) calcul.ack = ack0x ack10 ackn0 acknx ackn1.
 
 (*** Petites valeurs. *)
@@ -130,7 +130,7 @@ intro.
 save ack42.
 (* ack N4 N2 = S S N2 *)
 
-(*** Les premières fonctions de la suite. *)
+(*** Les premiÃ¨res fonctions de la suite. *)
 
 fact ack1x /\x : N (ack N1 x = N2 *x).
 intros.
@@ -150,7 +150,7 @@ rewrite H1.
 intro.
 save.
 
-(** Premiers résultats de majoration. *)
+(** Premiers rÃ©sultats de majoration. *)
 
 lemma  ack_sup_0 /\n,x:N ((n <> N1 or x > N0) -> ack n x >N0).
 intro 2.
@@ -209,12 +209,12 @@ intros.
 intros.
 save.
 
-(** Résultats de croissance. *)
+(** RÃ©sultats de croissance. *)
 
-(*** Quelques définitions et résultats généraux sur la croissance des
-suites entières. *)
+(*** Quelques dÃ©finitions et rÃ©sultats gÃ©nÃ©raux sur la croissance des
+suites entiÃ¨res. *)
 
-(*note A déplacer dans une librairie ? *)
+(*note A dÃ©placer dans une librairie ? *)
 
  def increasing.N f = /\x,x':N
 (x < x' -> f x < f x').  
@@ -254,7 +254,7 @@ elim ack_sup_0 ;; Try intros.
 trivial.
 save.
 
-fact  ackn_increase /\n:N increasing.N (ack n). (* non utilisé ensuite *)
+fact  ackn_increase /\n:N increasing.N (ack n). (* non utilisÃ© ensuite *)
 intros.
 elim inc_lem.N ;; trivial + acknx_less_acknsx..
 save.
@@ -264,7 +264,7 @@ intros.
 elim inc_lem'.N ;; trivial + acknx_less_acknsx.
 save.
 
-(*** Croissance sur la première composante. *)
+(*** Croissance sur la premiÃ¨re composante. *)
 
 lemma  acknx_less_acksnx /\n,x:N(x > N1 -> ack n x <= ack (S n) x).
 intros.
@@ -294,9 +294,9 @@ elim ackx_lincrease ;; Try trivial.
 save.
 
 
-(** L'itérée d'une composante de la fonction d'Ackermann. *)
+(** L'itÃ©rÃ©e d'une composante de la fonction d'Ackermann. *)
 
-(*** Définition. *)
+(*** DÃ©finition. *)
 def it a f  n = def_rec.N a (\p,r (f r)) n.
 def Ack k n x = it x (ack n) k.
 
@@ -319,7 +319,7 @@ save Ack_total.
 
 new_intro -t total Ack_total.
 
-(*** La fonction d'Ackermann itérée est croissante sur sa dernière composante. *)
+(*** La fonction d'Ackermann itÃ©rÃ©e est croissante sur sa derniÃ¨re composante. *)
 
 fact  Ackkn_lincrease /\ k,n:N lincreasing.N (Ack k n).
 intros.
@@ -334,7 +334,7 @@ intros.
 elim H2.
 save.
 
-(*** La fonction d'Ackermann itérée est croissante sur la première composante (le nombre d'itérations). *)
+(*** La fonction d'Ackermann itÃ©rÃ©e est croissante sur la premiÃ¨re composante (le nombre d'itÃ©rations). *)
 fact  Acknx_lincrease /\ n,x:N lincreasing.N \k(Ack k n x).
 intros.
 intros.
@@ -350,8 +350,8 @@ save.
 
 
 (*** 
-La n+1-ième composante de la fonction d'Ackermann comme itérée de
-la n-ième. *)
+La n+1-iÃ¨me composante de la fonction d'Ackermann comme itÃ©rÃ©e de
+la n-iÃ¨me. *)
 
 goal /\n,x,y:N(ack (S n) (y + x) = Ack  x n (ack (S n) y)). 
 intros.
@@ -365,10 +365,10 @@ trivial.
 save ack_Ack.
 
 
-(** La n+1-ième composante de la fonction d'Ackermann majore à partir
-d'un certain rang n'importe quelle itérée de sa n-ième composante. *)
+(** La n+1-iÃ¨me composante de la fonction d'Ackermann majore Ã  partir
+d'un certain rang n'importe quelle itÃ©rÃ©e de sa n-iÃ¨me composante. *)
 
-(* Je n'ai pas utilisé ce résultat. Cela peut simplifier la suite.
+(* Je n'ai pas utilisÃ© ce rÃ©sultat. Cela peut simplifier la suite.
 goal /\k,n,x:N Ack k n x <= ack (S n) (x+k).
 intros.
 rewrite ack_Ack.
@@ -407,7 +407,7 @@ trivial.
 rewrite G2.
 rewrite ack_Ack.
 elim  Ackkn_lincrease.
-(* intros.  décompose y, alors que x = y +k ! *)
+(* intros.  dÃ©compose y, alors que x = y +k ! *)
 trivial.
 trivial.
 apply acksny_sup_2y with  n and G1.

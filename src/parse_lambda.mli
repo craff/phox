@@ -1,5 +1,5 @@
-open Lambda
-open Lexer
+open Lambda_exp
+open Lex
 
 val get_def : string -> term
 

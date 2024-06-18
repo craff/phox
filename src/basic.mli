@@ -5,7 +5,7 @@
 
 val print_endline : string -> unit
 
-module Int_ord : sig type t = int val compare : 'a -> 'a -> int end
+module Int_ord : sig type t = int val compare : int -> int -> int end
 module Map : Map.S with type key = int
 module Set : Set.S with type elt = int
 
@@ -38,12 +38,7 @@ val rotate : 'a list -> 'a list
 val list_do : ('a -> unit) -> 'a list -> unit
 val list_count : (int -> 'a -> unit) -> 'a list -> unit
 val list_bcount : (int -> 'a -> unit) -> 'a list -> unit
-val stream_map : ('a -> 'b) -> 'a -> 'b Stream.t
 val best : ('a -> int) -> 'a list -> 'a * 'a list
 val forall2 : ('a -> 'a -> bool) -> 'a list -> 'a list -> bool
 val cons_option : ('a option) -> ('a list) -> 'a list
 val flat_select_map : (int -> 'a -> 'a list) -> int list -> 'a list -> (bool * 'a) list
-
-
-
-

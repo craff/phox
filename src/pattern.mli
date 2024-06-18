@@ -4,8 +4,7 @@
 (*			pattern.mli			*)
 (*######################################################*)
 
-open Data_base
-open Types
+open Type
 open Local
 open Basic
 
@@ -13,10 +12,10 @@ exception Not_normal
 exception Fail_matching
 exception Ill_rule of string
 
-type trinfo = { 
-    nlim : int; 
-    eqlvl : int; 
-    from_trivial : bool ; 
+type trinfo = {
+    nlim : int;
+    eqlvl : int;
+    from_trivial : bool ;
     first_order : bool;
     auto_elim : bool;
     eqflvl : int
@@ -40,12 +39,12 @@ val count_eq : rrule list -> int
 
 val rev_path : rrule list -> rrule list
 
-val pmatch : (pos_eq * eqns) list -> 
+val pmatch : (pos_eq * eqns) list ->
 	     local_defs ->
              bool -> bool ->
-             (trinfo * 
-                (trinfo -> contxt -> goal_state -> 
-                   (int * state * expr) list -> contxt * goal_state) * 
+             (trinfo *
+                (trinfo -> contxt -> goal_state ->
+                   (int * state * expr) list -> contxt * goal_state) *
                 goal_state) ->
              expr -> expr -> bool * rrule list * goal_state
 

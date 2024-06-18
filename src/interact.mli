@@ -7,7 +7,7 @@
 
 (* A NETOYER : commentaires des tactiques*)
 
-open Types
+open Type
 open Local
 open Pattern
 
@@ -20,15 +20,15 @@ bien a une entre "complete" (typiquement un axiome ou l'application
 d'un theorem *)
 
 (* type d'une preuve :
-    Goal = la formule a prouver 
-    Remain = les entrees incompletes de la preuve (la premiere entree 
+    Goal = la formule a prouver
+    Remain = les entrees incompletes de la preuve (la premiere entree
              constitue le "goal" courant)
     Leaf = les entrees completes de la preuve *)
 
-type proof_state = 
-  {goal : expr;       
-   gpoly: int;        
-   remain : (goal*state) list; 
+type proof_state =
+  {goal : expr;
+   gpoly: int;
+   remain : (goal*state) list;
    leaf : state list;
    pname : string option;
    ptex_name : string option;
@@ -50,13 +50,13 @@ and elim_option =
 
 (* type de la preuve courante (on utilise No_proof si il n'y a pas de
 preuve en cours *)
-and proof = 
-    No_proof 
-  | A_proof of proof_state 
+and proof =
+    No_proof
+  | A_proof of proof_state
   | To_save of sym_value * expr * int * string option * string option * bool
 
 
-(* Type des regles (ou tatique) generales : 
+(* Type des regles (ou tatique) generales :
     une tactique prend le "state" et "goal" d'une entree incomplete E
     et renvoie une liste d'entree incomplete ainsi qu'une liste d'entre
     complete qui peuvent etre substitues a E *)
@@ -83,7 +83,7 @@ val do_goal : expr -> string option -> string option -> bool -> unit
 val do_rule : int -> string -> int list -> arule -> int
 
 (* do_save name
-    sauve le theorem prouve sous le nom "name". La preuve courante doit 
+    sauve le theorem prouve sous le nom "name". La preuve courante doit
     d'abord etre termine (proof.Remain = []) *)
 val do_save : string option -> bool -> unit
 
@@ -91,7 +91,7 @@ val do_save : string option -> bool -> unit
     ajoute "expr" comme un axiome de nom "name" *)
 val do_claim : string -> string option -> expr -> bool -> unit
 
-(* do_depend name 
+(* do_depend name
     affiche les axiomes (si le booléens est vrai) ou les théorème
     (sinon) dont le theorem de nom "name" depend *)
 type depend_arg =
@@ -129,31 +129,31 @@ val rule_axiom : bool -> trinfo -> string -> arule
 
 val rule_theo : expr -> arule
 
-val rule_elim : bool -> trinfo -> bool -> bool -> bool -> 
+val rule_elim : bool -> trinfo -> bool -> bool -> bool ->
                  (int * elim_option) list -> int -> expr -> arule
 
-val rule_left : trinfo -> string -> 
+val rule_left : trinfo -> string ->
                 rule_opt -> int list ref option -> arule
-val rule_trivial : bool -> string list -> string list -> 
+val rule_trivial : bool -> string list -> string list ->
                     trinfo -> arule
-val mult_trivial : trinfo -> (goal * state) list -> 
+val mult_trivial : trinfo -> (goal * state) list ->
                      (goal * state) list * state list
 val rule_auto : bool -> string list -> string list -> trinfo -> arule
 
 val rule_use : bool -> trinfo -> string -> expr -> arule
-(*  add a goal "e" with the current hypothesys, then "e" is added 
-    to the hypothesys of the previous goal. the boolean control 
+(*  add a goal "e" with the current hypothesys, then "e" is added
+    to the hypothesys of the previous goal. the boolean control
     if the new goal is first or second *)
 
 val rule_rm : bool -> string list -> arule
 
 val rule_rename : string -> string -> arule
 
-val rule_claim : arule 
-val rule_absurd : arule 
-val rule_contradiction : arule 
+val rule_claim : arule
+val rule_absurd : arule
+val rule_contradiction : arule
 
-val rule_apply : trinfo -> string -> (int * elim_option) list -> int -> 
+val rule_apply : trinfo -> string -> (int * elim_option) list -> int ->
    expr -> arule
 
 val do_add_rlocal : string -> kind -> sym_value -> syntax -> arule
@@ -162,12 +162,12 @@ val do_add_csyntax : int -> string -> syntax -> arule
 
 val set_local : int -> unit
 
-val apply_rewrite : bool -> state list -> goal -> state -> rrule list -> 
+val apply_rewrite : bool -> state list -> goal -> state -> rrule list ->
                       goal * state * state list
 val add_assq :  pos_eq -> 'b -> (pos_eq * 'b) list -> (pos_eq * 'b) list
 val hyp_to_erule : expr -> int -> hyp_kind -> eq_type
 val hyp_to_rule : int -> hyp_kind -> rule
-type store_stack 
+type store_stack
 val store_mark : string -> store_stack
 val store : string -> unit
 val restore_to :  store_stack -> unit
@@ -204,7 +204,7 @@ val lock_depth : (string * int) list ref
 
 (* first bool: invertible rules only *)
 (* ouvre-t-on des définitions, même si on a trouvé un règle *)
-val get_intros : bool -> (pos_eq * eqns) list -> local_defs -> bool -> expr 
+val get_intros : bool -> (pos_eq * eqns) list -> local_defs -> bool -> expr
   -> bool * (string *  (expr * af2_obj * expr * int * rule_option * float * bool)) list
 val get_lefts : 'a option -> bool -> rule_opt -> string -> goal ->
   expr * int * hyp_kind * hyp_state *
@@ -214,10 +214,10 @@ val get_lefts : 'a option -> bool -> rule_opt -> string -> goal ->
   list
 
 val var_sat : goal -> unit
-val try_axiom : bool -> int -> (goal * state) list -> state list -> 
+val try_axiom : bool -> int -> (goal * state) list -> state list ->
   (goal * state) list * state list
 
 val from_resol : expr list ref option ref
 
-val call_trivial : trinfo -> contxt -> (goal * state * state list) -> 
+val call_trivial : trinfo -> contxt -> (goal * state * state list) ->
                      (int * state * Exprmap.key) list -> contxt * (goal * state * state list)

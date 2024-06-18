@@ -1,0 +1,12 @@
+(executable
+  (name phox)
+  (public_name phox)
+  (package phox)
+  (modes js native)
+  (js_of_ocaml (flags (--enable=effects)))
+  (modules :standard)
+  (preprocess  (per_module
+    ((action (run camlp5o %{input-file})) inductive lex new_cmd parse_base
+                                          parse_cmd parse_lambda phox_main print tex)
+    ((pps js_of_ocaml-ppx)		 phox)))
+  (libraries unix num camlp5 js_of_ocaml))

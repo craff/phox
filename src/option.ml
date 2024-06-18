@@ -9,10 +9,7 @@
 *)
 
 open Format
-open Basic
-open Data_base.Object
-open Types.Base
-open Types
+open Type
 open Files
 open Lang
 
@@ -21,7 +18,7 @@ let read_option () =
   let name = ref "" in
   let compiling = ref false and init = ref false in
   let keep_proof = ref false in
-  let proof_general = ref false in
+  let proof_general = ref true in
   let invisible_parenthesis = ref false in
   let short_answer = ref false in
   let pipe = ref None in

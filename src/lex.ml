@@ -66,10 +66,10 @@ let store c =
   incr bufpos
 
 let last_char () =
-  if !bufpos > 0 then !buffer.[!bufpos - 1] else ' '
+  if !bufpos > 0 then Bytes.get !buffer (!bufpos - 1) else ' '
 
 let get_string () =
-  let s = Bytes.sub !buffer 0 !bufpos in buffer := initial_buffer; s
+  let s = Bytes.sub_string !buffer 0 !bufpos in buffer := initial_buffer; s
 
 let special = parser
   [< ' ('!' | '%' | '&' | '*' | '+' | ',' | '-' | '/' | ':' | ';' |
@@ -79,13 +79,13 @@ let special = parser
 let extra_dot = ref false
 
 let maybe_white s = match s with parser
-    [< ' (' '|'\010'|'\013'|'\009'|'\026'|'\012'); s >] -> ()
+    [< ' (' '|'\010'|'\013'|'\009'|'\026'|'\012'); _ >] -> ()
   | [< >] -> ()
 
 let rec next_token s =
   if !extra_dot then (extra_dot:=false; Dot) else
   match s with parser
-    [< ' (' '|'\010'|'\013'|'\009'|'\026'|'\012'); s >] ->
+    [< ' (' '|'\160'|'\010'|'\013'|'\009'|'\026'|'\012'); s >] ->
       next_token s
   | [< ' ('A'..'Z' | 'a'..'z' as c); s>] ->
       reset_buffer(); store c; Ident(ident s)
@@ -99,23 +99,23 @@ let rec next_token s =
       neg_number s
   | [< ' ('('); s >] ->
       maybe_comment s
-  | [< ' ('\171'); s >] ->
+  | [< ' ('\171'); _ >] ->
       Lpar
-  | [< ' (')'|'\187'); s >] ->
+  | [< ' (')'|'\187'); _ >] ->
       Rpar
-  | [< ' ('.'); _ = maybe_white; s >] ->
+  | [< ' ('.'); _ = maybe_white; _ >] ->
       Dot
-  | [< ' ('$'); s >] ->
+  | [< ' ('$'); _ >] ->
       Dol
   | [< ' ('_');  s >] ->
       reset_buffer(); joker s
   | [< ' ('\''); s >] ->
       reset_buffer(); char_or_kvar s
-  | [< ' ('\255'); s>] ->
+  | [< ' ('\255'); _ >] ->
       Eof
   | [< c = special; s >] ->
       reset_buffer(); store c; ident2 s
-  | [< 'c; s >] ->
+  | [< 'c; _ >] ->
       raise (Illegal_char c)
 
   and joker = parser
@@ -284,26 +284,29 @@ let rec next_token s =
     [< ' ('('); s >] -> maybe_nested_comment s
   | [< ' ('*'); s >] -> maybe_end_comment s
   | [< ' ('\255') >] -> raise (Stream.Error "Unfinished comment")
-  | [< ' c; s >] -> comment s
+  | [< ' _; s >] -> comment s
 
   and maybe_nested_comment = parser
     [< ' ('*'); s >] -> comment s; comment s
   | [< ' ('\255') >] -> raise (Stream.Error "Unfinished comment")
-  | [< ' c; s >] -> comment s
+  | [< ' _; s >] -> comment s
 
   and maybe_end_comment = parser
     [< ' (')') >] -> ()
   | [< ' ('*'); s >] -> maybe_end_comment s
   | [< ' ('\255') >] -> raise (Stream.Error "Unfinished comment")
-  | [< ' c; s >] -> comment s
+  | [< ' _; s >] -> comment s
 
 
-let rec reset_lexer tstr =
+let reset_lexer tstr =
   let l = !cur_line and c = !cur_col in
   let rec fn = parser
     [< ' ('\n') >] -> ()
   | [< ' ('\r') >] -> ()
-  | [< 'c; s >] -> fn s
+  | [< ' _; s >] -> fn s
   | [< >] -> ()
   in
   fn tstr; cur_line := l; cur_col := c
+
+let stream_map f str =
+   Stream.from (fun _ -> Some (f str))

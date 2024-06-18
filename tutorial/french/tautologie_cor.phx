@@ -1,11 +1,11 @@
 (*
 ===========================================================================
 
-            Un tutorial d'introduction à la logique et à PhoX
+            Un tutorial d'introduction Ã  la logique et Ã  PhoX
 
-                         C. Raffalli Décembre 1997
+                         C. Raffalli DÃ©cembre 1997
 
-                          Mise à jour Octobre 2000
+                          Mise Ã  jour Octobre 2000
 		            
 ===========================================================================
 *)
@@ -14,23 +14,23 @@
 
 Le but de cet exemple est double: 
   - on introduit progressivement les commandes les plus simples du
-    système PhoX sur des exemples simples de logique propositionnelle ou
-    du calcul des prédicats. 
+    systÃ¨me PhoX sur des exemples simples de logique propositionnelle ou
+    du calcul des prÃ©dicats. 
   - Ces exemples peuvent aussi servir d'illustration pour une introduction
-    à la logique auprès des étudiants. 
+    Ã  la logique auprÃ¨s des Ã©tudiants. 
 
-Le principe général qui préside la construction des preuves est le suivant:
-  - On utilise la commande "goal" pour indiquer la formule à prouver.
-  - A chaque instant on a un certain nombre de buts à prouver dont le
-    premier est le but "courant" (but numéro 1). On peut afficher tous les
-    buts à l'aide de la commande "goals." (bouton State sous Emacs).
-    Chaque but se compose d'hypothèses qui sont automatiquement nommées (ou 
-    peut aussi nommer soit même les hypothèses) et d'une conclusion que l'on 
-    doit prouver en utilisant ces hypopthèses.
-  - On utilise des commandes qui indiquent la ou les règles logiques que l'on
-    désire appliquer. Le système construit alors le ou les nouveaux buts à
+Le principe gÃ©nÃ©ral qui prÃ©side la construction des preuves est le suivant:
+  - On utilise la commande "goal" pour indiquer la formule Ã  prouver.
+  - A chaque instant on a un certain nombre de buts Ã  prouver dont le
+    premier est le but "courant" (but numÃ©ro 1). On peut afficher tous les
+    buts Ã  l'aide de la commande "goals." (bouton State sous Emacs).
+    Chaque but se compose d'hypothÃ¨ses qui sont automatiquement nommÃ©es (ou 
+    peut aussi nommer soit mÃªme les hypothÃ¨ses) et d'une conclusion que l'on 
+    doit prouver en utilisant ces hypopthÃ¨ses.
+  - On utilise des commandes qui indiquent la ou les rÃ¨gles logiques que l'on
+    dÃ©sire appliquer. Le systÃ¨me construit alors le ou les nouveaux buts Ã 
     prouver (si il y en a).
-  - Quand il n'y a plus aucun but la preuve est terminée et on peut la
+  - Quand il n'y a plus aucun but la preuve est terminÃ©e et on peut la
     sauvegarder en utilisant la commande "save".
  
 *)
@@ -42,26 +42,26 @@ ce que vous venez de faire si vous lisez ce fichier !
 
 Sous XEmacs, on peut entrer directement une commande en cliquant sur
 le bouton "next", on en tapant "LineFeed" ou "Control-J". On peut
-aussi entrer une partie d'un fichier en se plaçant au bon endroit et
-en cliquant sur le bouton "goto".  Les lignes qui ont déjà été entré
-apparaîssent alors sur fond bleu. On peut revenir en arrière avec le
+aussi entrer une partie d'un fichier en se plaÃ§ant au bon endroit et
+en cliquant sur le bouton "goto".  Les lignes qui ont dÃ©jÃ  Ã©tÃ© entrÃ©
+apparaÃ®ssent alors sur fond bleu. On peut revenir en arriÃ¨re avec le
 bouton "undo".
 
-Dans certain cas, après de nombreux "undo"; le système est "perdu"
-(cela est du à des problèmes entre ProofGeneral et PhoX). On doit alors
-utiliser le bouton "restart" et se replacer où l'on en était avec le bouton 
+Dans certain cas, aprÃ¨s de nombreux "undo"; le systÃ¨me est "perdu"
+(cela est du Ã  des problÃ¨mes entre ProofGeneral et PhoX). On doit alors
+utiliser le bouton "restart" et se replacer oÃ¹ l'on en Ã©tait avec le bouton 
 "goto".
 
 Lorsque l'on est en train de faire une preuve, on peut utiliser le
-bouton "State" pour afficher les buts à prouver.
+bouton "State" pour afficher les buts Ã  prouver.
 
 Les premiers exercices utilisent les constantes "A", "B" et "C" ainsi que
-l'implication "->", la conjonction "&", la disjonction "or", la négation "~"
+l'implication "->", la conjonction "&", la disjonction "or", la nÃ©gation "~"
 et le faux "False".
 
-Note: "~ A" est défini comme "A -> False".
+Note: "~ A" est dÃ©fini comme "A -> False".
 
-On doit définir les variables propositionnelles A, B, C.
+On doit dÃ©finir les variables propositionnelles A, B, C.
 Pour cela entrez les lignes qui suivent:
 
 *)
@@ -78,24 +78,24 @@ goal A -> A.
 
 (* 
 
-La commande "goal" indique à PhoX que l'on veut commencer la preuve de
+La commande "goal" indique Ã  PhoX que l'on veut commencer la preuve de
 la formule "A -> A" (il ne faut pas oublier le point et le retour
 chariot qui suit).
 
-PhoX répond :
+PhoX rÃ©pond :
 
 |- A -> A
 
-Le signe "|-" précède la formule à prouver
+Le signe "|-" prÃ©cÃ¨de la formule Ã  prouver
 
-On peut alors indiquer que l'on veut utiliser une règle
+On peut alors indiquer que l'on veut utiliser une rÃ¨gle
 d'introduction:
 *)
 
 intro.
 
 (*
-PhoX répond :
+PhoX rÃ©pond :
 
 1 goal created.
 New goal is:
@@ -103,12 +103,12 @@ New goal is:
 H := A
    |- A
 
-La ligne H0 := A indique que l'on a en hypothèse la formule "A". "H0"
-est le nom de cette hypothèse. La formule à prouver sous cette hypothèse est
+La ligne H0 := A indique que l'on a en hypothÃ¨se la formule "A". "H0"
+est le nom de cette hypothÃ¨se. La formule Ã  prouver sous cette hypothÃ¨se est
 "A".
 
-PhoX a automatiquement détecté quelle règle d'introduction appliquer car la
-formule etait une implication et qu'il n'y a qu'une règle d'introduction pour
+PhoX a automatiquement dÃ©tectÃ© quelle rÃ¨gle d'introduction appliquer car la
+formule etait une implication et qu'il n'y a qu'une rÃ¨gle d'introduction pour
 ce connecteur logique.
 
 Il suffit alors de terminer la preuve par un axiome:
@@ -117,7 +117,7 @@ Il suffit alors de terminer la preuve par un axiome:
 axiom H.
 
 (*
-PhoX répond:
+PhoX rÃ©pond:
 
 0 goal created.
 proved
@@ -130,7 +130,7 @@ On peut maintenant sauvegarder cette preuve en tapant:
 save mon_premier_theoreme.
 
 (*
-PhoX répond:
+PhoX rÃ©pond:
 
 Building proof .... 
 Typing proof .... 
@@ -138,10 +138,10 @@ Verifying proof ....
 Saving proof ....
 mon_premier_theoreme = A -> A : Theorem
 
-PhoX construit et revérifie la preuve, puis la sauvegarde dans la machine
-sous le nom indiqué.
+PhoX construit et revÃ©rifie la preuve, puis la sauvegarde dans la machine
+sous le nom indiquÃ©.
 
-Prouvons une formule un peu plus compliquée:
+Prouvons une formule un peu plus compliquÃ©e:
 *)
 
 goal ((A & B) -> C) -> A -> B -> C  .
@@ -153,7 +153,7 @@ On pourrait tapez trois fois "intro.", on peut aussi tapez "intro 3.":
 intro 3.
 
 (*
-PhoX répond:
+PhoX rÃ©pond:
 
 1 goal created.
 New goal is:
@@ -163,25 +163,25 @@ H0 := A
 H1 := B
    |- C
 
-On veut maintenant utiliser l'hypothèse "H" pour prouver "C" à l'aide de
-l'élimination d'une implication. Il suffit d'écrire:
+On veut maintenant utiliser l'hypothÃ¨se "H" pour prouver "C" Ã  l'aide de
+l'Ã©limination d'une implication. Il suffit d'Ã©crire:
 
 *)
 
 elim H.
 
 (*
-PhoX a essayé d'appliquer des règles d'élimination pour obtenir la formule "C"
-à partir de "H" et il n'y avait qu'une seule possibilité (ce n'est pas
+PhoX a essayÃ© d'appliquer des rÃ¨gles d'Ã©limination pour obtenir la formule "C"
+Ã  partir de "H" et il n'y avait qu'une seule possibilitÃ© (ce n'est pas
 toujours le cas).
 
-De la même manière que précédemment, on applique une règle d'introduction:
+De la mÃªme maniÃ¨re que prÃ©cÃ©demment, on applique une rÃ¨gle d'introduction:
 *)
 
 intro.
 
 (*
-PhoX répond:
+PhoX rÃ©pond:
 
 2 goals created.
 
@@ -198,10 +198,10 @@ H0 := A
 H1 := B
    |- B
 
-On a deux buts à prouver car la règle d'introduction de la conjonction
-a deux prémisses. Le premier but affiché est le but courant. On peut
-le résoudre par un axiome, ainsi que le second but (qui devient le
-but courant une fois l'autre résolu). On sauve alors la preuve.
+On a deux buts Ã  prouver car la rÃ¨gle d'introduction de la conjonction
+a deux prÃ©misses. Le premier but affichÃ© est le but courant. On peut
+le rÃ©soudre par un axiome, ainsi que le second but (qui devient le
+but courant une fois l'autre rÃ©solu). On sauve alors la preuve.
 
 *)
 
@@ -211,20 +211,20 @@ save mon_second_theorem.
 
 (*
 
-Remarque: On, vient de voir deux types de règles:
+Remarque: On, vient de voir deux types de rÃ¨gles:
 
-- Les règles d'introduction qui permettent de destructurer la
+- Les rÃ¨gles d'introduction qui permettent de destructurer la
   conclusion d'un but.  
-- Les règles d'élimination qui permettent d'utiliser les hypothèses 
-  (ou tout autre formule qu'il faudra alors prouver) pour déduire 
+- Les rÃ¨gles d'Ã©limination qui permettent d'utiliser les hypothÃ¨ses 
+  (ou tout autre formule qu'il faudra alors prouver) pour dÃ©duire 
   d'autres formules. Avec ce point de vue, les axiomes sont un cas 
-  particulier d'élimination.  
-- On verra bientôt aussi les règles gauche qui permettent de
-  destructurer les hypothèses d'un but sans transformer la conclusion.
+  particulier d'Ã©limination.  
+- On verra bientÃ´t aussi les rÃ¨gles gauche qui permettent de
+  destructurer les hypothÃ¨ses d'un but sans transformer la conclusion.
 
 
-exercice: finir la preuve suivante (en remplaçant les "...." par les commandes
-adéquates):
+exercice: finir la preuve suivante (en remplaÃ§ant les "...." par les commandes
+adÃ©quates):
 
 *)
 
@@ -250,12 +250,12 @@ intro 2.
 elim H.
 
 (*
-à ce point de la preuve, on peut écrire "intro.":
+Ã  ce point de la preuve, on peut Ã©crire "intro.":
 *)
 intro.
 
 (*
-PhoX répond:
+PhoX rÃ©pond:
 
 1 goal created.
 New goal is:
@@ -264,11 +264,11 @@ H0 := A or B -> C
 H1 := A
    |- B
 
-et on ne pourra pas finir la preuve ! que s'est il passé ? il y a deux
-règles d'introduction pour la disjonction et PhoX a choisi la
-mauvaise. On peut écrire dans ce cas "intro l" pour préciser que l'on
-veut la règle quit dit "A |- A or B" (l pour left). Pour revenir en
-arrière, on utilise "undo." et on remplace "intro" par "intro l". On
+et on ne pourra pas finir la preuve ! que s'est il passÃ© ? il y a deux
+rÃ¨gles d'introduction pour la disjonction et PhoX a choisi la
+mauvaise. On peut Ã©crire dans ce cas "intro l" pour prÃ©ciser que l'on
+veut la rÃ¨gle quit dit "A |- A or B" (l pour left). Pour revenir en
+arriÃ¨re, on utilise "undo." et on remplace "intro" par "intro l". On
 peut alors finir la preuve: *)
 
 undo.
@@ -299,7 +299,7 @@ save th5.
 
 (*
 
-Le même problème peut se poser avec l'élimination de la conjonction:
+Le mÃªme problÃ¨me peut se poser avec l'Ã©limination de la conjonction:
 prouvons:
 
 *)
@@ -309,20 +309,20 @@ intro 2.
 
 (*
 
-PhoX répond:
+PhoX rÃ©pond:
 
 H0 := (A -> C) & (B -> C)
 H1 := A or B
    |- C
 
-On peut faire alors une élimination de la disjonction en tapant:
+On peut faire alors une Ã©limination de la disjonction en tapant:
 
 *)
 
 elim H0.
 
 (*
-On a alors les deux buts suivant à prouver:
+On a alors les deux buts suivant Ã  prouver:
 
 2 goals created.
 New goals are:
@@ -338,9 +338,9 @@ H1 := A or B
 H2 := B
    |- C
 
-Dans chacun des 2 buts, il faut faire une élimination de la conjonction sur
-H. puis une élimination de l'implication. Mais il faut choisir le bon côté
-pour la première élimination.  on fait cela en tapant:
+Dans chacun des 2 buts, il faut faire une Ã©limination de la conjonction sur
+H. puis une Ã©limination de l'implication. Mais il faut choisir le bon cÃ´tÃ©
+pour la premiÃ¨re Ã©limination.  on fait cela en tapant:
 
 *)
 
@@ -352,10 +352,10 @@ save th6.
 
 (*
 
-L'option "with [l]" indique de prendre la règle qui dit "A & B |- A"
-pour la première élimination. 
+L'option "with [l]" indique de prendre la rÃ¨gle qui dit "A & B |- A"
+pour la premiÃ¨re Ã©limination. 
 
-On pouvait aussi faire la même preuve en utlisant des règles gauches:
+On pouvait aussi faire la mÃªme preuve en utlisant des rÃ¨gles gauches:
 
 *)
 
@@ -371,8 +371,8 @@ save th6.
 
 (*
 
-La commande left, permet d'appliquer une règle gauche (règle qui ne transforme
-que les hypothèses) pour les connecteurs conjonction et disjonction.
+La commande left, permet d'appliquer une rÃ¨gle gauche (rÃ¨gle qui ne transforme
+que les hypothÃ¨ses) pour les connecteurs conjonction et disjonction.
 
 Exercice: prouver les formules suivantes:
 *)
@@ -401,12 +401,12 @@ save th8.
 
 (*
 
-PhoX connait aussi la négation noté " ~A " pour "non A" et l'absurde noté
+PhoX connait aussi la nÃ©gation notÃ© " ~A " pour "non A" et l'absurde notÃ©
 "False".
 
 PhoX permet alors de faire de la logique classique en utilisant la
-démonstration par l'absurde ou le tiers exclu. Pour faire une
-démonstration par l'absurde, on peut utiliser la commande
+dÃ©monstration par l'absurde ou le tiers exclu. Pour faire une
+dÃ©monstration par l'absurde, on peut utiliser la commande
 by_absurd. comme l'illustre la preuve suivante:
 
 *)
@@ -427,7 +427,7 @@ save th9.
 
 (*
 
-Remarque: lorsqu'une hypothèse se termine par une disjonction ou une négation,
+Remarque: lorsqu'une hypothÃ¨se se termine par une disjonction ou une nÃ©gation,
 on peut toujours appliquer la commande "elim", Ceci rend les preuves plus
 difficiles car on a plus de choix. 
 
@@ -438,9 +438,9 @@ excluded_middle = /\X (X or ~ X) : Theorem
 Il suffit de taper "elim excluded_middle with A" pour distinguer les cas
 A vrai et A faux.
 
-Remarque: Le /\X indique que ce théorème est valable pour toutes formules X.
+Remarque: Le /\X indique que ce thÃ©orÃ¨me est valable pour toutes formules X.
 
-L'utilisation du tiers exclu sera surtout utilse en calcul des prédicats.
+L'utilisation du tiers exclu sera surtout utilse en calcul des prÃ©dicats.
 
 Terminer la preuve suivante:
 
@@ -464,7 +464,7 @@ save th10.
 
 (*
 
-On peut savoir quels axiomes utilise la preuve d'un théorème en tapant:
+On peut savoir quels axiomes utilise la preuve d'un thÃ©orÃ¨me en tapant:
 
 *)
 
@@ -473,35 +473,35 @@ depend th3.
 
 (*
 
-On va maintenant utiliser le calcul des prédicats qui permet de
-prouver les proprités "d'objets" qui sont représentés par des
+On va maintenant utiliser le calcul des prÃ©dicats qui permet de
+prouver les propritÃ©s "d'objets" qui sont reprÃ©sentÃ©s par des
 "termes".
 
-Les termes sont contruits a partir de variables "x", "y" ... et à
+Les termes sont contruits a partir de variables "x", "y" ... et Ã 
 l'aide de symbole de fonction. Si "f" est un symbole de fonction
 unaire et si "t" est un terme alors "f t" est un terme. Si "g" est un
 symbole de fonction binaire et si "t ,u" sont deux termes alors "g t u" est
 un terme.
 
 On peut alors construire des formules en appliquant des constantes de
-prédicats aux termes. Si "P" est une constante de prédicat
+prÃ©dicats aux termes. Si "P" est une constante de prÃ©dicat
 unaire et si "t" est un terme alors "P t" est une formule. Si "R" est une
-constante de prédicat binaire et si "t, u" sont deux termes alors "R t u" est
+constante de prÃ©dicat binaire et si "t, u" sont deux termes alors "R t u" est
 une formule.
 
 On peut aussi construire des formules utilisant des quantificateur:
 "/\x A x" signifie "pour tout x on a (A x)" et "\/x A x" signifie "il
 existe x tel que (A x)". 
 
-Remarque: si l'on ecrit "E x" cela veut dire que "x" peut apparaître
-dans "E". Si l'on écrit "A", "x" ne peut pas apparaître dans "A".
+Remarque: si l'on ecrit "E x" cela veut dire que "x" peut apparaÃ®tre
+dans "E". Si l'on Ã©crit "A", "x" ne peut pas apparaÃ®tre dans "A".
  
-Remarque: on rencontre aussi l'abréviation "/\x:D E x" qui veut dire 
-"/\x (D x -> E x)" et l'abréviation "\/x:D E x" qui veut dire 
+Remarque: on rencontre aussi l'abrÃ©viation "/\x:D E x" qui veut dire 
+"/\x (D x -> E x)" et l'abrÃ©viation "\/x:D E x" qui veut dire 
 "\/x (D x & E x)".
 
-Les exercices qui suivent utilisent les constantes de prédicat unaire
-"D x" et "E x", les constantes de prédicat binaire "T x y" et "R x y"
+Les exercices qui suivent utilisent les constantes de prÃ©dicat unaire
+"D x" et "E x", les constantes de prÃ©dicat binaire "T x y" et "R x y"
 ainsi que le symbol de fonction unaire "f x":
 
 *)
@@ -515,8 +515,8 @@ Cst f : term -> term.
 
 (* 
 Cst D : term -> prop. veut dire que D prend un terme en argument et
-donne une proposition comme résultat: c'est bien la définition d'une
-constante de prédicat unaire.
+donne une proposition comme rÃ©sultat: c'est bien la dÃ©finition d'une
+constante de prÃ©dicat unaire.
 
 Entrez ces deux preuves:
 
@@ -549,42 +549,42 @@ save th12.
 
 Exercice: 
 
-Comprenez les deux preuves précédentes vous-même à partir de la
-connaissance que vous avez des règles logiques. Remarquez que
-l'introduction d'un "il existe" introduit une variable inconnue notée
+Comprenez les deux preuves prÃ©cÃ©dentes vous-mÃªme Ã  partir de la
+connaissance que vous avez des rÃ¨gles logiques. Remarquez que
+l'introduction d'un "il existe" introduit une variable inconnue notÃ©e
 "?n" dont on doit trouver la valeur. C'est aussi le cas de
-l'élimination d'un "pour-tout", mais souvant la tactique "elim" devine
-la valeur de cette inconnue. D'ailleurs dans la preuve précédente, on
+l'Ã©limination d'un "pour-tout", mais souvant la tactique "elim" devine
+la valeur de cette inconnue. D'ailleurs dans la preuve prÃ©cÃ©dente, on
 pouvait se passer de la commande "instance", la tactique "axiom"
-aurait aussi deviné la valeur des inconnues.
+aurait aussi devinÃ© la valeur des inconnues.
 
 On remarque qu'il y a en fait deux types de variables:
   - Les variables dites existentielles ("x", "y", ...) (introduite par 
-    l'élimination d'un quantificateur existentiel "\/x" ou
+    l'Ã©limination d'un quantificateur existentiel "\/x" ou
     l'introduction d'un quantificateur universelle "/\x"). Ce sont des 
-    constantes dont les seules propriétés sont données par les 
-    hypothèses de chaque buts. On ne peut pas changer "la valeur de
+    constantes dont les seules propriÃ©tÃ©s sont donnÃ©es par les 
+    hypothÃ¨ses de chaque buts. On ne peut pas changer "la valeur de
     ces variables"
   - Les variables universelles ("?1", "?2", ...) (introduite par 
-    l'élimination d'un quantificateur universelle "/\x" ou
+    l'Ã©limination d'un quantificateur universelle "/\x" ou
     l'introduction d'un quantificateur existentiel "\/x"). Ce sont des
-    variables dont on peut choisir la valeur à l'aide de la commande
+    variables dont on peut choisir la valeur Ã  l'aide de la commande
     "instance" afin de finir une preuve. 
   
-Remarque les règles logiques introduisent des contraintes de la forme
+Remarque les rÃ¨gles logiques introduisent des contraintes de la forme
   La variable "?1" ne peut pas utiliser la constante "x"
 
-Ces contraintes peuvent être affichées grâce à la commande
-"constraints". Une bonne illustration de ce phénomène consiste à
+Ces contraintes peuvent Ãªtre affichÃ©es grÃ¢ce Ã  la commande
+"constraints". Une bonne illustration de ce phÃ©nomÃ¨ne consiste Ã 
 essayer de prouver la formule "\/x R x -> /\x R x". 
 
-Ces contraintes peuvent aussi empêcher de terminer une preuve, si
-on applique certaines règles dans un ordre inadéquate.
+Ces contraintes peuvent aussi empÃªcher de terminer une preuve, si
+on applique certaines rÃ¨gles dans un ordre inadÃ©quate.
 
 Exercice: 
 
-Prouver les théorèmes suivant (en utilisant la logique classique
-seulement quand c'est nécéssaire):
+Prouver les thÃ©orÃ¨mes suivant (en utilisant la logique classique
+seulement quand c'est nÃ©cÃ©ssaire):
 
 *)
 

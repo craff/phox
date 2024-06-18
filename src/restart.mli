@@ -1,2 +1,0 @@
-
-val restart : unit -> 'a

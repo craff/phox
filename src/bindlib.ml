@@ -150,9 +150,7 @@ let mk_apply f a v = f v (a v)
 let mk_lapply f a v = f (a v)
 let mk_rapply f a v = f v a
 
-let mk_apply_test f a v = f v false (a v)
 let mk_lapply_test f a v = f false (a v)
-let mk_rapply_test f a v = f v false a
 
 (* the "bind" function of the monad: take an object of type ('a -> 'b)*)
 (* pre_term, that is a function with some free variables, an argument of type*)
@@ -171,18 +169,6 @@ let apply tf ta =
       let vars = merge vf va in
       Open(vars, [],
 	   mk_apply (select vf bf f) (select va ba a))
-
-let apply_test tf ta =
-  match tf, ta with
-    Closed(f), Closed(a) -> Closed (f true a)
-  | Closed(f), Open(va,ba,a) ->
-      Open(va,ba,mk_lapply_test f a)
-  | Open(vf,bf,f), Closed(a) ->
-      Open(vf, bf, mk_rapply_test f a)
-  | Open(vf,bf,f), Open(va,ba,a) ->
-      let vars = merge vf va in
-      Open(vars, [],
-	   mk_apply_test (select vf bf f) (select va ba a))
 
 (* Used in some cases ! *)
 let bind_apply = apply
@@ -344,7 +330,7 @@ let build_array a =
   in
   match
     fold_array
-      (fun x i a' -> unit_apply2 (fun x a' -> x::a') x a')
+      (fun x _ a' -> unit_apply2 (fun x a' -> x::a') x a')
       a 0 (unit [])
   with
     Closed(t) -> Closed (Array.of_list t)

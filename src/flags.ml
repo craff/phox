@@ -3,7 +3,6 @@
 (*			flags.ml			*)
 (*######################################################*)
 
-open Printf
 open Format
 
 type flag_value =
@@ -16,16 +15,16 @@ type flag =
     Fint of int ref
 |   Sint of (int -> unit) * (unit -> int)
 |   Fbool of bool ref
-|   Sbool of (bool -> unit) * (unit -> bool)
-|   Fstring of string ref
+(*|   Sbool of (bool -> unit) * (unit -> bool)*)
+(*|   Fstring of string ref*)
 |   Sstring of (string -> unit) * (unit -> string)
 
 let get_val = function
   Fint p -> Vint !p
 | Sint (_,f) -> Vint (f ())
 | Fbool p -> Vbool !p
-| Sbool (_,f) -> Vbool (f ())
-| Fstring p -> Vstring !p
+(*| Sbool (_,f) -> Vbool (f ())*)
+(*| Fstring p -> Vstring !p*)
 | Sstring (_,f) -> Vstring (f ())
 
 let flag_list = ref ([] : (string * (flag * flag_value)) list)
@@ -39,18 +38,18 @@ let rec set_flag s0 v =
   try let ptr = get_flag s0 in
   match v,ptr with
     (Vint n), (Fint p) -> p := n; set_flag s0 Vprint
-  | (Vint n), (Sint (set,get)) -> set n; set_flag s0 Vprint
+  | (Vint n), (Sint (set,_)) -> set n; set_flag s0 Vprint
   | (Vbool b), (Fbool p) -> p := b; set_flag s0 Vprint
-  | (Vbool b), (Sbool (set,get)) -> set b; set_flag s0 Vprint
-  | (Vstring s), (Fstring p) -> p := s; set_flag s0 Vprint
-  | (Vstring s), (Sstring (set,get)) -> set s; set_flag s0 Vprint
+  (*  | (Vbool b), (Sbool (set,get)) -> set b; set_flag s0 Vprint*)
+  (*  | (Vstring s), (Fstring p) -> p := s; set_flag s0 Vprint*)
+  | (Vstring s), (Sstring (set,_)) -> set s; set_flag s0 Vprint
   | (Vprint), (Fint p) ->
       open_hbox ();
       print_string s0;
       print_string " = ";
       print_int !p;
       print_newline ()
-  | (Vprint), (Sint (set,get)) ->
+  | (Vprint), (Sint (_,get)) ->
       open_hbox ();
       print_string s0;
       print_string " = ";
@@ -61,19 +60,19 @@ let rec set_flag s0 v =
       print_string s0;
       print_string (if !b then " = true" else " = false");
       print_newline ()
-  | (Vprint), (Sbool (set,get)) ->
+(*  | (Vprint), (Sbool (set,get)) ->
       open_hbox ();
       print_string s0;
       print_string (if get () then " = true" else " = false");
-      print_newline ()
-  | (Vprint), (Fstring p) ->
+      print_newline ()*)
+(*  | (Vprint), (Fstring p) ->
       open_hbox ();
       print_string s0;
       print_string " = \"";
       print_string (String.escaped !p);
       print_string "\"";
-      print_newline ()
-  | (Vprint), (Sstring (set,get)) ->
+      print_newline ()*)
+  | (Vprint), (Sstring (_,get)) ->
       open_hbox ();
       print_string s0;
       print_string " = \"";
@@ -191,14 +190,14 @@ let newcmd_resolve = ref false
 let _ = add_flag "newcmd_resolve" (Fbool newcmd_resolve)
 
 let reset_flags () =
-  List.iter (function (name,(v,init)) ->
+  List.iter (function (_,(v,init)) ->
     match init,v with
       (Vint n), (Fint p) -> p := n
-    | (Vint n), (Sint (set,get)) -> set n
+    | (Vint n), (Sint (set,_)) -> set n
     | (Vbool b), (Fbool p) -> p := b
-    | (Vbool b), (Sbool (set,get)) -> set b
-    | (Vstring s), (Fstring p) -> p := s
-    | (Vstring s), (Sstring (set,get)) -> set s
+    (*    | (Vbool b), (Sbool (set,get)) -> set b*)
+    (*| (Vstring s), (Fstring p) -> p := s*)
+    | (Vstring s), (Sstring (set,_)) -> set s
     | _ -> failwith "bug in reset_flags") !flag_list
 
 type trace_save = bool * bool

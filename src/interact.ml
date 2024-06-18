@@ -7,10 +7,9 @@
 
 open Basic
 open Format
-open Types.Base
-open Data_base.Object
-open Types
-open Parser
+open Type.Base
+open Type
+open Parse_base
 open Lambda_util
 open Af2_basic
 open Local
@@ -51,12 +50,7 @@ let empty_done = [], [], Exprmap.empty
 
 let singl_done (_,_,ad) e = [e], [], ad
 
-let print_eset l =
-  let f e = print_expr_tr e; print_string " , " in
-  List.iter f (fst l);
-  print_newline ()
-
-let mem_expr in_elim e (l,l',ad) =
+let mem_expr in_elim e (l,l',_) =
   let e = norm_expr e in
   try
     let fn = fun x -> add_non_unif None [e, x] in
@@ -112,7 +106,7 @@ and arule = goal -> state -> (goal * state) list * state list
 
 let ftrivial = ref (fun _ -> failwith "trivial not ready")
 
-let print_proof sl =
+let _print_proof sl =
   print_newline ();
   let ard = ref [] in
   let rec fn = function
@@ -130,27 +124,27 @@ let print_proof sl =
             Printf.printf "No_rule"; print_newline ()
 	| In_rule _ ->
             Printf.printf "In_rule"; print_newline ()
-    	| Arrow_intro (s,n,e) ->
+    	| Arrow_intro (s,n,_) ->
             Printf.printf "Arrow_intro creating hyp %d(%s)" n s;
             print_newline ()
     	| Cut_rule (s,n,n',p) ->
             Printf.printf "Cut_rule creating hyp %d(%s) in %d, %d" p s n n';
             print_newline ()
-    	| Forall_intro (s,n,k) ->
+    	| Forall_intro (s,n,_) ->
             Printf.printf "Forall_intro creating var %d(%s)" n s;
             print_newline ()
     	| Arrow_elim (n,n') ->
             Printf.printf "Arrow elim on ref %d and %d" n n'; print_newline ()
-    	| Forall_elim (e,t) ->
+    	| Forall_elim (e,_) ->
             Printf.printf "Forall elim on object ";
             print_expr e; print_newline ()
-    	| Fact_def (e2,e3,t) ->
+    	| Fact_def _ ->
             Printf.printf "Factor definition of object"; print_newline ()
-    	| Devl_def (e2,t) ->
+    	| Devl_def _ ->
             Printf.printf "Devl definition of object"; print_newline ()
-    	| Lr_eqn (p,e,n,n') ->
+    	| Lr_eqn _ ->
             Printf.printf "Lr eqn"; print_newline ()
-    	| Rl_eqn (p,e,n,n') ->
+    	| Rl_eqn _ ->
             Printf.printf "Rl eqn"; print_newline ()
     	| Decl_local_def _ -> ()
         | Comment s -> Printf.printf "Comment %s" s; print_newline ()
@@ -158,11 +152,6 @@ let print_proof sl =
     	| Theo e ->
             Printf.printf "apply theorem"; print_expr e; print_newline ()); print_newline (); fn next)
   in List.iter fn sl
-
-type lastrule =
-  Notcom
-| Elim of int * bool * bool * int * bool ref
-| Intro of int * bool * bool * int
 
 let lastopt = ref None
 let lastcmp = ref None
@@ -213,7 +202,7 @@ let call_trivial tri ulocal (gl0,st0,nl0) lrg =
     let glsts,gl0,st0,nl0 =
       List.fold_right gn lrg ([],gl0,st0,nl0) in
     (* let us call trivial ! *)
-    let nr, nlp = !ftrivial tri glsts in
+    let _, nlp = !ftrivial tri glsts in
     let nulocal = get_ulocal () in
     let r = (nulocal, (gl0, st0, nlp @ nl0 )) in
     set_ulocal save;
@@ -244,7 +233,7 @@ let save_stack =
 
 let set_local n =
   try match !cur_proof with
-    A_proof {remain = nr} ->
+    A_proof {remain = nr; _} ->
       cur_local := (fst (nth_try n nr)).local;
       cur_env := n
   | _ ->
@@ -303,7 +292,7 @@ let restore_to s =
 
 let pop_store () =
   match !save_stack with
-    (p,c,vk,u,"",pos)::ls ->
+    (_,_,_,_,"",_)::ls ->
       save_stack:=ls;
   | _ -> raise (Failure "bug in restore")
 
@@ -339,13 +328,13 @@ let remove_from_nomatch undoable n =
   update nomatch_set (Set.remove n !nomatch_set)
 
 let unlock_instancied () =
-  let rec fn n =
+  let fn n =
     try let _ = getuvar n in remove_from_nomatch false n
     with Not_found -> ()
   in
   Set.iter fn !nomatch_set
 
-let print_goal sy new_goal n i ({hyp = hl; concl = f; ax_test = b; local = local}) =
+let print_goal sy new_goal n i ({hyp = hl; concl = f; local = local; _}) =
     let save_local = !cur_local in
     cur_local := local;
     open_vbox 0;
@@ -356,7 +345,7 @@ let print_goal sy new_goal n i ({hyp = hl; concl = f; ax_test = b; local = local
       close_box ();
       print_cut ();
     end;
-    let fn (s,(e,n,_,_,_)) =
+    let fn (s,(e,_,_,_,_)) =
       print_string s; print_string " := "; print_expr_sy sy e;
       print_cut () in
     list_do fn hl;
@@ -368,7 +357,7 @@ let print_goal sy new_goal n i ({hyp = hl; concl = f; ax_test = b; local = local
 let do_goals () =
   if not !compiling then begin
     match !cur_proof with
-      A_proof {goal = f0;remain = remain; leaf = leaf} ->
+      A_proof {remain; _} ->
 	let total = List.length remain in
 	print_string
 	(match remain with _::_::_ -> "Here are the goals:" | _ -> "Here is the goal:");
@@ -388,7 +377,7 @@ let do_goals () =
       print_string "<phox>";
       print_newline ();
     (match !cur_proof with
-      A_proof {goal = f0;remain = remain; leaf = leaf} ->
+      A_proof {remain; _} ->
 	let total = List.length remain in
 	print_string
 	(match remain with _::_::_ -> "Here are the goals:" | _ -> "Here is the goal:");
@@ -410,15 +399,15 @@ let get_goal n =
 
 let is_higher_order t =
   let rec fn = function
-      EApp(t,a) -> fn t
+      EApp(t,_) -> fn t
     | UVar(n,k) -> (try fn (getuvar n) with Not_found -> order k > 1)
     | _ -> false
   in fn t
 
 let the_head t =
   let rec fn = function
-      EApp(t,a) -> fn t
-    | UVar(n,k) as t -> (try fn (getuvar n) with Not_found -> t)
+      EApp(t,_) -> fn t
+    | UVar(n,_) as t -> (try fn (getuvar n) with Not_found -> t)
     | _ -> t
   in fn t
 
@@ -443,13 +432,13 @@ let test_seq loc e ng hypt =
   | [] -> acc
   in
   let rec fn = function
-      EAtom(o,k) ->
+      EAtom(o,_) ->
 	if is_capsule o then begin
 	  match get_value o with
 	    Def e -> fn e
  	  | _ -> None
 	end else None
-    | UCst(n,k) -> (
+    | UCst(n,_) -> (
 	try let (e, l) = List.assoc n loc.cst_eq in
         match fn e with
 	  None -> None
@@ -461,7 +450,7 @@ let test_seq loc e ng hypt =
     if l = [] then e else let (_,_,e,_,_) = last l in e
   in
   match e with
-    EApp(EApp(EAtom(o,k),e1),e2) when o == equal_obj ->
+    EApp(EApp(EAtom(o,_),e1),e2) when o == equal_obj ->
       begin
 	let n, e', leq =
 	  match fn e1, fn e2 with
@@ -498,7 +487,7 @@ let update_hypeq hyp eqn loc =
 	   let e = match b with Theor _ -> e | _ -> norm_expr e in
 	   let l0, nd = decompose_eq l e in
 	   let find = ref false in
-	   let rec gn eqn (e1,e2,nl,andpath,nc,keq) =
+	   let gn eqn (e1,e2,nl,andpath,nc,keq) =
 	     let v = mk_Var() in
 	     let pos = get_undo_pos () in
 	     (try
@@ -586,7 +575,7 @@ let update_goals = List.map update_goal
 let add_hyp tri (name,(a1,_,_,_,_) as hyp) gl loc e =
   let a1 = norm_expr a1 in
   let is_trivial = match a1 with
-    EApp(EApp(EAtom(o,k),u),v) when
+    EApp(EApp(EAtom(o,_),u),v) when
       equal_obj == o && equal_expr u v -> true
   | _ -> false
   in
@@ -608,12 +597,6 @@ let add_hyp tri (name,(a1,_,_,_,_) as hyp) gl loc e =
      let hyp, neqns, nlocal = update_hypeq [hyp] gl.eqns loc in
      hyp@(List.remove_assoc name gl.hyp), singl_done gl.done_list e, neqns, nlocal, true
   end
-
-let build_app e l =
-  let rec fn = function
-    [] -> e
-  | (t,_)::l -> EApp(fn l,t)
-  in fn l
 
 let apply_rewrite toadd nl gl00 st00 ls =
   if ls = [] then gl00,st00,nl else begin
@@ -638,7 +621,7 @@ let apply_rewrite toadd nl gl00 st00 ls =
         let st1 = Fol {sref = gl0.gref; rule = rule; next = st0} in
         stc.next <- st1;
         fn (st@nl) gl1 st1 ls
-  | (Req(path,context,Some stic,e1,_,stc,st,dir) as r)::ls ->
+  | (Req(path,context,Some stic,_,_,stc,_,dir) as r)::ls ->
         if stic.sref = -1 then begin
           left_to_do := r::!left_to_do
         end else begin
@@ -707,8 +690,6 @@ let apply_rewrite toadd nl gl00 st00 ls =
   if !left_to_do <> [] then failwith "bug 1356 in apply_rewrite";
   r end
 
-exception No_subgoal
-
 let rec default_kvar = function
   UVar (n,k) -> (
     try default_kvar (getuvar n);()
@@ -717,26 +698,26 @@ let rec default_kvar = function
       let r' = Map.add n (default_of k) r in
       set_ulocal (r',a,b,c))
 | EApp (t1,t2) -> default_kvar t1; default_kvar t2
-| EAbs (_,t1,k) -> default_kvar t1
-| Path(path,t1) -> default_kvar t1
+| EAbs (_,t1,_) -> default_kvar t1
+| Path(_,t1) -> default_kvar t1
 | _ -> ()
 
 let default_inst_kind k =
   let rec f t = match norm t with
       KVar ptr -> update ptr kForm
     | KArrow(k, k') -> f k; f k'
-    | KAtom (a,l) -> List.iter f l
+    | KAtom (_,l) -> List.iter f l
     | _ -> ()
   in f k
 
 let default_inst_path path =
-  let rec g = function
-      PAbs(s, k) -> default_inst_kind k
+  let g = function
+      PAbs(_, k) -> default_inst_kind k
     | _ -> ()
   in List.iter g path
 
 let rec default_kinst = function
-  UVar (n,k) -> (
+  UVar (n,_) -> (
     try default_kinst (getuvar n);()
     with Not_found -> assert false)
 | EApp (t1,t2) -> default_kinst t1; default_kinst t2
@@ -751,10 +732,10 @@ module Inttbl = Myhashtbl.Poly_Hashtbl (struct type key = int end)
 
 let rec look_for_local_def o = function
   Fin _ -> true
-| Fol {rule = Decl_local_def(_,o'); next = next} when o == o' -> false
-| Fol {next = next} -> look_for_local_def o next
+| Fol {rule = Decl_local_def(_,o'); _} when o == o' -> false
+| Fol {next = next; _} -> look_for_local_def o next
 
-let rec build_proof e sr sl root =
+let build_proof _ sr sl root =
   let proofs = Inttbl.create 201 in
   let guses = Inttbl.create 201 in
   let getd n =
@@ -764,7 +745,7 @@ let rec build_proof e sr sl root =
   let last_p = ref (EVar (-1)) in
   let cur = ref (Fin 0) in
   let subg = ref 0 in
-  let nr = List.map (fun ({gref = n}, l) ->
+  let nr = List.map (fun ({gref = n; _}, l) ->
     incr subg;
     Fol {sref = n;rule =
 	 Comment ("goal "^(string_of_int !subg)); next = l}) sr
@@ -785,14 +766,14 @@ let rec build_proof e sr sl root =
        match !td with
          [] -> td:=!tdr; tdr:=[]
        | st::sl -> cur:= st; td:=sl)
-    | Fin n -> failwith "bug: Get Fin non 0 in build_proof"
+    | Fin _ -> failwith "bug: Get Fin non 0 in build_proof"
     | Fol {sref = n1; rule = rule; next = next} ->
       let cont p = last_n:=n1; last_p := p; cur := next in
       try match rule with
         Axiom n ->
           cont (UCst (n, dum_kind))
       | Subgoal n ->
-          Inttbl.add_find guses n (ref 1) (fun p -> incr p) (fun b -> ());
+          Inttbl.add_find guses n (ref 1) (fun p -> incr p) (fun _ -> ());
           cont (UCst (n, dum_kind))
       | Cut_rule (s,n,n',q) -> (
           let (p1,p2) = if n = !last_n then !last_p,(getd n')
@@ -826,7 +807,7 @@ let rec build_proof e sr sl root =
                        , !last_p),e))
       | Fact_def (e2,e3,t) -> (
           match e3 with
-            EAtom (o,k) ->
+            EAtom (o,_) ->
               if (Data_base.Object.get_value o).origin = Local_def &&
                  look_for_local_def o next
               then begin
@@ -839,7 +820,7 @@ let rec build_proof e sr sl root =
           | _ -> failwith "bug 008 in build_proof")
       | Devl_def (e2,t) -> (
           match e2 with
-            Path(path,(EAtom (o,k))) ->
+            Path(_,(EAtom (o,_))) ->
               if (Data_base.Object.get_value o).origin = Local_def &&
                  look_for_local_def o next
               then begin
@@ -1011,7 +992,7 @@ let rule_use dir tri s e gl0 st0 =
 let do_next n =
   store "next";
   match !cur_proof with
-    A_proof ({remain = remain} as record) ->
+    A_proof ({remain; _} as record) ->
           let nremain =
             try if n = 0 then rotate remain
                 else if n < 0 then extract (-n) remain
@@ -1020,7 +1001,7 @@ let do_next n =
           cur_proof := A_proof {record with remain = nremain };
           (match nremain with
             [] -> raise (Failure "bug in do_next")
-          | (gl,_)::_ -> do_goals ());
+          | (_,_)::_ -> do_goals ());
           set_local 0
   | _ -> raise (Ill_rule "Not proving.")
 
@@ -1082,7 +1063,7 @@ let new_names = ref []
 
 let get_exists_var addq do_open local e =
   let rec fn e stack = match e with
-      EApp(EAtom(o,_),EAbs(n,e1,_))
+      EApp(EAtom(o,_),EAbs(n,_,_))
       when o == !exists_obj || o == !exists_one_obj
       -> [if addq then "?"^n else n]
     | EApp(e1,u) -> fn e1 (u::stack)
@@ -1126,7 +1107,7 @@ let sort_rules elim loc e = function
   | [_] as rules -> rules
   | rules ->
       let rules = List.map (
-	function (_,(_,th,pat,n,l,_,_)) as r ->
+	function (_,(_,_,pat,n,_,_,_)) as r ->
 	  (dist loc e (saturate_pattern pat),
 	   if elim then 0 else rule_width pat n), r) rules
       in
@@ -1135,7 +1116,7 @@ let sort_rules elim loc e = function
           let fn n l o =
 	    let x = match l with
 	      Intro_opt(x,_) -> x
-            | Elim_opt (x::l) -> x
+            | Elim_opt (x::_) -> x
 	    | _ -> failwith "bug1 in sort_rules"
             in
 	    if isINV x && elim then (o,2,n) else
@@ -1146,7 +1127,7 @@ let sort_rules elim loc e = function
 	  if n < n' then -1 else 1) rules in
       List.map snd rules
 
-let rec get_intros inv_only leqn loc do_open e0 =
+let get_intros inv_only leqn loc do_open e0 =
   let e0 = norm_expr e0 in
 (*
   print_expr e; print_newline ();
@@ -1167,7 +1148,7 @@ let rec get_intros inv_only leqn loc do_open e0 =
     with Not_found -> [e0], [], []
   in
   let intros =
-      select  (fun (s,(_,th,_,_,l,_,_)) ->
+      select  (fun (_,(_,_,_,_,l,_,_)) ->
                  match l with Intro_opt(x,_) -> not (isTOT x)
                                               && not (do_open && isNEC x)
 		                              && not inv_only
@@ -1176,10 +1157,10 @@ let rec get_intros inv_only leqn loc do_open e0 =
   in
   let acc = ref [] in
   let totals e =
-    match e with EApp(e',ea) ->
+    match e with EApp(_,ea) ->
       let rec fn ea =
         try
-          let f,o,k,largs = decom' ea in
+          let f,o,_,largs = decom' ea in
           if List.exists (equal_pos_eq o) !acc then [] else begin
             acc:=o::!acc;
             (try
@@ -1219,7 +1200,7 @@ let rec get_intros inv_only leqn loc do_open e0 =
     | _ -> []
   in
   let totals =
-      select  (fun (s,(_,th,_,_,l,_,_)) ->
+      select  (fun (_,(_,_,_,_,l,_,_)) ->
                  match l with Intro_opt(x,o) ->
 		   isTOT x && (not inv_only || isINV x) &&
 		   (not do_open || not (isNEC x)) &&
@@ -1331,7 +1312,7 @@ let rec rule_intro did_inv tri rule_opt gl0 st0 =
 			 ax_test = false; done_list = ndl; local = nlocal;
 			 oldhyp = gl.oldhyp} in
               fn ng nl gl1 st1 ls)
-	| EApp(EApp(EAtom(o,[k1;k2]),a1),(EAbs(so,_,k) as a2)) when o == !let_obj ->
+	| EApp(EApp(EAtom(o,[_;_]),a1),(EAbs(so,_,k) as a2)) when o == !let_obj ->
 	    let s = if s <> ""  && eopt = None then
 	      if s.[0] = '?' then
 		free_name (String.sub s 1 (String.length s - 1)) []
@@ -1352,7 +1333,7 @@ let rec rule_intro did_inv tri rule_opt gl0 st0 =
               | _ -> assert false
             in
             fn ng nl gl1 st1 ls
-	| EApp(EAtom(o,[_]),(EAbs(so,a1,k) as a2) ) when o == forall_obj ->
+	| EApp(EAtom(o,[_]),(EAbs(so,_,k) as a2) ) when o == forall_obj ->
             if inv_only || test o then
               exit ((gl,st)::ng),nl else (
 		set o;
@@ -1454,7 +1435,7 @@ let rec rule_intro did_inv tri rule_opt gl0 st0 =
 
   and kn tpl ng nl gl st ls = function
           [] ->  exit ((gl,st)::ng),nl
-        | (s0,(f,th,aux,nb,optinf,order,_))::l' ->
+        | (s0,(f,th,aux,nb,optinf,_,_))::l' ->
 	let th, f, _ = generalize_for_rules th f aux in
         let (s',eopt,ls') = match ls with
           [] -> "",[],[]
@@ -1492,7 +1473,7 @@ and rule_elim in_rule tri noeq no_elim abs opt n e1 gl0 st0 =
 
   let e1,lr =
     match (get_inst e1) with
-      EApp(EApp(EAtom (o,k),e),_) when o == theorem_obj -> e,[Th e1]
+      EApp(EApp(EAtom (o,_),e),_) when o == theorem_obj -> e,[Th e1]
     | _ ->
     if in_rule then e1,[] else
     try
@@ -1599,7 +1580,7 @@ and rule_elim in_rule tri noeq no_elim abs opt n e1 gl0 st0 =
 	  with Not_found | Type_Clash _ ->
 	    continuation_nowith (UVar(new_uvar(),k))
       end
-  | EApp(EApp(EAtom (o,k),ea),er) ->
+  | EApp(EApp(EAtom (o,_),ea),er) ->
      if o != arrow_obj then
        gn in_rule (noeq && o == !and_obj) numincr gl0 st0 nl0 prev
           goal abs opt nb e1 la n else begin
@@ -1695,10 +1676,10 @@ and rule_elim in_rule tri noeq no_elim abs opt n e1 gl0 st0 =
 	     begin try
 	       unif k kForm;
  	       let ax =
-		 match e with EAtom(o,k) when
+		 match e with EAtom(o,_) when
 		   (Data_base.Object.get_value o).origin = Local_hyp ->
       		     (try
-		       let (e,n,b,_,_) =
+		       let (_,n,b,_,_) =
 			 (List.assoc (get_name o) gl0.hyp) in
 		       Some (hyp_to_rule n b)
       		     with
@@ -1727,10 +1708,10 @@ and rule_elim in_rule tri noeq no_elim abs opt n e1 gl0 st0 =
 	   OptFl e ->
 	     type_strong e kForm;
 	     let ax =
-	       match e with EAtom(o,k) when
+	       match e with EAtom(o,_) when
 		 (Data_base.Object.get_value o).origin = Local_hyp ->
       		   (try
-		     let (e,n,b,_,_) =
+		     let (_,n,b,_,_) =
 		       (List.assoc (get_name o) gl0.hyp) in
 		     Some (hyp_to_rule n b)
       		   with
@@ -1777,10 +1758,10 @@ and rule_elim in_rule tri noeq no_elim abs opt n e1 gl0 st0 =
       in
       try match search_opt nb opt
       with OptDf (str,opt0) ->
-        let (f,th,aux,n0,optinf,order,_) = try List.assoc str l
+        let (f,th,aux,n0,optinf,_,_) = try List.assoc str l
         with Not_found ->
           raise (Ill_rule "Invalid rule for this connective") in
-        let th, f, aux = generalize_for_rules th f aux in
+        let th, f, _ = generalize_for_rules th f aux in
         let (flags, optinf) = match optinf with
             Elim_opt (x::l) -> x, l
           | _ -> failwith "bug 737 in elim" in
@@ -1833,13 +1814,13 @@ and rule_elim in_rule tri noeq no_elim abs opt n e1 gl0 st0 =
 
   and kn in_rule noeq numincr gl0 st0 nl0 prev goal abs opt nb e1 la n = function
     [] -> raise (Ill_rule "Tactic elim failed.")
-  | (elim_name,(f,th,aux,n0,optinf,order,_))::ls ->
+  | (elim_name,(f,th,aux,n0,optinf,_,_))::ls ->
         if !trace_trivial then begin
 	  print_string ("Trying elim named: "^elim_name^" ");
 	  print_expr f;
 	  print_newline ();
 	end;
-        let th, f, aux = generalize_for_rules th f aux in
+        let th, f, _ = generalize_for_rules th f aux in
 	let pos = get_undo_pos () in
         let save_ulocal = get_ulocal () in
         try
@@ -1904,7 +1885,7 @@ and rule_elim in_rule tri noeq no_elim abs opt n e1 gl0 st0 =
       print_newline ();
 *)
       try
-        let (e,n,b,_,_) = (List.assoc hyp gl0.hyp) in
+        let (_,n,b,_,_) = (List.assoc hyp gl0.hyp) in
         let st = Fol {sref = gl0.gref;rule = hyp_to_rule n b;
                       next = st0} in
         ng, (st::nl)
@@ -2043,7 +2024,7 @@ and rule_elim in_rule tri noeq no_elim abs opt n e1 gl0 st0 =
     hn (not in_rule) [] nl gl0 st0 la
 
 
-let rec get_lefts inv_only from_trivial opt hypname gl0 =
+let get_lefts inv_only from_trivial opt hypname gl0 =
   let hyp,nhyp,bt,status,dleft =
     try List.assoc hypname gl0.hyp
     with Not_found -> raise (Ill_rule ("hypothesis "^hypname^" not found."))
@@ -2060,7 +2041,7 @@ let rec get_lefts inv_only from_trivial opt hypname gl0 =
       if can_left o then
 	let od = o::od in
 	let tt = try symhash_find tbl_elim o with Not_found -> [] in
-	let tt = select (function (od,(e1,e2,_,n,Elim_opt ln,order,_)) ->
+	let tt = select (function (_,(_,e2,_,_,Elim_opt ln,_,_)) ->
 	  if from_trivial && (inv_only != None &&
 			      !auto_left_lvl <= 1 && fst dleft) ||
 	    List.memq e2 (snd dleft) then false else
@@ -2102,7 +2083,7 @@ let rec rule_left tri hypname rule_opt inv_only gl0 st0 =
 
   let rec fn = function
     [] -> raise (Ill_rule "No left rule apply.")
-  | ((name,od),(e1,e20,aux,n,ln,order,_))::lefts ->
+  | ((name,od),(e1,e20,aux,n,ln,_,_))::lefts ->
       try
 	if !trace_trivial then begin
 	  print_string "trying left rule on hyp: ";
@@ -2137,23 +2118,23 @@ let rec rule_left tri hypname rule_opt inv_only gl0 st0 =
 	      else match l with
 		[] -> [], []
 	      | (x,e)::l when x = name ->
-		  List.map fst (List.filter (fun (x,e) -> e = None) l),
+		  List.map fst (List.filter (fun (_,e) -> e = None) l),
 		  (match e with None -> [] | Some e -> e)
 	      | (x,None)::_ as l when not (List.mem x all_names) ->
-		  List.map fst (List.filter (fun (x,e) -> e = None) l),
+		  List.map fst (List.filter (fun (_,e) -> e = None) l),
 		  []
-	      | (x,_)::l -> raise (Ill_rule "left failed")
+	      | (_,_)::_ -> raise (Ill_rule "left failed")
 	    in
 	    l, eopt, RNum 0
         in
-        let e2, e1, aux = generalize_for_rules e20 e1 aux in
+        let e2, _, _ = generalize_for_rules e20 e1 aux in
         let nr, nl =
           rule_elim true tri false true true [0, OptWith eopt] n e2 gl0 st0
         in
         let rec gn accr accl ll ni nr = match nr, ni with
           ((gl1,st1)::nr),(is::ni) ->
 	    if isINV flags && tri.from_trivial then begin
-	      let fn ((s,(e,pos,b,status,(dl,dleft))) as hyp) =
+	      let fn ((s,(e,pos,b,status,(_,dleft))) as hyp) =
 		if s = hypname then  (s,(e,pos,b,status,(true,e20::dleft)))
 		else hyp in
 	      gl1.hyp <- List.map fn gl1.hyp;
@@ -2164,7 +2145,7 @@ let rec rule_left tri hypname rule_opt inv_only gl0 st0 =
 		gn accr (nl@accl) ll ni nr
               else gn (accr@[gl1,st1]) accl ll ni nr
             end else begin
-              let gl1, st1,nb_hyp =
+              let gl1, st1, _ =
                 if isINV flags && (isREM flags || not tri.from_trivial) &&
 		  List.mem_assoc hypname gl1.hyp
 		then
@@ -2208,7 +2189,7 @@ let rec rule_left tri hypname rule_opt inv_only gl0 st0 =
                     gn (accr@nnr) (nnl@accl) ll2 ni nr
 	      | _ -> failwith "bug 4 in rule_left")
 	    end
-        | [gl1,st1], [] -> accr, accl
+        | [_], [] -> accr, accl
         | _ -> failwith "bug 1 in rule_left" in
         let nl =
           let (gl1,st1) = last nr in
@@ -2234,10 +2215,10 @@ let rec rule_left tri hypname rule_opt inv_only gl0 st0 =
         match inv_only with
           None -> r
         | Some p -> p := ln; r
-      with Ill_rule s -> fn lefts
+      with Ill_rule _ -> fn lefts
   in try fn lefts
      with
-        Ill_rule s  when not tri.from_trivial &&
+        Ill_rule _  when not tri.from_trivial &&
                                match rule_opt with RNum _ | Names _ -> true
                                             | _ -> false
             -> raise (Gen_error "left rule do not apply")
@@ -2245,7 +2226,7 @@ let rec rule_left tri hypname rule_opt inv_only gl0 st0 =
 let rule_auto_elim tri gl0 st0 =
    let rec fn = function
      [] -> raise Not_found
-   | (s,(e,pos,b,status,dleft))::l -> (
+   | (s,(e,_,_,_,_))::l -> (
        let save_ulocal = get_ulocal () in
        let upos = get_undo_pos () in
        try
@@ -2280,14 +2261,14 @@ let test_clean_auto_elim nr nl n p st0 st1 father =
   let cuts = get_cuts Set.empty st1 in
   (* checks if hypothesys of cuts produced by the left rule have been used *)
   if List.exists (function
-    Fol {rule = Axiom q} -> n < q && q < p
-  | Fol {rule = Subgoal q} -> Set.mem q cuts
+    Fol {rule = Axiom q; _} -> n < q && q < p
+  | Fol {rule = Subgoal q; _} -> Set.mem q cuts
   | _ -> false) nl
   then
     None
   else begin
     (* remove the memorized cut *)
-    List.iter (fun ({done_list = (l,l',m2)} as gl,_) ->
+    List.iter (fun ({done_list = (l,l',m2); _} as gl,_) ->
         let (b,m) = Exprmap.fold (fun k n (b,m) ->
             if Set.mem n cuts then (true, Exprmap.remove k m) else (b, m)
           ) m2 (false, m2) in
@@ -2300,7 +2281,7 @@ let test_clean_auto_elim nr nl n p st0 st1 father =
     Hashtbl.add tbl father true;
     let fst1 = ref None in
     let _ = match st0 with
-      Fin p -> ()
+      Fin _ -> ()
     | Fol x -> Hashtbl.add tbl x.sref false in
     let rec to_keep = function
         Fin _ ->
@@ -2321,9 +2302,6 @@ let test_clean_auto_elim nr nl n p st0 st1 father =
     fst1.next <- st0;
     Some (nnl, fst1, old_next)
   end
-
-let limdiv l d =
-  if d <= 1 then l - 1 else l / d
 
 type goal_typ =
   To_prove of (trinfo * goal * state)
@@ -2346,7 +2324,7 @@ let mktri tri lim =
     auto_elim = tri.auto_elim; eqflvl= tri.eqflvl }
 
 let sort_goals anr =
-  let rec count_intro g =
+  let count_intro g =
     try 1 + List.length (snd (get_intros false g.eqns g.local true g.concl))
     with Not_found -> 1
   in
@@ -2361,7 +2339,7 @@ let sort_goals anr =
       (g,st,d)) anr
   in
   let anr =
-    let cmp (g1,_,d1) (g2,_,d2) =
+    let cmp (_,_,d1) (_,_,d2) =
       if d1 > d2 then -1 else 1
     in
     List.sort cmp anr
@@ -2525,7 +2503,7 @@ let rule_trivial, mult_trivial  =
                      (To_prove_auto(tri,n,p,st0,st1,gl1.gref,nr'')::suit)
                      [] st [c]
                | [] -> fn suit st)
-           | Some (nst, st1, old_next) ->
+           | Some (nst, _, _) ->
 	       fn suit nst)
 
       | (To_prove (tri,gl,st0))::suit ->
@@ -2548,7 +2526,7 @@ let rule_trivial, mult_trivial  =
              match drm with
                None ->
                  try_taxiom tri None suit [] (st'@st) nr'
-             | Some optinf ->
+             | Some _ ->
                  let p = new_const () in
                  match nr' with
                    (gl2,st2 as c)::nr'' ->
@@ -2628,7 +2606,7 @@ let rule_trivial, mult_trivial  =
 	     f hypn1 - f hypn2
 	   in
 	   let hyp = List.sort compare_hyp gl.hyp in
-           try_map (fun _ (hypn,(f,hypnum,_,hyp_st,dleft)) ->
+           try_map (fun _ (hypn,(f,_,_,_,dleft)) ->
 	     if snd dleft <> [] then raise (Ill_rule "");
 (*
 	     let new_cmd_hyp = String.length hypn >= 5 &&
@@ -2669,7 +2647,7 @@ let rule_trivial, mult_trivial  =
 		   ref [0, OptWith (List.map (List.map fn) w)]
 		 with
 		   Not_found -> ref []
-		 | Unbound s -> ref []
+		 | Unbound _ -> ref []
 		 | e -> cur_local := save_local; raise e
 	       in
 	       cur_local := save_local;
@@ -2723,7 +2701,7 @@ let rule_trivial, mult_trivial  =
 *)
                    raise (Found (try_taxiom tri (Some 1) suit [] (st'@st) nr'))
                  with
-                   Ill_rule s ->
+                   Ill_rule _ ->
 		     do_undo pos;
                      set_ulocal save_ulocal;
                      if !b then add_non_unif (Some lastvar) als;
@@ -2792,19 +2770,19 @@ let rule_theo e gl0 st0 =
 
 let is_claim o =
   match get_value o with
-    Def (EApp(EApp(EAtom(o1,k), _), EAtom(p,_))) ->
+    Def (EApp(EApp(EAtom(o1,_), _), EAtom(p,_))) ->
       (o1 == theorem_obj) && (p == claim_obj)
   | _ -> false
 
 let is_just_theo o =
   match get_value o with
-    Def (EApp(EApp(EAtom(o1,k), _), _)) ->
+    Def (EApp(EApp(EAtom(o1,_), _), _)) ->
       (o1 == theorem_obj)
   | _ -> false
 
 let is_theo o f =
   match get_value o with
-    Def (EApp(EApp(EAtom(o1,k), g), _)) ->
+    Def (EApp(EApp(EAtom(o1,_), g), _)) ->
       (o1 == theorem_obj) && (equal_expr f g)
   | _ -> false
 
@@ -2821,18 +2799,18 @@ let do_save s exported =
 	| Some s, None -> s
 	| None, Some s -> s
 	| Some s, Some s' when s = s' -> s
-	| Some s, Some s' ->
+	| Some _, Some _ ->
 	    raise (Ill_rule "You allready gave another name to the theorem")
 	in
 	gname, name, tname, (exported && exported'), v, g, poly
-    | A_proof ({ goal = e; remain = nr; leaf = lf} as prf) ->
+    | A_proof ({ goal = e; remain = nr; leaf = lf; _} as prf) ->
 	let name = match s, prf.pname with
 	  None, None ->
 	    raise (Ill_rule "You must give a name to the theorem")
 	| Some s, None -> s
 	| None, Some s -> s
 	| Some s, Some s' when s = s' -> s
-	| Some s, Some s' ->
+	| Some _, Some _ ->
 	    raise (Ill_rule "You allready gave a name to the theorem")
 	in
   	if prf.remain <> [] then raise (Ill_rule "Proof not finished");
@@ -2993,7 +2971,7 @@ let rule_apply tri s l n e gl st =
       failwith "bug in rule_absurd"
 
 
-let rec try_axiom did_unif auto_lvl nr nl =
+let try_axiom did_unif auto_lvl nr nl =
     if auto_lvl <= 0 then (nr,nl) else
     let rec kn nl = function
 	[] -> [],nl
@@ -3089,7 +3067,7 @@ let prove_claim name exported =
   try
     let o = sym_get name in
     match get_value o with
-      Def (EApp(EApp(EAtom(o1,k), e), EAtom(p,_))) when
+      Def (EApp(EApp(EAtom(o1,_), e), EAtom(p,_))) when
 	(o1 == theorem_obj) && (p == claim_obj) ->
 	  do_goal e (Some name) None exported
     | _ -> raise Not_found
@@ -3109,7 +3087,7 @@ let do_instance auto_lvl e1 e2 =
     unlock_instancied ();
     if auto_lvl > 0 then begin
       match !cur_proof with
-	A_proof ({ goal = f0;remain = nr; leaf = nl} as record) ->
+	A_proof ({ remain = nr; leaf = nl; _} as record) ->
 	  let ng = List.length nr in
 	  let (nr,nl) =
             try_axiom true auto_lvl nr nl in
@@ -3155,19 +3133,19 @@ b:= true : arbre (en not. prefixe)  des expressions *)
 let do_rule auto_lvl str goal_num rl =
   store str;
   try match !cur_proof with
-    A_proof ({goal = f0;remain = remain; leaf = leaf} as record) ->
+    A_proof ({goal = f0;remain = remain; leaf = leaf; _} as record) ->
       let leaf = ref leaf in
       let nb_new_goals = ref 0 in
       let did_unif = ref false in
       let treat_one_goal goal_number (gl, state) =
 	set_local goal_number;
 	let uvars = List.fold_left
-	    (fun x (_,(e,n,b,_,_)) -> Set.union x (list_uvar e))
+	    (fun x (_,(e,_,_,_,_)) -> Set.union x (list_uvar e))
 	    (list_uvar gl.concl) gl.hyp
 	in
 	let (nr,nl) = rl gl state in
 	let uvars' = List.fold_left
-	    (fun x (_,(e,n,b,_,_)) -> Set.union x (list_uvar e))
+	    (fun x (_,(e,_,_,_,_)) -> Set.union x (list_uvar e))
 	    (list_uvar gl.concl) gl.hyp
 	in
 	did_unif := !did_unif || not (Set.is_empty (Set.diff uvars uvars'));
@@ -3203,7 +3181,7 @@ let do_rule auto_lvl str goal_num rl =
       let old =
 	let rec fn = function
 	    (true, _)::l -> fn l
-	  | (false, (gl, st))::l -> gl.gref::(fn l)
+	  | (false, (gl, _))::l -> gl.gref::(fn l)
 	  | [] -> []
 	in fn nr
       in

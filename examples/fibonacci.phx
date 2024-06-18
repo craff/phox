@@ -9,7 +9,7 @@ new_equation Fib_1.
 new_equation Fib_n.
 Fib_total = /\n:N  N (Fib n) : Theorem
 
-II. La valeur absolue de la différence
+II. La valeur absolue de la diffÃ©rence
 Cst lInfix[3.5] x "|-|" y : nat -> nat -> nat.
 claim pm1 /\x,y:N (x <= y -> x |-| y = y - x).
 claim pm2 /\x,y:N (y <= x -> x |-| y = x - y).
@@ -21,7 +21,7 @@ pm.add.N = /\x,y,z:N  (y <= x -> x |-| (y + z) = x - y |-| z) : Theorem
 new_equation pm.add.N.
 N2lesslesseq = /\x,x',z:N  (N2 <= x -> x' * x <= z * x + N1 -> x' <= z) : Theorem
 
-III. Le polynôme de Fibonacci
+III. Le polynÃ´me de Fibonacci
 def Pfib x y = (x * x + x*y) |-| y * y.
 Pfib_total = \/x,y:N  N (Pfib x y) : Theorem
 Pfib.rec = /\x,y:N  (x <= y -> Pfib x y = Pfib (y - x) x) : Theorem
@@ -92,7 +92,7 @@ Fib_total = /\n:N  N (Fib n) : Theorem
 new_intro -i -t Fib Fib_total.
 
 
-(** La valeur absolue de la différence
+(** La valeur absolue de la diffÃ©rence
 *)
 
 Cst lInfix[3.5] x "|-|" y : nat -> nat -> nat.
@@ -353,7 +353,7 @@ elim -1 x' -3 z lesseq.case1.N.
 
 deux cas x' <= z ou z < x': 
 
-cas x'<= z évident
+cas x'<= z Ã©vident
 
 cas z < x' : on cherche une contradiction
 ...
@@ -416,7 +416,7 @@ trivial =G4.
 *)
 
 
-(** Le polynôme de Fibonacci
+(** Le polynÃ´me de Fibonacci
 *)
 
 def Pfib x y = (x * x + x*y) |-| y * y.
@@ -446,14 +446,14 @@ rewrite mul.rsub.dist.N mul.lsub.dist.N.
 *)
 rewrite -nc add.rsub.N.
 (*4 goals created.
-3 conditions a vérifier ensuite :
+3 conditions a vÃ©rifier ensuite :
 ...
    |- N (y * x - x * x)              : c3
 ...
    |- N (y * y - x * y)              : c2
 ...
    |- y * x - x * x <= y * y - x * y :c1
-Résultat :
+RÃ©sultat :
 ...
    |- x * x + x * y |-| y * y = y * y - x * y |-| x * x
 *)
@@ -474,7 +474,7 @@ rewrite pm.add.N.
 *)
 elim equal.reflexive.
 (*0 goal created.
-Vérification des 3 conditions :
+VÃ©rification des 3 conditions :
 condition c1 :
 ...
    |- y * x - x * x <= y * y - x * y   
@@ -487,7 +487,7 @@ rewrite -r mul.lsub.dist.N.
 elim -1 (y-x) -3 x -5 (y-x) -7 y  lesseq.mul.N.
 (*6 goals created, with 5 automatically solved.
 
-1 nouvelle  condition à vérifier :
+1 nouvelle  condition Ã  vÃ©rifier :
 ...
    |- y - x <= y - x
 *)
@@ -755,7 +755,7 @@ G3 := y - x <= x
 elim -1 x -3 (y - x) lesseq.case1.N.
 (*4 goals created, with 3 automatically solved.
 Deux cas :
- y - x  < x : évident 
+ y - x  < x : Ã©vident 
    ou 
 H4 := x <= y - x
 Rappel :

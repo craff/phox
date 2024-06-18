@@ -6,8 +6,8 @@
 open Format
 open Basic
 open Data_base.Object
-open Types.Base
-open Types
+open Type.Base
+open Type
 open Print
 open Lambda_util
 open Typunif
@@ -19,8 +19,8 @@ let rec get_last = function
 
 
 let string_syntax = function
-  Prefix (sy,perm) -> "Prefix["^(level_to_string (get_last sy))^"]"
-| Infix (ll,lr,sy,perm,_,_) ->
+  Prefix (sy,_) -> "Prefix["^(level_to_string (get_last sy))^"]"
+| Infix (ll,lr,sy,_,_,_) ->
             if level_leq lr ll then
               "lInfix["^(level_to_string (idelta' lr))^"]"
             else if level_leq lr (get_last sy) then
@@ -31,7 +31,7 @@ let string_syntax = function
 
 let get_prior o = match get_syntax o with
   Prefix (sy,_) -> get_last sy
-| Infix (ll,lr,sy,_,_,_) -> lr
+| Infix (_,lr,_,_,_,_) -> lr
 | _ -> max_level
 
 
@@ -103,7 +103,7 @@ let do_search s k =
 
 let sp_describe e =
   match get_ext_tbl e with
-    Equations tbl -> let rec tr = function Eq_theo o -> get_name o
+    Equations tbl -> let tr = function Eq_theo o -> get_name o
                                  | _ -> failwith "bug in sp_describe" in
                     eqhash_it_table (fun all k l ->
                       List.flatten (List.map (fun (_,_,_,_,_,_,eqtl) ->
@@ -116,9 +116,9 @@ let sp_describe e =
                         (List.map (fun (_,(_,e,_,_,_,_,_)) ->
                                get_name e ^ " (" ^ get_name k ^")"
                         ) l) @ all) [] tbl
-  | Trivial_Hacks tbl -> symhash_it_table (fun all k l ->
+  | Trivial_Hacks tbl -> symhash_it_table (fun all k _ ->
                            get_name k::all) [] tbl
-  | Tex_syntax tbl -> symhash_it_table (fun all k l ->
+  | Tex_syntax tbl -> symhash_it_table (fun all k _ ->
                            get_name k::all) [] tbl
 
 let show_special s = try

@@ -4,8 +4,7 @@
 (*######################################################*)
 
 
-open Data_base
-open Types
+open Type
 
 exception Stack
 
@@ -32,7 +31,7 @@ val fkTheorem : kind ref
 (* reset the name of kind variables used to print polymorphic kind *)
 val reset_kind_var : unit -> unit
 
-(* a list of object in the base which should be printed by a special function. 
+(* a list of object in the base which should be printed by a special function.
    this function will get the list of arguments of the constant *)
 val print_sp : (af2_obj * (expr list -> expr)) list ref
 val do_texify : bool -> bool -> string -> string

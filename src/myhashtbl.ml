@@ -58,7 +58,7 @@ module type Hashtbl = sig
            restoring the previous binding if it List.exists.
            It does nothing if [x] is not bound in [tbl]. *)
 
-  val do_table : (key -> 'a -> 'c) -> 'a t -> unit
+  val do_table : (key -> 'a -> unit) -> 'a t -> unit
         (* [Hashtbl.iter f tbl] applies [f] to all bindings in table [tbl],
 	   discarding all the results.
            [f] receives the key as first argument, and the associated val
@@ -121,7 +121,7 @@ module Hashtbl (Key_type : Key_type) = struct
     let newdata = Array.make nn Empty in
       let rec fn = function
         Empty -> ()
-      | Cons ({hash = hn; next = rest} as bucket) ->
+      | Cons ({hash = hn; next = rest; _} as bucket) ->
           fn rest;
           let r = newdata.(mo hn nn) in
           bucket.next <- r; newdata.(mo hn nn) <- Cons bucket
@@ -133,7 +133,7 @@ module Hashtbl (Key_type : Key_type) = struct
     if n < 0 then true else
       match bucket with
         Empty -> false
-      | Cons{hash = hash; next = rest} ->
+      | Cons{hash = hash; next = rest; _} ->
           if List.mem hash hl then
             bucket_too_long hl n rest
           else
@@ -159,43 +159,43 @@ module Hashtbl (Key_type : Key_type) = struct
 
     match h.data.(i) with
       Empty -> raise Not_found
-    | Cons({key = k1; next = rest1} as buck1) ->
+    | Cons({key = k1; next = rest1; _} as buck1) ->
         if eq key k1 then h.data.(i) <- rest1 else
         match rest1 with
           Empty -> raise Not_found
-        | Cons({key = k2; next = rest2} as buck2) ->
+        | Cons({key = k2; next = rest2; _} as buck2) ->
             if eq key k2 then buck1.next <- rest2 else
             match rest2 with
               Empty -> raise Not_found
-            | Cons({key = k3; next = rest3} as last) ->
+            | Cons({key = k3; next = rest3; _} as last) ->
                 if eq key k3 then buck2.next <- rest3 else begin
-                  let rec rm ({next = pr} as buck) = function
+                  let rec rm buck = function
                       Empty ->
                         raise Not_found
-                    | Cons({key = k; next = rest} as last) ->
+                    | Cons({key = k; next = rest; _} as last) ->
                         if eq key k then buck.next <- rest else rm last rest
                   in rm last rest3
                 end
 
-  let fast_remove h ({hash = hn} as bucket) =
+  let fast_remove h ({hash = hn; _} as bucket) =
     let i = mo hn (Array.length h.data) in
 
     match h.data.(i) with
       Empty -> raise Not_found
-    | Cons({next = rest1} as buck1) ->
+    | Cons({next = rest1; _} as buck1) ->
         if buck1 == bucket then h.data.(i) <- rest1 else
         match rest1 with
           Empty -> raise Not_found
-        | Cons({next = rest2} as buck2)->
+        | Cons({next = rest2; _} as buck2)->
             if buck2 == bucket then buck1.next <- rest2 else
             match rest2 with
               Empty -> raise Not_found
-            | Cons({next = rest3} as buck3) ->
+            | Cons({next = rest3; _} as buck3) ->
                 if buck3 == bucket then buck2.next <- rest3 else begin
-                  let rec rm ({next = pr} as obuck) = function
+                  let rec rm obuck = function
                       Empty ->
                         raise Not_found
-                    | Cons({next = rest} as buck) ->
+                    | Cons({next = rest; _} as buck) ->
                         if buck == bucket then obuck.next <- rest
                                           else rm buck rest
                   in rm buck3 rest3
@@ -205,20 +205,20 @@ module Hashtbl (Key_type : Key_type) = struct
   let find h key =
     match h.data.(mo (hash key) (Array.length h.data)) with
       Empty -> raise Not_found
-    | Cons{key = k1; hval = d1; next = rest1} ->
+    | Cons{key = k1; hval = d1; next = rest1; _} ->
         if eq key k1 then d1 else
         match rest1 with
           Empty -> raise Not_found
-        | Cons{key = k2; hval = d2; next = rest2} ->
+        | Cons{key = k2; hval = d2; next = rest2; _} ->
             if eq key k2 then d2 else
             match rest2 with
               Empty -> raise Not_found
-            | Cons{key = k3; hval = d3; next = rest3} ->
+            | Cons{key = k3; hval = d3; next = rest3; _} ->
                 if eq key k3 then d3 else begin
                   let rec find = function
                       Empty ->
                         raise Not_found
-                    | Cons{key = k; hval = d; next = rest} ->
+                    | Cons{key = k; hval = d; next = rest; _} ->
                         if eq key k then d else find rest
                   in find rest3
                 end
@@ -232,7 +232,7 @@ module Hashtbl (Key_type : Key_type) = struct
         h.data.(i) <- Cons bucket;
         if bucket_too_long [] h.max_len h.data.(i) then resize h;
         fn bucket
-    | Cons{key = k; hval = d; next = rest} ->
+    | Cons{key = k; hval = d; next = rest; _} ->
         if eq key k then ft d else find rest
     in find h.data.(i)
 
@@ -240,7 +240,7 @@ module Hashtbl (Key_type : Key_type) = struct
     let rec find_in_bucket = function
       Empty ->
         []
-    | Cons{key = k; hval = d; next = rest} ->
+    | Cons{key = k; hval = d; next = rest; _} ->
         if eq k key then d :: find_in_bucket rest
                          else find_in_bucket rest in
     find_in_bucket h.data.(mo (hash key) (Array.length h.data))
@@ -251,7 +251,7 @@ module Hashtbl (Key_type : Key_type) = struct
       let rec do_bucket = function
           Empty ->
             ()
-        | Cons{key = k; hval = d; next = rest} ->
+        | Cons{key = k; hval = d; next = rest; _} ->
             f k d; do_bucket rest in
       do_bucket h.data.(i)
     done
@@ -263,7 +263,7 @@ module Hashtbl (Key_type : Key_type) = struct
       let rec do_bucket = function
           Empty ->
             ()
-        | Cons{key = k; hval = d; next = rest} ->
+        | Cons{key = k; hval = d; next = rest; _} ->
             res := f !res k d; do_bucket rest in
       do_bucket h.data.(i)
     done;

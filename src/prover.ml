@@ -628,7 +628,7 @@ module Prover(Logic:Logic) = struct
 	num=1
       then
 	match morceaux with
-	| [m]
+	| [_]
 	  ->
 	    [c] (* on est certain ainsi du bon tri des littéraux *)
 	| m::morceaux
@@ -884,8 +884,8 @@ module Prover(Logic:Logic) = struct
     let rec fst_sub_snd l1 l2 =
       match l1,l2 with
       | [],[] -> true
-      | [],a2::l2 -> true
-      | a1::l1,[] -> false
+      | [],_::_ -> true
+      | _::_,[] -> false
       | a1::l1,a2::l2
 	->
 	  if
@@ -899,8 +899,8 @@ module Prover(Logic:Logic) = struct
     let rec which_one_sub l1 l2 =
       match l1,l2 with
       | [],[] -> "both"
-      | [],a2::l2 -> "1"
-      | a1::l1,[] -> "2"
+      | [],_::_ -> "1"
+      | _::_,[] -> "2"
       | a1::l1,a2::l2
 	->
 	  if
@@ -1049,7 +1049,7 @@ let contract l c1 c2 contrainte =
     | e::lp1,_
       ->
 	(try
-	  let n,subs,changecont,newcont,newl,ll = unif (Contraction(actucont)) l e in
+	  let _,subs,changecont,newcont,newl,ll = unif (Contraction(actucont)) l e in
 	  (aux l lp1 ln2 c1 c2 lp ln lu actucont) (* on passe *)
 	  @
 	  let l = newl in
@@ -1069,7 +1069,7 @@ let contract l c1 c2 contrainte =
     | _,e::ln2
       -> (* c'est la même chose *)
 	(try
-	  let n,subs,changecont,newcont,newl,ll = unif (Contraction(actucont)) l e in
+	  let _,subs,changecont,newcont,newl,ll = unif (Contraction(actucont)) l e in
 	  (aux l lp1 ln2 c1 c2 lp ln lu actucont) (* on passe *)
 	  @
 	  let l = newl in
@@ -1126,7 +1126,7 @@ let contract l c1 c2 contrainte =
       cndats:=premajcndats clause !cndats !djvues;
       let contrac_list = contract l c1 c2 cont in
       List.iter
-	(fun (l,c1,c2,contravant,contrapres,lp,ln,lu)
+	(fun (l,c1,c2,_contravant,contrapres,lp,ln,lu)
 	  ->
 	    let cl = { (merge_contr l clause c1 c2 lp ln lu) with
 	      vientde = Contrac(clause.numero,clause.vientde,l) ;
@@ -1266,16 +1266,14 @@ let contract l c1 c2 contrainte =
 
 (* réinitialise complètement les djvues *)
 
-let real_init u =
-
+let real_init _ =
   initdjvues:=[];
   Hashtbl.clear initallclauses
 
 exception TimeOut
 
 (* initialise les valeurs au départ de la preuve *)
-let init u =
-
+let init _ =
   djvues:=!initdjvues;
   cndats := [];
   taillecndats := 0;
@@ -1297,7 +1295,7 @@ let init u =
 
 (* foncion qui arrête le processus si le temps est fini *)
 
-  let time_out n =
+  let time_out _ =
     Format.print_flush();
     Format.print_string "Temps imparti écoulé\n";
     Format.print_flush();
@@ -1320,7 +1318,7 @@ let init u =
 
     met:=methode;
 
-    let rec res u =
+    let rec res _ =
       match !cndats with
       | []
 	->raise Prove_fails

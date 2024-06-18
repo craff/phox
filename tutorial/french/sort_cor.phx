@@ -1,12 +1,12 @@
 (*
-Attention : Si vous êtes un débutant avec les assitants de preuves, il 
-est vivement conseillé d'avoir fait le tutorial tautologie.phx 
+Attention : Si vous Ãªtes un dÃ©butant avec les assitants de preuves, il 
+est vivement conseillÃ© d'avoir fait le tutorial tautologie.phx 
 avant celui-ci
 *)
 
 (* 
-Voici d'abord quelques définitions,
-Comprenez les (surtout la dernière) !
+Voici d'abord quelques dÃ©finitions,
+Comprenez les (surtout la derniÃ¨re) !
 *)
 
 def decidable A R = /\x,y:A (R x y or ~R x y).
@@ -27,7 +27,7 @@ def Well_founded D R =
 (*
 On se donne une sorte et des constructeurs pour les listes.
 On fait tout cela avec une commande "magique" : les types
-de données inductifs (voir le chapitre correspondant de la documentation):
+de donnÃ©es inductifs (voir le chapitre correspondant de la documentation):
 *)
 
 Data List A =
@@ -35,53 +35,53 @@ Data List A =
 | [Cons] rInfix[3] x "::" l of A and  List A.
 . 
 
-(* Regardez tous ce que fait cette commande ! Mais n'y réféchissez pas
+(* Regardez tous ce que fait cette commande ! Mais n'y rÃ©fÃ©chissez pas
 trop maintenant. Demandez vous simplement ce qui se passe quand vous
 utilisez les listes dans ce qui suit. 
 *)
 
 (*
-On introduit le premier niveau de détection automatique des axiomes. 
-Si un but est un axiome, il sera immédiatement résolu !
+On introduit le premier niveau de dÃ©tection automatique des axiomes. 
+Si un but est un axiome, il sera immÃ©diatement rÃ©solu !
 *)
 flag auto_lvl 1.
 
 (*
-Deux propositions intéressantes sur les listes. 
-Les preuves sont toutes faites et commentées:
+Deux propositions intÃ©ressantes sur les listes. 
+Les preuves sont toutes faites et commentÃ©es:
 *)
 goal /\A,B (/\x:A B x -> /\l:(List A) List B l). 
-(* Avec le type inductif, c'est automatique (récurrence triviale). *)
+(* Avec le type inductif, c'est automatique (rÃ©currence triviale). *)
 trivial.
 save List_increasing.
 
 goal /\A,B/\l (List A l -> List B l -> List \x (A x & B x) l). 
 intro 4.
 (* 
-On fait une récurrence sur H := List A l. Cela veut dire
-que l'on utilise le théorème rec.List généré automatique 
-et ajouté comme règle d'élimination pour les listes.
+On fait une rÃ©currence sur H := List A l. Cela veut dire
+que l'on utilise le thÃ©orÃ¨me rec.List gÃ©nÃ©rÃ© automatique 
+et ajoutÃ© comme rÃ¨gle d'Ã©limination pour les listes.
 *)
 elim H.
 trivial.
 intros.
 (* 
 On fait une analyse de cas sur List B (x::l0). Cela veut dire
-que l'on utilise le théorème case.List généré automatique 
-et ajouté comme règle d'élimination pour les listes, 
-mais ce n'est pas la règle par défaut, donc il faut 
-l'indiquer à la main.
+que l'on utilise le thÃ©orÃ¨me case.List gÃ©nÃ©rÃ© automatique 
+et ajoutÃ© comme rÃ¨gle d'Ã©limination pour les listes, 
+mais ce n'est pas la rÃ¨gle par dÃ©faut, donc il faut 
+l'indiquer Ã  la main.
 *)
 elim H3 with [case].
 (*
-le fait que Nil soit distinct de Cons a été ajouté comme
-règle gauche inversible. Ce but est donc trivial. 
+le fait que Nil soit distinct de Cons a Ã©tÃ© ajoutÃ© comme
+rÃ¨gle gauche inversible. Ce but est donc trivial. 
 left H4 marcherait aussi
 *)
 trivial.
 (*
-le fait que Cons soit injectif a été ajouté comme
-règle gauche inversible. Il suffit de faire left
+le fait que Cons soit injectif a Ã©tÃ© ajoutÃ© comme
+rÃ¨gle gauche inversible. Il suffit de faire left
 pour l'utiliser.
 *)
 left H6.
@@ -92,8 +92,8 @@ trivial.
 save List_conjunction.
 
 (*
-On ajoute une constante de fonction binaire pour chaque symbole de prédicat
-binaire, et les axiomes définissant cette fonction:
+On ajoute une constante de fonction binaire pour chaque symbole de prÃ©dicat
+binaire, et les axiomes dÃ©finissant cette fonction:
 *)
 Cst insert : ('a -> 'a -> prop) -> 'a -> list['a] -> list['a].
 
@@ -108,7 +108,7 @@ new_equation insert_Cons_1.
 new_equation insert_Cons_2.
 
 (*
-Prouvez la totalité de cette fonction:
+Prouvez la totalitÃ© de cette fonction:
 *)
 goal /\D,R (decidable D R -> /\a:D /\l:(List D) List D (insert R a l)).
 (*->*)
@@ -122,13 +122,13 @@ trivial.
 save List_insert.
 
 (*
-On l'ajoute comme règle d'introduciotn 
--t: c'est un théorème de totalité
+On l'ajoute comme rÃ¨gle d'introduciotn 
+-t: c'est un thÃ©orÃ¨me de totalitÃ©
 *)
 new_intro -t -i insert List_insert.
 
 (*
-On utilise insert pour définir la fonction de tri d'une liste
+On utilise insert pour dÃ©finir la fonction de tri d'une liste
 *)
 Cst sort : ('a -> 'a -> prop) -> list['a] -> list['a].
 
@@ -139,7 +139,7 @@ new_equation sort_Nil.
 new_equation sort_Cons.
 
 (*
-Prouvez la totalité de cette fonction:
+Prouvez la totalitÃ© de cette fonction:
 *)
 goal /\D,R (decidable D R -> /\l:(List D) (List D (sort R l))).
 (*->*)
@@ -151,21 +151,21 @@ trivial.
 save List_sort.
 
 (*
-On l'ajoute comme règle d'introduciotn 
--t: c'est un théorème de totalité
+On l'ajoute comme rÃ¨gle d'introduciotn 
+-t: c'est un thÃ©orÃ¨me de totalitÃ©
 *)
 new_intro -t -i sort List_sort.
 
 (*
-Un prédicat inductif exprimant que l' est obtenu en insérant x dans l a une
-position quelconque (l'option -i indique que la règle d'introduction de nil 
+Un prÃ©dicat inductif exprimant que l' est obtenu en insÃ©rant x dans l a une
+position quelconque (l'option -i indique que la rÃ¨gle d'introduction de nil 
 est inversible).
 *)
 Inductive Insert x l l' =
   nil -i : /\l0 Insert x l0 (x::l0)
 | cons : /\a/\l0,l1 (Insert x l0 l1 -> Insert x (a::l0) (a::l1)).
 
-(* deux exemples de preuves à comprendre seul ! *)
+(* deux exemples de preuves Ã  comprendre seul ! *)
 goal /\x /\l (~ Insert x l Nil).
 intros.
 intro.
@@ -186,7 +186,7 @@ trivial.
 trivial.
 save Insert_List.
 
-(* à vous de jouer ! *)
+(* Ã  vous de jouer ! *)
 goal /\A/\x,l'/\l:(List A) (Insert x l' l -> A x).
 (*->*)
 intros.
@@ -222,15 +222,15 @@ trivial.
 save cdr_Insert.
 
 (*
-On utilise Insert pour définir le prédicat suivant. 
-Pourquoi a-t'on besoin de ce prédicat pour prouver que "sort" est bien
+On utilise Insert pour dÃ©finir le prÃ©dicat suivant. 
+Pourquoi a-t'on besoin de ce prÃ©dicat pour prouver que "sort" est bien
 une fonction triant une liste ?
 *)
 
 (* 
-Pour des raisons étrange, la règle de récurrence de Equiv n'est pas prouvée
+Pour des raisons Ã©trange, la rÃ¨gle de rÃ©currence de Equiv n'est pas prouvÃ©e
 automatiquement par PhoX dans un temps raisonnable. 
-L'option "-ce" (claim elim) indique de ne pas essayer, on va le faire nous même
+L'option "-ce" (claim elim) indique de ne pas essayer, on va le faire nous mÃªme
 *)
 Inductive Equiv l l' -ce = 
   Nil -i : Equiv Nil Nil
@@ -248,10 +248,10 @@ trivial.
 save.
 
 (*
-Que signifie des deux prédicats qui suivent ?
-Que pensez vous de la définition de Minore ?
-Quel différence de style avec les prédicats Equiv et Insert 
-précédents ?
+Que signifie des deux prÃ©dicats qui suivent ?
+Que pensez vous de la dÃ©finition de Minore ?
+Quel diffÃ©rence de style avec les prÃ©dicats Equiv et Insert 
+prÃ©cÃ©dents ?
 *)
 def Minore D R x l = List \y (D y & R x y) l.
 
@@ -263,7 +263,7 @@ Inductive Sorted D R l =
 Import nat. 
 
 (*
-On définit la longueur d'une liste pour pouvoir faire une induction la
+On dÃ©finit la longueur d'une liste pour pouvoir faire une induction la
 dessus.
 *)
 Cst length : list['a] -> nat.
@@ -281,7 +281,7 @@ save length_total.
 new_intro -t -i length length_total.
 
 (*
-Un propriété de Insert et length à prouver
+Un propriÃ©tÃ© de Insert et length Ã  prouver
 *)
 goal /\x,l,l' (Insert x l l' -> length l' = S (length l)).
 (*->*)
@@ -297,8 +297,8 @@ new_equation length_Insert.
 
 (*
 Examinez bien la preuve suivante ! il faudra en faire d'autres sur le
-même modèle !
-Reportez vous à la doc pour voir ce que font les tactiques que vous ne
+mÃªme modÃ¨le !
+Reportez vous Ã  la doc pour voir ce que font les tactiques que vous ne
 comprennez pas !
 *)
 goal /\D,R (decidable D R -> /\x:D/\l:(List D) Insert x l (insert R x l)).
@@ -393,18 +393,18 @@ trivial.
 save sort_Sorted.
 
 (*
-Les théorèmes 
+Les thÃ©orÃ¨mes 
   sort_Sorted et sort_Equiv 
 exprime bien sur sort est correct, n'est ce pas ?
 *)
 
 (*
-Si vous êtes arrivé là,
-amusons nous à prouver que Equiv est une relation d'équivalence !
+Si vous Ãªtes arrivÃ© lÃ ,
+amusons nous Ã  prouver que Equiv est une relation d'Ã©quivalence !
 *)
 
 (*
-Commençons par quelques lemmes ...
+CommenÃ§ons par quelques lemmes ...
 *)
 goal /\A/\l2:(List A)/\x,y/\l1,l3 (
   Insert x l1 l2 -> Insert y l2 l3 ->
@@ -498,7 +498,7 @@ trivial.
 save Equiv_reflexive.
 
 (*
-Une preuve facile de la symétrie !
+Une preuve facile de la symÃ©trie !
 Que pouvez vous en dire ?
 *)
 goal /\A (symetric (List A) Equiv).
@@ -565,7 +565,7 @@ trivial.
 save lemme_Equiv.
 
 (*
-Et on peut enfin prouver la transitivité !
+Et on peut enfin prouver la transitivitÃ© !
 *)
 goal /\A (transitive (List A) Equiv).
 (*->*)

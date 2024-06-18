@@ -8,32 +8,10 @@ VERSFILE=version
 
 # you should know what you are doing if you modify anything beyond this line
 
-TARGET = phoxslow$(EXE)
-TARGETO = phoxopt$(EXE)
+TARGET = phox
 
 include ../$(CONFIGFILE)
 include ../$(VERSFILE)
-
-############
-
-
-$(TARGET) : version.ml
-	ocamlbuild -pp camlp4o -pkgs num,unix main.byte
-	ln -f _build/main.byte $@
-
-$(TARGETO) : version.ml
-	ocamlbuild -pp camlp4o -pkgs num,unix main.native
-	ln -f _build/main.native $@
-
-clean:
-	ocamlbuild -clean
-	- rm -rf *~ \#*\# $(TARGET) $(TARGETO)
-
-veryclean: clean
-	- rm -f version.ml .depend
-
-.SUFFIXES :
-.SUFFIXES : .mli .ml .cmi .cmx .cmo .o
 
 version.ml: ../version ../config Makefile
 	if [ -f version.ml ]; then rm -f version.ml; fi;\
@@ -41,5 +19,19 @@ version.ml: ../version ../config Makefile
 	echo 'let default_path = "$(DEFAULT_PATH)"' >> version.ml;\
 	echo "let delim = '$(DELIM)'" >> version.ml;\
 
-install: $(PHOXVERS)
-	cp $(PHOXVERS) $(BINDIR)/phox$(EXE)
+############
+
+all: version.ml
+	dune build
+
+clean:
+	dune clean
+
+veryclean: clean
+	- rm -f version.ml phox_main.ml
+
+.SUFFIXES :
+.SUFFIXES : .mli .ml .cmi .cmx .cmo .o
+
+install:
+	dune install

@@ -30,7 +30,7 @@ def complement B A = \x (~A x & B x).
 def complement_2 B A = \x,y (~A x y & B x y).
 def complement_3 B A = \x,y,z (~A x y z & B x y z).
 
-def injective X Y f = (X => Y) f & /\x,y:X (f x = f y -> x = y). 
+def injective X Y f = (X => Y) f & /\x,y:X (f x = f y -> x = y).
 def surjective X Y f = (X => Y) f & /\y:Y \/x:X y = f x.
 def bijective X Y f = injective X Y f & surjective X Y f.
 
@@ -61,7 +61,7 @@ save.
 new_equation surjective_bis.
 
 lemma Inv_bijective_image /\X,Y /\f:(injective X Y) bijective (Direct_image f X) X (Inv f X).
-intros. 
+intros.
 prove /\y:(Direct_image f X) \/!x:X y = f x.
 trivial.
 prove /\y:(Direct_image f X) (X (Inv f X y) & y = f (Inv f X y)).
@@ -93,7 +93,7 @@ save.
 
 
 lemma Inv1 /\X,Y /\f:(injective X Y) /\y:(Direct_image f X) (f (Inv f X y) = y).
-intros. 
+intros.
 prove /\y:(Direct_image f X) \/!x:X y = f x.
 trivial.
 prove /\y:(Direct_image f X) (X (Inv f X y) & y = f (Inv f X y)).
@@ -295,10 +295,11 @@ save.
 
 Import nat.
 
+def Test x = N x.
 def Cardinal A n = N n & \/f (bijective \x (N x & x < n) A f).
 
 (*
-fact Cardinal_remove /\n:N /\A /\a:A (Cardinal A (S n) -> 
+fact Cardinal_remove /\n:N /\A /\a:A (Cardinal A (S n) ->
 Cardinal \x (A x & x != a) n).
 intros.
 local A' = \x (A x & x != a).
@@ -309,7 +310,7 @@ apply H3 with H0.
 lefts G.
 intros.
 Import bool.
-local g n = f (if n < x then n else (S n)).   
+local g n = f (if n < x then n else (S n)).
 instance ?1 g.
 prove  (\x (N x & x < n) => A') g.
 intros.

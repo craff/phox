@@ -1,36 +1,36 @@
-(* On inclus certaines définitions toutes prêtes *)
+(* On inclus certaines dÃ©finitions toutes prÃªtes *)
 Import requis.
 
 
-(* Voici une première preuve. Comprenez la preuve et
+(* Voici une premiÃ¨re preuve. Comprenez la preuve et
 comment on la tape dans le logiciel.
 
 IL EST INDISPENSABLE que vous fassiez la relation entre la
 preuve sur machine et la preuve sur papier que vous faites 
-en TD ou à l'examen. *)
+en TD ou Ã  l'examen. *)
 
 goal /\A,B,C (A minus (B union C) = (A minus B) inter (A minus C)).
-(* On "décompose" la formule à prouver *)
+(* On "dÃ©compose" la formule Ã  prouver *)
 (* on commence par les "pour tout" *)
 intros.
-(* maintenant on décompose l'égalité des deux ensembles *)
+(* maintenant on dÃ©compose l'Ã©galitÃ© des deux ensembles *)
 intro.
-(* 2 sous-buts sont crées, on décompose le premier *)
+(* 2 sous-buts sont crÃ©es, on dÃ©compose le premier *)
 intros.
-(* on va maintenant décomposer l'hypothèse H *)
+(* on va maintenant dÃ©composer l'hypothÃ¨se H *)
 left H.
-(* on peut transformer l'hypothèse H0 grâce aux lois de De Morgan *)
+(* on peut transformer l'hypothÃ¨se H0 grÃ¢ce aux lois de De Morgan *)
 rewrite_hyp H0 demorganl.
-(* on décompose la conjonction *)
+(* on dÃ©compose la conjonction *)
 left H0.
-(* on décompose l'intersection *)
+(* on dÃ©compose l'intersection *)
 intro.
-(* on décompose la soustraction ensembliste *)
+(* on dÃ©compose la soustraction ensembliste *)
 intro.
 (* on a ce que l'on cherche *)
 axiom H.
 axiom H0.
-(* on décompose la soustraction ensembliste *)
+(* on dÃ©compose la soustraction ensembliste *)
 intro.
 (* on a ce que l'on cherche *)
 axiom H.
@@ -51,34 +51,34 @@ elim H1	with H3.
 elim H2 with H3.
 save tmp.
 
-(* On définit l'image directe et réciproque. Il faudra taper 
+(* On dÃ©finit l'image directe et rÃ©ciproque. Il faudra taper 
 ImageDir f A et non f[A] *)
 
 def ImageDir f A = { y | \/x in A  f x = y }.
 def ImageRec f A = { x | f x in A }.
 
-(* voici une preuve à terminer *)
+(* voici une preuve Ã  terminer *)
 
 goal /\f,A,B ImageDir f (A union B) = ImageDir f A union ImageDir f B.
 intros.
 intro.
 intros.
-(* x est mal nommé car dans l'ensemble d'arrivé, on renomme *)
+(* x est mal nommÃ© car dans l'ensemble d'arrivÃ©, on renomme *)
 rename x y.
-(* ici, on arrête de décomposer la formule à demontrer car 
+(* ici, on arrÃªte de dÃ©composer la formule Ã  demontrer car 
 on ne peut savoir si y est dans ImageDir f A ou ImageDir f B.
 *)
 left H.
 left H.
 left H.
-(* Dans le premier cas, on sait que y est dans ImageDir f A d'où le intro l
+(* Dans le premier cas, on sait que y est dans ImageDir f A d'oÃ¹ le intro l
 ("l" pour left) *)
 intro l.
 intro.
 intro.
 axiom H.
 axiom H0.
-(* Dans ce cas, on sait que y est dans ImageDir f B d'où le intro r
+(* Dans ce cas, on sait que y est dans ImageDir f B d'oÃ¹ le intro r
 ("r" pour right)*)
 intro r.
 intro.
@@ -86,7 +86,7 @@ intro.
 axiom H.
 axiom H0.
 
-(* terminer l'autre inclusion vous même *)
+(* terminer l'autre inclusion vous mÃªme *)
 (*->*)
 intros.
 left H.
@@ -241,8 +241,8 @@ trivial.
 (*->*)
 save idc'.
 
-(* On définit R réflexive. Remarquez que l'on doit écrire R x y au lieu de 
-x R y (dommage). Complétez les deux autres définitions *)
+(* On dÃ©finit R rÃ©flexive. Remarquez que l'on doit Ã©crire R x y au lieu de 
+x R y (dommage). ComplÃ©tez les deux autres dÃ©finitions *)
 
 def reflexive R = /\x (R x x).
 def symetrique R = 
@@ -256,7 +256,7 @@ def transitive R =
 
 def equivalence R = reflexive R & symetrique R & transitive R.
 
-(* On définit la classe de x pour la relation R.
+(* On dÃ©finit la classe de x pour la relation R.
 Remarque, on ne peut pas faire l'abus de notation que l'on
 fait toujours en math qui est d'oublier la relation dans
 la notation "x avec une barre au dessus" *)
@@ -270,9 +270,9 @@ trivial.
 (*->*)
 save inclass.
 
-(* pour cette preuve, on pourra introduire un lemme grâce à la
-commande prove. Si vous voulez utiliser le résultat précédent (ce
-n'est pas nécessaire), il faudra taper elim inclass with R *)
+(* pour cette preuve, on pourra introduire un lemme grÃ¢ce Ã  la
+commande prove. Si vous voulez utiliser le rÃ©sultat prÃ©cÃ©dent (ce
+n'est pas nÃ©cessaire), il faudra taper elim inclass with R *)
 
 goal /\R /\x,y (equivalence R -> (R x y <-> class R x = class R y)).
 (*->*)

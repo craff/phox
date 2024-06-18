@@ -60,7 +60,7 @@ def prime I = ideal I & ~(I one) & /\x,y ((I (x*y)) -> I x or I y).
 (* We will prove this lemma after the theorem. *)
 claim lemme /\I:ideal /\x (maximal I ->  ~ I x -> \/i:I \/a (i+a*x=one)).
 
-(* le sens direct du théorème *)
+(* le sens direct du thÃ©orÃ¨me *)
 goal /\I:ideal (maximal I -> prime I).
 (*->*)
 intros.

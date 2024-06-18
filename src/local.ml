@@ -4,9 +4,8 @@
 (*######################################################*)
 
 open Format
-open Types
-open Typunif
-open Types.Base
+open Type
+open Type.Base
 open Data_base
 open Undo
 
@@ -137,7 +136,7 @@ let add_local_close ld o =
 let remove_local_cst ld names hyps =
   { ld with cst_def = select (fun (n,_) -> not (List.mem n names)) ld.cst_def;
     caps_def = select (fun (n,_) -> not (List.mem n names)) ld.caps_def;
-    cst_eq = select (fun (s,(_,l)) -> not (List.exists (fun (n,_,_,_,_) -> List.mem n hyps) l)) ld.cst_eq }
+    cst_eq = select (fun (_,(_,l)) -> not (List.exists (fun (n,_,_,_,_) -> List.mem n hyps) l)) ld.cst_eq }
 
 let rename_local_cst ld oname nname =
   let find = ref 0 in
@@ -232,7 +231,7 @@ let add_skolem' n s sk =
 
 let propagate res sk s t =
   let rec g sk d = function
-    EAtom(o,k) -> (
+    EAtom(o,_) -> (
       match (Object.get_value o).fvalue with
         Def e -> if is_capsule o then g sk d e else sk
       | Prg e -> g sk d e
@@ -247,8 +246,6 @@ let propagate res sk s t =
   in g sk 0 t
 
 let fadd_to_tbl = ref (fun _ -> raise Exit)
-
-let get_value o = (Data_base.Object.get_value o).fvalue
 
 exception Non_unif
 

@@ -3,8 +3,8 @@
 
 (*header
 	title = "Basic PhoX Library"
-	author = "Christophe Raffalli, Paul Rozière"
-	institute = "Université de Savoie, université Paris VII"
+	author = "Christophe Raffalli, Paul RoziÃ¨re"
+	institute = "UniversitÃ© de Savoie, universitÃ© Paris VII"
 *)
 
 flag auto_lvl 1.

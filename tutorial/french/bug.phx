@@ -34,21 +34,21 @@ trivial.
 intros.
 (*  let x and y assume f x = f y [H0] prove x = y  *)
 intros.
-(*  D'après H avec  \z(z=x)   on a
+(*  D'aprÃ¨s H avec  \z(z=x)   on a
    inverse (image \z (z = x) f) f inclusdans \z (z = x) [G] 
      *)
 apply H with  \z(z=x) .
-(*  D'après G avec y  on a inverse (image \z (z = x) f) f y -> y = x [G0]   *)
+(*  D'aprÃ¨s G avec y  on a inverse (image \z (z = x) f) f y -> y = x [G0]   *)
 apply G with y.
 (*  Prouvons  inverse (image \z (z = x) f) f y.  *)
 prove  inverse (image \z (z = x) f) f y.
 (*  cherchons ?1 tel que ?1 = x puis tel que f y = f ?1  *)
 intros.
-(*  immédiat  *)
+(*  immÃ©diat  *)
 intros.
-(*  immédiat  *)
+(*  immÃ©diat  *)
 intros.
-(*  immédiat  *)
+(*  immÃ©diat  *)
 elim G0 with G1.
 
 (*  \z(z=x)  *)

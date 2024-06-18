@@ -3,9 +3,7 @@
 (*			rewrite.mli			*)
 (*######################################################*)
 
-open Data_base
-open Types
-open Local
+open Type
 open Pattern
 open Interact
 
@@ -18,10 +16,10 @@ type rewrite_opt =
 | Until of expr
 | Ortho of path list list
 
-val rule_rewrite : trinfo -> (bool * bool * af2_obj) list -> 
+val rule_rewrite : trinfo -> (bool * bool * af2_obj) list ->
   rewrite_opt -> bool -> bool -> arule
 
-val rule_rewrite_hyp : trinfo -> (bool * bool * af2_obj) list -> 
+val rule_rewrite_hyp : trinfo -> (bool * bool * af2_obj) list ->
   string -> rewrite_opt -> bool -> bool -> arule
 
 val make_th_list : string -> af2_obj list -> bool -> unit

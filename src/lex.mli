@@ -30,3 +30,4 @@ val string_of_token : token -> string
 val extra_dot : bool ref
 val comment : char Stream.t -> unit
 val special : char Stream.t -> char
+val stream_map : ('a -> 'b) -> 'a -> 'b Stream.t

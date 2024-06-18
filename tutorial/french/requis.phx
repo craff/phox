@@ -17,7 +17,7 @@ def Infix[4.7] A "minus" B = { x | x in A & x notin B}.
 def Postfix[4.2] A "cpl" = { x | x notin A}.
 
 (*
-Bonne idée, mais boucle ...
+Bonne idÃ©e, mais boucle ...
 
 fact notineq /\x,A (~ x in A = (x notin A)).
 intros.

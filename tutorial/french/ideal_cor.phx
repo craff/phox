@@ -1,42 +1,42 @@
-(* Le but est de montrer que dans un anneau commutatif tout idéal maximal est
-premier et que la réciproque est vraie si l'anneau est principal (donc
-intègre).  
+(* Le but est de montrer que dans un anneau commutatif tout idÃ©al maximal est
+premier et que la rÃ©ciproque est vraie si l'anneau est principal (donc
+intÃ¨gre).  
 
-Remarque: l'existence d'un opposé pour l'addition ne sert pas dans la preuve.
+Remarque: l'existence d'un opposÃ© pour l'addition ne sert pas dans la preuve.
 
-Voici une preuve informelle de ce résultat :
+Voici une preuve informelle de ce rÃ©sultat :
 
-- sens direct : (on montre d'abord le lemme : si I est un ideéal
-  maximal et x n'appartient pas à I, alors il existe
-  i dans I et a tq i+ax=1. En effet, comme I est maximal, l'idéal
-  engendré par I et x doit contenir 1)
+- sens direct : (on montre d'abord le lemme : si I est un ideÃ©al
+  maximal et x n'appartient pas Ã  I, alors il existe
+  i dans I et a tq i+ax=1. En effet, comme I est maximal, l'idÃ©al
+  engendrÃ© par I et x doit contenir 1)
   Soit I maximal et xy dans I. Si ni x ni y ne sont dans I alors, par le
   lemme, on a i+ax=1 et j+by=1. En faisant
-  le produit et en utilisant le fait que I est un idéal et que xy
-  appartient à I on déduit que 1 est dans I.
+  le produit et en utilisant le fait que I est un idÃ©al et que xy
+  appartient Ã  I on dÃ©duit que 1 est dans I.
   Contradiction.  
-- réciproque : Soit I engendré par p premier. Soit J= engendré par q
-  contenant I. On a donc p=qx. Comme I est premier, q appartient à I
-  (et donc J=I) ou x appartient à I. Alors x=py et donc p=pqy. Comme A
-  est integre p=0 (et donc I est réduit à 0) ou qy=1 et J=A.  cqfd.
+- rÃ©ciproque : Soit I engendrÃ© par p premier. Soit J= engendrÃ© par q
+  contenant I. On a donc p=qx. Comme I est premier, q appartient Ã  I
+  (et donc J=I) ou x appartient Ã  I. Alors x=py et donc p=pqy. Comme A
+  est integre p=0 (et donc I est rÃ©duit Ã  0) ou qy=1 et J=A.  cqfd.
 
 *)
 
-(* PhoX détectera automatiquement les axiomes *)
+(* PhoX dÃ©tectera automatiquement les axiomes *)
 flag auto_lvl 1.
 
-(* une sorte pour les éléments de l'anneau *)
+(* une sorte pour les Ã©lÃ©ments de l'anneau *)
 Sort ringelt.
 
-(* La somme et le produit avec les priorités usuelles *)
+(* La somme et le produit avec les prioritÃ©s usuelles *)
 Cst lInfix[4]  x"+"y  : ringelt -> ringelt -> ringelt.
 Cst lInfix[3] x"*"y   : ringelt -> ringelt -> ringelt.
 
-(* Les deux éléments neutres *)
+(* Les deux Ã©lÃ©ments neutres *)
 Cst  zero : ringelt.
 Cst un : ringelt.
 
-(* Les propriétés d'un (semi) anneau *)
+(* Les propriÃ©tÃ©s d'un (semi) anneau *)
 claim plusassoc /\x,y,z  x+(y+z)=x+y+z.
 claim pluscom /\x,y x+y=y+x.
 claim multassoc /\x,y,z x*(y*z)=x*y*z.
@@ -47,7 +47,7 @@ claim eltneutreun /\x (x*un=x & un*x=x).
 claim distributivite /\a,x,y a*(x+y)=a*x+a*y.
 claim distributiviter /\a,x,y (x+y)*a=x*a+y*a.
 
-(* On indique à PhoX d'utiliser ces équations pour le
+(* On indique Ã  PhoX d'utiliser ces Ã©quations pour le
 raisonnement automatique *)
 new_equation plusassoc.
 new_equation pluscom.
@@ -60,14 +60,14 @@ new_equation distributivite.
 new_equation distributiviter.
 
 (* On pourra taper "rewrite calcul" pour simplifier en utilisant tous les
-axiomes sauf la distributivité *)
+axiomes sauf la distributivitÃ© *)
 def_thlist calcul = eltabs eltneutreun eltneutrezero  plusassoc multassoc.
 
 (* On pourra taper "rewrite developpe" pour simplifier en utilisant tous les
 axiomes *)
 def_thlist developpe = eltabs eltneutreun eltneutrezero  plusassoc multassoc distributivite distributiviter.
 
-(* Les définitions utiles *)
+(* Les dÃ©finitions utiles *)
 def ideal I = /\x,y:I (I (x+y)) & /\x:I /\z (I (z*x)) & I zero.
 
 def principal I = \/a /\x (I x <-> \/y x = a*y).
@@ -78,10 +78,10 @@ def maximal I = ideal I & ~(I un) & /\J (ideal J & I subset J -> J subset I or J
 
 def premier I = ideal I & ~(I un) & /\x,y ((I (x*y)) -> I x or I y).
 
-(* on prouvera ce lemme après le théorème *)
+(* on prouvera ce lemme aprÃ¨s le thÃ©orÃ¨me *)
 claim lemme /\I:ideal /\x (maximal I ->  ~ I x -> \/i:I \/a (i+a*x=un)).
 
-(* le sens direct du théorème *)
+(* le sens direct du thÃ©orÃ¨me *)
 goal /\I:ideal (maximal I -> premier I).
 (*->*)
 intros.
@@ -119,11 +119,11 @@ elim H8.
 (*->*)
 save thm1.
 
-(* encore deux définitions *)
+(* encore deux dÃ©finitions *)
 def integre = /\x,y,a (a*x=a*y -> a=zero or x=y).
 def Aprincipal =  integre & /\I (ideal I  -> principal I).
 
-(* la réciproque du théorème *)
+(* la rÃ©ciproque du thÃ©orÃ¨me *)
 goal Aprincipal -> 
      /\I:ideal ((\/x:I ~x=zero) -> premier I -> ~ I un -> maximal I).
 (*->*)
@@ -180,10 +180,10 @@ axiom H14.
 (*->*)
 save thm2.
 
-(* definition nécessaire à la preuve du lemme *)
+(* definition nÃ©cessaire Ã  la preuve du lemme *)
 def engendre I x y = \/i:I \/a (y=i+a*x).
 
-(* première propriété de engendre *)
+(* premiÃ¨re propriÃ©tÃ© de engendre *)
 prop lemme1 /\I:ideal /\x ideal (engendre I x).
 (*->*)
 intros.
@@ -220,12 +220,12 @@ intro.
 (*->*)
 save.
 
-(* seconde propriété de engendre (triviale) *)
+(* seconde propriÃ©tÃ© de engendre (triviale) *)
 prop  lemme2 /\I,x I subset (engendre I x).
 trivial.
 save.
 
-(* troisième propriété de engendre (triviale) *)
+(* troisiÃ¨me propriÃ©tÃ© de engendre (triviale) *)
 prop  lemme3 /\I:ideal /\x engendre I x x.
 trivial.
 save.

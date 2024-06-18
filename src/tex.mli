@@ -3,8 +3,8 @@
 (*			tex.mli				*)
 (*######################################################*)
 
-open Types
-open Lexer
+open Type
+open Lex
 
 val tex_docs : (string * out_channel) list ref
 val parse_tex_header : token Stream.t -> unit

@@ -3,8 +3,8 @@
 (*			files.mli			*)
 (*######################################################*)
 
-(* Attention : 
-     ouverture de "type.mli" pour l'exception Error, 
+(* Attention :
+     ouverture de "type.mli" pour l'exception Error,
      a par ca ce fichier est portable *)
 
 (* gestion d'une liste de canaux d'entree utilise pour
@@ -12,24 +12,23 @@
 
 (* exception qui est leve quand on ferme le dernier fichier de la liste *)
 exception Quit
-exception Restart
 
 (* pointeur sur le  canal d'entree courant *)
 val cur_input : in_channel ref
 val cur_line : int ref
 val cur_col : int ref
 
-(* termine la lecture du canal courant et reprend la lecture du suivant 
+(* termine la lecture du canal courant et reprend la lecture du suivant
    dans la liste *)
 val pop_input : unit -> unit
 
-(* ferme tous les canaux sauf le dernier de la liste (utilise pour 
+(* ferme tous les canaux sauf le dernier de la liste (utilise pour
    remonter au "top_level") *)
 val pop_all : unit -> unit
 
 val open_path : string -> in_channel
 
-(* ouvre un fichier en lecture, et l'ajoute dans la liste. 
+(* ouvre un fichier en lecture, et l'ajoute dans la liste.
    moodifie la valeur de cur_input pour pointer sur le nouveau canal *)
 val read_file : string -> unit
 

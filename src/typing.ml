@@ -4,8 +4,7 @@
 (*######################################################*)
 
 open Format
-open Types
-open Data_base
+open Type
 open Basic
 open Local
 open Print
@@ -26,22 +25,22 @@ let ksym_get s =
   with
     Not_found -> failwith "bug in ksym_get"
 
-let rec tcheck t l lv =  function 
+let rec tcheck t l lv =  function
   EVar i as e -> unify e lv (List.nth l i) t
 | EData (Data.EInt _) as e -> unify e lv (ksym_get "num") t
 | EData (Data.EString _) as e ->  unify e lv (ksym_get "string") t
 | FVar _ -> raise (Failure "bug in type_check")
 | UVar (_,k) as e -> unify e lv k t
 | UCst (_,k) as e -> unify e lv k t
-| Path (path,e) -> 
-    let gn (l,lv as c) = function 
+| Path (path,e) ->
+    let gn (l,lv as c) = function
       PAbs (s,k) -> (k::l),(s::lv)
     | _ -> c in
     let l,lv = List.fold_left gn (l,lv) path in
     tcheck t l lv e
-| Syntax s as e -> unify e lv (ksym_get "syntax") t
+| Syntax _ as e -> unify e lv (ksym_get "syntax") t
 | EAtom (o,lk) as e -> unify e lv (subst_obj_kind lk o)  t
-| EApp (e1,e2) -> 
+| EApp (e1,e2) ->
     let v = mk_Var () in
     tcheck (KArrow (v,t)) l lv e1;
     tcheck v l lv e2
@@ -50,16 +49,16 @@ let rec tcheck t l lv =  function
     unify e' lv (KArrow(k,w)) t;
     tcheck w (k::l) (s::lv) e
 
-let rec fast_type_infer l e =  
+let rec fast_type_infer l e =
   match e with
-    EVar i -> List.nth l i 
+    EVar i -> List.nth l i
   | EData (Data.EInt _) -> ksym_get "num"
   | EData (Data.EString _) ->  ksym_get "string"
-  | Syntax s ->  ksym_get "syntax"
-  | UVar (n,k) -> k
+  | Syntax _ ->  ksym_get "syntax"
+  | UVar (_,k) -> k
   | UCst (_,k) -> k
   | EAtom (o,lk) -> subst_obj_kind lk o
-  | EApp (e1,e2) -> 
+  | EApp (e1,_) ->
       begin
 	try
 	  let k = fast_type_infer l e1 in
@@ -67,17 +66,17 @@ let rec fast_type_infer l e =
 	  v
 	with Clash -> failwith "bug in fast_type_infer"
       end
-  | EAbs (s,e,k) ->
+  | EAbs (_,e,k) ->
       let k' = fast_type_infer (k::l) e in
       KArrow(k,k')
   | _ -> raise (Failure "fast_type_infer")
-      
-let xcheck e t = 
+
+let xcheck e t =
   let pos = get_undo_pos () in
   try
     tcheck t [] [] e;
     t
-  with 
+  with
     Type_Clash (e,t,t',lv) ->
       open_hovbox 0;
       print_string "Typing Error: Can not use expression";
@@ -86,24 +85,24 @@ let xcheck e t =
       print_break 1 2;
       print_string "of type";
       print_break 1 2;
-      print_kind t; 
+      print_kind t;
       print_break 1 2;
       print_endline "with type";
       print_break 1 2;
-      print_kind t'; 
+      print_kind t';
       print_newline ();
       do_undo pos;
       raise Error
 
 (* inferes the type of an expression *)
 
-let rec type_check e = xcheck e (mk_Var ())
+let type_check e = xcheck e (mk_Var ())
 
-let rec type_strong e k = let _ = xcheck e k in ()
+let type_strong e k = let _ = xcheck e k in ()
 
 type generalize_env = (int * (kind ref * kind) list) ref
 
-let generalize_kind lk k = 
+let generalize_kind lk k =
   let rec f t = match norm t with
       KBVar _ | Unknown -> assert false
     | KArrow(k, k') -> KArrow(f k, f k')
@@ -117,10 +116,10 @@ let generalize_kind lk k =
 	  lk := (num+1, (ptr, t)::lt);
 	  t
   in f k
-	   
+
 let generalize_path lk path =
-  let rec g = function
-      PAbs(s, k) -> PAbs(s, generalize_kind lk k) 
+  let g = function
+      PAbs(s, k) -> PAbs(s, generalize_kind lk k)
     | c -> c
   in List.map g path
 
@@ -135,7 +134,7 @@ let generalize_expr lk e =
   | e -> e
   in g e
 
-let kind_inst o lk = 
+let kind_inst o lk =
   let poly = is_poly o in
   let v = (Data_base.Object.get_value o).fvalue in
   match v with
@@ -144,7 +143,7 @@ let kind_inst o lk =
   | _ -> raise Not_found
 
 let rec get_inst = function
-  EAtom(o,lk) as e -> 
+  EAtom(o,lk) as e ->
     (match get_value o with
       Cst | Fun _ -> e
     | Def _ -> get_inst (kind_inst o lk)
@@ -154,11 +153,10 @@ let rec get_inst = function
 | e -> e
 
 
-let build_subterm oe lk l = 
+let build_subterm oe lk l =
   let rec fn acc = function
       [] -> acc
     | t::l -> fn (EApp(acc,lift t)) l
   in
   let k = subst_obj_kind lk oe in
     k, EAbs("x",fn (EVar 0) l,k)
-

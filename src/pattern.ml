@@ -4,8 +4,8 @@
 (*######################################################*)
 
 open Format
-open Types.Base
-open Types
+open Type.Base
+open Type
 open Flags
 open Local
 open Lambda_util
@@ -90,15 +90,10 @@ let push_adone, pop_adone =
 
 exception Fail_match of path list
 
-let rec path_depth = function
- [] -> 0
-| (PAbs _):: l -> 1 + path_depth l
-| x :: l -> path_depth l
-
 let rec make_args t l = match norm2 t, l with
   _, [] -> []
 | (KArrow(ka,kr)), (a::l) -> (a,ka)::(make_args kr l)
-| (KVar ptr as t), l ->
+| (KVar _ as t), l ->
     unif t (KArrow(mk_Var (), mk_Var ()));
     make_args t l
 | _ -> raise (Failure "bug3 in make_args")
@@ -132,7 +127,7 @@ let term_to_eqn e0 result env =
 | EVar n ->
       {head=e; args = make_args (List.nth env n) !lst;
        nbargs = !nb; order = 0; allt = e0; kind = kt}
-| EAbs (s,_,k) ->
+| EAbs _ ->
       if !lst <> [] then let l = !lst in lst:=[]; nb:=0;
       fn (norm_lsexpr result e l) else
       {head=e; args = [];
@@ -153,13 +148,13 @@ let term_to_eqn e0 result env =
 
 let print_eqn e = print_expr_tr e.allt
 
-let rec print_eqns = function
+let rec _print_eqns = function
   [] -> print_newline ()
 | (e1,e2,_,_,_,_,(_,lvl,bl,br))::l ->
      open_hvbox 0;
      print_int lvl; if bl then print_string "l"; if br then print_string "r";
      print_eqn e1; print_string " ="; print_break 1 2;
-     print_eqn e2; print_newline (); print_eqns l
+     print_eqn e2; print_newline (); _print_eqns l
 
 let build_getrwt leqn key =
   let l1 = try eqhash_find tbl_rewrite key
@@ -239,7 +234,7 @@ let eta_expand result u k0 n args  =
 let rec result_kind k n = match norm2 k, n with
   k, 0 -> k
 | (KArrow(_,k)), n -> result_kind k (n - 1)
-| _, n -> raise (Failure "bug in result_kind")
+| _, _ -> raise (Failure "bug in result_kind")
 
 let rev_path p =
   let rec fn l = function
@@ -274,7 +269,7 @@ let reset_nomatch_set () =
   nomatch_set := Set.empty
 
 let rec sublist p1 p2 = match p1,p2 with
-  [], p -> true
+  [], _ -> true
 | (LApp::l), (LApp::l') -> sublist l l'
 | (RApp::l), (RApp::l') -> sublist l l'
 | ((PAbs _)::l), ((PAbs _)::l') -> sublist l l'
@@ -286,8 +281,8 @@ match p1 with
 | Some p1 ->
     let rec fn p1 p2 =
       match List.rev p1, List.rev p2 with
-      | p, [] -> false
-      | [], p -> true
+      | _, [] -> false
+      | [], _ -> true
       | (LApp::l), (LApp::l') -> fn l l'
       | (RApp::l), (RApp::l') -> fn l l'
       | ((PAbs _)::l), ((PAbs _)::l') -> fn l l'
@@ -312,14 +307,14 @@ let test_hash path e1 e2 rl lvl =
     raise (Fail_match path))
 
 
-let rec add_eqn result e l =
+let add_eqn result e l =
   begin
     let (t1, t2, _, path, _, _, _, (_, lvl, _, _)) = e in
     test_hash path t1.allt t2.allt result lvl
   end;
 
   let arg_mes args =
-    let rec fn acc (arg, _) =
+    let fn acc (arg, _) =
       match head arg with
 	Uveq, _ ->
 	  if head_length arg = 0 then acc else acc+1
@@ -328,28 +323,28 @@ let rec add_eqn result e l =
   in
 
   let term_mes e1 e2 = match e1, e2 with
-    {head=UVar _; nbargs=n1}, {head=UVar _; nbargs=n2} ->
+    {head=UVar _; nbargs=n1; _}, {head=UVar _; nbargs=n2; _} ->
        if n1 = 0 || n2 = 0 then -1 else 10000000
-  | {head=UVar _; nbargs = nb; args = args}, _ when nb = 0 ->
+  | {head=UVar _; nbargs = nb; _}, _ when nb = 0 ->
       -1
-  | _, {head=UVar _; nbargs = nb; args = args} when nb = 0 ->
+  | _, {head=UVar _; nbargs = nb; _} when nb = 0 ->
       -1
-  | {head=UVar _; nbargs = nb; args = args}, {head=EVar _} ->
+  | {head=UVar _; nbargs = nb; args = args; _}, {head=EVar _; _} ->
       let ma = arg_mes args in
       nb-ma-1 + 100*ma
-  | {head=UVar _; nbargs = nb; args = args}, _ ->
+  | {head=UVar _; nbargs = nb; args = args; _}, _ ->
       let ma = arg_mes args in
       nb-ma + 1000*ma
-  | {head=EVar _}, {head=UVar _; nbargs = nb; args = args} ->
+  | {head=EVar _; _}, {head=UVar _; nbargs = nb; args = args; _} ->
       let ma = arg_mes args in
       nb-ma-1 + 100*ma
-  | _, {head=UVar _; nbargs = nb;args=args} ->
+  | _, {head=UVar _; nbargs = nb;args=args; _} ->
       let ma = arg_mes args in
       nb-ma + 1000*ma
   | _ -> 0
   in
 
-  let eqn_cmp (e1,e2,_,pe,_,_,_,_) (f1,f2,_,pf,_,_,_,_) =
+  let eqn_cmp (e1,e2,_,_pe,_,_,_,_) (f1,f2,_,_pf,_,_,_,_) =
     match (term_mes e1 e2 - term_mes f1 f2) with
       0 -> min (term_size_rec e1.allt) (term_size_rec e2.allt) >  min (term_size_rec f1.allt) (term_size_rec f2.allt) (*path_compare pe pf *)
     | n -> n < 0
@@ -364,7 +359,7 @@ let rec add_texprs path l rl env insert plvl rec_open
   ((opp,lvl,inl,inr) as noeq) lll1 lll2 lll3 =
   match lll1, lll2, lll3 with
     [], [], _ -> l
-  | ((e1,k1)::l1), ((e2,k2)::l2), (_::op) ->
+  | ((e1,_)::l1), ((e2,_)::l2), (_::op) ->
 (*       if not (equal_kind k1 k2) then
          raise (Failure "bug in add_texprs path"); *)
        cross_var := false;
@@ -387,9 +382,9 @@ let set_plvl plvl eq =
 let subst_in_eqn (eqns : eqn list) result =
   let rec fn eqns = function
     [] -> eqns
-  | (({head=UVar (n1,_); allt = e1} as eq1),
-     ({head=UVar (n2,_); allt = e2} as eq2),
-        env, path, insert, plvl, rec_open, ((_,lvl,_,_) as noeq)) as c::ls ->
+  | (({head=UVar (n1,_); allt = e1; _} as eq1),
+     ({head=UVar (n2,_); allt = e2; _} as eq2),
+        env, path, insert, plvl, rec_open, noeq) as c::ls ->
        (try
 	  let _ = Map.find n1 result in
           let e = norm_lexpr result e1 in
@@ -411,8 +406,8 @@ let subst_in_eqn (eqns : eqn list) result =
 	  let plvl = set_plvl plvl eq2 in
           fn (add_eqn result (eq1, eq2,env,path,insert, plvl,rec_open, noeq) eqns) ls
       with Not_found -> fn (add_eqn result c eqns) ls)
-  | (({head=UVar (n1,_); allt = e1}), eq2,
-     env, path,insert,plvl,rec_open,((_,lvl,_,_) as noeq)) as c::ls ->
+  | (({head=UVar (n1,_); allt = e1; _}), eq2,
+     env, path,insert,plvl,rec_open,noeq) as c::ls ->
       (try
 	let _ = Map.find n1 result in
         let e = norm_lexpr result e1 in
@@ -422,8 +417,8 @@ let subst_in_eqn (eqns : eqn list) result =
              eqns) ls
       with Not_found ->
         fn (add_eqn result c eqns) ls)
-  | (eq2, ({head=UVar (n1,_); allt = e1}),
-     env,path,insert,plvl,rec_open,((_,lvl,_,_) as noeq)) as c::ls ->
+  | (eq2, ({head=UVar (n1,_); allt = e1;_}),
+     env,path,insert,plvl,rec_open,noeq) as c::ls ->
       (try
         let _ = Map.find n1 result in
         let e = norm_lexpr result e1 in
@@ -573,8 +568,6 @@ let subst_uvar n t result ctx =
   in
   nresult,(ctx, nonu)
 
-
-let remeq = ref []
 type tnode =
   Unode of int
 | Onode of int
@@ -742,7 +735,7 @@ let rec pre_unif result ctx env e1 e2 =
       lpre_unif	result ctx env t1.args t2.args
   | UVar(n,_), UVar(p,_) when n = p && t1.nbargs = t2.nbargs ->
       lpre_unif result ctx env t1.args t2.args
-  | UVar(n,_), UVar(p,_) when t1.args = [] && t2.args = [] -> (
+  | UVar(n,_), UVar(_,_) when t1.args = [] && t2.args = [] -> (
       try simpl_subst_uvar n e2 result ctx
       with Fail_subst -> result, ctx)
   | (UVar _, _) | (_, UVar _) ->
@@ -763,7 +756,7 @@ let rec pre_unif result ctx env e1 e2 =
 	try do_def o1 e2 k1 t1.args true with Exit ->
 	result, ctx
       end
-  | UCst(n,k), UCst(n',k') ->
+  | UCst(n,_), UCst(n',_) ->
       if n > n' then begin
 	try do_csteq n e2 t1.args true with Exit ->
 	try do_csteq n' e1 t2.args false with Exit ->
@@ -773,10 +766,10 @@ let rec pre_unif result ctx env e1 e2 =
 	try do_csteq n e2 t1.args true with Exit ->
 	result, ctx
       end
-  | UCst(n,k), _ -> (
+  | UCst(n,_), _ -> (
       try do_csteq n e2 t1.args true with Exit ->
       result, ctx)
-  | _, UCst(n,k) -> (
+  | _, UCst(n,_) -> (
       try do_csteq n e1 t2.args false with Exit ->
       result, ctx)
   | EAtom(o,k), _ -> (
@@ -815,7 +808,7 @@ and newdistance2 d1 result ctx env e1 e2 e3 e4 =
   let pos = get_undo_pos () in
   remeq := [];
   let result,ctx = pre_unif result ctx env e1 e2 in
-  let result,ctx = pre_unif result ctx env e3 e4 in
+  let result,_   = pre_unif result ctx env e3 e4 in
   let d' = Hilbert.distance !match_local result e1 e2 in
   let d'' = Hilbert.distance !match_local result e3 e4 in
   do_undo pos;
@@ -892,7 +885,7 @@ and tdistance dpath result ctx env e1 e2 =
 	result ctx env t1.args t2.args
   | UVar(n,_), UVar(p,_) when n = p && t1.nbargs = t2.nbargs ->
       ldistance dpath (Unode n) result ctx env t1.args t2.args
-  | UVar(n,_), UVar(p,_) when t1.args = [] && t2.args = [] -> (
+  | UVar(n,_), UVar(_,_) when t1.args = [] && t2.args = [] -> (
       try simpl_subst_uvar n e2 result ctx
       with Fail_subst -> rl := (dpath,e1,e2)::!rl; result, ctx)
   | (UVar _, _) | (_, UVar _) ->
@@ -913,7 +906,7 @@ and tdistance dpath result ctx env e1 e2 =
 	try do_def o1 e2 k1 t1.args true with Exit ->
 	rl := (dpath,e1,e2)::!rl; result, ctx
       end
-  | UCst(n,k), UCst(n',k') ->
+  | UCst(n,_), UCst(n',_) ->
       if n > n' then begin
 	try do_csteq n e2 t1.args true with Exit ->
 	try do_csteq n' e1 t2.args false with Exit ->
@@ -923,10 +916,10 @@ and tdistance dpath result ctx env e1 e2 =
 	try do_csteq n e2 t1.args true with Exit ->
 	rl := (dpath,e1,e2)::!rl; result, ctx
       end
-  | UCst(n,k), _ -> (
+  | UCst(n,_), _ -> (
       try do_csteq n e2 t1.args true with Exit ->
       rl := (dpath,e1,e2)::!rl; result, ctx)
-  | _, UCst(n,k) -> (
+  | _, UCst(n,_) -> (
       try do_csteq n e1 t2.args false with Exit ->
       rl := (dpath,e1,e2)::!rl; result, ctx)
   | EAtom(o,k), _ -> (
@@ -984,7 +977,7 @@ and olddistance2 d1 result ctx env e1 e2 e3 e4 =
   let result,ctx = tdistance [] result ctx env e1 e2 in
   let l1 = !rl in
   rl := [];
-  let result,ctx = tdistance [] result ctx env e3 e4 in
+  let result,_ = tdistance [] result ctx env e3 e4 in
   do_undo pos;
   let n = list_diff result l1 in
   let n' = list_diff result !rl in
@@ -1029,7 +1022,7 @@ and fneq (flvl, aug) call_trivial
 	print_ctx' (fst ctx);
       end;
 
-    let rec do_proj order rf k args = (
+    let do_proj order rf k args = (
       let rec gn n = function
         [] -> raise (Fail_match path)
       | (arg,k')::ls ->
@@ -1124,7 +1117,7 @@ and fneq (flvl, aug) call_trivial
 	  norm_lsexpr result e l, leq
 	with Not_found -> raise (Fail_match path)
       in
-      let make_req (e0, ll) (ng, e', e, hypt, ld) =
+      let make_req (e0, ll) (ng, _, e, hypt, ld) =
         let st0 = {
 	  sref = new_ref ();
 	  rule = if hypt then Axiom ng else Subgoal ng;
@@ -1164,14 +1157,14 @@ and fneq (flvl, aug) call_trivial
 
       let d1 = distance result ctx env t1.allt t2.allt in
 
-      let mes_eqn dir (o2,e1,e2,nl,k,sy,eqtl as eq) =
+      let mes_eqn dir (o2,e1,e2,nl,k,_sy,eqtl as eq) =
 (*
 	List.iter2 (fun k k' ->
 	  if not (equal_kind k k') then raise Fail_saturate)
 	  (match (head_kind (if dir then t1 else t2).head) with _,_,k -> k)
 	  (match (head_kind e1) with _,_,k -> k);
 *)
-        let (pathd,l,t',t'') = saturate e1 e2 nl k t1.kind env in
+        let (_pathd,_,t',t'') = saturate e1 e2 nl k t1.kind env in
         let t0' = norm_expr t' and t0'' = norm_expr t'' in
         let lf, m, ml = match dir with
             true -> distance2 d1 result ctx env t1.allt t0' t0'' t2.allt
@@ -1222,7 +1215,7 @@ and fneq (flvl, aug) call_trivial
         EApp (t,t') -> g (t'::acc) t
       | EAbs (_,t,_) as e -> if acc = [] then g [] t
                         else g [] (norm_lsexpr result e acc)
-      | Path (_,e) -> failwith "bug in test_occur"
+      | Path (_,_) -> failwith "bug in test_occur"
       | UVar (p,_)  -> (try g acc (Map.find p result) with Not_found -> p = n0 ||
                                                                 (strict && List.exists (g []) acc))
       | EAtom(o,_) ->
@@ -1248,7 +1241,7 @@ and fneq (flvl, aug) call_trivial
     let pos = get_undo_pos () in
 
     match eq1,eq2 with
-      {head=EAbs(s1,e1,k1)}, {head=EAbs(s2,e2,k2)} when equal_kind k1 k2 ->
+      {head=EAbs(s1,e1,k1); _}, {head=EAbs(_,e2,k2); _} when equal_kind k1 k2 ->
 	if !trace_pmatch then print_endline "abs-abs";
         let env = k1::env in
         fn false (add_eqn result (term_to_eqn e1 result env,
@@ -1256,7 +1249,7 @@ and fneq (flvl, aug) call_trivial
                      env,((PAbs (s1,k1))::path), insert, plvl, rec_open,noeq) suit)
                      result ctx lrl rrl
 
-    | ({head=UCst(n1,k1)} as t1), ({head=UCst(n2,k2)} as t2) ->
+    | ({head=UCst(n1,k1); _} as t1), ({head=UCst(n2,k2); _} as t2) ->
 	if !trace_pmatch then print_endline "cst-cst";
         begin
 	  try try
@@ -1277,7 +1270,7 @@ and fneq (flvl, aug) call_trivial
             tmap t1 t2 (Uneq n1) (Uneq n2)
 	end
 
-    | ({head=EVar n1} as t1), ({head=EVar n2} as t2) ->
+    | ({head=EVar n1; _} as t1), ({head=EVar n2; _} as t2) ->
 	if !trace_pmatch then print_endline "evar-evar";
         if n1 <> n2 then raise (Fail_match path);
         let np = make_path path t1.args in
@@ -1285,7 +1278,7 @@ and fneq (flvl, aug) call_trivial
 	      noeq t1.args t2.args np)
            result ctx lrl rrl
 
-    | ({head=EData n1} as t1), ({head=EData n2} as t2) ->
+    | ({head=EData n1; _} as t1), ({head=EData n2; _} as t2) ->
 	if !trace_pmatch then print_endline "eint-eint";
         if not (Data.eq_data n1 n2) then raise (Fail_match path);
         let np = make_path path t1.args in
@@ -1293,17 +1286,17 @@ and fneq (flvl, aug) call_trivial
 	      noeq t1.args t2.args np)
            result ctx lrl rrl
 
-    | ({head=EAtom(o1,k1)} as t1), t2 when
+    | ({head=EAtom(o1,k1); _} as t1), t2 when
           (Data_base.Object.get_value o1).origin = Local_hyp ->
 	if !trace_pmatch then print_endline "eatomlocal-x";
 	do_def o1 k1 t1.args t2 true
 
-    | t2, ({head=EAtom(o1,k1)} as t1) when
+    | t2, ({head=EAtom(o1,k1); _} as t1) when
           (Data_base.Object.get_value o1).origin = Local_hyp ->
 	if !trace_pmatch then print_endline "x-eatomlocal";
         do_def o1 k1 t1.args t2 false
 
-    | ({head=EAtom(o1,k1)} as t1), ({head=EAtom(o2,k2)} as t2)  ->
+    | ({head=EAtom(o1,k1); _} as t1), ({head=EAtom(o2,k2); _} as t2)  ->
 	if !trace_pmatch then print_endline "eatom-eatom";
 	begin
 	  try try
@@ -1327,12 +1320,12 @@ and fneq (flvl, aug) call_trivial
             tmap t1 t2 (Oneq o1) (Oneq o2)
         end
 
-   | ({head=UVar(n1,k1)} as t1), ({head=EVar n2} as t2) -> (
+   | ({head=UVar(n1,k1); _} as t1), ({head=EVar _; _} as t2) -> (
        if !trace_pmatch then print_endline "uvar-evar";
        test_occur false n1 t2.args;
        do_proj t1.order n1 (result_kind k1 t1.nbargs) t1.args)
 
-   | ({head=UVar(n1,k1)} as t1), ({head=EData n2} as t2) -> (
+   | ({head=UVar(n1,k1); _} as t1), ({head=EData _; _} as t2) -> (
        if !trace_pmatch then print_endline "uvar-edata";
        if t1.nbargs = 0 then (
          let result,ctx = try subst_uvar n1 t2.allt result ctx
@@ -1345,7 +1338,7 @@ and fneq (flvl, aug) call_trivial
 	 subraise path p;
          do_cst t1.order n1 t2.head t1.args t2.args)
 
-   | ({head=UVar(n1,k1)} as t1), ({head=UCst(n2,k2)} as t2) -> (
+   | ({head=UVar(n1,k1); _} as t1), ({head=UCst(n2,_); _} as t2) -> (
 	if !trace_pmatch then print_endline "uvar-cst";
         test_occur false n1 t2.args;
         try if t1.nbargs = 0 then (
@@ -1364,7 +1357,7 @@ and fneq (flvl, aug) call_trivial
 	  subraise path p;
 	  do_csteq n2 t2.args t2.allt t1 false)
 
-   | ({head=UVar(n1,k1)} as t1), ({head=EAtom(o2,k2)} as t2) -> (
+   | ({head=UVar(n1,k1); _} as t1), ({head=EAtom(o2,k2); _} as t2) -> (
 	if !trace_pmatch then print_endline "uvar-eatom";
         test_occur false n1 t2.args;
         if t1.nbargs = 0 then (
@@ -1384,12 +1377,12 @@ and fneq (flvl, aug) call_trivial
 	  subraise path p;
           do_def o2 k2 t2.args t1 false)
 
-   | ({head=EVar n2} as t2), ({head=UVar(n1,k1)} as t1) -> (
+   | ({head=EVar _; _} as t2), ({head=UVar(n1,k1); _} as t1) -> (
        if !trace_pmatch then print_endline "evar-uvar";
        test_occur false n1 t2.args;
        do_proj t1.order n1 (result_kind k1 t1.nbargs) t1.args)
 
-   | ({head=EData n2} as t2), ({head=UVar(n1,k1)} as t1) -> (
+   | ({head=EData _; _} as t2), ({head=UVar(n1,k1); _} as t1) -> (
        if !trace_pmatch then print_endline "edata-uvar";
        if t1.nbargs = 0 then (
          let result,ctx = try subst_uvar n1 t2.allt result ctx
@@ -1402,7 +1395,7 @@ and fneq (flvl, aug) call_trivial
 	 subraise path p;
          do_cst t1.order n1 t2.head t1.args t2.args)
 
-   | ({head=UCst(n2,k2)} as t2), ({head=UVar(n1,k1)} as t1) ->
+   | ({head=UCst(n2,_); _} as t2), ({head=UVar(n1,k1); _} as t1) ->
        if !trace_pmatch then print_endline "cst-uvar";
        test_occur false n1 t2.args; (
        try if t1.nbargs = 0 then (
@@ -1421,7 +1414,7 @@ and fneq (flvl, aug) call_trivial
 	 subraise path p;
 	 do_csteq n2 t2.args t2.allt t1 true)
 
-    | ({head=EAtom(o2,k2)} as t2), ({head=UVar(n1,k1)} as t1) -> (
+    | ({head=EAtom(o2,k2); _} as t2), ({head=UVar(n1,k1); _} as t1) -> (
 	if !trace_pmatch then print_endline "eatom-uvar";
         test_occur false n1 t2.args;
         if t1.nbargs = 0 then (
@@ -1440,7 +1433,7 @@ and fneq (flvl, aug) call_trivial
 	  subraise path p;
           do_def o2 k2 t2.args t1 true)
 
-    | ({head=EAtom(o1,k1)} as t1), ({head=UCst(n2,k2)} as t2) ->
+    | ({head=EAtom(o1,k1); _} as t1), ({head=UCst(n2,_); _} as t2) ->
 	if !trace_pmatch then print_endline "eatom-cst";
         (try do_csteq n2 t2.args t2.allt t1 false
         with Fail_match p -> try
@@ -1452,7 +1445,7 @@ and fneq (flvl, aug) call_trivial
 	    subraise path p;
             tmap t1 t2 (Oneq o1) (Uneq n2))
 
-    | ({head=UCst(n1,k1)} as t1), ({head=EAtom(o2,k2)} as t2) ->
+    | ({head=UCst(n1,_); _} as t1), ({head=EAtom(o2,k2); _} as t2) ->
 	if !trace_pmatch then print_endline "cst-eatom";
         (try do_csteq n1 t1.args t1.allt t2 true
         with Fail_match p -> try
@@ -1464,7 +1457,7 @@ and fneq (flvl, aug) call_trivial
 	  subraise path p;
           tmap t1 t2 (Uneq n1) (Oneq o2))
 
-    | {head=EAbs _ as u} as t1, ({head=UVar(n,k)} as t2) ->
+    | {head=EAbs _ as u; _} as t1, ({head=UVar(n,_); _} as t2) ->
 	if !trace_pmatch then print_endline "eabs-uvar";
         if t2.nbargs = 0 then (
            let result,ctx = try test_occur true n [t1.allt,t1.kind]; subst_uvar n t1.allt result ctx
@@ -1476,7 +1469,7 @@ and fneq (flvl, aug) call_trivial
                          with Fail_subst -> raise (Fail_match path) in
         fn false (subst_in_eqn eqns result) result ctx lrl rrl
 
-    | {head=UVar(n,k)} as t1, ({head=EAbs _ as u} as t2)  ->
+    | {head=UVar(n,_); _} as t1, ({head=EAbs _ as u; _} as t2)  ->
 	if !trace_pmatch then print_endline "uvar-eabs";
         if t1.nbargs = 0 then (
            let result,ctx = try test_occur true n [t2.allt,t2.kind]; subst_uvar n t2.allt result ctx
@@ -1488,7 +1481,7 @@ and fneq (flvl, aug) call_trivial
                          with Fail_subst -> raise (Fail_match path) in
         fn false (subst_in_eqn eqns result) result ctx lrl rrl
 
-    | {head=EAbs(s1,e1,k1)}, t2 ->
+    | {head=EAbs(s1,e1,k1); _}, t2 ->
 	if !trace_pmatch then print_endline "eabs-x";
         let e2 = EApp(lift t2.allt,EVar 0) in
         let env = k1::env in
@@ -1497,7 +1490,7 @@ and fneq (flvl, aug) call_trivial
            env, (PAbs (s1,k1)::path), insert, plvl, rec_open,
 		     noeq) suit) result ctx lrl rrl
 
-    | t1, {head=EAbs(s2,e2,k2)} ->
+    | t1, {head=EAbs(s2,e2,k2); _} ->
 	if !trace_pmatch then print_endline "x-eabs";
         let e1 = EApp(lift t1.allt,EVar 0) in
         let env = k2::env in
@@ -1507,7 +1500,7 @@ and fneq (flvl, aug) call_trivial
 		     noeq) suit) result ctx lrl rrl
 
 
-    | ({head=EAtom(o1,k1)} as t1), t2 ->
+    | ({head=EAtom(o1,k1); _} as t1), t2 ->
 	if !trace_pmatch then print_endline "eatom-x";
         (try
            do_def o1 k1 t1.args t2 true
@@ -1516,7 +1509,7 @@ and fneq (flvl, aug) call_trivial
 	  subraise path p;
           tmap t1 t2 (Oneq o1) Alleq)
 
-    | t1, ({head=EAtom(o2,k2)} as t2) ->
+    | t1, ({head=EAtom(o2,k2); _} as t2) ->
 	if !trace_pmatch then print_endline "x-eatom";
         (try
            do_def o2 k2 t2.args t1 false
@@ -1525,7 +1518,7 @@ and fneq (flvl, aug) call_trivial
 	  subraise path p;
           tmap t1 t2 Alleq (Oneq o2))
 
-    | ({head=UCst(n1,k1)} as t1), t2 -> (
+    | ({head=UCst(n1,_); _} as t1), t2 -> (
 	if !trace_pmatch then print_endline "cst-x";
         try do_csteq n1 t1.args t1.allt t2 true
         with Fail_match p ->
@@ -1533,7 +1526,7 @@ and fneq (flvl, aug) call_trivial
           subraise path p;
 	  tmap t1 t2 (Uneq n1) Alleq)
 
-    | t1, ({head=UCst(n2,k2)} as t2) -> (
+    | t1, ({head=UCst(n2,_); _} as t2) -> (
 	if !trace_pmatch then print_endline "x-cst";
 	try do_csteq n2 t2.args t2.allt t1 false
         with Fail_match p ->
@@ -1541,7 +1534,7 @@ and fneq (flvl, aug) call_trivial
           subraise path p;
 	  tmap t1 t2 Alleq (Uneq n2))
 
-    | ({head=UVar(n1,k1)} as t1), ({head=UVar(n2,k2)} as t2) ->
+    | ({head=UVar(n1,_); _} as t1), ({head=UVar(n2,_); _} as t2) ->
 	if !trace_pmatch then print_endline "uvar-uvar";
         if t1.nbargs = 0 && n1 = n2 then
           fn false suit result ctx lrl rrl else
@@ -1570,7 +1563,7 @@ and fneq (flvl, aug) call_trivial
         else
           let nst = {sref = -1; rule = No_rule; next = Fin (new_fin ())} in
           let found = ref false in
-          let rec jn = function
+          let jn = function
             t1,t2,kl,pl,None,plvl,rec_open,noeq -> found:=true; t1,t2,kl,pl,Some nst,plvl,rec_open,noeq
           | x -> x
           in
@@ -1600,18 +1593,18 @@ and fneq (flvl, aug) call_trivial
     let rec gn n l = match n,l with
         _, [] -> raise (Fail_match the_path)
       | 0, _ -> raise (Fail_match the_path)
-      | n, ((dir,(lf,d2,keq),(o2,e1,e2,nl,k,sy,eqtl),lrl,rrl,
+      | n, ((dir,(lf,d2,keq),(_,e1,e2,nl,k,_,eqtl),lrl,rrl,
             t1,t2,suit,result,ctx,env,path,insert,plvl,rec_open,
             (op,lvl,inl,inr))::l) ->
 
       let frtr =
-	let { eqflvl = eqflvl }, _ , _ = call_trivial in
+	let { eqflvl = eqflvl; _ }, _ , _ = call_trivial in
         if d2+.aug<0.0 then (eqflvl,0.0) else
           if flvl = 0 then raise (Fail_match path) else (flvl-1,d2+.aug)
       in
       let call_trivial, restore_gst = match insert with
-        None | Some {rule = No_rule} -> call_trivial, (fun x -> x)
-      | Some ({rule = In_rule (glc,stc)} as str) ->
+        None | Some {rule = No_rule; _} -> call_trivial, (fun x -> x)
+      | Some ({rule = In_rule (glc,stc); _} as str) ->
           let tri, f, (gl0,st0,nl) = call_trivial in
               (tri, f, (glc,stc.next,nl)),
                 (function tri,f,(gl1,st1,nl) ->
@@ -1661,7 +1654,7 @@ and fneq (flvl, aug) call_trivial
             e, {sref = sref; rule = Subgoal n; next = Fin (new_fin ())}
         in
         let rec fn delayed gst contxt acc st0 perm andpath = function
-          EApp(EAtom(o,_),(EAbs(vname,_,k) as e)) when
+          EApp(EAtom(o,_),(EAbs(_,_,k) as e)) when
               o == forall_obj ->
             let sref = new_ref () in
             let pos, nperm = match perm with
@@ -1676,7 +1669,7 @@ and fneq (flvl, aug) call_trivial
             st0.next <- Fol st1;
             fn delayed gst contxt acc st1
                nperm andpath (norm_lsexpr result e [es])
-        | EApp(EApp(EAtom(o,keq),e1),e2) when o == arrow_obj ->
+        | EApp(EApp(EAtom(o,_),e1),e2) when o == arrow_obj ->
             let ref1 = new_ref () and ref2 = new_ref () in
             let st2 = {sref = ref2; rule = Arrow_elim(st0.sref, ref1);
                        next = Fin (new_fin ())} in
@@ -1702,7 +1695,7 @@ and fneq (flvl, aug) call_trivial
               end
             in
             fn delayed goal_state contxt acc st2 perm andpath e2
-       | EApp(EApp(EAtom(o,keq),e1),e2) when o == !and_obj ->
+       | EApp(EApp(EAtom(o,_),e1),e2) when o == !and_obj ->
            let ref3 = new_ref () in
            let b, nandpath = match andpath with
              [] -> failwith "bug 5 in apply_eqn"
@@ -1727,7 +1720,7 @@ and fneq (flvl, aug) call_trivial
              nandpath (match b with
 	       Left_and -> e1 | Right_and -> e2 | _ ->
 		 failwith "bug path in apply_eqn")
-       | EApp(EApp(EAtom(o,keq),e1),e2) when o == equal_obj ->
+       | EApp(EApp(EAtom(o,_),e1),e2) when o == equal_obj ->
 	   (if ld then e1,e2 else e2,e1),st0, acc,
 	   contxt, gst, delayed, pathd (* path_diff (List.hd keq) t1.kind *)
        | e ->
@@ -1782,7 +1775,7 @@ and fneq (flvl, aug) call_trivial
 		       } in
             tri, triv, triv tri', goal_state
         in
-        let rec fn (subst,ctx,rem,nonu) gst las =
+        let fn (subst,ctx,rem,nonu) gst las =
           let treat (ref1, st2, e1) (las,subst,ctx,nonu) =
             let subst,(ctx,nonu),chg =
               try has_neg subst (ctx,nonu) e1
@@ -1904,9 +1897,6 @@ end;
 
     in gn !eqbreadth l
 
-let constr = ref ([] : (rig * rig * path list * int) list)
-
-
 let pmatch leqn loc inl inr call_trivial e1 e2 =
   let pos = get_undo_pos () in
   let v = type_check e1 in
@@ -1925,7 +1915,7 @@ let pmatch leqn loc inl inr call_trivial e1 e2 =
   getrwt := build_getrwt leqn;
   let smatch_local = !match_local in
   match_local := loc;
-  let {eqlvl = lvl; eqflvl = eqflvl}, _, _ = call_trivial in
+  let {eqlvl = lvl; eqflvl = eqflvl; _}, _, _ = call_trivial in
   let (subst,(ctx,nonu),rwt,rem),calt  = try
     fneq (eqflvl, 0.0) call_trivial []
          ((term_to_eqn e1 r [], term_to_eqn e2 r [],[],[],None,!eqplvl,
@@ -2056,12 +2046,12 @@ let umatch leqn loc e1 e2 =
   let call_trivial =
     {nlim = 0; eqlvl = !Flags.eqdepth; from_trivial = true; first_order = false;
      auto_elim = false; eqflvl = !Flags.eqflvl},
-    (fun tri ctxt ll ng ->
+    (fun _ ctxt ll ng ->
       conditions := (List.map (fun (_,_,e) -> e) ng) @ !conditions;
       ctxt, ll),
     (defgoal,Fin 0,[])
   in
-  let (subst,(ctx,nonu),rwt,rem),_  = try
+  let (subst,(ctx,nonu),_,rem),_  = try
     fneq (!Flags.eqflvl, 0.0) call_trivial []
       ((term_to_eqn e1 r [], term_to_eqn e2 r [],[],[],None,!eqplvl,
         ([],[]),(None,!Flags.eqflvl,false,false))::m) r (u,l) [] []

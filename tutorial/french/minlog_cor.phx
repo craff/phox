@@ -9,12 +9,12 @@ La construction des formules
 --------------------------*)
 
 (* 
-On va définir les formules de la logique minimale. On va utiliser
+On va dÃ©finir les formules de la logique minimale. On va utiliser
 les entiers comme nom de variable.
 
-Attention: On va prouver des propriétés de la logique minimale (logique
+Attention: On va prouver des propriÃ©tÃ©s de la logique minimale (logique
 objet) en logique du second ordre (meta-logique). Il faudra prendre
-garde a ne pas mélanger les deux niveaux.
+garde a ne pas mÃ©langer les deux niveaux.
 
 *)
 
@@ -30,19 +30,19 @@ Data Form =
 
 (* 
 - rInfix 
-    donne une syntaxe infix associative à droite:
+    donne une syntaxe infix associative Ã  droite:
     a |-> b |-> c signifie $|-> a ($|-> b c)
 - [4] 
-    donne la priorité (plus le nombre est petit, plus ca "colle"
+    donne la prioritÃ© (plus le nombre est petit, plus ca "colle"
 
 (par convention on utilise > 5 pour les connecteurs, < 5 pour les
-functions et 5 pour les constantes de prédicats)
+functions et 5 pour les constantes de prÃ©dicats)
 
 *)
 
 priority $S $var $|->.
 (* 
-La priorité de S étant 2, on peut écrire (sans parenthèses) :
+La prioritÃ© de S Ã©tant 2, on peut Ã©crire (sans parenthÃ¨ses) :
 *)
 print var S N0 |-> var N0.
 (*
@@ -53,15 +53,15 @@ QUESTION:
 
 
 (*-------------------
-Mon premier théorème
+Mon premier thÃ©orÃ¨me
 ___________________*)
 
 (*
-On peut prouver un petit théorème:
+On peut prouver un petit thÃ©orÃ¨me:
 *)
 goal Form (var S N0 |-> var N0).
 (* 
-On ouvre la définition:
+On ouvre la dÃ©finition:
 *)
 unfold Form.
 (* 
@@ -74,28 +74,28 @@ On introduit les implications:
 intro.
 intro.
 (* 
-On applique des éliminations sur l'hypothèse H0
+On applique des Ã©liminations sur l'hypothÃ¨se H0
 *)
 elim H0.
 (* 
-On applique des éliminations sur l'hypothèse H et deux intros:
+On applique des Ã©liminations sur l'hypothÃ¨se H et deux intros:
 (intro 2. = intro. intro.
 *)
 elim H.
 intro 2.
 (* 
-On applique des éliminations sur l'hypothèse H et une intro:
+On applique des Ã©liminations sur l'hypothÃ¨se H et une intro:
 *)
 elim H.
 intro.
 (* 
-QED. On sauve le theorème!
+QED. On sauve le theorÃ¨me!
 *)
 save mon_premier_theoreme.
 
 (*
 QUESTION:
-        Que signifie ce théorème ?
+        Que signifie ce thÃ©orÃ¨me ?
 
 QUESTION:
 	Que fait elim exactement ?
@@ -108,8 +108,8 @@ On pouvait faire plus court:
 goal Form (var S N0 |-> var N0).
 (* 
 Le unfold est fait automatiquement par intro ! en plus intros permet de
-faire un maximum d'intro pour les connecteurs spécifiés. En plus la commande
-Data a crée des règles d'introduction pour Form !
+faire un maximum d'intro pour les connecteurs spÃ©cifiÃ©s. En plus la commande
+Data a crÃ©e des rÃ¨gles d'introduction pour Form !
 
 QUESTION:
         Quels sont-elles ? 
@@ -119,7 +119,7 @@ intros N Form.
 save mon_premier_theoreme.
 
 (* 
-Et même encore plus court:
+Et mÃªme encore plus court:
 *)
 goal Form (var S N0 |-> var N0).
 trivial.
@@ -143,7 +143,7 @@ Question:
 *)
 
 (*----------------
-Sémantique:
+SÃ©mantique:
 ----------------*)
 
 (*
@@ -168,7 +168,7 @@ def Force p f = /\X (
 
 (* 
 Question:
-        Force définit une sémantique. Laquelle ?
+        Force dÃ©finit une sÃ©mantique. Laquelle ?
         .............
 Question:
         Quels-sont les termes extraits d'une preuve de "Force l f" ?
@@ -176,7 +176,7 @@ Question:
 *)
 
 (*
-Une propriété de Force:
+Une propriÃ©tÃ© de Force:
 EXERCICE: finis la preuve
 *)
 
@@ -201,11 +201,11 @@ save increasing.Force.
 Question: 
   As-t'on utiliser les deux lemmes ? Comment ?
 Question:
-  Comment pourrais-t'on se passer de ces lemmes, et à quel prix ?
+  Comment pourrais-t'on se passer de ces lemmes, et Ã  quel prix ?
 *)
 
 (*-----------------------------
-La correction de la sémantique:
+La correction de la sÃ©mantique:
 -----------------------------*)
 
 (*
@@ -236,16 +236,16 @@ left H3.
 left H5.
 from H4.
 (*->*)
-(* début de la preuve, on généralise: *)
+(* dÃ©but de la preuve, on gÃ©nÃ©ralise: *)
 prove /\p (/\p' List \f (X (p'@p) f) nil -> /\p' X (p'@p) f).
 (*
 On ne veut pas utiliser rec.Prouvable 
 	(pour obtenir un terme extrait plus court !
-On ouvre donc la définition a la main !
+On ouvre donc la dÃ©finition a la main !
 *) 
 unfold_hyp H Prouvable.
 (*
-et on fait l'induction ! à vous de finir !
+et on fait l'induction ! Ã  vous de finir !
 *)
 elim H.
 (*->*)
@@ -265,7 +265,7 @@ intro.
 intro.
 elim H4.
 elim H3.
-(* cas de l'impl_élimination *)
+(* cas de l'impl_Ã©limination *)
 intros.
 elim H1.
 elim H2 with (p' @ p0).
@@ -281,17 +281,17 @@ intro.
 save Correcte.
 
 (*-----------------------------
-La complétude de la sémantique:
+La complÃ©tude de la sÃ©mantique:
 -----------------------------*)
 
 (*
-on a besoin des listes non typées:
+on a besoin des listes non typÃ©es:
 *)
 
 def UList p = List (\x True) p.
 
 (*
-définition d'une fonction sur les listes:
+dÃ©finition d'une fonction sur les listes:
 *)
 
 Cst liat : list['a] -> list['a].
@@ -307,14 +307,14 @@ QUESTION: que fait-elle ?
 *)
 
 (*
-Voici la preuve de totalité de cette fonction:
+Voici la preuve de totalitÃ© de cette fonction:
 *)
 
 goal /\p (UList p -> UList (liat p)).
 intros.
 elim H.
 (*
-on réécrit une équation à la main:
+on rÃ©Ã©crit une Ã©quation Ã  la main:
 *)
 rewrite liat0.
 intro.
@@ -337,8 +337,8 @@ new_intro -t liat liat.total.
 
 (*
 Question:
-	Combien existe-t'il de méthode pour 
-	faire du raisonnement équationel ?
+	Combien existe-t'il de mÃ©thode pour 
+	faire du raisonnement Ã©quationel ?
 *) 
 (*
 un premier lemme:
@@ -379,7 +379,7 @@ Question:
 *)
 
 (*
-La complétude, enfin !
+La complÃ©tude, enfin !
 EXERCICE: finis le preuve !
 *)
 goal /\f (/\p:<list[form] Force p f -> Prouvable nil f).

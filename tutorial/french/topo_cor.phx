@@ -1,19 +1,19 @@
 Import requis.
 
-(* le but de cet exemple est de montrer que, dans un espace métrique,
-l'adhérence de la réunion de deux ensembles est égale à la réunion des
-adhérences. On notera que ceci ne nécessite aucune des propriétés de la
-distance et simplement deux propriétés du <.*)
+(* le but de cet exemple est de montrer que, dans un espace mÃ©trique,
+l'adhÃ©rence de la rÃ©union de deux ensembles est Ã©gale Ã  la rÃ©union des
+adhÃ©rences. On notera que ceci ne nÃ©cessite aucune des propriÃ©tÃ©s de la
+distance et simplement deux propriÃ©tÃ©s du <.*)
 
-(* On se donne des réels et un ensemble *)
+(* On se donne des rÃ©els et un ensemble *)
 Sort set.
 Sort real.
 
-(* R0 représente le réel zéro. On ne peut pas écrire simplement 0 pour
+(* R0 reprÃ©sente le rÃ©el zÃ©ro. On ne peut pas Ã©crire simplement 0 pour
 des raisons qu'il serait trop long d'expliquer ici *)
 Cst R0 : real.
 
-(* On se donne la relation inférieur sur les réels *)
+(* On se donne la relation infÃ©rieur sur les rÃ©els *)
 Cst Infix[5.0] x "<" y : real -> real -> prop.
 def Infix[5.0] x ">" y = y < x.
 
@@ -22,11 +22,11 @@ claim lemme /\e_1, e_2 >R0 \/e >R0 (e<e_1 & e<e_2).
 
 claim transitif /\x,y,z (x<y -> y<z -> x<z).
 
-(* d x y est la distance de deux éléments de l'ensemble *)
+(* d x y est la distance de deux Ã©lÃ©ments de l'ensemble *)
 Cst d : set -> set -> real.
 
-(* Adh A x se lit x est dans l'adhérence de A. Adh A désigne 
-donc l'adhérence de A et est définit ainsi : *)
+(* Adh A x se lit x est dans l'adhÃ©rence de A. Adh A dÃ©signe 
+donc l'adhÃ©rence de A et est dÃ©finit ainsi : *)
 def Adh A x  =  /\e > R0 \/y in A d x y < e.
 
 goal /\A /\B (Adh A union Adh B =  Adh (A union B)).

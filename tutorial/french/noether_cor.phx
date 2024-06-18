@@ -23,7 +23,7 @@ claim eltneutreun /\x (x ** un=x & un ** x=x).
 claim distributivite /\a,x,y a ** (x ++ y)=a ** x ++ a ** y.
 claim distributiviter /\a,x,y (x ++ y) ** a=x ** a ++ y ** a.
 
-(* On indique à PhoX d'utiliser ces équations pour le raisonnement automatique *)
+(* On indique Ã  PhoX d'utiliser ces Ã©quations pour le raisonnement automatique *)
 new_equation plusassoc.
 new_equation pluscom.
 new_equation multassoc.
@@ -39,7 +39,7 @@ def Infix[5] X "subset" Y = /\x (X x -> Y x).
 def Infix[4] X "union" Y = \x (X x or Y x).
 def plus X a x = X x or x = a.
 
-(* égalité sur les ensembles *)
+(* Ã©galitÃ© sur les ensembles *)
 goal /\A,B (A subset B -> B subset A  -> A = B).
 trivial +equal.extensional.
 save equal.extensional.intro.
@@ -63,7 +63,7 @@ def stationnaire SI = \/n:N /\m:N(m>=n -> SI m subset SI n).
 
 def Sup SI = \x \/n:N SI n x.
 
-(* rappel d'arithmétique (tout fait) *)
+(* rappel d'arithmÃ©tique (tout fait) *)
 fact or1 /\n,m:N (n<=m or m<=n).
 intros.
 elim lesseq.case1.N with H and H0;; trivial.
@@ -73,7 +73,7 @@ fact or2 /\x,y,z:N (x<=y -> y<=z -> x<=z).
 trivial.
 save.
 
-(* des lemmes que l'on prouvera après ... *)
+(* des lemmes que l'on prouvera aprÃ¨s ... *)
 claim p0 /\X:Fini Engendre X zero.
 
 claim p1 /\X:Fini (X subset Engendre X).
@@ -121,7 +121,7 @@ elim H5.
 (*->*)
 save.
 
-(*d'autres lemmes (avant le réciproque).
+(*d'autres lemmes (avant le rÃ©ciproque).
  *)
 claim p7 /\A,B (~A=B -> A subset B -> \/x:B ~ A x).
 

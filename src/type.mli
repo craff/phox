@@ -4,7 +4,6 @@
 (*######################################################*)
 
 
-open Format
 open Basic
 open Data_base
 open Object
@@ -214,9 +213,10 @@ val sp_del : af2_obj list -> ext -> unit
 val sp_sub : ext -> af2_obj list
 val sp_new : unit -> ext array
 val imported_modules : (string * renaming) list ref
-val tmp_modules : (string * renaming) list ref
 
-module Base: Base with type symbol = symbol and type tbl_types = tbl_types
+module Base: Base with type symbol = symbol
+                   and type tbl_types = tbl_types
+                   and type renaming = renaming
 
 open Base
 
@@ -247,7 +247,7 @@ val eqhash_clear : 'b eqhash -> unit
 val eqhash_add : 'b eqhash -> pos_eq -> 'b -> unit
 val eqhash_find : 'b eqhash -> pos_eq -> 'b
 val eqhash_remove : 'b eqhash -> pos_eq -> unit
-val eqhash_do_table : (pos_eq -> 'b -> 'c) -> 'b eqhash -> unit
+val eqhash_do_table : (pos_eq -> 'b -> unit) -> 'b eqhash -> unit
 val eqhash_it_table : ('c -> pos_eq -> 'b -> 'c) -> 'c -> 'b eqhash -> 'c
 
 val symhash_new : int -> 'b symhash
@@ -255,7 +255,7 @@ val symhash_clear : 'b symhash -> unit
 val symhash_add : 'b symhash -> af2_obj -> 'b -> unit
 val symhash_find : 'b symhash -> af2_obj -> 'b
 val symhash_remove : 'b symhash -> af2_obj -> unit
-val symhash_do_table : (af2_obj -> 'b -> 'c) -> 'b symhash -> unit
+val symhash_do_table : (af2_obj -> 'b -> unit) -> 'b symhash -> unit
 val symhash_it_table : ('c -> af2_obj -> 'b -> 'c) -> 'c -> 'b symhash -> 'c
 
 val get_Equations : tbl_types -> eqns eqhash

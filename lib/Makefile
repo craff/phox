@@ -3,6 +3,8 @@
 #path
 include ../config
 
+PHOXPATH=dune exec phox --
+
 .SUFFIXES :
 .SUFFIXES : .phx .pho .phi
 
@@ -12,20 +14,20 @@ SRCS =  prop.phx set.phx bin_rel.phx bool.phx nat_def.phx nat_ax.phx nat.phx \
 
 all: depend $(SRCS:.phx=.phi)
 
-.phx.phi: 
-	../src/$(PHOXVERS) -I . -c $<
+.phx.phi:
+	$(PHOXPATH) -I . -c $<
 
-prop.phi: prop.phx ../src/$(PHOXVERS)
-	../src/$(PHOXVERS) -I . -c -init prop.phx
+prop.phi: prop.phx
+	$(PHOXPATH) -I . -c -init prop.phx
 
 depend: Makefile $(SRCS)
-	if [ -x ../tools/phoxdep ]; then ../tools/phoxdep -i../src/$(PHOXVERS) $(SRCS) > depend; fi
+	../tools/phoxdep $(SRCS) > depend
 
 install: $(LIBS)
 	cp *.phi *.pho *.phx $(LIBDIR)
 
 clean:
-	- rm -f *.phi *.pho *.tex *.aux *.log *.dvi *.pin *.pout 
+	- rm -f *.phi *.pho *.tex *.aux *.log *.dvi *.pin *.pout
 
 veryclean: clean
 	- rm -f depend TAGS

@@ -189,11 +189,11 @@ tex_syntax Form Math "{\\mathcal F}".
 
 
 goal /\x:Var Form (var x). 
-trivial. (* à remplacer ! *)
+trivial. (* Ã  remplacer ! *)
 save var.Form.
 
 goal /\f,g:Form Form (f |-> g). 
-trivial. (* à remplacer ! *)
+trivial. (* Ã  remplacer ! *)
 save impl.Form.
 
 new_intro -c -i var var.Form.
@@ -244,7 +244,7 @@ def Prouvable C f = /\X (
           X C f).
 tex_syntax Prouvable Infix[5] C "\\Vdash" f.
 
-(* les règles d'intros *)
+(* les rÃ¨gles d'intros *)
 
 goal /\C,f Prouvable (f::C) f.
 trivial.
@@ -638,7 +638,7 @@ The term $\Car$ and $\Cdr$ extracted respectively from (1) and (2)
 implement the usual destructors for lists (this is an easy consequence
 of the proposition \ref{data} and the adequation lemma). 
 *) 
-(* debut de la preuve: on généralise: *)
+(* debut de la preuve: on gÃ©nÃ©ralise: *)
 (*! math
 Now to do the induction, we substitute the following predicate  
 to the variable $X$ in $\[ $$ H \]$:
@@ -651,7 +651,7 @@ prove /\p (M_L p nil -> /\q M (o q p) f).
 (* 
 On ne veut pas utiliser rec.Prouvable 
 	(pour obtenir un terme extrait plus court !
-On ouvre donc la définition a la main !
+On ouvre donc la dÃ©finition a la main !
 *) 
 unfold_hyp H Prouvable.
 (*
@@ -687,7 +687,7 @@ intro.
 intro.
 elim H6.
 elim H5.
-(* cas de l'impl_élimination *)
+(* cas de l'impl_Ã©limination *)
 (*! math
 \item {\textwidth=11cm $\[[ $0 \]]$} 
 which is easy using \[ $$H0 \] , \[ $$H1 \] and $a : \[ $$H3 \]$.
@@ -807,7 +807,7 @@ numeral itself (see \cite{Kri90e}). \qed
 *)
 
 (*
-définition d'une fonction sur les listes:
+dÃ©finition d'une fonction sur les listes:
 *)
 
 claim append.associative.untyped /\l,l',l'' (l @ (l' @ l'') = (l @ l') @ l''). 
@@ -864,7 +864,7 @@ QUESTION: que fait-elle ?
 *)
 
 (*
-Voici la preuve de totalité de cette fonction:
+Voici la preuve de totalitÃ© de cette fonction:
 *)
 
 goal UList nil.

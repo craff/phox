@@ -3,11 +3,8 @@
 (*			typunif.ml			*)
 (*######################################################*)
 
-open Format
 open List
-open Basic
-open Types
-open Data_base
+open Type
 open Undo
 
 exception Clash
@@ -20,14 +17,14 @@ let rec norm = function
     t
 | KVar ({contents = v} as ptr) ->
     let t = norm v in
-    if not (t == v) then update ptr t; 
+    if not (t == v) then update ptr t;
     t
 | t -> t
 
 
 let kind_subst largs t =
   let rec f t = match norm t with
-    KVar ptr as t -> t
+    KVar _ as t -> t
   | KBVar n -> List.nth largs n
   | KAtom (_,[]) as t -> t
   | KAtom (n,l) -> KAtom(n, List.map f l)
@@ -40,12 +37,12 @@ let rec norm2 = function
     t
 | KVar ({contents = v} as ptr) ->
     let t = norm2 v in
-    if not (t == v) then update ptr t; 
+    if not (t == v) then update ptr t;
     t
 | (KAtom (a,l)) as t ->
     begin
       match (Data_base.Object.get_value a).fvalue with
-	KDef k -> norm2 (kind_subst l k) 
+	KDef k -> norm2 (kind_subst l k)
       | _ -> t
     end
 | t -> t
@@ -61,39 +58,39 @@ let test_occur ptr t =
   in f t
 
 
-let rec kind_subst_expr largs =  function 
-  EVar i as e -> e
+let rec kind_subst_expr largs =  function
+  EVar _ as e -> e
 | EData _ as e -> e
 | FVar _ -> raise (Failure "bug in kind_subst_expr")
-| UVar (_,k) -> raise (Failure "bug in kind_subst_expr")
-| UCst (_,k) -> raise (Failure "bug in kind_subst_expr")
-| Path (path,e) -> 
-    let gn = function 
+| UVar (_,_) -> raise (Failure "bug in kind_subst_expr")
+| UCst (_,_) -> raise (Failure "bug in kind_subst_expr")
+| Path (path,e) ->
+    let gn = function
       PAbs (s,k) -> PAbs (s,kind_subst largs k)
     | c -> c in
     Path(List.map gn path, kind_subst_expr largs e)
-| Syntax s as e -> e
-| EAtom (o,k) -> 
+| Syntax _ as e -> e
+| EAtom (o,k) ->
     EAtom(o, List.map (kind_subst largs) k)
-| EApp (e1,e2) -> 
+| EApp (e1,e2) ->
     EApp(kind_subst_expr largs e1, kind_subst_expr largs e2)
 | EAbs (s,e,k) ->
     EAbs(s,kind_subst_expr largs e, kind_subst largs k)
 
 
-let unif t1 t2 = 
+let unif t1 t2 =
   let rec fn t1 t2 = match norm t1, norm t2 with
-      (KArrow (t1,t2)), (KArrow (t'1,t'2)) -> 
+      (KArrow (t1,t2)), (KArrow (t'1,t'2)) ->
         fn t1 t'1;
 	fn t2 t'2
     | (KAtom (a,l) as t1), (KAtom (a',l') as t2) ->
 	let found_def = ref false in
-	let t1' = 
+	let t1' =
 	  match (Data_base.Object.get_value a).fvalue with
 	    KDef k -> found_def := true; kind_subst l k
 	  | _ -> t1
 	in
-	let t2' = 
+	let t2' =
 	  match (Data_base.Object.get_value a').fvalue with
 	    KDef k -> found_def := true; kind_subst l' k
 	  | _ -> t2
@@ -101,8 +98,8 @@ let unif t1 t2 =
 	if !found_def then
 	  fn t1' t2'
 	else if a == a' then
-	  List.iter2 fn l l' 
-	else 
+	  List.iter2 fn l l'
+	else
 	  raise Clash
     | KBVar(n), KBVar(n') when n = n' -> ()
     | (KVar x), (KVar x') when x == x'-> ()
@@ -120,34 +117,33 @@ let unif t1 t2 =
 	    KDef k -> fn t1 (kind_subst l k)
 	  | _ -> raise Clash
 	end
-    | _ -> raise Clash  
+    | _ -> raise Clash
   in
-  let pos = get_undo_pos () in  
-  try 
-    fn t1 t2 
+  let pos = get_undo_pos () in
+  try
+    fn t1 t2
   with e ->
     do_undo pos; raise e
 
-let rec filter_arrow t =
+let filter_arrow t =
   match norm2 t with
     KArrow(t, t') -> t, t'
   | KVar ptr ->
       let v = mk_Var () and v' = mk_Var () in
       update ptr (KArrow(v,v'));
       v, v'
-  | _ -> raise Clash  
+  | _ -> raise Clash
 
 let equal_kind t t' =
-  try 
+  try
     unif t t';
     true
   with
-    Clash -> 
+    Clash ->
       false
 
-let unify e lv t t' = 
-  try 
+let unify e lv t t' =
+  try
     unif t t'
-  with Clash -> 
+  with Clash ->
     raise (Type_Clash (e,t,t',lv))
-

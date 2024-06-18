@@ -5,7 +5,7 @@
 
 (* gestion d'une base d'un "ensemble de donnees" modulaire *)
 
-(* note : la modularite n'est pas encore completement implementee !! *) 
+(* note : la modularite n'est pas encore completement implementee !! *)
 
 module Object : sig
   type 'a o_object
@@ -23,7 +23,7 @@ module Object : sig
       renvoie la valeur de l'objet encapsule o *)
   val get_value : 'a o_object -> 'a
 
-  (* To construct the encapsuled table. Use it ONLY to construct 
+  (* To construct the encapsuled table. Use it ONLY to construct
      the initial tables in the init_base fonction *)
   val mk_ext : string -> 'b -> ('a,'b) o_extern
 
@@ -32,10 +32,10 @@ module Object : sig
   val is_locked : 'a o_object -> bool
 end
 
-module type Data = sig 
-  open Object
+module type Data = sig
   type symbol
   type tbl_types
+  type renaming
   type obj = symbol Object.o_object
   type extern = (symbol,tbl_types) Object.o_extern
 
@@ -45,15 +45,14 @@ module type Data = sig
   val sp_del : obj list -> extern -> unit
 
   val sp_write : out_channel -> unit
-  val sp_read : in_channel -> unit
+  val sp_read : in_channel -> (string * renaming) list
   val recursive : bool ref
 end
 
 module type Base = sig
-  open Object
-
   type symbol
   type tbl_types
+  type renaming
   type obj = symbol Object.o_object
   type extern = (symbol,tbl_types) Object.o_extern
 
@@ -69,7 +68,7 @@ module type Base = sig
   (* exception levee en cas de definition recursive d'un symbol *)
   exception Rec_def
 
-  val dummy_object : symbol -> obj  
+  val dummy_object : symbol -> obj
 
   val capsule_object : string -> symbol -> int -> obj
   val is_capsule : obj -> bool
@@ -77,14 +76,14 @@ module type Base = sig
 
   val dummy_base : unit -> base
 
-  val load_base :  string list -> string -> base
+  val load_base :  string list -> string -> base * (string * renaming) list
   val new_base :  unit -> base
 
-  (* save_base b 
-      sauve la base b (en ecrasant eventuellement l'ancienne version) *) 
+  (* save_base b
+      sauve la base b (en ecrasant eventuellement l'ancienne version) *)
   val save_base : base -> string -> unit
 
-  (* base_get b name 
+  (* base_get b name
       recherche l'objet de nom "name" dans la base b *)
   val base_get : base -> string -> obj
 
@@ -98,9 +97,9 @@ module type Base = sig
       si l'objet est "locked" *)
   val base_add : base -> string -> symbol -> bool -> obj
 
-  (* base_remove b o 
+  (* base_remove b o
       supprime l'objet o de la base b
-      Attention, tous les objets referencant o doivent avoir ete supprimes 
+      Attention, tous les objets referencant o doivent avoir ete supprimes
       de la base, sinon une exception est levee *)
   val base_remove : bool -> base -> obj -> unit
 
@@ -111,9 +110,9 @@ module type Base = sig
   val get_table_byname : base -> string -> extern
   val do_ext_table : base -> (extern -> unit) -> unit
 
-  (* rec_remove b o 
+  (* rec_remove b o
       supprime l'objet o de la base b
-      Attention, tous les sous-objets referencant o sont recursivement 
+      Attention, tous les sous-objets referencant o sont recursivement
       supprimes *)
   val rec_remove : bool -> base -> obj -> unit
 
@@ -142,13 +141,4 @@ end
 module Base (Data : Data) : Base
   with type symbol = Data.symbol
   and  type tbl_types = Data.tbl_types
- 
-
-
-
-
-
-
-
-
-
+  and  type renaming = Data.renaming

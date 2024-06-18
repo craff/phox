@@ -5,11 +5,11 @@
 
 open Format
 open Basic
-open Lexer
+open Lex
 open Local
-open Types.Base
-open Types
-open Parser
+open Type.Base
+open Type
+open Parse_base
 open Print
 open Typing
 open Safe_add
@@ -23,12 +23,11 @@ open Pattern
 open Flags
 open Module
 open Data_info
-open Sys
 open Tex
 open Compile
 open Inductive
 open Parse_lambda
-open Lambda
+open Lambda_exp
 open New_cmd
 open Option
 open Proof_general
@@ -100,11 +99,6 @@ and parse_with = parser
   [< 'Ident "with"; l = parse_exprlist >] -> l
 | [< >] -> []
 
-let parse_boold b = parser
-  [< 'Ident "true" >] -> true
-| [< 'Ident "false" >] -> false
-| [< >] -> b
-
 let parse_value = parser
   [< 'Num n >] -> Vint (Num.int_of_num n)
 | [< 'Ident "true" >] -> Vbool true
@@ -123,7 +117,7 @@ let parse_path =
   in parser [< 'Kwd "["; l = fn; 'Kwd "]" >] -> l
 
 
-let rec parse_rewrite_opt = parser
+let parse_rewrite_opt = parser
   [< 'Kwd "-"; s = parse_ident; str >] ->
     (match s with
       "l" -> (match str with parser [< 'Num n >] -> Lim (Num.int_of_num n), true, false)
@@ -147,7 +141,7 @@ let rec parse_string_list = parser
     [< 'Str s; l = parse_string_list >] -> s::l
   | [< >] -> []
 
-let rec parse_depend_opt = parser
+let parse_depend_opt = parser
   [< 'Kwd "-"; s = parse_ident >] ->
     (match s with
       "a" | "all" -> All
@@ -199,7 +193,7 @@ let parse_into p s =
   and gn l r p tstr = match tstr with parser
     [< 'Kwd "[";
        'Ident str ?? serror "an identifier" tstr;
-       l0,p0 = fn [] 1;
+       l0,_ = fn [] 1;
        'Kwd "]" ?? serror "]" tstr; s >] ->
       fn ((r, OptDf (str,l0))::l) p s
   | [< e = parse_atomexpr; s >] -> fn ((r,OptFl e)::l) p s
@@ -207,7 +201,7 @@ let parse_into p s =
   let l,d = fn [] p s
   in List.sort (fun (n,_) (p,_) -> if n < p then -1 else 1) l, d
 
-let rec test_opt l w =
+let test_opt l w =
   match w with
     [] ->
       let rec fn = function
@@ -237,7 +231,7 @@ let parse_inta tstr = match tstr with parser
 let parse_ints = parser
   [< l = parse_symlist >] -> if l = [] then Default else Auth l
 
-let rec parse_trivial_opts take_int str =
+let parse_trivial_opts take_int str =
   let default =  {nlim = !trdepth; eqlvl = !eqdepth;
                	from_trivial = take_int; first_order = not take_int;
 		auto_elim = true; eqflvl = !eqflvl}
@@ -285,7 +279,7 @@ let rec parse_trivial_options = parser
     b,le,l@lm,lp
 | [< 'Kwd "+"; l = parse_ident_list; b,le,lm,lp = parse_trivial_options >] ->
     b,le,lm,l@lp
-| [< 'Kwd "="; l = parse_ident_list; b,le,lm,lp = parse_trivial_options >] ->
+| [< 'Kwd "="; l = parse_ident_list; _,le,lm,lp = parse_trivial_options >] ->
     false, l@le,lm,lp
 | [< >] -> true, [], [], []
 
@@ -382,7 +376,7 @@ let parse_export export tstr = match tstr with parser
 	List.map (fun (s,_,_) -> s, mk_Var ()) defs
       in
       let binds =
-	List.map (fun (s,l,e) ->
+	List.map (fun (_,l,e) ->
 	  let rec f e = function
 	      [] -> e
 	    | (s,k)::l -> EAbs(s,f e l, k) in
@@ -399,7 +393,7 @@ let parse_export export tstr = match tstr with parser
 	  type_strong e k) binds types
       in
       let csts =
-	List.map2 (fun e (name, k) ->
+	List.map2 (fun _ (name, k) ->
 	  let o =
 	    add_sym name k Cst Trivial false export Idtren None
 	  in aobj o) binds names
@@ -684,8 +678,6 @@ let parse_cmd cstrm tstr = (try match tstr with parser
        ()
 | [< 'Ident "quit"; 'Dot ?? terror Dot tstr >] ->
         raise Quit
-| [< 'Ident "restart"; 'Dot ?? terror Dot tstr >] ->
-        raise Restart
 | [< 'Ident "flag"; 'Ident s ?? serror "an identifier" tstr;
      v = parse_value ?? serror "aflag value" tstr;
     'Dot ?? terror Dot tstr >] ->
@@ -802,12 +794,12 @@ let parse_cmd cstrm tstr = (try match tstr with parser
        with Not_found ->
 	 raise (Gen_error ("Unbound identifier: \""^ s ^"\"")))
 | [< 'Ident "output";
-    order, opts = parse_options "output" ["kvm"];
+    _, opts = parse_options "output" ["kvm"];
     l = parse_ident_list ;
     'Dot ?? terror Dot tstr >]
 	 -> outputs  ~kvm:(List.mem "kvm" opts) l
 | [< 'Ident "eval";
-     order, opts = parse_options "eval" ["kvm"];
+     _, opts = parse_options "eval" ["kvm"];
      t = parse_lambda;
      'Dot ?? terror Dot tstr >] ->
     if List.mem "kvm" opts
@@ -901,7 +893,7 @@ let parse_cmd cstrm tstr = (try match tstr with parser
      e = parse_expr ?? serror "an expression" tstr;
      'Dot ?? terror Dot tstr>] ->
        let rules = AL.get_rules () e false in
-       let fn (str,w,subst,c,cl) =
+       let fn (str,w,_,_,cl) =
 	 print_string str; print_string " "; print_int w; print_string " : ";
 	 List.iter (fun e -> print_expr e; print_string " ; ") cl;
 	 print_newline ()
@@ -913,7 +905,7 @@ let parse_cmd cstrm tstr = (try match tstr with parser
      e = parse_expr ?? serror "an expression" tstr;
      'Dot ?? terror Dot tstr>] ->
        let rules = AL.get_rules () e true in
-       let fn (str,w,subst,c,cl) =
+       let fn (str,w,_,_,cl) =
 	 print_string str; print_string " "; print_int w; print_string " : ";
 	 List.iter (fun e -> print_expr e; print_string " ; ") cl;
 	 print_newline ()

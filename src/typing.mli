@@ -4,8 +4,7 @@
 (*######################################################*)
 
 
-open Types
-open Data_base
+open Type
 
 
 type generalize_env = (int * (kind ref * kind) list) ref

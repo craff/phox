@@ -3,8 +3,8 @@
 (*			compile.mli			*)
 (*######################################################*)
 
-open Types
-open Lambda
+open Type
+open Lambda_exp
 
 val compile : af2_obj -> term
 

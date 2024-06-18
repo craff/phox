@@ -5,9 +5,34 @@ include config
 
 world:
 	cd tools; $(MAKE) all
-	cd src; $(MAKE) $(PHOXVERS)
-	cd tex; $(MAKE) $(PRETTYVERS)
+	cp src/phox.native.hide src/phox.ml
+	cd src; $(MAKE) all
 	cd lib; $(MAKE) all
+
+js:
+	cp src/phox.js.hide src/phox.ml
+	dune build ./src/phox.bc.js
+
+local-js: js
+	cp src/phox.native.hide src/phox.ml
+	dune build ./src/phox.bc.js
+	mkdir -p phox-js/lib
+	- cd phox-js; ln -s ../config ../tools .
+	rsync -avx lib/Makefile lib/*.phx phox-js/lib
+	cd phox-js/lib; make depend
+	cd phox-js/lib; make PHOXPATH='node -- ../../_build/default/src/phox.bc.js' all
+	mkdir -p phox-js/tutorial
+	for d in tutorial/* ; do \
+	  rsync -avx $$d/Makefile $$d/*.phx  phox-js/$$d/; \
+	  cd phox-js/$$d;\
+          make depend ;\
+          make PHOXPATH='node -- ../../../_build/default/src/phox.bc.js' all;\
+          cd ../../..; \
+	done
+	mkdir -p phox-js/examples
+	rsync -avx examples/Makefile examples/*.phx phox-js/examples/
+	cd phox-js/examples; make depend
+	cd phox-js/examples; make PHOXPATH='node -- ../../_build/default/src/phox.bc.js' all
 
 install-all: install installPG
 
@@ -28,6 +53,22 @@ install:
 	cp -r examples/* $(EXAMPLESDIR)
 	cp -r tutorial $(EXAMPLESDIR)
 	if [ ! -z `which texhash` ]; then texhash; fi
+
+WWW=/var/www/html/phox
+#WWW=my:public/phox/
+
+install-www:
+	echo 'phoxMenus = [];' > phox-js/files.js; \
+	for f in lib examples tutorial/*; do \
+	  echo -n 'phoxMenus.push({ folder: "'$${f}'" , files: ["' >> phox-js/files.js; \
+	  cd $$f; ls *.phx > tmp.txt; \
+          cd -; cat $$f/tmp.txt | xargs echo -n | sed 's/ /", "/g' >> phox-js/files.js; \
+	  rm $$f/tmp.txt; \
+	  echo '"]});' >>  phox-js/files.js; \
+        done
+	rsync -vr phox-js/* $(WWW)/
+	rsync -v www/*.html www/*.js  $(WWW)
+	rsync -v _build/default/src/phox.bc.js $(WWW)
 
 uninstall:
 	- rm -rf $(LIBDIR) $(DOCDIR) $(TEXDIR)
@@ -54,7 +95,6 @@ depend:
 
 clean:
 	./tools/cleandir .
-	cd tools; $(MAKE) clean
 	cd src; $(MAKE) clean
 	cd lib; $(MAKE) clean
 	cd doc; $(MAKE) clean
@@ -64,6 +104,8 @@ clean:
 	if [ -d private ]; then  cd private; $(MAKE) clean; fi
 	cd tutorial/french; $(MAKE) clean
 	cd tutorial/english; $(MAKE) clean
+	rm -rf phox-js
+	cd tools; $(MAKE) clean
 
 veryclean:
 	./tools/cleandir .

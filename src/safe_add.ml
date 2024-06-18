@@ -4,8 +4,8 @@
 (*######################################################*)
 
 open Format
-open Types.Base
-open Types
+open Type.Base
+open Type
 open Basic
 open Lambda_util
 open Typing
@@ -160,9 +160,9 @@ let test_prefix sy =
 let no_local t =
   let rec f d = function
     EVar p -> p < d
-  | EAtom (o,k) -> if is_capsule o then false else true
+  | EAtom (o,_) -> if is_capsule o then false else true
   | EApp (t,t') -> (f d t) && (f d t')
-  | EAbs (s,t,k) -> f (d+1) t
+  | EAbs (_,t,_) -> f (d+1) t
   | Path (path,t) -> f (d + path_count path) t
   | UCst _ | UVar _ -> false
   | _ -> true
@@ -267,8 +267,8 @@ let add_sym name kind value syntax lock exported origin poly =
 	  kind, value, fst !lt
     in
     let sy = match syntax with
-	Prefix (sy,perm) -> test_prefix sy;sy
-      | Infix (ll,lr,sy,perm,_,_) -> test_infix ll lr sy;sy
+	Prefix (sy,_) -> test_prefix sy;sy
+      | Infix (ll,lr,sy,_,_,_) -> test_infix ll lr sy;sy
       | Trivial -> []
       | _ -> raise (Failure "bug in ass_sym") in
     let (value,kind) = ckind_expr_copy (value,kind) in
@@ -306,8 +306,8 @@ let add_sym name kind value syntax lock exported origin poly =
 		Def (EApp(EApp(EAtom(o,_),_),_) as l')
 		when o == !ftheorem_list_cons_obj -> (
 		  let rec thlist_to_list = function
-		      EApp(EApp(EAtom(o,_),th),l) -> th::thlist_to_list l
-		    | EAtom(o,_) -> []
+		      EApp(EApp(EAtom(_,_),th),l) -> th::thlist_to_list l
+		    | EAtom(_,_) -> []
 		    | _ -> assert false
 		  in
 		  let l0 = thlist_to_list l in
@@ -481,8 +481,8 @@ let add_rlocal ld name kind value syntax =
   if not (test_arity true kind syntax) then raise (Failure
         "Def. Error: too many arguments in the given syntax");
   let sy = match syntax with
-    Prefix (sy,perm) -> test_prefix sy;sy
-  | Infix (ll,lr,sy,perm,_,_) -> test_infix ll lr sy;sy
+    Prefix (sy,_) -> test_prefix sy;sy
+  | Infix (ll,lr,sy,_,_,_) -> test_infix ll lr sy;sy
   | Trivial -> []
   | _ -> raise (Failure "bug in ass_sym") in
   let o =
@@ -490,7 +490,7 @@ let add_rlocal ld name kind value syntax =
     match get_syntax o' with
       Hiden false -> {fkind = kind; fvalue = value; syntax = syntax;
                       poly = 0; exported = false; origin = Local_def}
-    | sy -> raise (Redef name)
+    | _ -> raise (Redef name)
   with Not_found ->
     {fkind = kind; fvalue = value; syntax = syntax;
      poly = 0; exported = false; origin = Local_def}
