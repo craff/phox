@@ -45,7 +45,7 @@ let print_prompt() =
   if !compiling && not !in_inductive then begin
     exit_tex ();
     print_endline "aborted !";
-    raise Quit
+    exit 1
   end
 
 let print_pos () =
@@ -214,7 +214,8 @@ let main(inCh) =
            print_pos (); emergency_exit ()
         | Quit ->
            ()
-           else go (Filename.concat dirname root) cstrm tstrm
+
+    else go (Filename.concat dirname root) cstrm tstrm
   in
   if !compiling then
       cur_input := open_path (Filename.concat dirname input_name);
