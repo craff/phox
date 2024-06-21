@@ -18,6 +18,9 @@ val cur_input : in_channel ref
 val cur_line : int ref
 val cur_col : int ref
 
+(* running as a server: prompt only at end of command *)
+val server : bool ref
+
 (* termine la lecture du canal courant et reprend la lecture du suivant
    dans la liste *)
 val pop_input : unit -> unit

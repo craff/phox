@@ -1,6 +1,6 @@
 (* Le but est de montrer que dans un anneau commutatif tout idéal maximal est
 premier et que la réciproque est vraie si l'anneau est principal (donc
-intègre).  
+intègre).
 
 Remarque: l'existence d'un opposé pour l'addition ne sert pas dans la preuve.
 
@@ -14,7 +14,7 @@ Voici une preuve informelle de ce résultat :
   lemme, on a i+ax=1 et j+by=1. En faisant
   le produit et en utilisant le fait que I est un idéal et que xy
   appartient à I on déduit que 1 est dans I.
-  Contradiction.  
+  Contradiction.
 - réciproque : Soit I engendré par p premier. Soit J= engendré par q
   contenant I. On a donc p=qx. Comme I est premier, q appartient à I
   (et donc J=I) ou x appartient à I. Alors x=py et donc p=pqy. Comme A
@@ -29,23 +29,23 @@ flag auto_lvl 1.
 Sort ringelt.
 
 (* La somme et le produit avec les priorités usuelles *)
-Cst lInfix[4]  x"+"y  : ringelt -> ringelt -> ringelt.
-Cst lInfix[3] x"*"y   : ringelt -> ringelt -> ringelt.
+Cst lInfix[4] x"+"y  : ringelt → ringelt → ringelt.
+Cst lInfix[3] x"×"y  : ringelt → ringelt → ringelt.
 
 (* Les deux éléments neutres *)
 Cst  zero : ringelt.
 Cst un : ringelt.
 
 (* Les propriétés d'un (semi) anneau *)
-claim plusassoc /\x,y,z  x+(y+z)=x+y+z.
-claim pluscom /\x,y x+y=y+x.
-claim multassoc /\x,y,z x*(y*z)=x*y*z.
-claim multcom /\x,y x*y=y*x.
-claim eltabs /\x (x*zero=zero & zero*x=zero).
-claim eltneutrezero /\x (x+zero=x & zero+x=x).
-claim eltneutreun /\x (x*un=x & un*x=x).
-claim distributivite /\a,x,y a*(x+y)=a*x+a*y.
-claim distributiviter /\a,x,y (x+y)*a=x*a+y*a.
+claim plusassoc ∀x,y,z  x+(y+z)=x+y+z.
+claim pluscom ∀x,y x+y=y+x.
+claim multassoc ∀x,y,z x×(y×z)=x×y×z.
+claim multcom ∀x,y x×y=y×x.
+claim eltabs ∀x (x×zero=zero ∧ zero×x=zero).
+claim eltneutrezero ∀x (x+zero=x ∧ zero+x=x).
+claim eltneutreun ∀x (x×un=x ∧ un×x=x).
+claim distributivite ∀a,x,y a×(x+y)=a×x+a×y.
+claim distributiviter ∀a,x,y (x+y)×a=x×a+y×a.
 
 (* On indique à PhoX d'utiliser ces équations pour le
 raisonnement automatique *)
@@ -68,22 +68,22 @@ axiomes *)
 def_thlist developpe = eltabs eltneutreun eltneutrezero  plusassoc multassoc distributivite distributiviter.
 
 (* Les définitions utiles *)
-def ideal I = /\x,y:I (I (x+y)) & /\x:I /\z (I (z*x)) & I zero.
+def ideal I = ∀x,y:I (I (x+y)) ∧ ∀x:I ∀z (I (z×x)) ∧ I zero.
 
-def principal I = \/a /\x (I x <-> \/y x = a*y).
+def principal I = ∃a ∀x (I x ↔ ∃y x = a×y).
 
-def Infix[5] I "subset" J = /\x:I J x.
+def Infix[5] I "⊂" J = ∀x:I J x.
 
-def maximal I = ideal I & ~(I un) & /\J (ideal J & I subset J -> J subset I or J un).
+def maximal I = ideal I ∧ ¬(I un) ∧ ∀J (ideal J ∧ I ⊂ J → J ⊂ I ∨ J un).
 
-def premier I = ideal I & ~(I un) & /\x,y ((I (x*y)) -> I x or I y).
+def premier I = ideal I ∧ ¬(I un) ∧ ∀x,y ((I (x×y)) → I x ∨ I y).
 
 (* on prouvera ce lemme après le théorème *)
-claim lemme /\I:ideal /\x (maximal I ->  ~ I x -> \/i:I \/a (i+a*x=un)).
+claim lemme ∀I:ideal ∀x (maximal I →  ¬ I x → ∃i:I ∃a (i+a×x=un)).
 
 (* le sens direct du théorème *)
-goal /\I:ideal (maximal I -> premier I).
-(*->*)
+goal ∀I:ideal (maximal I → premier I).
+(*→*)
 intros.
 unfold premier.
 intros.
@@ -103,8 +103,8 @@ left G.
 left H6.
 left H7.
 prove I un.
-from I (un*un).
-from I ((i+a*x)*(i0+a0*y)).
+from I (un×un).
+from I ((i+a×x)×(i0+a0×y)).
 rewrite developpe.
 lefts H.
 elim H.
@@ -116,17 +116,17 @@ elim H8 with H6.
 elim H8 with H1.
 lefts H0.
 elim H8.
-(*->*)
+(*→*)
 save thm1.
 
 (* encore deux définitions *)
-def integre = /\x,y,a (a*x=a*y -> a=zero or x=y).
-def Aprincipal =  integre & /\I (ideal I  -> principal I).
+def integre = ∀x,y,a (a×x=a×y → a=zero ∨ x=y).
+def Aprincipal =  integre ∧ ∀I (ideal I  → principal I).
 
 (* la réciproque du théorème *)
-goal Aprincipal -> 
-     /\I:ideal ((\/x:I ~x=zero) -> premier I -> ~ I un -> maximal I).
-(*->*)
+goal Aprincipal →
+     ∀I:ideal ((∃x:I ¬x=zero) → premier I → ¬ I un → maximal I).
+(*→*)
 intro.
 left H.
 intros.
@@ -150,7 +150,7 @@ elim H6.
 elim H8 with G1.
 rename y x.
 lefts H3.
-apply H11 with I (q * x).
+apply H11 with I (q × x).
 axiom G.
 elim G2.
 intro l.
@@ -159,10 +159,10 @@ elim H7 with H12.
 elim H8 with H13.
 elim H7 with [r].
 intro.
-instance ?1 y * y0.
+instance ?1 y × y0.
 intro.
 elim H7 with H12.
-prove  x * un = x * (q * y).
+prove  x × un = x × (q × y).
 intro.
 apply integre with G3.
 left G4.
@@ -177,28 +177,28 @@ intro r.
 elim H8 with [r].
 intro.
 axiom H14.
-(*->*)
+(*→*)
 save thm2.
 
 (* definition nécessaire à la preuve du lemme *)
-def engendre I x y = \/i:I \/a (y=i+a*x).
+def engendre I x y = ∃i:I ∃a (y=i+a×x).
 
 (* première propriété de engendre *)
-prop lemme1 /\I:ideal /\x ideal (engendre I x).
-(*->*)
+prop lemme1 ∀I:ideal ∀x ideal (engendre I x).
+(*→*)
 intros.
 lefts H.
 intros.
 intros.
 rename x0 z.
-lefts H2 $& $\/ engendre.
+lefts H2 $∧ $∃ engendre.
 rename a j.
 rename i a.
-lefts H3 $& $\/ engendre.
+lefts H3 $∧ $∃ engendre.
 rename i b.
 rename a0 i.
 rewrite H4 H5.
-intros engendre $& $\/.
+intros engendre $∧ $∃.
 select 2.
 instance ?2 j + i.
 instance ?1 a + b.
@@ -206,42 +206,42 @@ rewrite developpe.
 intro.
 elim H.
 intros.
-lefts H2 $& $\/ engendre.
+lefts H2 $∧ $∃ engendre.
 rewrite H3.
-intros engendre $& $\/.
+intros engendre $∧ $∃.
 select 2.
-instance ?4 z*a.
-instance ?3 z*i.
+instance ?4 z×a.
+instance ?3 z×i.
 intro.
 elim H0.
-intros engendre $& $\/.
+intros engendre $∧ $∃.
 axiom H1.
 intro.
-(*->*)
+(*→*)
 save.
 
 (* seconde propriété de engendre (triviale) *)
-prop  lemme2 /\I,x I subset (engendre I x).
+prop  lemme2 ∀I,x I ⊂ (engendre I x).
 trivial.
 save.
 
 (* troisième propriété de engendre (triviale) *)
-prop  lemme3 /\I:ideal /\x engendre I x x.
+prop  lemme3 ∀I:ideal ∀x engendre I x x.
 trivial.
 save.
 
 (* preuve du lemme *)
 prove_claim lemme.
-(*->*)
+(*→*)
 intros.
 local J = engendre I x.
 prove ideal J.
 elim lemme1.
-prove I subset J.
+prove I ⊂ J.
 elim lemme2.
 prove J x.
 elim lemme3.
-apply H0 with G & G0.
+apply H0 with G ∧ G0.
 intro.
 elim G2.
 elim H1.
@@ -252,5 +252,5 @@ left H4.
 intro 2.
 axiom H3.
 intro 2.
-(*->*)
+(*→*)
 save.

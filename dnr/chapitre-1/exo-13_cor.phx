@@ -1,0 +1,29 @@
+Sort term.
+Cst P : term → prop.
+Cst R : term → prop.
+Cst T : term → term → prop.
+Cst S : term → prop.
+
+goal ∃x∀y(P x ∧(R y → T x y))→ ∀x,y(¬ P x ∨ ¬ S y ∨ ¬ T x y) → ∀x(¬ R x ∨ ¬ S x).
+intro 3.
+by_absurd.
+rewrite_hyp H1 disjunction.demorgan.
+rewrite_hyp H1 negation.demorgan.
+elim False.
+left H1.
+elim H.
+apply -1 (x) H3.
+left G.
+apply -1 (x0) -2 (x) H0.
+use T x0 x.
+elim G.
+elim H6.
+axiom H4.
+elim H6.
+elim H7.
+axiom H2.
+elim H7.
+axiom G0.
+elim H5.
+axiom H1.
+save th.

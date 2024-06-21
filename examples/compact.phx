@@ -3,39 +3,39 @@ flag auto_lvl 1.
 
 Sort elt.
 
-Cst Elt : elt -> prop.
+Cst Elt : elt → prop.
 
-Cst Ouvert : (elt -> prop) -> prop.
+Cst Ouvert : (elt → prop) → prop.
 
-def Ferme F = F subset Elt & Ouvert (complement Elt F).
+def Ferme F = F ⊂ Elt ∧ Ouvert (Elt ∖ F).
 
-claim Topologie0 /\U:Ouvert U subset Elt.
+claim Topologie0 ∀U:Ouvert U ⊂ Elt.
 
-claim Topologie1 /\F (F subset Ouvert -> Ouvert (Union F)).
+claim Topologie1 ∀F (F ⊂ Ouvert → Ouvert (⋃ F)).
 
-claim Topologie2 /\F:Finite (F subset Ouvert -> Ouvert (Inter F)).
+claim Topologie2 ∀F:Finite (F ⊂ Ouvert → Ouvert (⋂ F)).
 
 claim Topologie3 Ouvert emptyset.
 
 claim Topologie4 Ouvert Elt.
 
-fact Ferme0 /\F:Ferme F subset Elt.
+fact Ferme0 ∀F:Ferme F ⊂ Elt.
 trivial.
 save.
 
-fact Ferme1 /\F (\/x F x -> F subset Ferme -> Ferme (Inter F)).
+fact Ferme1 ∀F (∃x F x → F ⊂ Ferme → Ferme (⋂ F)).
 intros.
 intros.
 trivial.
 rewrite complement_Inter.
 elim Topologie1.
 intros.
-lefts H1 Direct_image $& $\/.
+lefts H1 Direct_image $∧ $∃.
 rewrite H2.
 elim H0.
 save.
 
-fact Ferme2 /\F:Finite (\/x F x -> F subset Ferme -> Ferme (Union F)).
+fact Ferme2 ∀F:Finite (∃x F x → F ⊂ Ferme → Ferme (⋃ F)).
 intros.
 intros.
 trivial.
@@ -43,7 +43,7 @@ rewrite complement_Union.
 elim Topologie2.
 select 2.
 intros.
-lefts H2 Direct_image $& $\/.
+lefts H2 Direct_image $∧ $∃.
 rewrite H3.
 elim H1.
 elim Finite_Direct_image.
@@ -53,28 +53,28 @@ claim Ferme3 Ferme Elt.
 
 claim Ferme4 Ferme emptyset.
 
-claim Separe /\x:Elt /\y:Elt (x!=y -> \/U,V:Ouvert (U inter V=emptyset & U x & V y)).
+claim Separe ∀x:Elt ∀y:Elt (x≠y → ∃U,V:Ouvert (U ∩ V=emptyset ∧ U x ∧ V y)).
 
 
-fact uf /\U,V:Ouvert (Ouvert (U union V)).
+fact uf ∀U,V:Ouvert (Ouvert (U ∪ V)).
 intros.
-local F = singleton U union singleton V.
-apply Topologie1 with F subset Ouvert.
+local F = singleton U ∪ singleton V.
+apply Topologie1 with F ⊂ Ouvert.
 trivial.
-prove U union V=Union F.
+prove U ∪ V = ⋃ F.
 intro;; trivial.
 axiom G.
 save.
 
-def Recouvrement X I U = /\x:X \/i:I (U i x).
-def RecouvrementOuvert X I U = Recouvrement X I U & Direct_image U I subset Ouvert.
-def Compact X = /\I:<(elt -> prop) /\U:(RecouvrementOuvert X I) \/J:Finite (J subset I & RecouvrementOuvert X J U).
+def Recouvrement X I U = ∀x:X ∃i:I (U i x).
+def RecouvrementOuvert X I U = Recouvrement X I U ∧ Direct_image U I ⊂ Ouvert.
+def Compact X = ∀I:<(elt → prop) ∀U:(RecouvrementOuvert X I) ∃J:Finite (J ⊂ I ∧ RecouvrementOuvert X J U).
 
 Import ac.
 
-fact lem0 /\U subset Elt (/\x:U (\/V (Ouvert V & V subset U & V x))-> Ouvert U).
+fact lem0 ∀U ⊂ Elt (∀x:U (∃V (Ouvert V ∧ V ⊂ U ∧ V x))→ Ouvert U).
 intros.
-prove U = Union (\V (V subset U & Ouvert V)).
+prove U = ⋃ (λV (V ⊂ U ∧ Ouvert V)).
 intro.
 select 2.
 trivial.
@@ -87,7 +87,7 @@ save.
 
 
 
-fact lem1 /\F subset Elt (/\x:Elt (~ F x -> \/ U (Ouvert U & U subset complement Elt F & U x))-> Ferme F).
+fact lem1 ∀F ⊂ Elt (∀x:Elt (¬ F x → ∃ U (Ouvert U ∧ U ⊂ Elt ∖ F ∧ U x))→ Ferme F).
 intros.
 intro.
 elim lem0.
@@ -98,18 +98,18 @@ trivial =H1.
 trivial =H1.
 save.
 
-fact Theoreme /\K subset Elt (Compact K -> Ferme K).
+fact Theoreme ∀K ⊂ Elt (Compact K → Ferme K).
 intros.
 elim lem1.
 intros.
 
-local Q y U V = Ouvert U & U y & Ouvert V & V x & U inter V = emptyset.
+local Q y U V = Ouvert U ∧ U y ∧ Ouvert V ∧ V x ∧ U ∩ V = emptyset.
 local Phi y = Def2_1 (Q y).
 local Psi y = Def2_2 (Q y).
-prove /\y:K (Q y (Phi y) (Psi y)).
+prove ∀y:K (Q y (Phi y) (Psi y)).
 intros.
 elim AC2.
-apply Separe with Elt x and Elt y and x != y.
+apply Separe with Elt x and Elt y and x ≠ y.
 trivial.
 trivial.
 trivial = G.
@@ -123,16 +123,16 @@ instance ?4 x0.
 trivial =G H H3.
 trivial =G H.
 apply H0 with G0.
-lefts G1 $& $\/.
+lefts G1 $∧ $∃.
 
-local V = Inter (Direct_image Psi J).
-elim excluded_middle with \/z K z.
+local V = ⋂ (Direct_image Psi J).
+elim excluded_middle with ∃z K z.
 select 2.
 rewrite_hyp H6 demorgan.
-intros $& $\/.
+intros $∧ $∃.
 from Topologie4.
 trivial =H6.
-prove \/j J j.
+prove ∃j J j.
 by_absurd.
 rewrite_hyp H7 demorgan.
 elim False.
@@ -142,20 +142,20 @@ trivial =H5 H6 H7.
 rename G1 D2.
 rmh H6.
 
-intros $\/ $&.
+intros $∃ $∧.
 instance ?4 V.
 unfold V.
 elim Topologie2.
 
 elim Finite_Direct_image.
-trivial =H G H4. 
+trivial =H G H4.
 intros.
 intro.
 intro.
 apply H5 with H7.
 left G1.
 left H8.
-unfold_hyp H6 V Inter Direct_image.
+unfold_hyp H6 V $⋂ Direct_image.
 apply H6 with ? and ?.
 intro.
 intro.
@@ -166,11 +166,11 @@ intro.
 apply G with K i.
 elim H4.
 lefts G2.
-prove (Phi i inter Psi i) x0.
+prove (Phi i ∩ Psi i) x0.
 trivial.
 trivial= H14 G2.
 
-unfold_hyp H6 V Inter Direct_image.
+unfold_hyp H6 V $⋂ Direct_image.
 left D2.
 apply H6 with ? and ?.
 intro.
@@ -185,4 +185,3 @@ apply Topologie0 with H10 and  G1.
 intros.
 trivial =H G H6 H4.
 save.
-

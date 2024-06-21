@@ -1,19 +1,19 @@
 (* ring : a mono_ring whose additive monoid is also a commutative group. *)
 
 Use com_group with
-  op -> rInfix[3.5] x "+" y
-| e  -> R0
-| set -> _
-| G  -> R
-| i -> Prefix[1] "--" x
-| _ -> _.add
+  op → rInfix[3.5] x "+" y
+| e  → R0
+| set → _
+| G  → R
+| i → Prefix[1] "--" x
+| _ → _.add
 .
 
 Use mono_ring with
   from nat with
-    * -> rInfix[3] x "*.nat" y
-  | + -> rInfix[3.5] x "+.nat" y
-  | ^ -> Infix[2.5] x "^.nat" y
+    × → rInfix[3] x "*.nat" y
+  | + → rInfix[3.5] x "+.nat" y
+  | ^ → Infix[2.5] x "^.nat" y
   . 
 .
 

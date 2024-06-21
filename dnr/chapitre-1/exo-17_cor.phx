@@ -1,0 +1,48 @@
+Sort term.
+Cst A : term → term → prop.
+Cst B : term → term → prop.
+Cst C : term → term → prop.
+Cst D : term → term → prop.
+
+theorem numero1
+  ∀e ∃a ∀x (A a x → B e x) ∧
+  ∀a ∃b ∀x (C b x  → A a x) ∧
+  ∀e ∀a (B e a → D e a)
+  → ∀e ∃a ∀x (C a x → D e x).
+intro.
+lefts H.
+intro 1.
+apply H with e.
+left G.
+apply H0 with a.
+left G.
+intro.
+instance ?1 b.
+intros.
+apply H3 with H4.
+apply H2 with G.
+apply H1 with G0.
+axiom G1.
+save.
+
+
+theorem numero2
+  ∀e ∃a ∀x (A a x → B e x) ∧
+  ∀a ∃b ∀x (B b x → D a x) ∧
+  ∀e ∀a (C e a → A e a)
+  → ∀e ∃a ∀x (C a x → D e x).
+intro.
+lefts H.
+intro.
+apply H0 with e.
+left G.
+apply H with b.
+left G.
+intro.
+instance ?1 a.
+intro 2.
+elim H2.
+elim H3.
+elim H1.
+axiom H4.
+save.

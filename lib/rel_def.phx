@@ -1,9 +1,9 @@
 Use nat with
-  N -> N
-| N0 -> N0
-| nat -> nat 
-| _.N -> _.N
-| _ -> _.N.
+  N → N
+| N0 → N0
+| nat → nat 
+| _.N → _.N
+| _ → _.N.
 Import product.
 flag auto_lvl 1.
 
@@ -44,10 +44,10 @@ save.
 
 
 Use -n quotient with
-  set -> z
-| D -> Z'
-| Q -> Z
-| _.Q -> _.Z
+  set → z
+| D → Z'
+| Q → Z
+| _.Q → _.Z
 .
 
 def Z0 = class (N0, N0).
@@ -60,7 +60,7 @@ new_intro -i -t Z0 Z0.Z.
 
 def S' x = class (S.N (fst x), snd x).  
 
-fact total.S'.Z /\x:Z' Z (S' x).
+fact total.S'.Z ∀x:Z' Z (S' x).
 trivial.
 save.
 
@@ -79,7 +79,7 @@ save.
 
 def S = lift S'.
 
-fact S.total.Z /\x:Z Z (S x).
+fact S.total.Z ∀x:Z Z (S x).
 trivial +compat.S.Z.
 save S.total.Z.
 
@@ -87,7 +87,7 @@ new_intro -t -i S S.total.Z.
 
 def P' x = class (fst x, S.N (snd x)).  
 
-fact total.P'.Z /\x:Z' Z (P' x).
+fact total.P'.Z ∀x:Z' Z (P' x).
 trivial.
 save.
 
@@ -108,7 +108,7 @@ save.
 
 def P = lift P'.
 
-fact P.total.Z /\x:Z Z (P x).
+fact P.total.Z ∀x:Z Z (P x).
 trivial +compat.P.Z.
 save P.total.Z.
 
@@ -116,7 +116,7 @@ new_intro -t -i P P.total.Z.
 
 flag auto_lvl 1.
 
-fact SP.Z /\x:Z S (P x) = x.
+fact SP.Z ∀x:Z S (P x) = x.
 intros.
 intro.
 trivial.
@@ -140,7 +140,7 @@ elim sym.Z.
 save.
 
 
-fact PS.Z /\x:Z P (S x) = x.
+fact PS.Z ∀x:Z P (S x) = x.
 intros.
 intro.
 trivial.

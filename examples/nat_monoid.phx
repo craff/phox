@@ -1,10 +1,10 @@
 Import monoid.
 Import nat.
 
-Cst Infix [2.5] x "@" y : nat -> set -> set.
+Cst Infix [2.5] x "@" y : nat → set → set.
 
-claim nprod0 /\x (N0 @ x = e).
-claim nprodS /\x,y (S x @ y = x @ y op y). 
+claim nprod0 ∀x (N0 @ x = e).
+claim nprodS ∀x,y (S x @ y = x @ y op y). 
 new_equation nprod0.
 new_equation nprodS.
 

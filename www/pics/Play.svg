@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+<!-- CreationDate: 2024-06-21 10:22:22 -->
+<!-- Magnification: 1.05 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="12px" height="20px"
+	viewBox="0 0 120 200">
+<g fill="none">
+<!-- Line -->
+<polyline points=" 0,0 120,100 0,200 0,0" fill="#30C030"
+          stroke-linejoin="round" stroke="#ffffff" stroke-width="10"/>
+</g>
+</svg>

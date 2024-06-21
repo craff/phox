@@ -15,18 +15,18 @@ flag auto_lvl 3.
 
 Use monoid.
 
-Cst Prefix[2] "i" x : set -> set.
-tex_syntax $i Postfix[2] x "^{-1}". 
+Cst Prefix[2] "i" x : set → set.
+tex_syntax $i Postfix[2] x "^{-1}".
 
-claim inv_total /\x:G  G (i x).
+claim inv_total ∀x:G  G (i x).
 new_intro -t i inv_total.
 
-claim inv_left /\x:G (i x) op x = e. 
+claim inv_left ∀x:G (i x) op x = e.
 new_equation inv_left.
 tex_syntax inv_left "inverse left".
 
-(*! math doc 
-  \begin{definition} 
+(*! math doc
+  \begin{definition}
     A group is a monoid with an inverse function $ x \mapsto \[ i x \] $ which
     is an inverse to the left. This is expressed by the following axiom:
       $$ \[ $$inv_left \] \hspace{2cm} \[ inv_left \]. $$
@@ -36,7 +36,7 @@ tex_syntax inv_left "inverse left".
 (*! doc
   In ascii, the inverse function \[ i x \] is written \{ i x \} with a prefix
   syntax of higher pripority (level 2) than the monoid operator \{ $op \}. So
-  we can write \{ i i x \} for \verb#i (i x)# and \{i x op y\} for 
+  we can write \{ i i x \} for \verb#i (i x)# and \{i x op y\} for
   \verb#(i x) op y#.
 *)
 
@@ -49,7 +49,7 @@ tex_syntax inv_left "inverse left".
 
 edel equation neutre_right.
 
-goal /\x:G (x op e = x).
+goal ∀x:G (x op e = x).
 intros.
 (*! math doc
   \begin{proof} So we must prove \[ $0 \] for an arbitrary $x$. We can use the
@@ -65,7 +65,7 @@ intro.
 (*! math doc
   $$\begin{array}{lcll}
   \[ x op e\] &=& \[(e op x) op e\] &\hspace{1cm}(\[neutre_left\]) \cr
-              &=& \[((i (i x) op i x) op x) op e\] 
+              &=& \[((i (i x) op i x) op x) op e\]
                               &\hspace{1cm}(\[inv_left\])\cr
               &=& \[(i (i x) op i x op x) op e\] &\hspace{1cm}(\[assoc\])\cr
               &=& \[(i (i x) op e) op e\] &\hspace{1cm}(\[inv_left\]) \cr
@@ -82,33 +82,33 @@ intro.
 save neutre_right.
 new_equation neutre_right.
 
-goal /\x:G (i i x = x).
+goal ∀x:G (i i x = x).
 intros.
 from i (i x) op (i x op x) = x.
 intro.
 save inv_idempotent.
 new_equation inv_idempotent.
 
-goal /\x:G (x op i x = e).
+goal ∀x:G (x op i x = e).
 intros.
 from (i i x op i x = e).
 trivial.
 save inv_right.
 new_equation inv_right.
 
-goal /\a,x,y:G (a op x = a op y -> x = y).
+goal ∀a,x,y:G (a op x = a op y → x = y).
 intros.
 from (i a op a) op x = (i a op a) op y.
 intro.
 save left_regular.
 
-goal /\a,x,y:G (x op a = y op a -> x = y).
+goal ∀a,x,y:G (x op a = y op a → x = y).
 intros.
 from x op (a op i a) = y op (a op i a).
 intro.
 save right_regular.
 
-goal /\x,y:G i (x op y) = i y op i x.
+goal ∀x,y:G i (x op y) = i y op i x.
 intros.
 elim -1 x right_regular.
 trivial. trivial.
@@ -118,8 +118,3 @@ from i (x op y) op (x op y) = i y op y.
 intro.
 save inv_contrapos.
 new_equation inv_contrapos.
-
-
-
-
-

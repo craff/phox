@@ -1,7 +1,7 @@
 Import requis.
 
 (* le but de cet exemple est de montrer que, dans un espace métrique,
-l'adhérence de la réunion de deux ensembles est égale à la réunion des
+l'adhérence de la ré∪ de deux ensembles est égale à la ré∪ des
 adhérences. On notera que ceci ne nécessite aucune des propriétés de la
 distance et simplement deux propriétés du <.*)
 
@@ -14,23 +14,23 @@ des raisons qu'il serait trop long d'expliquer ici *)
 Cst R0 : real.
 
 (* On se donne la relation inférieur sur les réels *)
-Cst Infix[5.0] x "<" y : real -> real -> prop.
+Cst Infix[5.0] x "<" y : real → real → prop.
 def Infix[5.0] x ">" y = y < x.
 
 (* On a besoin de deux lemmes sur < : *)
-claim lemme /\e_1, e_2 >R0 \/e >R0 (e<e_1 & e<e_2).
+claim lemme ∀e_1, e_2 >R0 ∃e >R0 (e<e_1 ∧ e<e_2).
 
-claim transitif /\x,y,z (x<y -> y<z -> x<z).
+claim transitif ∀x,y,z (x<y → y<z → x<z).
 
 (* d x y est la distance de deux éléments de l'ensemble *)
-Cst d : set -> set -> real.
+Cst d : set → set → real.
 
-(* Adh A x se lit x est dans l'adhérence de A. Adh A désigne 
+(* Adh A x se lit x est dans l'adhérence de A. Adh A désigne
 donc l'adhérence de A et est définit ainsi : *)
-def Adh A x  =  /\e > R0 \/y in A d x y < e.
+def Adh A x  =  ∀e > R0 ∃y ∈ A d x y < e.
 
-goal /\A /\B (Adh A union Adh B =  Adh (A union B)).
-(*->*)
+goal ∀A ∀B (Adh A ∪ Adh B =  Adh (A ∪ B)).
+(*→*)
 intros.
 intro.
 intro.
@@ -47,22 +47,15 @@ by_absurd.
 elim False.
 
 rewrite_hyp H0 demorganl.
-lefts H0 $& $\/.
+lefts H0 $∧ $∃.
 apply lemme with H1 and H0.
-lefts G $& $\/.
+lefts G $∧ $∃.
 apply H with H4.
-lefts G $& $\/.
+lefts G $∧ $∃.
 left H7.
 apply H3 with H7.
 trivial +transitif.
 apply H2 with H7.
 trivial +transitif.
-(*->*)
+(*→*)
 save th.
-
-
-
-
-
-
-

@@ -3,50 +3,50 @@ flag auto_lvl 1.
 
 Sort reel = num.
 
-Cst lInfix [3] x "+" y : reel -> reel -> reel.
-Cst opp : reel -> reel.
+Cst lInfix [3] x "+" y : reel → reel → reel.
+Cst opp : reel → reel.
 def lInfix [3] x "-" y = x + opp y.
 
-claim plus_assoc /\x,y,z ((x + y) + z = x + (y + z)).
-claim plus_com   /\x,y (x + y = y + x).
-claim plus_zero /\x x + 0 = x.
+claim plus_assoc ∀x,y,z ((x + y) + z = x + (y + z)).
+claim plus_com   ∀x,y (x + y = y + x).
+claim plus_zero ∀x x + 0 = x.
 new_rewrite plus_assoc plus_com plus_zero.
-fact zero_plus /\x 0 + x = x.
+fact zero_plus ∀x 0 + x = x.
 trivial.
 save.
 new_rewrite zero_plus.
-claim opp_left /\x (opp x + x = 0).
+claim opp_left ∀x (opp x + x = 0).
 new_rewrite opp_left.
-fact opp_right /\x (x + opp x = 0).
+fact opp_right ∀x (x + opp x = 0).
 trivial.
 save.
 new_rewrite opp_right.
-fact plus_right_regular /\x,y,z (x + z = y + z -> x = y).
+fact plus_right_regular ∀x,y,z (x + z = y + z → x = y).
 intros.
 from x + 0 = y + 0.
 from x + z + opp z = y + z + opp z.
 intro.
 save.
-fact plus_left_regular /\x,y,z (z + x = z + y -> x = y).
+fact plus_left_regular ∀x,y,z (z + x = z + y → x = y).
 trivial +plus_right_regular.
 save.
-fact plus_right_left /\X,x,y,z ((x = y -> X) -> x + z = y + z -> X).
+fact plus_right_left ∀X,x,y,z ((x = y → X) → x + z = y + z → X).
 trivial +plus_right_regular.
 save.
-fact plus_left_left /\X,x,y,z ((x = y -> X) -> z + x = z + y -> X).
+fact plus_left_left ∀X,x,y,z ((x = y → X) → z + x = z + y → X).
 trivial +plus_left_regular.
 save.
 new_elim -n -i $= plus_right plus_right_left.
 new_elim -n -i $= plus_left plus_left_left.
 
-fact opp_opp /\x opp (opp x) = x.
+fact opp_opp ∀x opp (opp x) = x.
 intros.
 prove opp (opp x) + opp x = x + opp x.
 trivial + opp_right opp_left.
 left G.
 save.
 
-fact opp_plus /\x,y (opp (x + y) = opp x + opp y).
+fact opp_plus ∀x,y (opp (x + y) = opp x + opp y).
 intros.
 prove opp (x + y) + y + x = opp x + opp y + y + x.
 from opp (x + y) + (y + x) = opp x + (opp y + y) + x.
@@ -56,74 +56,74 @@ save.
 
 new_rewrite opp_plus opp_opp.
 
-Cst lInfix [2] x "*" y : reel -> reel -> reel.
-Cst inv : reel -> reel.
-def lInfix [2] x "/" y = x * inv y.
+Cst lInfix [2] x "*" y : reel → reel → reel.
+Cst inv : reel → reel.
+def lInfix [2] x "/" y = x × inv y.
 
-Cst positive x : reel -> prop.
+Cst positive x : reel → prop.
 def Infix [5] x "<" y = positive (y - x).
 def Infix [5] x ">" y = y < x.
-def Infix [5] x "<=" y = x < y or x = y.
-def Infix [5] x ">=" y = x > y or x = y.
+def Infix [5] x "⩽" y = x < y ∨ x = y.
+def Infix [5] x "⩾" y = x > y ∨ x = y.
 
-claim positive_plus /\x,y:positive positive (x + y).
+claim positive_plus ∀x,y:positive positive (x + y).
 new_intro -t plus positive_plus.
 
 
 Inductive IN x = 
   zero : IN 0
-| succ : /\x (IN x -> IN (x + 1)).
+| succ : ∀x (IN x → IN (x + 1)).
 
 
-def Infix [3] u "++" v = \x (u x + v x).
+def Infix [3] u "++" v = λx (u x + v x).
 
-Cst abs x : reel -> reel.
+Cst abs x : reel → reel.
 
-fact plus_entier /\x,y in IN x + y in IN.
+fact plus_entier ∀x,y in IN x + y in IN.
 intro 2.
 elim H.
 trivial.
 trivial.
 save.
 
-goal 1235252647 * 123436721 + 345 = ?.
+goal 1235252647 × 123436721 + 345 = ?.
 rewrite $+.
 intro.
 save th.
 
-claim div_pos /\x,y (x > 0 -> y > 0 -> x / y > 0). 
+claim div_pos ∀x,y (x > 0 → y > 0 → x / y > 0). 
 claim deux_pos 2 > 0.
-claim max /\A /\n,m in A \/p in A (p > n & p > m). 
+claim max ∀A ∀n,m in A ∃p in A (p > n ∧ p > m). 
 
-claim less_trans /\x,y,z (x < y -> y < z -> x < z).
-claim less_plus /\x,y,z,t (x < y -> z < t -> x + z < y + t).
-claim less_abs /\x,y (abs (x + y) < abs x + abs y).
+claim less_trans ∀x,y,z (x < y → y < z → x < z).
+claim less_plus ∀x,y,z,t (x < y → z < t → x + z < y + t).
+claim less_abs ∀x,y (abs (x + y) < abs x + abs y).
 
 
 
-lemma plus_2 /\x,y,z (x + y + z = x + z + y).
+lemma plus_2 ∀x,y,z (x + y + z = x + z + y).
 trivial.
 save.
 
-lemma plus_2' /\x,y,z (x + y + z = z + y + x).
+lemma plus_2' ∀x,y,z (x + y + z = z + y + x).
 trivial.
 save.
 
 new_rewrite plus_2 plus_2'.
 
-lemma plus_3 /\x,y,z,t (x + y + z + t = x + y + t + z).
+lemma plus_3 ∀x,y,z,t (x + y + z + t = x + y + t + z).
 trivial.
 save.
-lemma plus_3' /\x,y,z,t (x + y + z + t = x + t + z + y).
+lemma plus_3' ∀x,y,z,t (x + y + z + t = x + t + z + y).
 trivial.
 save.
-lemma plus_3'' /\x,y,z,t (x + y + z + t = t + y + z + x).
+lemma plus_3'' ∀x,y,z,t (x + y + z + t = t + y + z + x).
 trivial.
 save.
 new_rewrite plus_3 plus_3' plus_3''.
 
-claim plus_deux /\x (x + x = 2 * x).
-claim mul_div /\x,y (y != 0 -> y * (x / y) = x).
-claim less_diff /\x,y (x > y -> x != y). 
+claim plus_deux ∀x (x + x = 2 × x).
+claim mul_div ∀x,y (y ≠ 0 → y × (x / y) = x).
+claim less_diff ∀x,y (x > y → x ≠ y). 
 
 new_rewrite plus_deux mul_div.

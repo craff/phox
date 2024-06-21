@@ -15,36 +15,36 @@ de réécriture étant plus efficaces. *)
 Import nat.
 flag auto_lvl 1.
 
-def lInfix[5] x "|" y = \/z:N  y = z * x.
+def lInfix[5] x "|" y = ∃z:N  y = z × x.
 
 (** Basic properties *)
 (*** Some introduction rules *)
 
 
-fact (* basic introduction rule *) div.def.N /\x,y,z:N (y=z * x -> x | y). 
+fact (* basic introduction rule *) div.def.N ∀x,y,z:N (y=z × x → x | y).
 trivial.
 save.
 
 new_intro -n  def div.def.N.
 
-fact (* divisibility is reflexive *)  div.reflexive.N 
-/\x:N  x | x.
+fact (* divisibility is reflexive *)  div.reflexive.N
+∀x:N  x | x.
 trivial.
 save.
 
 fact (* #| and #* *) div.lmul.N
- /\x,y (N x -> N y -> x | x * y).
+ ∀x,y (N x → N y → x | x × y).
 intros.
 trivial.
 save.
 
 fact (* #| and #* *) div.rmul.N
- /\x,y (N x -> N y -> x |  y * x).
+ ∀x,y (N x → N y → x |  y × x).
 intros.
 trivial.
 save.
 
-fact (* #N0 is maximum for divisibility *) div.N0.max.N /\x:N  x | N0.
+fact (* #N0 is maximum for divisibility *) div.N0.max.N ∀x:N  x | N0.
 intros.
 intro.
 instance ?1 N0.
@@ -55,7 +55,7 @@ save.
 
 
 fact (* simple property of #| and #+ *) div.radd.N
-/\x,y:N(x | y -> x | y + x).
+∀x,y:N(x | y → x | y + x).
 intros.
 left H1.
 left H1.
@@ -69,7 +69,7 @@ intro.
 save.
 
 fact (* simple property of #| and #+ *) div.ladd.N
-/\x,y:N(x | y -> x | x + y).
+∀x,y:N(x | y → x | x + y).
 intros.
 left H1.
 left H1.
@@ -83,22 +83,22 @@ intro.
 save.
 
 fact (* useful for automatic procedure *) div.rN0.N
-/\x,y:N(x|y+N0 -> x|y).
+∀x,y:N(x|y+N0 → x|y).
 trivial.
 save.
 
 fact (* useful for utomatic procedure *) div.rN1.N
-/\x,y:N(x|y+ (S N0) -> x|S y).
+∀x,y:N(x|y+ (S N0) → x|S y).
 trivial.
 save.
 
 
 fact (* useful for automatic procedure *) div.rS.N
-/\x,y,z:N(x|y+(S z) -> x|(S y)+z).
+∀x,y,z:N(x|y+(S z) → x|(S y)+z).
 trivial.
 save.
 
-fact (* #N1 is a minimum for divisibility *) div.N1.min.N /\x:N  N1 | x.
+fact (* #N1 is a minimum for divisibility *) div.N1.min.N ∀x:N  N1 | x.
 trivial.
 (*
 intros.
@@ -133,7 +133,7 @@ goal essai S S N0 | S S S S S S N0.
 trivial.
 *)
 
-(* ne fonctionne pas 
+(* ne fonctionne pas
 goal  N2 | N6.
 trivial 8. *)
 
@@ -147,7 +147,7 @@ abort.
 flag trace_pmatch true.
 
 goal  S S S N0 | S S S S S S S S S S S S S S S S S S S S S S S S S S S N0.
-trivial [ -eq 0]. 
+trivial [ -eq 0].
 
 flag trace_pmatch false.
 
@@ -166,12 +166,12 @@ goal S S S N0 | S S S S S S N0.
 trivial.
 
 goal  S S S N0 | S S S S S S S S S S S S S S S S S S S S S S S S S S S N0.
-trivial 0. 
+trivial 0.
 
 fonctionne bien que long,  mais trivial n'aboutit pas *)
 
-fact (* compatibility of #| with #+ *)  div.add.N 
- /\x,y,z:N (x | y -> x |  z -> x | y + z).
+fact (* compatibility of #| with #+ *)  div.add.N
+ ∀x,y,z:N (x | y → x |  z → x | y + z).
 intros.
 left H2. left H3.
 left H2. left H3.
@@ -186,15 +186,15 @@ new_intro -n add div.add.N.
 
 (*
 goal N2 | N6.
-trivial. échoue 
-abort. 
+trivial. échoue
+abort.
 goal S S N0 | N6.
 trivial. réussit
 *)
 
 
 fact (* inductive definition of #| *) div.inductive.N
-/\x,y:N (/\X(X x N0 -> /\ z:N (X x z -> X x (z+x)) -> X x y) -> x | y).
+∀x,y:N (∀X(X x N0 → ∀ z:N (X x z → X x (z+x)) → X x y) → x | y).
 intros.
 elim H1.
 intro.
@@ -207,19 +207,19 @@ new_intro -n inductive div.inductive.N.
 
 (*** Elimination rules *)
 
-fact (* basic elimination rule *) div.elim.N 
-/\ X /\x,y:N(/\d:N( y  = d * x -> X) -> x | y -> X). 
+fact (* basic elimination rule *) div.elim.N
+∀ X ∀x,y:N(∀d:N( y  = d × x → X) → x | y → X).
 trivial.
 save.
 
 new_elim  -n $| def div.elim.N.
 
 fact (* induction on divisibility *) div.rec.N
-/\X /\x:N(X x N0 -> /\z:N  (x|z -> X x z -> X x (z+x )) 
-                                   -> /\y:N  (x | y -> X x y)).
+∀X ∀x:N(X x N0 → ∀z:N  (x|z → X x z → X x (z+x ))
+                                   → ∀y:N  (x | y → X x y)).
 intro 8.
 left H3.
-prove /\y:N(y = z*x -> X x y).
+prove ∀y:N(y = z×x → X x y).
 (* rmh H2 H4. avec -i *)
 rmh H2 H3 H5.
 (* elim H3. avec -i *)
@@ -243,21 +243,21 @@ save.
 
 new_elim   $| rec div.rec.N.
 
-fact (* reasoning by case upon $| *)div.case_c.N 
-/\x,m:N(x|m -> (m=N0 or \/m':N(x|m'&m=m'+x))).
+fact (* reasoning by case upon $| *)div.case_c.N
+∀x,m:N(x|m → (m=N0 ∨ ∃m':N(x|m'∧m=m'+x))).
 intros.
 elim -1[rec] H1.
 intro l.
 intro.
 intro r.
-(* 
+(*
 H := N x
 H0 := N m
 H1 := x | m
 H2 := N z
 H3 := x | z
-H4 := \/m':N  (x | m' & z = m' + x)
-   |- \/m':N  (x | m' & z + x = m' + x)
+H4 := ∃m':N  (x | m' ∧ z = m' + x)
+   |- ∃m':N  (x | m' ∧ z + x = m' + x)
 trivial. ne fonctionne pas ! ou tres lent *)
 (* trivial =H H2 H3. fonctionne. trop lent *)
 intro.
@@ -270,10 +270,10 @@ save.
 
 
 (* for left rule, the following form is more usable. *)
-fact (* reasoning by case upon $| *)div.case.N 
-/\X/\x,m:N((m=N0 -> X) -> /\m':N(x|m' -> m=m'+x -> X) -> x|m -> X).
+fact (* reasoning by case upon $| *)div.case.N
+∀X∀x,m:N((m=N0 → X) → ∀m':N(x|m' → m=m'+x → X) → x|m → X).
 intros.
-elim -5 H3 div.case_c.N..
+elim -5 H3 div.case_c.N.
 elim H1.
 left H4.
 lefts H4.
@@ -283,13 +283,13 @@ save.
 new_elim $| case div.case.N.
 (* ne peut-être déclarée comme règle gauche
 : la tactique trivial devient aberrante
-goal /\x,y:N/\X,Y(x|y -> X ->(X->Y) -> Y).
+goal ∀x,y:N∀X,Y(x|y → X →(X→Y) → Y).
 intros.
 trivial.
 *)
 
 
-fact div.lesseq.N  /\x,y:N(x|y -> y = N0 or x <= y).
+fact div.lesseq.N  ∀x,y:N(x|y → y = N0 ∨ x ⩽ y).
 intros.
 elim H1.
 intro l.
@@ -298,15 +298,15 @@ intro r.
 trivial = H H2.
 save.
 
-fact div.lesseq_not_eqN0.N /\x,y:N(y != N0 -> x| y -> x<= y).
+fact div.lesseq_not_eqN0.N ∀x,y:N(y ≠ N0 → x| y → x⩽ y).
 intros.
 apply div.lesseq.N with H2.
 trivial.
 save.
 
 
-fact div.lesseq_left.N 
-/\X/\x,y:N((y = N0 -> X) -> (x<=y  -> X) -> (x| y -> X)). 
+fact div.lesseq_left.N
+∀X∀x,y:N((y = N0 → X) → (x⩽y  → X) → (x| y → X)).
 (* trivial  + div.lesseq.N. ne marche pas *)
 intros.
 elim -5H3 div.lesseq.N.
@@ -320,7 +320,7 @@ new_elim -n  $| div.lesseq  div.lesseq_left.N.
 
 
 fact (* #N0 is the only multiple of #x less than #x *) div.less_is_zero.N
-/\X /\ x,m:N((m=N0 -> X)  -> m < x -> x | m -> X).
+∀X ∀ x,m:N((m=N0 → X)  → m < x → x | m → X).
 intros.
 elim H1.
 elim -1[div.lesseq] H3.
@@ -333,7 +333,7 @@ new_elim  -n $| less_is_zero div.less_is_zero.N.
 
 (* à ajouter dans la librairie nat *)
 fact (* if sum is N0 *) add.eq_N0.N
-/\X/\x,y:N ( (x =N0 -> y = N0 ->X)-> (x+y=N0 -> X)).
+∀X∀x,y:N ( (x =N0 → y = N0 →X)→ (x+y=N0 → X)).
 intros.
 elim H1.
 rmh H1.
@@ -348,40 +348,40 @@ save.
 
 new_elim -i -n   $=  eq_N0 add.eq_N0.N.
 
-fact (* only #N0 divide #N0 *) div.lN0.N /\x:N (N0 | x -> x = N0). 
+fact (* only #N0 divide #N0 *) div.lN0.N ∀x:N (N0 | x → x = N0).
 trivial 8.
 save.
 
-fact (* only #N0 divide #N0, left rule *) div.lN0_left.N 
-/\X /\x:N((x= N0 -> X) -> N0|x -> X).
+fact (* only #N0 divide #N0, left rule *) div.lN0_left.N
+∀X ∀x:N((x= N0 → X) → N0|x → X).
 trivial 8.
 save.
 
 new_elim -i -n $| N0 div.lN0_left.N.
 
-fact div.N0w.N /\X/\x:N(X->x|N0->X).
+fact div.N0w.N ∀X∀x:N(X→x|N0→X).
 intros.
 save.
 
 
-fact lesseq_less.ltrans.N /\x:N/\y,z (x <= y -> y < z -> x < z).
+fact lesseq_less.ltrans.N ∀x:N∀y,z (x ⩽ y → y < z → x < z).
 intros.
-prove S x<=S y.
+prove S x⩽S y.
 trivial.
 rmh H0.
 elim -5G -6H1 lesseq.ltrans.N.
 intro.
 save.
 
-fact less_lesseq.ltrans.N /\x:N/\y,z (x < y -> y <= z -> x < z).
+fact less_lesseq.ltrans.N ∀x:N∀y,z (x < y → y ⩽ z → x < z).
 intros.
 elim -5H0 -6H1 lesseq.ltrans.N.
 intro.
 save.
 
 
-fact div.not_less.N 
-/\X/\x,y:N(S y < x -> x|N0+S y-> X).
+fact div.not_less.N
+∀X∀x,y:N(S y < x → x|N0+S y→ X).
 intros.
 elim -1[div.lesseq] H2.
 intros.
@@ -395,7 +395,7 @@ save.
 
 
 fact div.add_left.N
-/\X/\x,m:N( (x|m -> X) -> x|m+x -> X).
+∀X∀x,m:N( (x|m → X) → x|m+x → X).
 intros.
 elim H1.
 rmh H1.
@@ -410,12 +410,12 @@ save.
 
 
 fact (* useful for automatic procedure *) div.left.rN1.N
-/\X/\x,y:N((x|y + S N0 -> X) -> x | S y -> X).
+∀X∀x,y:N((x|y + S N0 → X) → x | S y → X).
 trivial.
 save.
 
 fact div.left_rS.N
-/\X/\x,y,z:N((x| y + S z -> X)-> x | S y + z -> X).
+∀X∀x,y,z:N((x| y + S z → X)→ x | S y + z → X).
 trivial.
 save.
 
@@ -430,26 +430,26 @@ new_elim -i -n $| N0w div.N0w.N.
 (*** Rewrite rules. *)
 
 fact (* simple property of #| and #+ *) div.rewrite_ladd.N
-/\x,y:N( (x | x+y) = (x | y)).
+∀x,y:N( (x | x+y) = (x | y)).
 trivial.
 save.
 
-fact div.rewrite_N0.max.N /\x:N( (x|N0) = True).
+fact div.rewrite_N0.max.N ∀x:N( (x|N0) = True).
 trivial.
 save.
 
 fact div.rewrite_rN1.N
-/\x,y:N( (x | S y) = (x | y + (S N0))).
+∀x,y:N( (x | S y) = (x | y + (S N0))).
 trivial.
 save.
 
 fact div.rewrite_rS.N
-/\x,y,z:N( (x | S y + z ) = (x | y + S z) ).
+∀x,y,z:N( (x | S y + z ) = (x | y + S z) ).
 trivial.
 save.
 
 fact div.rewrite_lesseq.N
-/\x,m:N(m< x -> ( (x|m) = (m=N0) )).
+∀x,m:N(m< x → ( (x|m) = (m=N0) )).
 intros.
 intro.
 intro.
@@ -461,7 +461,7 @@ save.
 
 
 fact div.rewrite_reflexive.N
-/\x:N ( ( x | x) = True ).
+∀x:N ( ( x | x) = True ).
 trivial.
 save.
 
@@ -475,19 +475,19 @@ close_def $|.
 
 (*
 goal  S S S N0 | S S S S S S S S S S S S S S S S S S S S S S S S S S S N0.
-rewrite calcul.div.N. 
-* fonctionne mais trop long, beaucoup plus rapide si l'on supprime 
+rewrite calcul.div.N.
+* fonctionne mais trop long, beaucoup plus rapide si l'on supprime
 div.rewrite_lesseq de calcul.div.N *
 intro.
 save essai2.
 
-goal ~ S S S N0 | S S S S S N0.
+goal ¬ S S S N0 | S S S S S N0.
 rewrite calcul.div.N.
 trivial.
 save essai1.
 
 
-goal ~ S S S N0 | S S N0.
+goal ¬ S S S N0 | S S N0.
 rewrite calcul.div.N.
 trivial.
 save essai3.
@@ -498,7 +498,7 @@ save essai3.
 (*** Divisibility is an order *)
 
 fact (* divisibility is transitive *) div.transitive.N
-/\x,y,z:N  (x | y -> y | z -> x | z).
+∀x,y,z:N  (x | y → y | z → x | z).
 intros.
 elim H2 with [def] ;; rmh H2.
 elim H3 with [def] ;; rmh H3.
@@ -506,8 +506,8 @@ trivial.
 save.
 
 
-fact (* divisibility is anti-symmetric *) div.anti_sym.N 
- /\x,y:N (x | y -> y | x -> x = y).
+fact (* divisibility is anti-symmetric *) div.anti_sym.N
+ ∀x,y:N (x | y → y | x → x = y).
 intros.
 apply -5H1 div.lesseq.N.
 apply -5H2 div.lesseq.N.
@@ -530,8 +530,8 @@ save.
 (*** Primes *)
 
 def lInfix[5] x "prime_with" y =
-  				 N x & N y & /\ z:N (z | x & z | y -> z = N1).
-def lInfix[5] x "prime" = N x & x != N1 & /\ z:N (z | x -> z = N1 or z = x).
+  				 N x ∧ N y ∧ ∀ z:N (z | x ∧ z | y → z = N1).
+def lInfix[5] x "prime" = N x ∧ x ≠ N1 ∧ ∀ z:N (z | x → z = N1 ∨ z = x).
 
 fact (* #N2 is prime *) prime.N2.N N2 prime.
 intros.
@@ -547,7 +547,7 @@ save.
 (*texte Preuve du fait que quelques petits nombres sont premiers, en
 essayant tous les entiers plus petits ! *)
 
-fact (* #N2 donnot divide #N3 *) div.N2_N3.N ~ N2 | N3.
+fact (* #N2 donnot divide #N3 *) div.N2_N3.N ¬ N2 | N3.
 rewrite calcul.div.N.
 trivial.
 save.
@@ -602,9 +602,9 @@ intros.
 elim  div.lesseq_left.N with ? and H0 ;; Try intros.
 trivial.
 left H1 ;; Try trivial 0.
-left H1 ;; Try trivial 0. 
+left H1 ;; Try trivial 0.
 select 2.
-(* le Try qui échoue interrompt la suite de calculs donc 
+(* le Try qui échoue ∩rompt la suite de calculs donc
 left H1 ;; Try trivial 0 ;; rewrite_hyp H0 H1 ;; rewrite_hyp H0 calcul.div.N ;; trivial.
 ne fonctionne pas. *)
 rewrite_hyp H0 H1 ;; rewrite_hyp H0 calcul.div.N ;; trivial.
@@ -662,4 +662,3 @@ select 2.
 rewrite_hyp H0 H1 ;; rewrite_hyp H0 calcul.div.N ;; trivial.
 left H1 ;; Try trivial.
 save.
-

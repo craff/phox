@@ -1,0 +1,84 @@
+tex
+  title = "Introduction � la logique: Exo 3.5"
+  author = "Ren� David, Karim Nour et Christophe Raffalli"
+  institute = ""
+  preambule = "\\usepackage{../../other} \\usepackage{../../composed}"
+  documents = math
+.
+
+Import PA.
+
+flag tex_type_sugar false.
+flag tex_lisp_app false.
+
+(*! math
+\begin{lproof}
+*)
+goal ∀F (F N0 ∧ F (S N0) ∧  ∀x (F x → F (S S x)) → ∀x F x).
+intro.
+(*! math
+$ |- \[[ $0 \]]$ λusing {$λflintro, λtoutintro$}
+*)
+intro.
+intro.
+(*! math
+$\[[ $$H \]] |- \[[ $0 \]] $ λusing {$λetgauche λtimes 2$}
+*)
+lefts H.
+local Q x = F x ∧ F (S x).
+(*! math
+$\[[ $$H0 \]] , \[[ $$H \]] , \[[ $$H1 \]] |- \[[ $0 \]]$
+\\ λusing {$\[[ P0 \]]$ avec $F x = \[[ Q x \]] $ (1) (2) (3) }
+*)
+apply 3 P0 with Q.
+(*! math
+\refnum{(1)}
+\begin{lproof}
+$\[[ $$H \]] , \[[ $$H1 \]] |- \[[ $0 \]]$ λusing{$λetintro, λaxiom λtimes 2$}
+\end{lproof}
+*)
+intro.
+axiom H.
+axiom H1.
+
+(*! math
+\refnum{(2)}
+\begin{lproof}
+$\[[ $$H0 \]] |- \[[ $0 \]]$ 
+\\ λusing{$λtoutintro, λflintro$}
+*)
+intro 2.
+(*! math
+$\[[ $$H0 \]] , \[[ $$H2 \]] |- \[[ $0 \]]$ λusing{$λetgauche$}
+*)
+left H2.
+(*! math
+$\[[ $$H0 \]] , \[[ $$H2 \]] , \[[ $$H3 \]] |- \[[ $0 \]]$  λusing{$λetintro (i) (ii)$}
+*)
+
+intro.
+(*! math
+\refnum{(i)}
+\begin{lproof}
+$\[[ $$H3 \]] |- \[[ $0 \]]$ λusing{$λaxiom$}
+\end{lproof}
+*)
+axiom H3.
+(*! math
+\refnum{(ii)}
+\begin{lproof}
+$\[[ $$H0 \]] , \[[ $$H2 \]] |- \[[ $0 \]]$ λusing{$λflelim, λtoutelim, λaxiom$} 
+\end{lproof}
+\end{lproof}
+*)
+elim H0.
+axiom H2.
+(*! math
+\refnum{(3)}
+\begin{lproof}
+$\[[ $$G \]] |- \[[ $0 \]]$ λusing{$λetelim^g, λtoutelim, λaxiom$}
+\end{lproof}
+\end{lproof}
+*)
+elim G.
+save exo5.

@@ -1,0 +1,59 @@
+Sort term.
+Cst R : term → term → prop.
+Cst S : term → prop.
+def F = ∀x R x x ∧ ∀x,y(R x y → R y x) ∧ ∀x,y,z(R x y ∧ R y z → R x z).
+def G = ∀x,y (S x → (R x y ↔ S y)).
+def H = ∃x S x → ∃x(S x ∧ ∀y (S y ↔ R x y)).
+
+goal F → (G ↔H).
+intro 3.
+intro.
+elim H2.
+intro.
+instance ?1 x.
+intro .
+axiom H3.
+intro 2.
+intro.
+apply -2 (y) -3 H3 H1.
+elim G0.
+axiom H4.
+intro.
+apply -2 (y) -3 H3 H1.
+elim G0.
+axiom H4.
+intro 3.
+use ∃x(S x ∧ ∀y(S y ↔ R x y)).
+elim G0.
+left H3.
+use R x0 x.
+intro 2.
+elim H4.
+left H0.
+left H6.
+elim H7.
+instance ?2 x.
+intro.
+axiom G1.
+axiom H5.
+elim H4.
+instance ?3 y.
+use R x0 y.
+left H0.
+left H8.
+use R x x0.
+elim H9.
+instance ?4 x0.
+intro.
+axiom G3.
+axiom G2.
+elim H8.
+axiom G1.
+elim H6.
+axiom H5.
+elim H4.
+axiom H2.
+elim H1.
+intro.
+axiom H2.
+save th.

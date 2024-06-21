@@ -350,7 +350,7 @@ let print_goal sy new_goal n i ({hyp = hl; concl = f; local = local; _}) =
       print_cut () in
     list_do fn hl;
     close_box ();
-    print_string "   |- ";print_expr_sy sy f; print_newline (); print_newline ();
+    print_string "   âŠ¢ ";print_expr_sy sy f; print_newline (); print_newline ();
     cur_local := save_local
 
 
@@ -1299,7 +1299,7 @@ let rec rule_intro did_inv tri rule_opt gl0 st0 =
 	      warn_if_used gl s;
               let nlocal = add_rhyp gl.local s a1 in
               let n = new_const () in
-	      type_strong a1 kForm; (* BUg à corriger mieux *)
+	      type_strong a1 kForm; (* BUg Ã  corriger mieux *)
               let nh,ndl,neqns,nlocal,new_hyp =
 		add_hyp tri (s,(a1,n,Hypo,Dont_know [], (false, []))) gl nlocal ncl in
               let rl = Arrow_intro (s,n,a1) in
@@ -3114,7 +3114,7 @@ let do_instance auto_lvl e1 e2 =
   with e -> restore false; raise e
 
 let print_answer b new_goals nr =
-(* b : booleen, nr : liste des buts créés, suit : liste des anciens buts.
+(* b : booleen, nr : liste des buts crÃ©Ã©s, suit : liste des anciens buts.
 b:=false : affichage avec syntaxe infixe etc. pour les expressions,
 b:= true : arbre (en not. prefixe)  des expressions *)
   let total = List.length nr in

@@ -18,15 +18,15 @@ symbol [ x :: l ].
 
 Sort list['a].
 Cst (* empty list *) nil : list['a].
-tex_syntax nil Math "\[\]".
-Cst (* cons *)  rInfix[4] x "::" y : 'a -> list['a] -> list['a].
+tex_syntax nil Math "\\[\\]".
+Cst (* cons *)  rInfix[4] x "::" y : 'a → list['a] → list['a].
 (* x :: y *)
 tex_syntax $:: rInfix[4] x ! "\\,\\, :: \\;\\;\\;\\;" ! y.
 
 (*texte
 Then the list predicate is defined as follows:
 *)
-def List D x = /\X (X nil -> /\a:D /\y:X X (a::y) -> X x).
+def List D x = ∀X (X nil → ∀a:D ∀y:X X (a::y) → X x).
 tex_syntax List Prefix[5] "\\rm I\\hspace{-0.2em}L" ! "_{" ! D ! "}".
 
 (*texte
@@ -34,10 +34,10 @@ We assume the following.
 *)
 
 (*axiom *)
-claim (* empty list $nil is not a $:: (cons) *) nil_not_cons.List 
-		/\x,l (nil != x::l).
-claim (* injectivity of list constructor $:: (cons) *) cons.injective.List 
-			/\x1,l1,x2,l2 (x1 :: l1 = x2 :: l2 -> x1 = x2 & l1 = l2).
+claim (* empty list $nil is not a $:: (cons) *) nil_not_cons.List
+		∀x,l (nil ≠ x::l).
+claim (* injectivity of list constructor $:: (cons) *) cons.injective.List
+			∀x1,l1,x2,l2 (x1 :: l1 = x2 :: l2 → x1 = x2 ∧ l1 = l2).
 (*endaxiom *)
 
 (*** Rules on lists *)
@@ -49,12 +49,12 @@ These rules are added respectively as introdution and
 elimination rules, with the given abbreviations.
 *)
 (**** Introduction rules *)
-fact (* nil is a list *) nil.total.List  /\D List D nil.
+fact (* nil is a list *) nil.total.List  ∀D List D nil.
 trivial.
 save.
 
 fact (* $:: (cons) is well defined *) cons.total.List
- /\D /\a:D /\l:(List D) List D (a::l).
+ ∀D ∀a:D ∀l:(List D) List D (a::l).
 trivial.
 save.
 
@@ -63,11 +63,11 @@ new_intro -i -c cons cons.total.List.
 
 (**** Elimination rules *)
 
-fact (* structural induction on lists *) rec.List 
-	/\D /\X (X nil -> /\a:D/\l':(List D) (X l' -> X (a :: l')) -> 
-                  /\l:(List D) X l).
+fact (* structural induction on lists *) rec.List
+	∀D ∀X (X nil → ∀a:D∀l':(List D) (X l' → X (a :: l')) →
+                  ∀l:(List D) X l).
 intro 6.
-use List D l & X l.
+use List D l ∧ X l.
 trivial.
 elim H1.
 trivial.
@@ -75,8 +75,8 @@ intro 4.
 trivial.
 save.
 
-fact (* reasoning by cases on the structure of lists *) case.List 
-	/\D /\l:(List D) (l = nil or \/d:D\/l':(List D) l = d::l').
+fact (* reasoning by cases on the structure of lists *) case.List
+	∀D ∀l:(List D) (l = nil ∨ ∃d:D∃l':(List D) l = d::l').
 intros.
 elim H.
 intro l. trivial.
@@ -84,12 +84,12 @@ intros.
 intro r. trivial -H.
 save.
 
-fact case_left.List /\D,X /\l ((l = nil -> X nil) ->
-  /\d:D /\l':(List D) (l = d::l' -> X (d::l')) -> List D l -> X l).
+fact case_left.List ∀D,X ∀l ((l = nil → X nil) →
+  ∀d:D ∀l':(List D) (l = d::l' → X (d::l')) → List D l → X l).
 intros.
 elim case.List with H1.
 elim H.
-lefts H2 $& $\/.
+lefts H2 $∧ $∃.
 elim H0.
 save.
 
@@ -98,15 +98,15 @@ new_elim -n List case case_left.List.
 new_elim -n List ocase case.List.
 
 
-(**** Left rules (eliminating list constructors) 
+(**** Left rules (eliminating list constructors)
 *)
-fact (*   $:: (cons) is not $nil *) cons_not_nil.List /\x,l (x::l != nil).
+fact (*   $:: (cons) is not $nil *) cons_not_nil.List ∀x,l (x::l ≠ nil).
 trivial +nil_not_cons.List.
 save.
 
 
 fact (* injectivity of list constructor (rule form) *)cons.injective_left.List
- /\X,x1,x2,l1,l2 ((x1 = x2 -> l1 = l2 -> X) -> x1::l1 = x2 ::l2 -> X).
+ ∀X,x1,x2,l1,l2 ((x1 = x2 → l1 = l2 → X) → x1::l1 = x2 ::l2 → X).
 trivial +cons.injective.List.
 save.
 
@@ -119,7 +119,7 @@ new_elim -i -n $= nil_not_cons nil_not_cons.List.
 new_elim -i -n $= cons_not_nil cons_not_nil.List.
 new_elim -i -n $= cons.injective_left cons.injective_left.List.
 
-fact cons.left.List /\X,A,a,l ((A a -> List A l -> X) -> List A (a::l) -> X).
+fact cons.left.List ∀X,A,a,l ((A a → List A l → X) → List A (a::l) → X).
 intros.
 elim H0 with [case].
 left H1.
@@ -132,8 +132,8 @@ close_def List.
 
 (*** Decidability of equality *)
 
-fact (* equality is decidable on lists *)  eq_dec.List 
-	/\D (equal.decidable D -> equal.decidable (List D)).
+fact (* equality is decidable on lists *)  eq_dec.List
+	∀D (equal.decidable D → equal.decidable (List D)).
 intro 4.
 elim H0.
 trivial -H0.
@@ -149,9 +149,9 @@ save.
 new_intro -i -t List eq_dec.List.
 
 (** Defining functions by induction on lists *)
-(*** Definition 
+(*** Definition
 *)
-(*texte 
+(*texte
 In order to introduce definition of functions by structural
 induction on list we will use the operator [ Def ] of definite
 description. We then first introduce the following predicate.
@@ -163,29 +163,29 @@ base case (when [ l = nil ]) and [ f ] for the cons case.
 *)
 
 def   (* definition by induction on lists : predicate version *)
-  def_rec_P.List a f l z = /\X (
-	X nil a ->
-	/\l:(List \x True)/\x,r (X l r  -> X (x::l) (f x l r)) -> X l z).
-tex_syntax def_rec_P.List Math 
+  def_rec_P.List a f l z = ∀X (
+	X nil a →
+	∀l:(List λx True)∀x,r (X l r  → X (x::l) (f x l r)) → X l z).
+tex_syntax def_rec_P.List Math
 	"\\text{\\rm DEF}_{\\rm I\\hspace{-0.2em}L}^{rec}".
 (*note
-Note: you should remark the use of [ \x True ] to use lists of 
+Note: you should remark the use of [ λx True ] to use lists of
 *anything* !
 *)
 
-(*texte 
+(*texte
 We prove then that [ def_rec_P.List a f l z ] effectively
-defines a function. 
+defines a function.
  *)
 
-Local lem def_rec_unique.List 
-	/\a,f,l (List (\x True) l -> \/!z def_rec_P.List a f l z).
+Local lem def_rec_unique.List
+	∀a,f,l (List (λx True) l → ∃!z def_rec_P.List a f l z).
 intros.
 elim H.
 intro.
 trivial.
 intros.
-elim -1 \l,z (nil = l -> z = a) H0.
+elim -1 λl,z (nil = l → z = a) H0.
 trivial.
 trivial.
 trivial.
@@ -193,7 +193,7 @@ left H2.
 intro.
 trivial.
 intros.
-elim -1 \l,z' (def_rec_P.List a f l z' & (l = a0::l' -> z' = f a0 l' z))
+elim -1 λl,z' (def_rec_P.List a f l z' ∧ (l = a0::l' → z' = f a0 l' z))
      -4 [s] H4.
 trivial.
 intros.
@@ -213,7 +213,7 @@ save.
 The main theorem about untyped list is the following.
 *)
 
-fact (* Untyped list *) True.List /\D /\l:(List D) List \x True l.
+fact (* Untyped list *) True.List ∀D ∀l:(List D) List λx True l.
 trivial.
 save.
 
@@ -228,9 +228,9 @@ $def_rec.List that introduces a function symbol [ def_rec.List a f ]
 for any definition by induction on lists !
 *)
 
-def (* definition by induction on list *) 
- def_rec.List a f l = Def \z (def_rec_P.List a f l z).
-tex_syntax def_rec.List Math 
+def (* definition by induction on list *)
+ def_rec.List a f l = Def λz (def_rec_P.List a f l z).
+tex_syntax def_rec.List Math
 	"\\text{\\rm def}_{\\rm I\\hspace{-0.2em}L}^{rec}".
 
 
@@ -243,8 +243,8 @@ the  following.
 (*fact Characteristic properties of definitions by induction *)
 
 fact (* characteristic property of definition by induction on list :
-base case *) def_rec.nil.List 
-  /\f/\a def_rec.List a f nil = a.
+base case *) def_rec.nil.List
+  ∀f∀a def_rec.List a f nil = a.
 intros.
 elim Def.lemma.
 elim def_rec_unique.List.
@@ -253,8 +253,8 @@ trivial.
 save.
 
 fact (* characteristic property of definition by induction on list :
-recurrence step *) def_rec.cons.List 
-  /\f/\a/\x/\l:(List \x True) def_rec.List a f (x::l) = 
+recurrence step *) def_rec.cons.List
+  ∀f∀a∀x∀l:(List λx True) def_rec.List a f (x::l) =
     f x l (def_rec.List a f l).
 intros.
 elim Def.lemma.
@@ -281,8 +281,8 @@ close_def def_rec.List.
 We can now prove the totality of any definition by induction:
 *)
 
-fact (* Totality of a function defined by induction on lists *) def_rec.total.List 
-/\X,D/\f:(D => List D => X => X)/\a:X/\l:(List D) X (def_rec.List a f l).
+fact (* Totality of a function defined by induction on lists *) def_rec.total.List
+∀X,D∀f:(D ⇒ List D ⇒ X ⇒ X)∀a:X∀l:(List D) X (def_rec.List a f l).
 trivial 6.
 save.
 new_intro -t def_rec def_rec.total.List.
@@ -291,15 +291,15 @@ new_intro -t def_rec def_rec.total.List.
 (*** Application : operations on lists
 *)
 
-(**** The append function 
+(**** The append function
 *)
 
 (*
 The concatenation of two lists is defined by:
 *)
 
-def rInfix[4.5] l "@" l' = def_rec.List l' \d,l,r (d::r) l.
-(* l @ l' = def_rec.List l' \d,l,r (d::r) l *)
+def rInfix[4.5] l "@" l' = def_rec.List l' λd,l,r (d::r) l.
+(* l @ l' = def_rec.List l' λd,l,r (d::r) l *)
 tex_syntax $@ rInfix[4.5] l "\\mathbin{@}" l'.
 
 (*texte
@@ -307,12 +307,12 @@ We prove the following properties of [ l @ l' ].
 *)
 
 (*fact Characteristic properties of $@ *)
-fact append.lnil.List /\l nil @ l = l.
+fact append.lnil.List ∀l nil @ l = l.
 trivial.
 save.
 new_equation append.lnil.List.
 
-fact append.lcons.List /\a/\l:(List \x True)/\l' (a::l) @ l' = a::(l @ l').
+fact append.lcons.List ∀a∀l:(List λx True)∀l' (a::l) @ l' = a::(l @ l').
 trivial.
 save.
 new_equation append.lcons.List.
@@ -321,8 +321,8 @@ new_equation append.lcons.List.
 
 close_def $@.
 
-fact (* totality of $@ *) append.total.List 
-			/\D /\l,l':(List D) List D (l @ l').
+fact (* totality of $@ *) append.total.List
+			∀D ∀l,l':(List D) List D (l @ l').
 intros.
 elim H.
 from H0.
@@ -330,31 +330,31 @@ intro.
 save.
 new_intro -i -t append append.total.List.
 
-fact append.rnil.List /\l:(List \x True) l @ nil = l.
+fact append.rnil.List ∀l:(List λx True) l @ nil = l.
 trivial.
 save.
 new_equation append.rnil.List.
 
 fact (* associativity of $@ *) append.associative.List
-	 /\x,y,z:(List \x True) (x @ y) @ z = x @ (y @ z).
+	 ∀x,y,z:(List λx True) (x @ y) @ z = x @ (y @ z).
 trivial.
 save.
 new_equation append.associative.List.
 
 
 
-(**** The map functional 
+(**** The map functional
 *)
 
 (*texte We define : *)
-def map f l = def_rec.List nil \a,l,r (f a::r) l.
+def map f l = def_rec.List nil λa,l,r (f a::r) l.
 
-(*fact Characteristics properties of $map. *)  
-fact map.nil.List /\f map f nil = nil.
+(*fact Characteristics properties of $map. *)
+fact map.nil.List ∀f map f nil = nil.
 trivial.
 save.
 
-fact map.cons.List /\f/\a/\l:(List \x True) map f (a::l) = (f a)::(map f l).
+fact map.cons.List ∀f∀a∀l:(List λx True) map f (a::l) = (f a)::(map f l).
 trivial.
 save.
 (*endfact *)
@@ -363,14 +363,14 @@ new_equation map.nil.List.
 new_equation map.cons.List.
 close_def map.
 
-fact (* totality of $map *)  map.total.List 
-		/\D,D' /\f:(D => D') /\l:(List D) List D' (map f l).
+fact (* totality of $map *)  map.total.List
+		∀D,D' ∀f:(D ⇒ D') ∀l:(List D) List D' (map f l).
 trivial 6.
 save.
 new_intro -i -t map map.total.List.
 
 fact (* $map on $@ *) map.append.List
-	  /\f /\l1,l2:(List \x True) map f (l1 @ l2) = (map f l1) @ (map f l2).
+	  ∀f ∀l1,l2:(List λx True) map f (l1 @ l2) = (map f l1) @ (map f l2).
 trivial 6.
 save.
 new_equation map.append.List.
@@ -378,30 +378,30 @@ new_equation map.append.List.
 
 
 (*** Head and tail of a list as partial functions *)
-(**** Definitions 
+(**** Definitions
 *)
 
-def (* graph of head *) headP l a  =  \/ l'  l = a::l'.
-def (* graph of tail *) tailP l l' =  \/ a l = a::l'.
+def (* graph of head *) headP l a  =  ∃ l'  l = a::l'.
+def (* graph of tail *) tailP l l' =  ∃ a l = a::l'.
 
-Local lemma (* $headP defines a partial function *) headP_unique 
-		 /\l:(List \x True) /\b \/!a (headP  (b::l) a).
+Local lemma (* $headP defines a partial function *) headP_unique
+		 ∀l:(List λx True) ∀b ∃!a (headP  (b::l) a).
 trivial.
 save.
 
-Local lemma (* $tailP defines a partial function *) tailP_unique 
-		 /\l:(List \x True) /\b \/!l' (tailP  (b::l) l').
+Local lemma (* $tailP defines a partial function *) tailP_unique
+		 ∀l:(List λx True) ∀b ∃!l' (tailP  (b::l) l').
 trivial.
 save.
 
-def (* head *) head   l = Def \z(headP l z).
-def (* tail *) tail l = Def \z(tailP l z).
+def (* head *) head   l = Def λz(headP l z).
+def (* tail *) tail l = Def λz(tailP l z).
 
 
-(**** Basic facts 
+(**** Basic facts
 *)
-fact (* Characteristic property of head *) head.cons.List 
-				/\D /\a :D /\l:(List D) head (a::l) = a.
+fact (* Characteristic property of head *) head.cons.List
+				∀D ∀a :D ∀l:(List D) head (a::l) = a.
 intros.
 elim -1l -3a headP_unique.
 trivial.
@@ -411,8 +411,8 @@ save.
 new_equation  head.cons.List.
 
 
-fact (* Characteristic property of tail *) tail.cons.List 
-			/\D/\a:D/\l:(List D) tail (a::l) = l.
+fact (* Characteristic property of tail *) tail.cons.List
+			∀D∀a:D∀l:(List D) tail (a::l) = l.
 intros.
 elim -1l -3a tailP_unique.
 trivial.
@@ -421,12 +421,12 @@ save.
 new_equation tail.cons.List.
 
 fact (* totality of head on its definition set *) head.total.List
-/\D /\ l:(List D)( l != nil -> D(head l)).
+∀D ∀ l:(List D)( l ≠ nil → D(head l)).
 trivial.
 save.
 
 fact (* totality of tail on its definition set *) tail.total.List
-/\D /\ l:(List D)( l != nil -> (List D(tail l))).
+∀D ∀ l:(List D)( l ≠ nil → (List D(tail l))).
 trivial.
 save.
 
@@ -435,32 +435,32 @@ new_intro -i -t tail tail.total.List.
 
 
 
-fact cons_head_tail.List /\D /\l:(List D) (l != nil -> head l :: tail l = l).
+fact cons_head_tail.List ∀D ∀l:(List D) (l ≠ nil → head l :: tail l = l).
 trivial.
 save.
 
 new_equation cons_head_tail.List.
 
 (*** Quantifiers bounded on lists.*)
-(**** Existence in a list 
+(**** Existence in a list
 *)
 
 
-(***** Definition 
+(***** Definition
 *)
 def (* there exists x:D in l *) Exists D l =
-/\ X (/\a/\l(D a ->  X(a::l)) -> /\a/\l(X l -> X (a::l)) -> X l).
+∀ X (∀a∀l(D a →  X(a::l)) → ∀a∀l(X l → X (a::l)) → X l).
 
 
 (***** Introduction rules
 *)
 fact (* left introducing $Exists *) Exists.lcons.List
-/\D/\a/\l ( D a -> Exists D(a::l)).
+∀D∀a∀l ( D a → Exists D(a::l)).
 trivial.
 save.
 
 fact (* right introducing $Exists *) Exists.rcons.List
-/\D/\a/\l ( Exists D l -> Exists D(a::l)).
+∀D∀a∀l ( Exists D l → Exists D(a::l)).
 trivial.
 save.
 
@@ -469,10 +469,10 @@ new_intro  Exists.rcons Exists.rcons.List.
 
 (***** Elimination rules
 *)
-fact (* Nothing in $nil *) Exists.nil.List /\D ~ (Exists D nil).
+fact (* Nothing in $nil *) Exists.nil.List ∀D ¬ (Exists D nil).
 intro.
 intro.
-elim -1 (\l \/a\/l'(a::l' = l)) H.
+elim -1 (λl ∃a∃l'(a::l' = l)) H.
 trivial.
 trivial.
 trivial.
@@ -482,13 +482,13 @@ save.
 
 
 (*
-depend Exists.nil.List : nil_not_cons.List  equal.reflexive 
+depend Exists.nil.List : nil_not_cons.List  equal.reflexive
 *)
 
 fact (* eliminating $Exists in cons *) Exists.elim_cons.List
-			/\D/\a/\l (Exists D(a::l) -> D a or Exists D l).
+			∀D∀a∀l (Exists D(a::l) → D a ∨ Exists D l).
 intros.
-elim -1 (\l' \/a,l(l'= a::l & (D a or Exists D l))) H.
+elim -1 (λl' ∃a,l(l'= a::l ∧ (D a ∨ Exists D l))) H.
 trivial.
 trivial.
 trivial.
@@ -507,8 +507,8 @@ depend Exists.elim_cons.List : cons.injective.List equal.reflexive
 (***** Existence in  append
 *)
 
-fact (* left introducing $Exists in $@ *) Exists.lappend.List 
-	/\D /\l:(List \x True) /\l' (Exists D l -> Exists D (l@l')).
+fact (* left introducing $Exists in $@ *) Exists.lappend.List
+	∀D ∀l:(List λx True) ∀l' (Exists D l → Exists D (l@l')).
 intro 4.
 elim H.
 trivial.
@@ -520,8 +520,8 @@ intro Exists.rcons.
 elim H2.
 save.
 
-fact (* right introducing $Exists in $@ *) Exists.rappend.List 
-	/\D /\l:(List \x True) /\l' (Exists D l' -> Exists D (l@l')).
+fact (* right introducing $Exists in $@ *) Exists.rappend.List
+	∀D ∀l:(List λx True) ∀l' (Exists D l' → Exists D (l@l')).
 intro 4.
 elim H.
 trivial.
@@ -537,8 +537,8 @@ new_intro Exists.rappend Exists.rappend.List.
 
 
 fact (* eliminating $Exists in $@ *) Exists.elim_append.List
-	/\D/\l:(List \x True)/\l' (Exists D(l @ l') 
-						-> Exists D l or Exists D l').
+	∀D∀l:(List λx True)∀l' (Exists D(l @ l')
+						→ Exists D l ∨ Exists D l').
 intro 4.
 elim H.
 intro.
@@ -562,28 +562,28 @@ new_elim $Exists Exists.elim_append Exists.elim_append.List.
 *)
 
 (*texte
-Universal closure of the predicate D on the list l is 
+Universal closure of the predicate D on the list l is
 exactly List D l
 *)
 
 def (* Forall x such that D in l *) Forall =  List.
 
 (*texte
-Results on list can then be reinterpreted, for instance 
-[/\D List D nil] is [/\D forall D nil].
- 
+Results on list can then be reinterpreted, for instance
+[∀D List D nil] is [∀D forall D nil].
+
 It is also the case of the following facts.
 *)
 
-fact (* introducing list of a type stronger *) List_increasing 
-			/\A,B (/\x:A B x -> /\l:(List A) List B l). 
+fact (* introducing list of a type stronger *) List_increasing
+			∀A,B (∀x:A B x → ∀l:(List A) List B l).
 trivial.
 save.
 
 new_elim -t List inc List_increasing.
 
-fact (* list of objects of type [ A & B ] *) List_conjunction 
-	/\A,B/\l (List A l -> List B l -> List \x (A x & B x) l). 
+fact (* list of objects of type [ A ∧ B ] *) List_conjunction
+	∀A,B∀l (List A l → List B l → List λx (A x ∧ B x) l).
 intro 4.
 elim H.
 trivial.
@@ -600,17 +600,17 @@ All facts are trivially derived as particular cases of analogous ones
 with $Exists .
 *)
 
-(**** Introduction rules 
+(**** Introduction rules
 *)
-def (* membership in list *) Mem x l = Exists \y (x = y) l.
+def (* membership in list *) Mem x l = Exists λy (x = y) l.
 
 
-fact(* left introducing $Mem in cons *) Mem.lcons.List /\a/\l Mem a (a::l).
+fact(* left introducing $Mem in cons *) Mem.lcons.List ∀a∀l Mem a (a::l).
 trivial.
 save.
 
-fact(* right introducing $Mem in cons *) Mem.rcons.List 
-				/\b/\a/\l (Mem b l -> Mem b (a::l)).
+fact(* right introducing $Mem in cons *) Mem.rcons.List
+				∀b∀a∀l (Mem b l → Mem b (a::l)).
 
 trivial.
 save.
@@ -620,12 +620,12 @@ new_intro Mem.rcons Mem.rcons.List.
 
 (**** Elimination rules
 *)
-fact (* no member of nil *) Mem.nil.List /\x ~ Mem x nil.
+fact (* no member of nil *) Mem.nil.List ∀x ¬ Mem x nil.
 trivial.
 save.
 
 fact  (* eliminating $Mem in cons *) Mem.elim_cons.List
-                        /\b/\a/\l (Mem b (a::l) -> b = a or Mem b l).
+                        ∀b∀a∀l (Mem b (a::l) → b = a ∨ Mem b l).
 trivial.
 save.
 
@@ -638,19 +638,18 @@ new_elim  $Mem Mem_cons Mem.elim_cons.List.
 (* flag trace_trivial true.
 *)
 fact  (* left introducing $Mem in $@ *) Mem.lappend.List
-        /\b /\l:(List \x True) /\l' (Mem b l -> Mem b (l@l')).
+        ∀b ∀l:(List λx True) ∀l' (Mem b l → Mem b (l@l')).
 trivial +Exists.lappend.List.
 save.
 
 fact  (* right introducing $Mem in $@ *) Mem.rappend.List
-        /\b /\l:(List \x True) /\l' (Mem b l' -> Mem b (l@l')).
+        ∀b ∀l:(List λx True) ∀l' (Mem b l' → Mem b (l@l')).
 trivial.
 save.
 
 
 fact  (* eliminating $Mem in $@ *) Mem.elim_append.List
-        /\b /\l:(List \x True)/\l' (Mem b (l @ l')
-                                                -> Mem b l or Mem b l').
+        ∀b ∀l:(List λx True)∀l' (Mem b (l @ l')
+                                                → Mem b l ∨ Mem b l').
 trivial  + Exists.elim_append.List.
 save.
-

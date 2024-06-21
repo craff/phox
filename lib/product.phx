@@ -14,43 +14,43 @@ flag auto_lvl 3.
 
 (*texte
 To define the product of two predicates, we extend the language with one
-binary function symbol \[ x, y \] .
+binary function symbol λ[ x, y λ] .
 Then the product of two unary predicates is defined by the following predicate
 [ Product A B ]
 *)
 
 (*definition Product *)
 Sort product['a,'b].
-Cst rInfix[3.7] x "," y : 'a -> 'b -> 'a * 'b.
+Cst rInfix[3.7] x "," y : 'a → 'b → 'a * 'b.
 (* x , y *)
 tex_syntax $, rInfix[3.7] x ! "\\,\\, , \\;\\;\\;\\;" ! y.
-def Product A B p = /\X (/\a: A /\b : B X (a,b) -> X p). 
+def Product A B p = ∀X (∀a: A ∀b : B X (a,b) → X p).
 tex_syntax Product Infix[2] A "\\times" B.
 (*enddefinition *)
 
 (*** The introduction rule for $Product *)
 
-fact (* Product introduction *) intro.Product 
-	/\A/\B /\x:A /\y:B (Product A B (x,y)).
+fact (* Product introduction *) intro.Product
+	∀A∀B ∀x:A ∀y:B (Product A B (x,y)).
 trivial.
 save.
 new_intro -i -c i intro.Product.
 
 (*** The elimination rules for $Product *)
 
-fact (* Product elimination *) elim.Product 
-	 /\X,A,B,z (/\x:A /\y:B (z = (x,y) -> X) -> Product A B z -> X).
+fact (* Product elimination *) elim.Product
+	 ∀X,A,B,z (∀x:A ∀y:B (z = (x,y) → X) → Product A B z → X).
 intros.
-elim -1 \c (z = c -> X) H0.
+elim -1 λc (z = c → X) H0.
 trivial.
 save.
 new_elim -i Product r elim.Product.
 
-claim (* Product injective *) injective.Product 
-	/\x,y,x',y' (x,y = x',y' -> x = x' & y = y').
+claim (* Product injective *) injective.Product
+	∀x,y,x',y' (x,y = x',y' → x = x' ∧ y = y').
 
-fact (* Product injective as left rule *) injective_left.Product 
-	/\X/\x,y,x',y' ((x = x' -> y = y' -> X) -> x,y = x',y' -> X).
+fact (* Product injective as left rule *) injective_left.Product
+	∀X∀x,y,x',y' ((x = x' → y = y' → X) → x,y = x',y' → X).
 trivial +injective.Product.
 save.
 new_elim -i -n $= Product injective_left.Product.
@@ -64,22 +64,22 @@ Projections are introduced using  the definite
 description operator on these predicates :
  *)
 
-def   fstP z x = \/y (z = x,y).
-def  sndP z y = \/x (z = x,y).
+def   fstP z x = ∃y (z = x,y).
+def  sndP z y = ∃x (z = x,y).
 
 Local lemma (* First projection is a function *) fstP.unique.Product
-	/\A,B/\z:(Product A B) \/! x (fstP z x).
+	∀A,B∀z:(Product A B) ∃! x (fstP z x).
 trivial.
 save.
 
 Local lemma (* Second projection is a function *) sndP.unique.Product
-	/\A,B/\z:(Product A B) \/! y (sndP z y).
+	∀A,B∀z:(Product A B) ∃! y (sndP z y).
 trivial.
 save.
 
 (*definition projections defined as functions *)
-def (* first projection *)  fst z = Def \x (fstP z x).
-def (* second projection *) snd z = Def \y (sndP z y).
+def (* first projection *)  fst z = Def λx (fstP z x).
+def (* second projection *) snd z = Def λy (sndP z y).
 (*enddef *)
 
 
@@ -88,8 +88,8 @@ Then using the properties of the definite
 description, we prove the following facts.
 *)
 
-fact (* property defining first projection *) fst.Product 
-					/\x,y (fst (x,y) = x).
+fact (* property defining first projection *) fst.Product
+					∀x,y (fst (x,y) = x).
 intros.
 prove fstP (x,y) (fst (x,y)).
 intro.
@@ -100,8 +100,8 @@ from true.intro.
 trivial.
 save.
 
-fact (* property defining second projection *) snd.Product 
-					/\x,y (snd (x,y) = y).
+fact (* property defining second projection *) snd.Product
+					∀x,y (snd (x,y) = y).
 intros.
 prove sndP (x,y) (snd (x,y)).
 intro.
@@ -129,26 +129,26 @@ def_thlist calcul.Product = fst.Product snd.Product.
 We also prove the following propositions :
 *)
 
-fact (* first projection is always defined on a product *) fst.total.Product 
-					   /\A/\B /\p:(Product A B) A (fst p).
+fact (* first projection is always defined on a product *) fst.total.Product
+					   ∀A∀B ∀p:(Product A B) A (fst p).
 trivial.
 save.
 new_intro -t fst fst.total.Product.
 
-fact (* second projection is always defined on a product *) snd.total.Product 
-					  /\A/\B /\p:(Product A B) B (snd p).
+fact (* second projection is always defined on a product *) snd.total.Product
+					  ∀A∀B ∀p:(Product A B) B (snd p).
 trivial.
 save.
 new_intro -t snd snd.total.Product.
 
-fact (* Reconstruction of a product from its projections *) surjective.Product 
-				/\A/\B /\x: (Product A B) fst x, snd x = x. 
+fact (* Reconstruction of a product from its projections *) surjective.Product
+				∀A∀B ∀x: (Product A B) fst x, snd x = x.
 intros.
 trivial.
 save.
 new_equation surjective.Product.
 
-(*note 
+(*note
 The two first are added as totality rule and the last one is
 added as rewriting rule
 *)
@@ -157,17 +157,17 @@ added as rewriting rule
 
 Import bin_rel.
 
-def lex R1 R2 c1 c2 = 
-  R1 (fst c1) (fst c2) or (fst c1 = fst c2 & R2 (snd c1) (snd c2)).
+def lex R1 R2 c1 c2 =
+  R1 (fst c1) (fst c2) ∨ (fst c1 = fst c2 ∧ R2 (snd c1) (snd c2)).
 
 
-goal /\D1,D2 /\R1,R2 (
-  well.founded D1 R1 -> 
-  well.founded D2 R2 -> 
-    well.founded (Product D1 D2) (lex R1 R2)). 
-intros. 
+goal ∀D1,D2 ∀R1,R2 (
+  well.founded D1 R1 →
+  well.founded D2 R2 →
+    well.founded (Product D1 D2) (lex R1 R2)).
 intros.
-prove /\b : D2 X (fst a, b).
+intros.
+prove ∀b : D2 X (fst a, b).
 next. trivial.
 elim H.
 next. trivial.
@@ -183,4 +183,3 @@ prove a0 = fst b.
 trivial.
 trivial = H3 H5 H6 H7 H9 G.
 save well_founded.lex.Product.
-

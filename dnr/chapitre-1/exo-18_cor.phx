@@ -1,0 +1,73 @@
+Sort term.
+Cst f : term →term.
+Cst g : term →term.
+def surj f = ∀y ∃x f x = y.
+def inj f =  ∀x,y ((f x) = (f y)  → x = y).
+def bij f = inj f ∧ surj f.
+def I = ∀x,y(f (g x)=f (g y) → x=y).
+def S = ∀y ∃x f (g x) =y.
+
+theorem numero3 inj f  ∧ inj g → I.
+intro 4.
+left H.
+apply H with H0.
+apply H1 with G.
+axiom G0.
+save.
+
+theorem numero4 surj f  ∧ surj g → S.
+intro 2.
+left H.
+elim H.
+elim H0.
+instance ?1 y.
+instance ?2 x.
+intro.
+instance ?3 x0.
+trivial.
+save.
+
+
+
+
+
+
+theorem numero5 bij f → bij g → I ∧ S.
+intro 3.
+intro 3.
+use g x = g y.
+elim H0.
+axiom G.
+elim H.
+axiom H1.
+intro.
+use ∃z f z = y.
+elim G.
+use ∃u g u =z.
+elim G0.
+intro.
+instance ?1 u.
+intro.
+elim H0.
+elim H.
+save.
+
+theorem numero6  I → inj g.
+intro 4.
+use f (g x)=f (g y).
+elim H.
+axiom G.
+intro.
+save.
+
+theorem numero7 S → surj f.
+intros.
+intros.
+unfold_hyp H S.
+elim H with y.
+intro.
+axiom H0.
+save.
+
+
+

@@ -89,7 +89,7 @@ let print_kind t =
        if b || b' then (print_string "("; open_hovbox 0) else
          if invisible_parenthesis then print_string "\171";
        f true false t;
-       print_string " ->"; print_break 1 2; f false false t';
+       print_string " →"; print_break 1 2; f false false t';
        if b || b' then (close_box (); print_string ")") else
          if invisible_parenthesis then print_string "\187";
     | KBVar n ->
@@ -567,7 +567,7 @@ and size_print s =
   match proof_general, s with
     true,
     (">=" | "<=" | "!=" | "in" | "notin" | "subset" | "inter" | "union"  | "minus"
-          | "/\\" | "\\/" | "or" | "<->" | "->" | "=>") ->
+          | "∀" | "∃" | "∨" | "↔" | "→" | "=>") ->
 	print_as 1 s
   | _ ->
       print_string s
@@ -806,7 +806,7 @@ and print_match stack e =
 	  print_space ();
 	  print_aux 5.0 5.0 [] envl lm;
 	  print_space ();
-	  print_string "->";
+	  print_string "→";
 	  print_space ();
 	  print_aux max_level max_level [] envl rm;
  	  close_box ();
@@ -864,7 +864,7 @@ in function
       match eta_red e with
         EAbs (s,e1,k) ->
         let s = if s = "#" then default_name k env else s (*free_name s env*) in
-        print_string (if !in_tex then "\\lambda " else "\\");
+        print_string (if !in_tex then "\\lambda " else "λ");
         print_string (texify false true s);
 	if !print_sort then begin
 	  print_string ":<";

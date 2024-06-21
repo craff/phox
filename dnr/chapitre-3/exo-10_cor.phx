@@ -1,0 +1,52 @@
+Sort real.
+Cst Infix[5] x "<" y : real → real → prop.
+Cst Infix[5] x "⩽" y : real → real → prop.
+Cst zero : real.
+Cst deux : real.
+Cst Infix[3] x "-" y : real → real → real.
+Cst Infix[2] x "/" y : real → real → real.
+Cst abs : real → real.
+def Infix[5] x ">" y = y < x.
+ 
+def continue1 f = ∀x ∀e > zero ∃a > zero ∀y (abs (x - y) < a → abs (f x - f y) < e).
+def continue2 f = ∀x ∀e > zero ∃a > zero ∀y (abs (x - y) ⩽ a → abs (f x - f y) ⩽ e).
+
+goal
+  ∀a,b (a < b → a ⩽ b) →
+  ∀a (a > zero → a / deux > zero) →
+  ∀a (a > zero → ∀b (b ⩽ a / deux → b < a)) →
+  ∀f (continue1 f ↔ continue2 f).
+intro F2 F3 F4 f.
+intros.
+intros.
+intros.
+elim H with x and H0.
+left H1.
+intro.
+instance ?1 a / deux.
+intro.
+elim F3.
+axiom H1.
+intros.
+elim F2.
+elim H2.
+elim F4.
+axiom H1.
+axiom H3.
+
+intros.
+intros.
+elim H with x and e / deux.
+elim F3.
+axiom H0.
+left H1.
+intro.
+intro.
+axiom H1.
+intros.
+elim F4.
+axiom H0.
+elim H2.
+elim F2.
+axiom H3.
+save th.

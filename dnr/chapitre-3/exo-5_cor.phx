@@ -1,0 +1,22 @@
+Import PA.
+
+goal ∀F (F N0 ∧ F (S N0) ∧  ∀x (F x → F (S S x)) → ∀x F x).
+intro.
+intro.
+intro.
+lefts H.
+apply 3 P0 with λx (F x ∧ F (S x)).
+
+intro.
+axiom H.
+axiom H1.
+
+intro 2.
+left H2.
+
+intro.
+axiom H3.
+elim H0.
+axiom H2.
+elim G.
+save th.

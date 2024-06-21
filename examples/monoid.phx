@@ -21,8 +21,8 @@ Module monoid.
   claim neutre_total G e.
   new_intro -t e neutre_total.
 
-  claim neutre_left /\x:G e op x = x.
-  claim neutre_right /\x:G x op e = x.
+  claim neutre_left ∀x:G e op x = x.
+  claim neutre_right ∀x:G x op e = x.
   new_equation neutre_left.
   new_equation neutre_right.
   tex_syntax neutre_left "neutre left".
@@ -34,7 +34,7 @@ Module monoid.
     operateur \[ x op y \]. This is exporessed by the axiom following axioms:
       $$\begin{array}{ll}
          \[ $$neutre_right \] &\hspace{2cm} (\[ neutre_right \])\cr
-         \[ $$neutre_left \] &\hspace{2cm} (\[ neutre_left \]) 
+         \[ $$neutre_left \] &\hspace{2cm} (\[ neutre_left \])
       \end{array}$$
   \end{definition}
   *)
@@ -52,11 +52,11 @@ end.
 Module hmorph.
 
   Use monoid with
-    _ -> _.D
+    _ → _.D
   .
 
   Use monoid with
-    _ -> _.I
+    _ → _.I
   .
 
   Use semigroup.hmorph.
@@ -69,17 +69,17 @@ end.
 Module hmorph_comp.
 
   Use hmorph with
-    _.D -> _.1
-  | _.I -> _.2
-  | f -> f
-  | _.f -> _.f
+    _.D → _.1
+  | _.I → _.2
+  | f → f
+  | _.f → _.f
   .
 
   Use hmorph with
-    _.D -> _.2
-  | _.I -> _.3
-  | f -> g
-  | _.f -> _.g
+    _.D → _.2
+  | _.I → _.3
+  | f → g
+  | _.f → _.g
   .
 
   Use semigroup.hmorph_comp.
@@ -95,11 +95,10 @@ Module hmorph_comp.
   new_equation neutre_compat.h.
 
   Use hmorph with
-    _.D -> _.1
-  | _.I -> _.3
-  | f -> h
-  | _.f -> _.h
+    _.D → _.1
+  | _.I → _.3
+  | f → h
+  | _.f → _.h
   .
 
 end.
- 

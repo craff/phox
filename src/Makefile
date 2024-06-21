@@ -28,7 +28,7 @@ clean:
 	dune clean
 
 veryclean: clean
-	- rm -f version.ml phox_main.ml
+	- rm -f version.ml phox.ml
 
 .SUFFIXES :
 .SUFFIXES : .mli .ml .cmi .cmx .cmo .o

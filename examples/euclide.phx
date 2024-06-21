@@ -14,7 +14,7 @@ Import nat.
 flag auto_lvl 1.
 flag auto_type true.
 
-goal /\p,d : N (d != N0 -> \/q,r:N (r < d & p = q * d + r)). 
+goal ∀p,d : N (d ≠ N0 → ∃q,r:N (r < d ∧ p = q × d + r)).
 (*! math
 \begin{theorem}
 $$\[[ $0 \]]$$
@@ -23,7 +23,7 @@ $$\[[ $0 \]]$$
 *)
 intros.
 (*! math
-Let us choose $\[ p \] , \[ d \]$ two natural numbers with $\[ $$H1 \]$. 
+Let us choose $\[ p \] , \[ d \]$ two natural numbers with $\[ $$H1 \]$.
 We prove the following by induction on p: $\[ $0 \]$.
 *)
 elim well_founded.N with p.
@@ -37,7 +37,7 @@ select 2.
 (*! math
 We distinguish two cases: $\[ $$H4 \]$ and $\[1 $$H4 \]$.
 *)
-intros $\/ $&.
+intros $∃ $∧.
 select 4.
 instance ?1 N0.
 instance ?2 a.
@@ -46,17 +46,17 @@ In the first case, we choose $\[ q = ?1 \]$ and $\[ r = ?2 \]$.
 *)
 intro.
 local a' = a - d.
-(*! math 
+(*! math
 In the second case, we take $\[ a' = $$a' \]$.
 *)
 apply H3 with a' < a.
 trivial 5.
-lefts G $& $\/.
-(*! math 
+lefts G $∧ $∃.
+(*! math
 Using the induction hypothesis on $\[ a' \]$, we find two naturals
 $\[ q \] , \[ r \]$ such that $\[ $$H7 \]$ and $\[ $$H8 \]$.
 *)
-intros $& $\/.
+intros $∧ $∃.
 select 4.
 instance ?4 r.
 instance ?3 S q.
@@ -64,13 +64,11 @@ instance ?3 S q.
 We choose $\[ ?3 \]$ and $\[ ?4 \]$ as quotient and remaining
 for the division of $\[ a \]$. We must prove $\[ $0 \]$ which is immediate.
 *)
-from a = q * d + d + r.
-from a = q * d + r + d.
+from a = q × d + d + r.
+from a = q × d + r + d.
 from a = a' + d.
 intro.
 (*! math
 \qed\end{proof}
 *)
 save euclide_exists.
-
-

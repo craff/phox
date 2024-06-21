@@ -1,0 +1,96 @@
+Sort real.
+
+Cst Infix[5.0] x "<" y : real → real → prop.
+def Infix[5.0] x ">" y = y < x.
+
+Cst d : real → real → real.
+
+Cst R0 : real.
+
+def image f A y = ∃ x ((A x) ∧ (f x) = y).
+
+def inverse f A x = (A (f x)).
+
+def intervide U V  = ¬ ∃ x ((U x) ∧ (V x)).
+
+def union U V x = (U x) ∨ (V x).
+
+def inclus A B = ∀ x ((A x) → (B x)).
+
+def ouvert O = ∀ x (O x → ∃a > R0 ∀y (d x y < a → O y)).
+
+def connexe A = ∀ U, V (ouvert U → ouvert V → (inclus A (union U
+V)) → (intervide U V) → (inclus A U) ∨ (inclus A V)).
+
+def continue1 f = ∀ x  ∀e > R0 ∃a > R0 ∀ y (d x y < a → d (f
+x) (f y) < e).
+
+def continue2 f = ∀ U ((ouvert U) → (ouvert (inverse f U))).
+
+lemma lem1 ∀f (continue1 f → continue2 f).
+intros.
+intros.
+intros.
+unfold_hyp H1 inverse.
+unfold_hyp H0 ouvert.
+apply H0 with H1.
+lefts G $∧ $∃.
+apply H with H2.
+lefts G $∧ $∃.
+intros.
+axiom H4.
+intro.
+intros.
+elim H3.
+elim H5.
+axiom H6.
+save lem1.
+
+lemma lem2 ∀f (continue2 f → ∀ A (connexe A → connexe (image f A))).
+intros.
+intros.
+by_absurd.
+elim False.
+local U' = inverse f U.
+local V' = inverse f V.
+prove ouvert U'.
+elim H.
+axiom H1.
+prove ouvert V'.
+elim H.
+axiom H2.
+prove inclus A (union U' V').
+intros.
+elim H3.
+intros.
+axiom H6.
+intro.
+prove intervide U' V'.
+intros.
+elim H4.
+left H6.
+intros.
+elim H6.
+elim H6.
+apply H0 with G and G0 and G1 and G2.
+rewrite_hyp H5 disjunction.demorgan.
+left H5.
+left G3.
+elim H5.
+intros.
+left H8.
+elim H7.
+elim H8.
+elim H6.
+intros.
+left H8.
+elim H7.
+elim H8.
+save lem2.
+
+goal ∀f (continue1 f → ∀ A (connexe A → connexe (image f A))).
+intro 2.
+elim lem2.
+elim lem1.
+axiom H.
+save th.

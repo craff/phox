@@ -1,28 +1,28 @@
 (*
-Attention : Si vous êtes un débutant avec les assitants de preuves, il 
-est vivement conseillé d'avoir fait le tutorial tautologie.phx 
+Attention : Si vous êtes un débutant avec les assitants de preuves, il
+est vivement conseillé d'avoir fait le tutorial tautologie.phx
 avant celui-ci
 *)
 
-(* 
+(*
 Voici d'abord quelques définitions,
 Comprenez les (surtout la dernière) !
 *)
 
-def decidable A R = /\x,y:A (R x y or ~R x y).
+def decidable A R = ∀x,y:A (R x y ∨ ¬R x y).
 
-def reflexive A R = /\x:A R x x.
+def reflexive A R = ∀x:A R x x.
 
 def transitive A R =
-  /\a,b,c:A (R a b -> R b c -> R a c).
+  ∀a,b,c:A (R a b → R b c → R a c).
 
 def symetric A R =
-  /\a,b:A (R a b -> R b a). 
+  ∀a,b:A (R a b → R b a).
 
-def total A R = /\x,y:A (R x y or R y x).
+def total A R = ∀x,y:A (R x y ∨ R y x).
 
 def Well_founded D R =
-  /\X(/\a (D a -> /\b (D b -> R b a -> X b) -> X a) -> /\a (D a -> X a)).
+  ∀X(∀a (D a → ∀b (D b → R b a → X b) → X a) → ∀a (D a → X a)).
 
 (*
 On se donne une sorte et des constructeurs pour les listes.
@@ -31,51 +31,50 @@ de données inductifs (voir le chapitre correspondant de la documentation):
 *)
 
 Data List A =
-  Nil 
+  Nil
 | [Cons] rInfix[3] x "::" l of A and  List A.
-. 
 
 (* Regardez tous ce que fait cette commande ! Mais n'y réféchissez pas
 trop maintenant. Demandez vous simplement ce qui se passe quand vous
-utilisez les listes dans ce qui suit. 
+utilisez les listes dans ce qui suit.
 *)
 
 (*
-On introduit le premier niveau de détection automatique des axiomes. 
+On introduit le premier niveau de détection automatique des axiomes.
 Si un but est un axiome, il sera immédiatement résolu !
 *)
 flag auto_lvl 1.
 
 (*
-Deux propositions intéressantes sur les listes. 
+Deux propositions intéressantes sur les listes.
 Les preuves sont toutes faites et commentées:
 *)
-goal /\A,B (/\x:A B x -> /\l:(List A) List B l). 
+goal ∀A,B (∀x:A B x → ∀l:(List A) List B l).
 (* Avec le type inductif, c'est automatique (récurrence triviale). *)
 trivial.
 save List_increasing.
 
-goal /\A,B/\l (List A l -> List B l -> List \x (A x & B x) l). 
+goal ∀A,B∀l (List A l → List B l → List λx (A x ∧ B x) l).
 intro 4.
-(* 
+(*
 On fait une récurrence sur H := List A l. Cela veut dire
-que l'on utilise le théorème rec.List généré automatique 
+que l'on utilise le théorème rec.List généré automatique
 et ajouté comme règle d'élimination pour les listes.
 *)
 elim H.
 trivial.
 intros.
-(* 
+(*
 On fait une analyse de cas sur List B (x::l0). Cela veut dire
-que l'on utilise le théorème case.List généré automatique 
-et ajouté comme règle d'élimination pour les listes, 
-mais ce n'est pas la règle par défaut, donc il faut 
+que l'on utilise le théorème case.List généré automatique
+et ajouté comme règle d'élimination pour les listes,
+mais ce n'est pas la règle par défaut, donc il faut
 l'indiquer à la main.
 *)
 elim H3 with [case].
 (*
 le fait que Nil soit distinct de Cons a été ajouté comme
-règle gauche inversible. Ce but est donc trivial. 
+règle gauche inversible. Ce but est donc trivial.
 left H4 marcherait aussi
 *)
 trivial.
@@ -95,11 +94,11 @@ save List_conjunction.
 On ajoute une constante de fonction binaire pour chaque symbole de prédicat
 binaire, et les axiomes définissant cette fonction:
 *)
-Cst insert : ('a -> 'a -> prop) -> 'a -> list['a] -> list['a].
+Cst insert : ('a → 'a → prop) → 'a → list['a] → list['a].
 
-claim insert_Nil /\R/\a (insert R a Nil = a::Nil).
-claim insert_Cons_1 /\R/\a,b,l (R a b -> insert R a (b::l) = a::b::l).
-claim insert_Cons_2 /\R/\a,b,l (~ R a b -> insert R a (b::l) = b:: insert R a l).
+claim insert_Nil ∀R∀a (insert R a Nil = a::Nil).
+claim insert_Cons_1 ∀R∀a,b,l (R a b → insert R a (b::l) = a::b::l).
+claim insert_Cons_2 ∀R∀a,b,l (¬ R a b → insert R a (b::l) = b:: insert R a l).
 
 (* On indique au raisonnement equationnel automatique qu'il peut utiliser
 ces axiomes. *)
@@ -110,19 +109,19 @@ new_equation insert_Cons_2.
 (*
 Prouvez la totalité de cette fonction:
 *)
-goal /\D,R (decidable D R -> /\a:D /\l:(List D) List D (insert R a l)).
-(*->*)
+goal ∀D,R (decidable D R → ∀a:D ∀l:(List D) List D (insert R a l)).
+(*→*)
 intros.
 elim H1.
 trivial.
 elim H with H0 and H2.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save List_insert.
 
 (*
-On l'ajoute comme règle d'introduciotn 
+On l'ajoute comme règle d'introduciotn
 -t: c'est un théorème de totalité
 *)
 new_intro -t -i insert List_insert.
@@ -130,10 +129,10 @@ new_intro -t -i insert List_insert.
 (*
 On utilise insert pour définir la fonction de tri d'une liste
 *)
-Cst sort : ('a -> 'a -> prop) -> list['a] -> list['a].
+Cst sort : ('a → 'a → prop) → list['a] → list['a].
 
-claim sort_Nil /\R (sort R Nil = Nil).
-claim sort_Cons /\R,a,l (sort R (a::l) = insert R a (sort R l)).
+claim sort_Nil ∀R (sort R Nil = Nil).
+claim sort_Cons ∀R,a,l (sort R (a::l) = insert R a (sort R l)).
 
 new_equation sort_Nil.
 new_equation sort_Cons.
@@ -141,32 +140,32 @@ new_equation sort_Cons.
 (*
 Prouvez la totalité de cette fonction:
 *)
-goal /\D,R (decidable D R -> /\l:(List D) (List D (sort R l))).
-(*->*)
+goal ∀D,R (decidable D R → ∀l:(List D) (List D (sort R l))).
+(*→*)
 intros.
 elim H0.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save List_sort.
 
 (*
-On l'ajoute comme règle d'introduciotn 
+On l'ajoute comme règle d'introduciotn
 -t: c'est un théorème de totalité
 *)
 new_intro -t -i sort List_sort.
 
 (*
 Un prédicat inductif exprimant que l' est obtenu en insérant x dans l a une
-position quelconque (l'option -i indique que la règle d'introduction de nil 
+position quelconque (l'option -i indique que la règle d'introduction de nil
 est inversible).
 *)
 Inductive Insert x l l' =
-  nil -i : /\l0 Insert x l0 (x::l0)
-| cons : /\a/\l0,l1 (Insert x l0 l1 -> Insert x (a::l0) (a::l1)).
+  nil -i : ∀l0 Insert x l0 (x::l0)
+| cons : ∀a∀l0,l1 (Insert x l0 l1 → Insert x (a::l0) (a::l1)).
 
 (* deux exemples de preuves à comprendre seul ! *)
-goal /\x /\l (~ Insert x l Nil).
+goal ∀x ∀l (¬ Insert x l Nil).
 intros.
 intro.
 elim H with [case].
@@ -176,7 +175,7 @@ save Insert_not_Nil.
 
 new_elim -i -n Insert not_Nil Insert_not_Nil.
 
-goal /\A/\x:A/\l:(List A)/\l' (Insert x l l' -> List A l').
+goal ∀A∀x:A∀l:(List A)∀l' (Insert x l l' → List A l').
 intro 5.
 elim H0.
 intros.
@@ -187,10 +186,10 @@ trivial.
 save Insert_List.
 
 (* à vous de jouer ! *)
-goal /\A/\x,l'/\l:(List A) (Insert x l' l -> A x).
-(*->*)
+goal ∀A∀x,l'∀l:(List A) (Insert x l' l → A x).
+(*→*)
 intros.
-prove $$H -> $0.
+prove $$H → $0.
 elim H0.
 intro.
 elim H1 with [case].
@@ -201,13 +200,13 @@ elim H3 with [case].
 trivial.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save car_Insert.
 
-goal /\A/\x,l'/\l:(List A) (Insert x l' l -> List A l').
-(*->*)
+goal ∀A∀x,l'∀l:(List A) (Insert x l' l → List A l').
+(*→*)
 intros.
-prove $$H -> $0.
+prove $$H → $0.
 elim H0.
 intro.
 elim H1 with [case].
@@ -218,28 +217,28 @@ elim H3 with [case].
 trivial.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save cdr_Insert.
 
 (*
-On utilise Insert pour définir le prédicat suivant. 
+On utilise Insert pour définir le prédicat suivant.
 Pourquoi a-t'on besoin de ce prédicat pour prouver que "sort" est bien
 une fonction triant une liste ?
 *)
 
-(* 
+(*
 Pour des raisons étrange, la règle de récurrence de Equiv n'est pas prouvée
-automatiquement par PhoX dans un temps raisonnable. 
+automatiquement par PhoX dans un temps raisonnable.
 L'option "-ce" (claim elim) indique de ne pas essayer, on va le faire nous même
 *)
-Inductive Equiv l l' -ce = 
+Inductive Equiv l l' -ce =
   Nil -i : Equiv Nil Nil
-| Cons : /\x,l1,l2,l1',l2' (
-    Equiv l1 l2 -> Insert x l1 l1' -> Insert x l2 l2' -> Equiv l1' l2').
+| Cons : ∀x,l1,l2,l1',l2' (
+    Equiv l1 l2 → Insert x l1 l1' → Insert x l2 l2' → Equiv l1' l2').
 
 prove_claim rec.Equiv.
 intros.
-use $$H1 & $0.
+use $$H1 ∧ $0.
 trivial.
 unfold_hyp H1 Equiv.
 elim H1.
@@ -250,31 +249,31 @@ save.
 (*
 Que signifie des deux prédicats qui suivent ?
 Que pensez vous de la définition de Minore ?
-Quel différence de style avec les prédicats Equiv et Insert 
+Quel différence de style avec les prédicats Equiv et Insert
 précédents ?
 *)
-def Minore D R x l = List \y (D y & R x y) l.
+def Minore D R x l = List λy (D y ∧ R x y) l.
 
 Inductive Sorted D R l =
   Nil -i : Sorted D R Nil
-| Cons -i :  /\x:D/\l:(List D) (Minore D R x l -> Sorted D R l -> Sorted D R (x::l)).
+| Cons -i :  ∀x:D∀l:(List D) (Minore D R x l → Sorted D R l → Sorted D R (x::l)).
 
 (* On a besoin des nombres entiers. *)
-Import nat. 
+Import nat.
 
 (*
 On définit la longueur d'une liste pour pouvoir faire une induction la
 dessus.
 *)
-Cst length : list['a] -> nat.
+Cst length : list['a] → nat.
 
 claim length_Nil length Nil = N0.
-claim length_Cons /\x,l length (x::l) = S (length l).
+claim length_Cons ∀x,l length (x::l) = S (length l).
 
 new_equation length_Nil.
 new_equation length_Cons.
 
-goal /\A/\l:(List A) N(length l).
+goal ∀A∀l:(List A) N(length l).
 trivial.
 save length_total.
 
@@ -283,14 +282,14 @@ new_intro -t -i length length_total.
 (*
 Un propriété de Insert et length à prouver
 *)
-goal /\x,l,l' (Insert x l l' -> length l' = S (length l)).
-(*->*)
+goal ∀x,l,l' (Insert x l l' → length l' = S (length l)).
+(*→*)
 intros.
 unfold_hyp H Insert.
 elim H.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save length_Insert.
 
 new_equation length_Insert.
@@ -301,10 +300,10 @@ même modèle !
 Reportez vous à la doc pour voir ce que font les tactiques que vous ne
 comprennez pas !
 *)
-goal /\D,R (decidable D R -> /\x:D/\l:(List D) Insert x l (insert R x l)).
+goal ∀D,R (decidable D R → ∀x:D∀l:(List D) Insert x l (insert R x l)).
 intro 3.
-local Hyp n = /\x:D  /\l:(List D) (length l = n -> Insert x l (insert R x l)).
-prove /\n:N Hyp n.
+local Hyp n = ∀x:D  ∀l:(List D) (length l = n → Insert x l (insert R x l)).
+prove ∀n:N Hyp n.
 intros.
 elim H0.
 intros.
@@ -322,39 +321,39 @@ intro.
 trivial.
 save insert_Insert.
 
-goal /\D,R (decidable D R -> 
-  /\x,x':D /\l,l':(List D) (Equiv l l' -> Equiv (x::l) (insert R x
+goal ∀D,R (decidable D R →
+  ∀x,x':D ∀l,l':(List D) (Equiv l l' → Equiv (x::l) (insert R x
   l'))).
 trivial +insert_Insert.
 save insert_Equiv.
 
-goal /\D,R (decidable D R -> /\l:(List D) Equiv l (sort R l)).
-(*->*)
+goal ∀D,R (decidable D R → ∀l:(List D) Equiv l (sort R l)).
+(*→*)
 intros.
 elim H0.
 intro Nil.
 elim insert_Equiv with D and R.
 axiom H1.
 intros.
-(*->*)
+(*→*)
 save sort_Equiv.
 
-goal /\D,R (decidable D R -> total D R -> /\l:(List D)/\a,x:D (
-  R a x -> Minore D R a l -> Minore D R a (insert R x l))).
-(*->*)
+goal ∀D,R (decidable D R → total D R → ∀l:(List D)∀a,x:D (
+  R a x → Minore D R a l → Minore D R a (insert R x l))).
+(*→*)
 intro 6.
 elim H1.
 intros.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save insert_Minore.
 
-goal /\D,R (decidable D R -> total D R -> transitive D R ->
-  /\x:D/\l:(List D) (Sorted D R l -> Sorted D R (insert R x l))).
-(*->*)
+goal ∀D,R (decidable D R → total D R → transitive D R →
+  ∀x:D∀l:(List D) (Sorted D R l → Sorted D R (insert R x l))).
+(*→*)
 intros.
-prove /\x:D (Sorted D R l -> Sorted D R (insert R x l)).
+prove ∀x:D (Sorted D R l → Sorted D R (insert R x l)).
 elim H3.
 trivial.
 intros.
@@ -366,7 +365,7 @@ intro.
 trivial.
 intro.
 trivial.
-elim List_increasing with \y (D y & R x2 y)  and \y (D y & R x1 y). 
+elim List_increasing with λy (D y ∧ R x2 y)  and λy (D y ∧ R x1 y).
 trivial =H1 H10 H8 H16.
 axiom H12.
 axiom H9.
@@ -378,23 +377,23 @@ elim insert_Minore.
 elim H7.
 trivial.
 elim G.
-(*->*)
+(*→*)
 save insert_Sorted.
 
-goal /\D,R (decidable D R -> total D R -> transitive D R ->
-  /\l:(List D) (Sorted D R (sort R l))).
-(*->*)
+goal ∀D,R (decidable D R → total D R → transitive D R →
+  ∀l:(List D) (Sorted D R (sort R l))).
+(*→*)
 intros.
 elim H2.
 trivial.
 elim insert_Sorted.
 trivial.
-(*->*)
+(*→*)
 save sort_Sorted.
 
 (*
-Les théorèmes 
-  sort_Sorted et sort_Equiv 
+Les théorèmes
+  sort_Sorted et sort_Equiv
 exprime bien sur sort est correct, n'est ce pas ?
 *)
 
@@ -406,10 +405,10 @@ amusons nous à prouver que Equiv est une relation d'équivalence !
 (*
 Commençons par quelques lemmes ...
 *)
-goal /\A/\l2:(List A)/\x,y/\l1,l3 (
-  Insert x l1 l2 -> Insert y l2 l3 ->
-   \/l2' (Insert y l1 l2' & Insert x l2' l3)).
-(*->*)
+goal ∀A∀l2:(List A)∀x,y∀l1,l3 (
+  Insert x l1 l2 → Insert y l2 l3 →
+   ∃l2' (Insert y l1 l2' ∧ Insert x l2' l3)).
+(*→*)
 intro 3.
 elim H.
 trivial.
@@ -436,20 +435,20 @@ intros.
 axiom H5.
 left H10.
 apply H2 with H5 and H9.
-lefts G $& $\/.
+lefts G $∧ $∃.
 intro.
 instance ?4 (a::l2').
 intro.
 intro.
 intro.
-(*->*)
+(*→*)
 save associative_Insert.
 
-goal /\A/\l1:(List A)/\x,y/\l2,l3 (
-  Insert x l2 l1 -> Insert y l3 l1 ->
-   (x = y & l2 = l3) or
-   \/l4 (Insert y l4 l2 & Insert x l4 l3)).
-(*->*)
+goal ∀A∀l1:(List A)∀x,y∀l2,l3 (
+  Insert x l2 l1 → Insert y l3 l1 →
+   (x = y ∧ l2 = l3) ∨
+   ∃l4 (Insert y l4 l2 ∧ Insert x l4 l3)).
+(*→*)
 intro 3.
 elim H.
 trivial.
@@ -474,7 +473,7 @@ instance ?2 l0.
 trivial.
 left H11.
 apply H2 with H5 and H9.
-lefts G $& $\/ $or.
+lefts G $∧ $∃ $∨.
 select 2.
 intro r.
 intro.
@@ -484,46 +483,46 @@ intro.
 intro.
 intro l.
 trivial.
-(*->*)
+(*→*)
 save diamond_Insert.
 
-goal /\A (reflexive (List A) Equiv).
-(*->*)
+goal ∀A (reflexive (List A) Equiv).
+(*→*)
 intros.
 intros.
 elim H.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save Equiv_reflexive.
 
 (*
 Une preuve facile de la symétrie !
 Que pouvez vous en dire ?
 *)
-goal /\A (symetric (List A) Equiv).
-(*->*)
+goal ∀A (symetric (List A) Equiv).
+(*→*)
 intros.
 intros.
 unfold_hyp H1 Equiv.
 elim H1.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save Equiv_symetric.
 
 (*
 Encore un dernier lemme ...
 *)
-goal /\A /\a,b,a':(List A)/\x:A (
-    Equiv a b -> Insert x a' a ->
-    \/b':(List A) (Insert x b' b & Equiv a' b')).
-(*->*)
+goal ∀A ∀a,b,a':(List A)∀x:A (
+    Equiv a b → Insert x a' a →
+    ∃b':(List A) (Insert x b' b ∧ Equiv a' b')).
+(*→*)
 intro.
-local Hyp n = /\a,b,a':(List A)/\x:A (length a = n ->
-    Equiv a b -> Insert x a' a ->
-    \/b':(List A) (Insert x b' b & Equiv a' b')).
-prove /\n:N Hyp n.
+local Hyp n = ∀a,b,a':(List A)∀x:A (length a = n →
+    Equiv a b → Insert x a' a →
+    ∃b':(List A) (Insert x b' b ∧ Equiv a' b')).
+prove ∀n:N Hyp n.
 intros.
 elim H.
 intros.
@@ -538,7 +537,7 @@ intros.
 elim cdr_Insert with A and H11.
 trivial.
 trivial.
-lefts H12 $\/ $&.
+lefts H12 $∃ $∧.
 unfold_hyp H1 Hyp.
 apply H1 with H9 and H13.
 elim cdr_Insert with A and H10.
@@ -547,7 +546,7 @@ elim cdr_Insert with A and H12.
 rewrite_hyp H6 -l 1 length_Insert.
 apply cdr_Insert with A and H10.
 left H6.
-lefts G $& $\/.
+lefts G $∧ $∃.
 elim associative_Insert with A and H15 and H11.
 elim cdr_Insert with A and H11.
 left H17.
@@ -561,19 +560,19 @@ elim G with H3 and H4.
 select 2.
 intro.
 trivial.
-(*->*)
+(*→*)
 save lemme_Equiv.
 
 (*
 Et on peut enfin prouver la transitivité !
 *)
-goal /\A (transitive (List A) Equiv).
-(*->*)
+goal ∀A (transitive (List A) Equiv).
+(*→*)
 intros.
 intros.
-local Hyp n = /\a,b,c:(List A)(length a = n ->
-   Equiv a b -> Equiv b c -> Equiv a c).
-prove /\n:N Hyp n.
+local Hyp n = ∀a,b,c:(List A)(length a = n →
+   Equiv a b → Equiv b c → Equiv a c).
+prove ∀n:N Hyp n.
 intro 2.
 slh H H4.
 elim H4.
@@ -592,7 +591,7 @@ trivial.
 apply lemme_Equiv with A and H8 and H11.
 elim cdr_Insert with A and H11.
 elim car_Insert with A and H11.
-lefts G $& $\/.
+lefts G $∧ $∃.
 intro.
 instance ?1 l1.
 instance ?2 b'.
@@ -607,6 +606,5 @@ elim  G with H and H2 and H3.
 select 2.
 intro.
 trivial.
-(*->*)
+(*→*)
 save transitive_Equiv.
-

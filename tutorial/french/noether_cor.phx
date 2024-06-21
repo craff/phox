@@ -8,20 +8,20 @@ flag auto_lvl 1.
 Sort anneau.
 
 
-Cst lInfix[4]  x"++"y  : anneau -> anneau -> anneau.
-Cst lInfix[3] x"**"y   : anneau -> anneau -> anneau.
+Cst lInfix[4]  x"++"y  : anneau → anneau → anneau.
+Cst lInfix[3] x"**"y   : anneau → anneau → anneau.
 Cst  zero : anneau.
 Cst un : anneau.
 
-claim plusassoc /\x,y,z  x ++ (y ++ z)=x ++ y ++ z.
-claim pluscom /\x,y x ++ y=y ++ x.
-claim multassoc /\x,y,z x ** (y ** z)=x ** y ** z.
-claim multcom /\x,y x ** y=y ** x.
-claim eltabs /\x (x ** zero=zero & zero ** x=zero).
-claim eltneutrezero /\x (x ++ zero=x & zero ++ x=x).
-claim eltneutreun /\x (x ** un=x & un ** x=x).
-claim distributivite /\a,x,y a ** (x ++ y)=a ** x ++ a ** y.
-claim distributiviter /\a,x,y (x ++ y) ** a=x ** a ++ y ** a.
+claim plusassoc ∀x,y,z  x ++ (y ++ z)=x ++ y ++ z.
+claim pluscom ∀x,y x ++ y=y ++ x.
+claim multassoc ∀x,y,z x ** (y ** z)=x ** y ** z.
+claim multcom ∀x,y x ** y=y ** x.
+claim eltabs ∀x (x ** zero=zero ∧ zero ** x=zero).
+claim eltneutrezero ∀x (x ++ zero=x ∧ zero ++ x=x).
+claim eltneutreun ∀x (x ** un=x ∧ un ** x=x).
+claim distributivite ∀a,x,y a ** (x ++ y)=a ** x ++ a ** y.
+claim distributiviter ∀a,x,y (x ++ y) ** a=x ** a ++ y ** a.
 
 (* On indique à PhoX d'utiliser ces équations pour le raisonnement automatique *)
 new_equation plusassoc.
@@ -35,59 +35,59 @@ new_equation distributivite.
 new_equation distributiviter.
 
 def vide x = False.
-def Infix[5] X "subset" Y = /\x (X x -> Y x).
-def Infix[4] X "union" Y = \x (X x or Y x).
-def plus X a x = X x or x = a.
+def Infix[5] X "⊂" Y = ∀x (X x → Y x).
+def Infix[4] X "∪" Y = λx (X x ∨ Y x).
+def plus X a x = X x ∨ x = a.
 
 (* égalité sur les ensembles *)
-goal /\A,B (A subset B -> B subset A  -> A = B).
+goal ∀A,B (A ⊂ B → B ⊂ A  → A = B).
 trivial +equal.extensional.
 save equal.extensional.intro.
 new_intro ext equal.extensional.intro .
 
 Inductive Fini  X = 
   vide : Fini vide
-| plus  : /\X,a (Fini X -> Fini (plus X a)).
+| plus  : ∀X,a (Fini X → Fini (plus X a)).
 
 
-def ideal I = /\x,y:I  I (x ++ y) & 
-              /\x:I /\z  I (z ** x) & 
+def ideal I = ∀x,y:I  I (x ++ y) ∧ 
+              ∀x:I ∀z  I (z ** x) ∧ 
               I zero.
 
-def Engendre X = \x /\I:ideal (X subset I -> I x).
+def Engendre X = λx ∀I:ideal (X ⊂ I → I x).
 
-def type_fini I = \/X:Fini  Engendre X = I.
-def suite SI = /\n:N ideal (SI n).
-def croissante SI = /\n,m:N (n <= m -> SI n subset SI m).
-def stationnaire SI = \/n:N /\m:N(m>=n -> SI m subset SI n).
+def type_fini I = ∃X:Fini  Engendre X = I.
+def suite SI = ∀n:N ideal (SI n).
+def croissante SI = ∀n,m:N (n ⩽ m → SI n ⊂ SI m).
+def stationnaire SI = ∃n:N ∀m:N(m⩾n → SI m ⊂ SI n).
 
-def Sup SI = \x \/n:N SI n x.
+def Sup SI = λx ∃n:N SI n x.
 
 (* rappel d'arithmétique (tout fait) *)
-fact or1 /\n,m:N (n<=m or m<=n).
+fact or1 ∀n,m:N (n⩽m ∨ m⩽n).
 intros.
 elim lesseq.case1.N with H and H0;; trivial.
 save.
 
-fact or2 /\x,y,z:N (x<=y -> y<=z -> x<=z).
+fact or2 ∀x,y,z:N (x⩽y → y⩽z → x⩽z).
 trivial.
 save.
 
 (* des lemmes que l'on prouvera après ... *)
-claim p0 /\X:Fini Engendre X zero.
+claim p0 ∀X:Fini Engendre X zero.
 
-claim p1 /\X:Fini (X subset Engendre X).
+claim p1 ∀X:Fini (X ⊂ Engendre X).
 
-claim p2 /\A:Fini (A subset N -> \/m:N /\n:A n<=m).
+claim p2 ∀A:Fini (A ⊂ N → ∃m:N ∀n:A n⩽m).
 
-claim p3 /\SI:suite (croissante SI  -> ideal (Sup SI)).
+claim p3 ∀SI:suite (croissante SI  → ideal (Sup SI)).
 
-claim p4 /\X:Fini /\SI ((/\x:X Sup SI x) -> \/A:Fini (A subset N & /\x:X \/n:A SI n x)).
+claim p4 ∀X:Fini ∀SI ((∀x:X Sup SI x) → ∃A:Fini (A ⊂ N ∧ ∀x:X ∃n:A SI n x)).
 
-claim p6 /\X:Fini /\J:ideal (X subset J -> Engendre X subset J).
+claim p6 ∀X:Fini ∀J:ideal (X ⊂ J → Engendre X ⊂ J).
 
-theorem noether1  /\I:ideal (type_fini I) -> /\SI:suite (croissante SI -> stationnaire SI).
-(*->*)
+theorem noether1  ∀I:ideal (type_fini I) → ∀SI:suite (croissante SI → stationnaire SI).
+(*→*)
 intro H SI H0 H1.
 unfold_hyp H type_fini.
 apply p3 with H0 and H1.
@@ -96,9 +96,9 @@ left H2.
 apply p4 with H2 then SI and ?.
 intros.
 elim p1.
-lefts G0 $& $\/.
+lefts G0 $∧ $∃.
 apply p2 with H5.
-lefts G0 $& $\/.
+lefts G0 $∧ $∃.
 intro.
 instance ?1 m.
 intros.
@@ -114,67 +114,67 @@ elim G0.
 elim H0.
 intros.
 apply H6 with H12.
-lefts G1 $& $\/.
+lefts G1 $∧ $∃.
 apply H8 with H13.
 elim H1 with G1.
 elim H5.
-(*->*)
+(*→*)
 save.
 
 (*d'autres lemmes (avant le réciproque).
  *)
-claim p7 /\A,B (~A=B -> A subset B -> \/x:B ~ A x).
+claim p7 ∀A,B (¬A=B → A ⊂ B → ∃x:B ¬ A x).
 
-claim p8 /\X:Fini ideal (Engendre X).
+claim p8 ∀X:Fini ideal (Engendre X).
 
-claim p9 /\SI:suite (/\n:N SI n subset SI (S n) -> croissante SI).
+claim p9 ∀SI:suite (∀n:N SI n ⊂ SI (S n) → croissante SI).
 
-claim  p10 /\X:Fini /\a Engendre X subset Engendre (plus X a).
+claim  p10 ∀X:Fini ∀a Engendre X ⊂ Engendre (plus X a).
 
-goal /\I:suite (croissante I -> stationnaire I) -> /\I:ideal type_fini I.
+goal ∀I:suite (croissante I → stationnaire I) → ∀I:ideal type_fini I.
 intro 3.
 by_absurd.
 elim False.
 unfold_hyp H1 type_fini.
 rewrite_hyp H1 demorganl.
-prove /\X:Fini (X subset I -> \/x:I ~Engendre X x).
+prove ∀X:Fini (X ⊂ I → ∃x:I ¬Engendre X x).
 intro 3.
 apply p6 with H2 and H0 and H3.
 apply H1 with H2.
 elim p7.
 
-local pasdans X = Def \y (I y & ~Engendre X y).
-local f = def_rec.N vide (\n \X (plus X (pasdans X))).
+local pasdans X = Def λy (I y ∧ ¬Engendre X y).
+local f = def_rec.N vide (λn λX (plus X (pasdans X))).
 
 prove f N0 = vide.
 trivial.
 
-prove /\y:N f (S y) = plus (f y) (pasdans (f y)).
+prove ∀y:N f (S y) = plus (f y) (pasdans (f y)).
 trivial.
 
-prove /\n:N ((I (pasdans (f n)) & 
-      ~ Engendre (f n) (pasdans (f n))) & (f n subset I  & Fini (f n))).
+prove ∀n:N ((I (pasdans (f n)) ∧ 
+      ¬ Engendre (f n) (pasdans (f n))) ∧ (f n ⊂ I  ∧ Fini (f n))).
 intro .
 
 intro.
 elim H2.
 intro .
-prove \/x:I ~ Engendre vide x.
+prove ∃x:I ¬ Engendre vide x.
 elim G.
 trivial.
 trivial.
 elim AC.
 axiom G2.
 (*terminez la preuve*)
-(*->*)
+(*→*)
 intro.
-from vide subset I.
+from vide ⊂ I.
 trivial.
 trivial.
 
 intro.
 lefts H4.
-prove \/x:I ~ Engendre (f (S y)) x.
+prove ∃x:I ¬ Engendre (f (S y)) x.
 elim G.
 trivial.
 intros.
@@ -194,7 +194,7 @@ trivial.
 elim H4.
 trivial.
 
-apply H with \n (Engendre (f n)) and ? and ?.
+apply H with λn (Engendre (f n)) and ? and ?.
 intros.
 elim p8.
 elim G2 with H2 and [r].
@@ -206,7 +206,7 @@ intros.
 elim p10.
 elim G2 with H2 and [r].
 lefts G3.
-apply H3 with S n >= n.
+apply H3 with S n ⩾ n.
 trivial.
 trivial.
 apply G3 with pasdans (f n) and ?.
@@ -215,43 +215,43 @@ trivial.
 rewrite G1.
 trivial.
 elim G2 with H2.
-(*->*)
+(*→*)
 save noether2.
 
 prove_claim p10.
-(*->*)
+(*→*)
 auto.
-(*->*)
+(*→*)
 save.
 
 prove_claim p9.
-(*->*)
+(*→*)
 intros.
 intros.
 elim H3.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save.
 
 prove_claim p7.
-(*->*)
+(*→*)
 intros.
 by_absurd.
 elim False.
 rewrite_hyp H1 demorganl.
 trivial.
-(*->*)
+(*→*)
 save.
 
 prove_claim p1.
-(*->*)
+(*→*)
 auto.
-(*->*)
+(*→*)
 save.
 
 prove_claim p4.
-(*->*)
+(*→*)
 intro 3.
 elim H.
 intros.
@@ -285,11 +285,11 @@ left G.
 intro.
 instance ?4 n0.
 trivial.
-(*->*)
+(*→*)
 save.
 
 prove_claim p3.
-(*->*)
+(*→*)
 intros.
 intros.
 intros.
@@ -306,11 +306,11 @@ intros.
 instance ?2 n.
 trivial.
 trivial.
-(*->*)
+(*→*)
 save.
 
 prove_claim p2.
-(*->*)
+(*→*)
 intro 2.
 elim H.
 trivial.
@@ -327,37 +327,37 @@ trivial.
 intros.
 instance ?2 m.
 trivial.
-(*->*)
+(*→*)
 save.
 
 prove_claim p8.
-(*->*)
+(*→*)
 intros.
 auto.
-(*->*)
+(*→*)
 save.
 
 prove_claim p6.
-(*->*)
+(*→*)
 auto.
-(*->*)
+(*→*)
 save.
 
 depend noether1.
 depend noether2.
 
-Cst sigma : (anneau -> prop) -> (anneau -> anneau) -> anneau.
+Cst sigma : (anneau → prop) → (anneau → anneau) → anneau.
 
-claim sigma_plus /\X:Fini /\f,a (~ X a -> sigma (plus X a) f = sigma X f ++ f a ** a).
-claim sigma_vide /\f sigma vide f = zero.
+claim sigma_plus ∀X:Fini ∀f,a (¬ X a → sigma (plus X a) f = sigma X f ++ f a ** a).
+claim sigma_vide ∀f sigma vide f = zero.
 
 new_equation sigma_plus.
 new_equation sigma_vide.
 
-def Engendre' X x = \/f x = sigma X f.
+def Engendre' X x = ∃f x = sigma X f.
 
-lemma sigma1 /\X:Fini /\fx,fy sigma X fx ++ sigma X fy = sigma X \z (fx z ++ fy z).
-(*->*)
+lemma sigma1 ∀X:Fini ∀fx,fy sigma X fx ++ sigma X fy = sigma X λz (fx z ++ fy z).
+(*→*)
 intros.
 elim H.
 trivial.
@@ -370,13 +370,13 @@ rewrite -r H1.
 rewrite distributiviter.
 rewrite plusassoc.
 intro.
-(*->*)
+(*→*)
 save.
 
 new_equation sigma1.
 
-lemma sigma2 /\X:Fini /\fx,z z ** sigma X fx = sigma X \x (z ** fx x).
-(*->*)
+lemma sigma2 ∀X:Fini ∀fx,z z ** sigma X fx = sigma X λx (z ** fx x).
+(*→*)
 intros.
 elim H.
 trivial.
@@ -387,13 +387,13 @@ axiom H1.
 rewrite sigma_plus.
 rewrite -r H1.
 intro.
-(*->*)
+(*→*)
 save.
 
 new_equation sigma2.
 
-lemma sigma3 /\X:Fini sigma X (\x zero) = zero.
-(*->*)
+lemma sigma3 ∀X:Fini sigma X (λx zero) = zero.
+(*→*)
 intros.
 elim H.
 trivial.
@@ -402,13 +402,13 @@ prove plus X0 a = X0.
 trivial.
 axiom H1.
 intro.
-(*->*)
+(*→*)
 save.
 
 new_equation sigma3.
 
-lemma sigma4 /\X:Fini /\a,b (sigma X (\x if x = a then b else zero) = if X a then b ** a else zero).
-(*->*)
+lemma sigma4 ∀X:Fini ∀a,b (sigma X (λx if x = a then b else zero) = if X a then b ** a else zero).
+(*→*)
 intros.
 elim H.
 trivial.
@@ -425,14 +425,14 @@ trivial.
 rewrite G.
 intro.
 save.
-(*->*)
+(*→*)
 
 (*
 new_equation sigma4.
 *)
 
-lemma e1 /\X:Fini (Engendre X = Engendre' X).
-(*->*)
+lemma e1 ∀X:Fini (Engendre X = Engendre' X).
+(*→*)
 intro 2.
 intros.
 intros.
@@ -442,7 +442,7 @@ elim H.
 trivial.
 intros.
 intro.
-instance ?1 \x if x = x0 then un else zero.
+instance ?1 λx if x = x0 then un else zero.
 rewrite sigma4.
 intro.
 
@@ -465,6 +465,6 @@ trivial.
 trivial.
 elim H4 with [r].
 trivial.
-(*->*)
+(*→*)
 save.
 

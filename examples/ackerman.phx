@@ -41,7 +41,7 @@ définition par récurrence serait possible, mais assez lourde dans l'état
 actuel. *)
 
 
-(*définition Fonction d'Ackermann. *) 
+(*définition Fonction d'Ackermann. *)
 
 (*texte Il y a plusieurs version de la fonction d'Ackermann. La fonction
 originale avait 3 arguments. On utilise une version simplifiée à deux
@@ -50,14 +50,14 @@ la clause  utilisant une récurrence double avec imbrication
 des deux appels récursifs.
 
 Celle qui suit est initialisée de façon que les premières fonctions de la
-suite soient simples (x -> x+2, x-> 2x, x -> 2^x, ...). *)
+suite soient simples (x → x+2, x→ 2x, x → 2^x, ...). *)
 
-Cst ack : nat -> nat -> nat.
+Cst ack : nat → nat → nat.
 
-claim ack0x          /\x:N ack N0 x = x + N2.
+claim ack0x          ∀x:N ack N0 x = x + N2.
 claim ack10               ack N1 N0 = N0.
-claim ackn0    /\n:N ack (S S n) N0 = N1.
-claim acknx /\n,x:N ack (S n) (S x) = ack n (ack (S n) x).       
+claim ackn0    ∀n:N ack (S S n) N0 = N1.
+claim acknx ∀n,x:N ack (S n) (S x) = ack n (ack (S n) x).
 (*enddefinition *)
 
 (*texte On indique aux tactiques de PhoX d'utiliser les clauses de
@@ -69,7 +69,7 @@ new_equation ackn0.
 new_equation acknx.
 
 fact (* totalité de la fonction d'Ackermann *)
-ack_total /\n,x:N N (ack n x).
+ack_total ∀n,x:N N (ack n x).
 intro 2.
 elim H.
 trivial.
@@ -91,7 +91,7 @@ new_intro -t -i total ack_total.
 (** Quelques valeurs de la fonction d'Ackermann. *)
 
 (*** Une égalité utile pour la réécriture. *)
-fact (* ack n+1 2 = 2 *) ackn1 /\n:N(ack (S n) N1 = N2).
+fact (* ack n+1 2 = 2 *) ackn1 ∀n:N(ack (S n) N1 = N2).
 intros.
 elim  H.
 intro.
@@ -100,7 +100,7 @@ rewrite  ackn0.
 save.
 
 (*texte Les tactiques de PhoX pourront aussi utiliser le précedent
-résultat comme règle de réécriture. *) 
+résultat comme règle de réécriture. *)
 new_equation ackn1.
 
 
@@ -132,7 +132,7 @@ save ack42.
 
 (*** Les premières fonctions de la suite. *)
 
-fact ack1x /\x : N (ack N1 x = N2 *x).
+fact ack1x ∀x : N (ack N1 x = N2 × x).
 intros.
 elim H.
 trivial.
@@ -141,7 +141,7 @@ rewrite H1.
 intro.
 save.
 
-fact  ack2x /\x : N (ack N2 x = N2^x).
+fact  ack2x ∀x : N (ack N2 x = N2^x).
 intros.
 elim H.
 trivial.
@@ -152,7 +152,7 @@ save.
 
 (** Premiers résultats de majoration. *)
 
-lemma  ack_sup_0 /\n,x:N ((n <> N1 or x > N0) -> ack n x >N0).
+lemma  ack_sup_0 ∀n,x:N ((n <> N1 ∨ x > N0) → ack n x >N0).
 intro 2.
 elim -1[case] H.
 trivial.
@@ -176,7 +176,7 @@ intros.
 trivial.
 save.
 
-lemma  acknx_sup_x /\n,x:N (x > N0 -> ack n x > x).
+lemma  acknx_sup_x ∀n,x:N (x > N0 → ack n x > x).
 intro 2.
 elim H.
 trivial.
@@ -198,7 +198,7 @@ apply H1 with G0 ;; Try intros.
 trivial.
 save.
 
-lemma acknx_lsup_x /\n,x:N (ack n x >= x).
+lemma acknx_lsup_x ∀n,x:N (ack n x ⩾ x).
 intros.
 elim -1[case] H0.
 trivial.
@@ -216,21 +216,21 @@ suites entières. *)
 
 (*note A déplacer dans une librairie ? *)
 
- def increasing.N f = /\x,x':N
-(x < x' -> f x < f x').  
+ def increasing.N f = ∀x,x':N
+(x < x' → f x < f x').
 
-def lincreasing.N f = /\x,x':N (x <= x' -> f x
-<= f x').
+def lincreasing.N f = ∀x,x':N (x ⩽ x' → f x
+⩽ f x').
 
 
-fact inc_lem.N /\f:(N=>N) (/\x:N f x < f (S x) -> increasing.N f).
+fact inc_lem.N ∀f:(N⇒N) (∀x:N f x < f (S x) → increasing.N f).
 intros.
 intros.
 elim H3 with [rec] ;; Try trivial -H3.
 save.
 
 
-fact inc_lem'.N /\f:(N=>N) (/\x:N f x <= f (S x) -> lincreasing.N f).
+fact inc_lem'.N ∀f:(N⇒N) (∀x:N f x ⩽ f (S x) → lincreasing.N f).
 intros.
 intros.
 elim H3 with [rec] ;; Try trivial -H3.
@@ -240,7 +240,7 @@ save.
 
 (*** Croissance sur la seconde composante. *)
 
-lemma  acknx_less_acknsx /\n,x:N ack n x < ack n (S x).
+lemma  acknx_less_acknsx ∀n,x:N ack n x < ack n (S x).
 intros.
 elim -1[case] H.
 trivial.
@@ -254,36 +254,36 @@ elim ack_sup_0 ;; Try intros.
 trivial.
 save.
 
-fact  ackn_increase /\n:N increasing.N (ack n). (* non utilisé ensuite *)
+fact  ackn_increase ∀n:N increasing.N (ack n). (* non utilisé ensuite *)
 intros.
-elim inc_lem.N ;; trivial + acknx_less_acknsx..
+elim inc_lem.N ;; trivial + acknx_less_acknsx.
 save.
 
-fact ackn_lincrease /\n:N lincreasing.N (ack n).
+fact ackn_lincrease ∀n:N lincreasing.N (ack n).
 intros.
 elim inc_lem'.N ;; trivial + acknx_less_acknsx.
 save.
 
 (*** Croissance sur la première composante. *)
 
-lemma  acknx_less_acksnx /\n,x:N(x > N1 -> ack n x <= ack (S n) x).
+lemma  acknx_less_acksnx ∀n,x:N(x > N1 → ack n x ⩽ ack (S n) x).
 intros.
 elim -1[case] H0.
 trivial.
 rewrite H3 acknx calcul.N.
-prove S y <= ack (S n) y.
-trivial + acknx_sup_x..
+prove S y ⩽ ack (S n) y.
+trivial + acknx_sup_x.
 elim ackn_lincrease;; trivial.
 save.
 
-fact  ackx_lincrease /\n,n',x:N (x > N1 -> n <= n' -> ack n x <= ack n' x).
+fact  ackx_lincrease ∀n,n',x:N (x > N1 → n ⩽ n' → ack n x ⩽ ack n' x).
 intros.
-elim  inc_lem'.N with (\n (ack n x));; Try trivial.
+elim  inc_lem'.N with (λn (ack n x));; Try trivial.
 trivial +acknx_less_acksnx.
 save.
 
 (*** Une majoration utile dans la suite. *)
-lemma  acksny_sup_2y /\n,y:N (ack (S n) y >= N2 * y).
+lemma  acksny_sup_2y ∀n,y:N (ack (S n) y ⩾ N2 × y).
 intros.
 elim -1[case] H0.
 trivial.
@@ -297,20 +297,20 @@ save.
 (** L'itérée d'une composante de la fonction d'Ackermann. *)
 
 (*** Définition. *)
-def it a f  n = def_rec.N a (\p,r (f r)) n.
+def it a f  n = def_rec.N a (λp,r (f r)) n.
 def Ack k n x = it x (ack n) k.
 
-goal /\n,x:N Ack N0 n x = x.
+goal ∀n,x:N Ack N0 n x = x.
 trivial.
 save Ack0.
 
-goal /\k,n,x:N(Ack (S k) n x = ack n (Ack  k n x)).
+goal ∀k,n,x:N(Ack (S k) n x = ack n (Ack  k n x)).
 trivial.
 save AckS.
 
 new_equation Ack0. new_equation AckS.
 
-goal /\k,n,x:N N(Ack k n x).
+goal ∀k,n,x:N N(Ack k n x).
 intros.
 elim H.
 trivial.
@@ -321,7 +321,7 @@ new_intro -t total Ack_total.
 
 (*** La fonction d'Ackermann itérée est croissante sur sa dernière composante. *)
 
-fact  Ackkn_lincrease /\ k,n:N lincreasing.N (Ack k n).
+fact  Ackkn_lincrease ∀ k,n:N lincreasing.N (Ack k n).
 intros.
 elim H.
 intros.
@@ -335,7 +335,7 @@ elim H2.
 save.
 
 (*** La fonction d'Ackermann itérée est croissante sur la première composante (le nombre d'itérations). *)
-fact  Acknx_lincrease /\ n,x:N lincreasing.N \k(Ack k n x).
+fact  Acknx_lincrease ∀ n,x:N lincreasing.N λk(Ack k n x).
 intros.
 intros.
 elim H3 with [rec].
@@ -349,11 +349,11 @@ intros.
 save.
 
 
-(*** 
+(***
 La n+1-ième composante de la fonction d'Ackermann comme itérée de
 la n-ième. *)
 
-goal /\n,x,y:N(ack (S n) (y + x) = Ack  x n (ack (S n) y)). 
+goal ∀n,x,y:N(ack (S n) (y + x) = Ack  x n (ack (S n) y)).
 intros.
 elim -1[case] H0.
 rewrite Ack0.
@@ -369,7 +369,7 @@ save ack_Ack.
 d'un certain rang n'importe quelle itérée de sa n-ième composante. *)
 
 (* Je n'ai pas utilisé ce résultat. Cela peut simplifier la suite.
-goal /\k,n,x:N Ack k n x <= ack (S n) (x+k).
+goal ∀k,n,x:N Ack k n x ⩽ ack (S n) (x+k).
 intros.
 rewrite ack_Ack.
 elim Ackkn_lincrease.
@@ -388,17 +388,17 @@ save Ack_lem1.
 *)
 
 
-def Infix[5]  f "domine" g = \/k:N/\x:N(x >= k -> g x <= f x).
+def Infix[5]  f "domine" g = ∃k:N∀x:N(x ⩾ k → g x ⩽ f x).
 
 
-proposition  acksn_domine_Ackpn /\k,n:N ack (S n) domine Ack k n.
+proposition  acksn_domine_Ackpn ∀k,n:N ack (S n) domine Ack k n.
 intros.
 intro.
 lock ?1.
 use N ?1.
 intro.
 intros.
-use k <= ?1.
+use k ⩽ ?1.
 local y = x - k.
 prove N y.
 trivial.
@@ -411,10 +411,10 @@ elim  Ackkn_lincrease.
 trivial.
 trivial.
 apply acksny_sup_2y with  n and G1.
-use y + k <= N2 * y.
+use y + k ⩽ N2 × y.
 trivial 2 = G3 G4 G1 H H0.
 rmh G3.
-use k <=y.
+use k ⩽y.
 slh G3 G1 H.
 intro lesseq.add.
 trivial 2.
@@ -430,17 +430,17 @@ Import list.
 Import list_nat.
 
 def compose f gs l =
-  f (map (\g (g l)) gs).
+  f (map (λg (g l)) gs).
 
 def recurrence f g l =
-  def_rec.N (f (tail l)) (\p \r (g (r::p::(tail l)))) (head l).
+  def_rec.N (f (tail l)) (λp λr (g (r::p::(tail l)))) (head l).
 
 Inductive PR n f -ce =
-  zero : /\n:N PR n (\l N0)
-| succ : PR N1 (\l (S (head l)))
-| proj : /\n,p:N (p < n -> PR n (\l (nth l p)))
-| comp -ci : /\n,p:N/\f:(PR n)/\gs:(List (PR p)) (length gs = n -> PR p (compose f gs)) 
-| recu : /\n:N/\f:(PR n)/\g:(PR (S S n)) PR (S n) (recurrence f g).
+  zero : ∀n:N PR n (λl N0)
+| succ : PR N1 (λl (S (head l)))
+| proj : ∀n,p:N (p < n → PR n (λl (nth l p)))
+| comp -ci : ∀n,p:N∀f:(PR n)∀gs:(List (PR p)) (length gs = n → PR p (compose f gs))
+| recu : ∀n:N∀f:(PR n)∀g:(PR (S S n)) PR (S n) (recurrence f g).
 
 prove_claim comp.PR.
 intros.
@@ -459,7 +459,7 @@ save.
 
 prove_claim rec.PR.
 intros.
-use X n f & PR n f.
+use X n f ∧ PR n f.
 left G.
 unfold_hyp H4 PR.
 elim H4;; rmh H4.
@@ -481,9 +481,9 @@ trivial =H7.
 trivial.
 save.
 
-def Array D n l = List D l & length l = n.
+def Array D n l = List D l ∧ length l = n.
 
-fact PR.total /\n:N /\f:(PR n) /\l:(Array N n) N (f l).
+fact PR.total ∀n:N ∀f:(PR n) ∀l:(Array N n) N (f l).
 intro 4.
 elim H0 with [rec].
 
@@ -516,23 +516,23 @@ intro.
 trivial.
 save.
 
-def Infix[5]  f "Domine" g "with" n = \/k:N/\x:N/\l:(List N) 
-  (length l = n -> x >= k -> /\i:N (i < n -> nth l i <= x) -> g l <= f x).
+def Infix[5]  f "Domine" g "with" n = ∃k:N∀x:N∀l:(List N)
+  (length l = n → x ⩾ k → ∀i:N (i < n → nth l i ⩽ x) → g l ⩽ f x).
 
 (*
-goal /\n:N /\f:(PR n) \/p:N ack p Domine f with n.
+goal ∀n:N ∀f:(PR n) ∃p:N ack p Domine f with n.
 intros.
 elim H0.
 
 trivial =H1.
 
-intros $& $\/ $-> $/\.
+intros $∧ $∃ $→ $∀.
 intro N0.
-intros $Domine $& $\/ $-> $/\.
+intros $Domine $∧ $∃ $→ $∀.
 intro N0.
 prove nth l N0 = head l.
 trivial =H2 H3.
-from S (nth l N0) <= ack N0 x.
+from S (nth l N0) ⩽ ack N0 x.
 apply H5 with N0 < N1.
 intros.
 intros.
@@ -542,7 +542,7 @@ intros.
 trivial.
 trivial.
 
-intros $Domine $& $\/ $-> $/\.
+intros $Domine $∧ $∃ $→ $∀.
 select 3.
 instance ?3 N0.
 rewrite ack0x.
@@ -557,15 +557,15 @@ axiom H3.
 intro.
 intro N0.
 
-lefts H4 $& $\/.
-prove \/p1:N List \x (ack p1 Domine x with p) gs.
+lefts H4 $∧ $∃.
+prove ∃p1:N List λx (ack p1 Domine x with p) gs.
 elim H6.
 trivial.
-lefts H9 $& $\/.
-lefts H11 $& $\/.
+lefts H9 $∧ $∃.
+lefts H11 $∧ $∃.
 Import bool.
-def max n p = if n <= p then p else n.
-intros $& $\/.
+def max n p = if n ⩽ p then p else n.
+intros $∧ $∃.
 instance ?5 max n p.
 
 print max.

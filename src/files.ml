@@ -16,6 +16,7 @@ let cur_line = ref 1
 let cur_col = ref 0
 
 let stack_input = ref ([]:(in_channel * int * int) list)
+let server = ref false
 
 let pop_input0 = function
   (c,lin,col)::s ->
@@ -27,7 +28,7 @@ let pop_input0 = function
 |  [] ->
     raise Quit
 
-let is_top () = !stack_input = []
+let is_top () = not !server && !stack_input = []
 
 let pop_input () = (pop_input0 !stack_input)
 

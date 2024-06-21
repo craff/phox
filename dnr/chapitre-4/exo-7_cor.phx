@@ -1,0 +1,120 @@
+Sort term.
+Cst R : term → prop.
+
+theorem numero1 ¬ ¬ ∃x∀y (R x → ¬ ¬ R y).
+(*->*)
+intro.
+elim H.
+intro 4.
+elim H.
+intro 4.
+elim H1.
+axiom H2.
+(*->*)
+save.
+
+theorem numero3  ¬ ¬  ∃ x ∀y ((( ¬ ¬ R y → ¬ ¬ R x) →  ¬ ¬ R x ) → ¬ ¬ R y ).
+(*->*)
+intro.
+elim H.
+intro 4.
+elim H.
+intro 4.
+instance ?2 y.
+elim H2.
+intro 2.
+elim H4.
+axiom H3.
+axiom H1.
+(*->*)
+save.
+
+Cst S : term → prop.
+
+(* exercice difficile*)
+theorem numero4 ¬ ¬ ∃x∀y ¬ ¬ (((R y → R x) → R x) → R y).
+(*->*)
+intro.
+elim H.
+intro 2.
+intro.
+elim H0.
+intro.
+(* la commande suivante correspond à la règle d'absurdité intuitionniste*)
+elim H.
+intro.
+instance ?2 y.
+intro 2.
+elim H2.
+intro.
+elim H0.
+intro.
+elim H3.
+intro.
+elim H2.
+intro.
+axiom H5.
+(*->*)
+save.
+
+(* comme le précédent mais un peu plus dur !*)
+theorem numero6  ¬ ¬ ∃x∀y ¬ ¬ ((S y → R x) → (S x → R y)).
+(*->*)
+intro.
+elim H.
+intro 2.
+intro.
+elim H0.
+intro 2.
+elim H.
+intro.
+instance ?2 y.
+intro 2.
+elim H3.
+intro 2.
+elim H.
+intro.
+instance ?3 y0.
+intro 2.
+elim H6.
+intro 2.
+elim H3.
+intro 2.
+elim H0.
+intro 2.
+elim H4.
+axiom H8.
+(*->*)
+save.
+
+Cst f : term → term.
+
+theorem numero7  ¬ ¬ ∃x∀y (((R (f x) → ¬ ¬ R (f y)) → R x) → ¬ ¬ R y).
+(*->*)
+intros.
+elim H.
+intros.
+intros.
+intros.
+rmh H0.
+elim H.
+intros.
+instance ?2 y.
+intros.
+intros.
+elim H1.
+elim H0.
+intros.
+intros.
+elim H.
+intros.
+instance ?3 y0.
+intros.
+intros.
+elim H2.
+elim H5.
+intros.
+elim H4.
+axiom H7.
+(*->*)
+save.

@@ -7,9 +7,84 @@
     <script src="files.js"></script>
     <script src="phox.js"></script>
     <style>
-      #input { width: 85ch; height: 80vh; border:1px solid blue;}
-      #output { width: 82ch; height: 25vh; border:1px solid black;}
-      #goals { width: 82ch; height: 50vh; border:1px solid black;}
+      @font-face {
+	  font-family: "JuliaMono";
+          font-weight: normal;
+          font-style: normal;
+	  src: url("fonts/JuliaMono-Regular.woff2") format("woff2");
+      }
+      @font-face {
+	  font-family: "JuliaMono";
+          font-weight: bold;
+          font-style: normal;
+	  src: url("fonts/JuliaMono-Bold.woff2") format("woff2");
+      }
+      @font-face {
+	  font-family: "JuliaMono";
+          font-weight: normal;
+          font-style: italic;
+	  src: url("fonts/JuliaMono-RegularItalic.woff2") format("woff2");
+      }
+      @font-face {
+	  font-family: "JuliaMono";
+          font-weight: bold;
+          font-style: italic;
+	  src: url("fonts/JuliaMono-BoldItalic.woff2") format("woff2");
+      }
+
+      #input { height: auto;
+	       width: auto;
+	       max-height:90vh;
+	       min-height:50vh;
+	       min-width:max(70ch, 47vw);
+	       border:1px solid blue;}
+      #output { height: auto;
+		width: auto;
+		max-height:35vh;
+		min-height:max(40ex,40vh);
+		min-width:max(70ch, 47vw);
+		border:1px solid black;}
+      #goals { height: auto;
+	       width: auto;
+	       max-height:55vh;
+	       min-height:max(40ex,40vh);
+	       min-width:max(70ch, 47vw);
+	       border:1px solid black;}
+      textarea {
+ 	  overflow-y: auto;
+	  overflow-x: auto;
+      }
+      .button {
+          display: table-cell;
+          vertical-align: bottom;
+          margin: 0px;
+          padding: 0px;
+          position: relative;
+      }
+      .help {
+          display: none;
+      }
+      .button:hover .help {
+          display: block;
+          position: absolute;
+          left:0;
+          top:30px;
+          z-index:10;
+          width:max-content;
+          background: #C0F0C0;
+      }
+      .button img {
+          padding-left: 5px;
+          padding-right: 5px;
+          margin-left: 2px;
+          margin-right: 2px;
+          padding-top: 2px;
+          padding-bottom: 2px;
+          margin-bottom: 0px;
+          margin-top: 0px;
+          border:2px solid #30C030;
+          border-radius: 5px;
+      }
       .editor {
 	  outline: none;
 	  overflow-y: auto;
@@ -17,13 +92,16 @@
 	  padding-left: 48px;
 	  padding-top: 5px;
 	  counter-reset: line;
-	  border:2px solid blue;
       }
       .editor div {
 	  display: block;
 	  position: relative;
 	  white-space: pre-wrap;
-	  min-height: 2.5ex;
+          padding-top: 0.3ex;
+          min-height: 1.5ex;
+      }
+      .editor div span {
+          padding-top: 0.3ex;
       }
       .editor div::before {
 	  content: counter(line);
@@ -34,35 +112,77 @@
       }
       .container {
 	  display: flex;
-	  flex-direction: row;
 	  flex-wrap: wrap;
+	  align-items: stretch;
+	  align-content: stretch;
+	  gap: 3px;
+	  padding: 2px;
+	  width:100vw;
+	  height:auto;
       }
-      .flex {
-	  font-family: monospace;
-	  font-size: 12px;
+      .math {
+	  font-family: "JuliaMono";
+	  font-size: 13px;
+      }
+      .cell {
+	  flex: 1 1 auto;
+	  margin: 0;
+	  padding: 0;
+      }
+      body {
+	  margin: 0;
+	  padding: 0;
+	  width: 100vw;
+	  height: 100vh;
+	  overflow: none;
+      }
+      #header {
+	  margin: auto;
+          display: table-row;
       }
     </style>
   </head>
   <body>
     <div id="header">
-      <button onclick="sendNextCommand();">Next</button>
-      <button onclick="undo();">Undo</button>
-      <button onclick="goTo();">GoTo</button>
-      <button onclick="restart();">Restart</button>
+      <strong style="margin-right: 10px">Phox playground</strong>
+      <div class="button" id="restart">
+        <img src = "pics/Restart.svg" alt="Restart" onclick="restart();">
+        <div class="help">
+          Restart Phox
+        </div>
+      </div>
+      <div class="button">
+        <img src = "pics/Undo.svg" alt="Undo" onclick="undo();">
+        <div class="help">
+          Undo (works only in proofs) Ctrl+←
+        </div>
+      </div>
+      <div class="button">
+        <img src = "pics/Play.svg" alt="Next" onclick="sendNextCommand();">
+        <div class="help">
+          Next command Ctrl+→
+        </div>
+      </div>
+      <div class="button">
+        <img src = "pics/GoTo.svg" alt="GoTo" onclick="goTo();">
+        <div class="help">
+          Execute all commands before the cursor position
+        </div>
+      </div>
+      <div class="button">
+        <img src = "pics/GoToEnd.svg" alt="GoToEnd" onclick="goTo(true);">
+        <div class="help">
+          Execute all commands
+        </div>
+      </div>
+      <span style="margin-right:10px; margin-left: 10px">Select files:</span>
     </div>
-    <div class="container">
-      <div class="flex">
-	<div class="editor" id="input" contenteditable="true" spellcheck="false">
-	  <div>goal /\X (X -> X).</div>
-	  <div>intro.</div>
-	  <div>intro. axiom H.</div>
-	  <div>save th.</div>
-	</div>
+    <div class="container math">
+      <div class="cell">
+	<div class="editor" id="input" contenteditable="true" spellcheck="false"></div>
       </div>
-      <div class="flex">
-	<textarea class="out" disabled style="display:none" id="goals"></textarea>
-	<textarea class="out" disabled id="output"></textarea>
-      </div>
+      <textarea class="out cell" disabled style="display:none" id="goals"></textarea>
+      <textarea class="out cell" disabled id="output"></textarea>
     </div>
   </body>
 </html>

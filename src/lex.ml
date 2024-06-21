@@ -57,13 +57,15 @@ let reset_buffer () =
   bufpos := 0
 
 let store c =
-  if !bufpos >= Bytes.length !buffer then begin
-    let newbuffer = Bytes.make (2 * !bufpos) ' ' in
-    Bytes.blit !buffer 0 newbuffer 0 !bufpos;
-    buffer := newbuffer
-  end;
-  Bytes.set !buffer !bufpos c;
-  incr bufpos
+  if c != '\000' then begin
+      if !bufpos >= Bytes.length !buffer then begin
+          let newbuffer = Bytes.make (2 * !bufpos) ' ' in
+          Bytes.blit !buffer 0 newbuffer 0 !bufpos;
+          buffer := newbuffer
+        end;
+      Bytes.set !buffer !bufpos c;
+      incr bufpos
+    end
 
 let last_char () =
   if !bufpos > 0 then Bytes.get !buffer (!bufpos - 1) else ' '
@@ -76,7 +78,17 @@ let special = parser
         '<' | '=' | '>' | '@' | '[' | '\\' | ']' | '^' | '`' | '#' |
         '{' | '|' | '}' | '~' | 'µ' ) as c >] -> c
 
+let unicode_special = parser
+    [< ' ('\xE2' as c); ' ('\x86'..'\x8B' | '\xA8'..'\xAB' as c1); 'c2 >]  -> (c,c1,c2)
+  | [< ' ('\xC2' as c1); ' ('\xAC' | '\xB1' as c2) >] -> (c1,c2,'\000')
+  | [< ' ('\xC3' as c1); ' ('\x97' | '\xB7' as c2) >] -> (c1,c2,'\000')
+  | [< ' ('\xCE' as c1); ' ('\xBB' as c2) >] -> (c1,c2,'\000')
+
 let extra_dot = ref false
+
+let add_dot () =
+  if !extra_dot then raise (Stream.Error "Multiple dots");
+  extra_dot := true
 
 let maybe_white s = match s with parser
     [< ' (' '|'\010'|'\013'|'\009'|'\026'|'\012'); _ >] -> ()
@@ -115,6 +127,8 @@ let rec next_token s =
       Eof
   | [< c = special; s >] ->
       reset_buffer(); store c; ident2 s
+  | [< (c1,c2,c3) = unicode_special; s >] ->
+      reset_buffer(); store c1; store c2; store c3; ident2 s
   | [< 'c; _ >] ->
       raise (Illegal_char c)
 
@@ -149,19 +163,21 @@ let rec next_token s =
   | [< ' ('.' as c); s >] -> (
 	match (peek s) with
 	  Some ('A'..'Z'|'a'..'z'|'0'..'9') -> store c; ident s
-	| _ -> extra_dot := true; get_string())
+	| _ -> add_dot(); get_string())
   | [< s >] -> primeseq s
 
   and ident' = parser
       [< c = special; s >] -> store c; ident'' s
+    | [< (c1,c2,c3) = unicode_special; s >] -> store c1; store c2; store c3; ident'' s
     | [< s = ident >] -> s
 
   and ident'' = parser
       [< c = special; s >] -> store c; ident'' s
+    | [< (c1,c2,c3) = unicode_special; s >] -> store c1; store c2; store c3; ident'' s
     | [< ' ('.' as c); s >] -> (
 	match (peek s) with
 	  Some ('A'..'Z'|'a'..'z'|'0'..'9') -> store c; ident s
-	| _ -> extra_dot := true; get_string())
+	| _ -> add_dot(); get_string())
     | [< ' ('_' as c); s >] -> store c; ident' s
     | [< s >] -> primeseq s
 
@@ -170,16 +186,18 @@ let rec next_token s =
   | [< ' ('.' as c); s >] -> (
 	match (peek s) with
 	  Some ('A'..'Z'|'a'..'z'|'0'..'9') -> store c; ident s
-	| _ -> extra_dot := true; get_string())
+	| _ -> add_dot(); get_string())
   | [< >] -> get_string()
 
   and ident2 = parser
     [< c = special; s >] -> store c; ident2 s
+  | [< (c1,c2,c3) = unicode_special; s >] -> store c1; store c2; store c3; ident2 s
   | [< ' ('_' as c); s >] -> store c; Kwd (ident s)
+
   | [< ' ('.' as c); s >] -> (
 	match (peek s) with
 	  Some ('A'..'Z'|'a'..'z'|'0'..'9'|'_') -> store c; Kwd(ident s)
-	| _ -> extra_dot := true; Kwd(get_string()))
+	| _ -> add_dot(); Kwd(get_string()))
   | [< >] -> Kwd (get_string())
 
   and char_or_kvar = parser
@@ -217,7 +235,7 @@ let rec next_token s =
   | [< ' ('.' as c); s >] -> (
       match (peek s) with
 	  Some ('E'|'e'|'0'..'9') -> store c; decimal_part s
-	| _ -> extra_dot := true; Num(Num.num_of_string(get_string())))
+	| _ -> add_dot(); Num(Num.num_of_string(get_string())))
   | [< >] ->
       Num(Num.num_of_string(get_string()))
 

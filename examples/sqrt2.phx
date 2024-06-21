@@ -49,7 +49,7 @@ binary elimination rule (with two principal premices ?).
 They should be included in the library ?
 *)
 
-lemma not_odd_and_even.N /\y,z:N( N2 * y != N1 + N2 * z).
+lemma not_odd_and_even.N ∀y,z:N( N2 × y ≠ N1 + N2 × z).
 (*! math
 \begin{lemma}\label{not_odd_and_even.N}
 An integer can not be odd and even:
@@ -64,7 +64,7 @@ intro 2.
 elim H.
 (* y := 0 *)
  trivial.
-(* y0 -> S y0 *)
+(* y0 → S y0 *)
  intros.
  (* case over z *)
  elim H2 with [case].
@@ -72,9 +72,9 @@ elim H.
   trivial.
  (* z := S y1 *)
   intro.
-  prove N2 + N2 * y0 = N2 + N1 + N2 * y1.
-   from N2 * S y0 = N1 + N2 + N2 * y1.
-   from N2 * S y0 = N1 + (N2 + N2 * y1).
+  prove N2 + N2 × y0 = N2 + N1 + N2 × y1.
+   from N2 × S y0 = N1 + N2 + N2 × y1.
+   from N2 × S y0 = N1 + (N2 + N2 × y1).
    from H5.
   lefts G.
   elim H1 with H6.
@@ -82,7 +82,7 @@ save.
 
 
 
-fact sum_square.N /\x,y:N (x + y)^N2 = x^N2 + N2*x*y + y^N2.
+fact sum_square.N ∀x,y:N (x + y)^N2 = x^N2 + N2×x×y + y^N2.
 (*! math
 \begin{lemma}\label{sum_square.N}
 $$ \[ $0 \] $$
@@ -97,7 +97,7 @@ intro.
 save.
 
 
-fact less.exp.N /\n,x,y:N( x <= y -> x^n <= y^n).
+fact less.exp.N ∀n,x,y:N( x ⩽ y → x^n ⩽ y^n).
 (*! math
 \begin{lemma}\label{less.exp.N}
 $$ \[ $0 \] $$
@@ -113,7 +113,7 @@ rewrite calcul.N.
 trivial.
 save.
 
-fact less_r.exp.N  /\n,x,y:N( x^n < y^n -> x < y).
+fact less_r.exp.N  ∀n,x,y:N( x^n < y^n → x < y).
 (*! math
 \begin{lemma}\label{less_r.exp.N}
 $$ \[ $0 \] $$
@@ -128,7 +128,7 @@ apply less.exp.N with n and H3.
 elim lesseq.imply.not.greater.N with y^n and x^n.
 save.
 
-fact less.ladd.N /\x,y:N (N0 < y -> x < x + y).
+fact less.ladd.N ∀x,y:N (N0 < y → x < x + y).
 (*! math
 \begin{lemma}\label{less.ladd.N}
 $$ \[ $0 \] $$
@@ -153,7 +153,7 @@ save.
 
 (** The proof itself. *)
 
-theorem n.square.pair /\n:N /\p:N( n^N2=N2*p -> \/q:N n=N2*q).
+theorem n.square.pair ∀n:N ∀p:N( n^N2=N2×p → ∃q:N n=N2×q).
 (*! math
 \begin{lemma}\label{n.square.pair}
  If the square of \[ n \] is even then \[ n \] is even:
@@ -163,7 +163,7 @@ $$ \[ $0 \] $$
 *)
 intros.
 apply odd_or_even.N with H.
-lefts G $\/ $& $or.
+lefts G $∃ $∧ $∨.
 (*! math
 We assume \[ $$H1 \] ( \[ H1 \] ).
 We distinguish two cases. If \[ n \] is even we get what we want.
@@ -172,12 +172,12 @@ trivial.
 (*! math
 If  \[ n \] is odd we have \[ $$H3 \]
 *)
-prove  n^N2 = N1 + N2*(N2*y^N2+N2*y).
+prove  n^N2 = N1 + N2×(N2×y^N2+N2×y).
 (*! math
 which implies \[ $0 \]
 *)
  rewrite  H3 sum_square.N.
- from N1+(N2*(N2*y)+ N2*(y *(N2*y)))= N1+N2 * ?1.
+ from N1+(N2×(N2×y)+ N2×(y ×(N2×y)))= N1+N2 × ?1.
  intro.
 (*! math
 and this gives a contradiction by lemma \ref{not_odd_and_even.N} using ( \[ H1 \] ).
@@ -187,7 +187,7 @@ rewrite_hyp G H1.
 elim not_odd_and_even.N with G.
 save.
 
-lem decrease /\m,n : N (m^ N2 = N2 * n^ N2 -> N0 < n -> n < m).
+lem decrease ∀m,n : N (m^ N2 = N2 × n^ N2 → N0 < n → n < m).
 (*! math
 \begin{lemma}\label{decrease}
 $$ \[ $0 \] $$
@@ -203,7 +203,7 @@ elim less.ladd.N.
 trivial  =H0 H2.
 save.
 
-theorem square2_irrat /\m,n : N (m^ N2 = N2 * n^ N2 -> m = N0 & n = N0).
+theorem square2_irrat ∀m,n : N (m^ N2 = N2 × n^ N2 → m = N0 ∧ n = N0).
 (*! math
 \begin{theorem} The square-root of 2 is irrational. For this we just need to prove the following:
 $$ \[ $0 \] $$
@@ -243,7 +243,7 @@ The result follow by using induction hypothesis \[ H1 \] ,
 (*! math
 using \[ $0 \] which follows from \[$$H3 \].
 *)
- prove N2 * (N2 * q ^N2) = N2 * n ^ N2.
+ prove N2 × (N2 × q ^N2) = N2 × n ^ N2.
   from H3.
  left G0.
  trivial 0.

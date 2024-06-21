@@ -24,14 +24,14 @@ Import nat.
 On se donne une "sorte" qui contiendra les formules
 *)
 Data Form =
-  var x : N x -> Form (var x)
-| [implication] rInfix [4] x "|->" y : Form x -> Form y -> Form (x |-> y)
+  var x : N x → Form (var x)
+| [implication] rInfix [4] x "|→" y : Form x → Form y → Form (x |→ y)
 .
 
 (* 
 - rInfix 
     donne une syntaxe infix associative à droite:
-    a |-> b |-> c signifie $|-> a ($|-> b c)
+    a |→ b |→ c signifie $|→ a ($|→ b c)
 - [4] 
     donne la priorité (plus le nombre est petit, plus ca "colle"
 
@@ -40,11 +40,11 @@ functions et 5 pour les constantes de prédicats)
 
 *)
 
-priority $S $var $|->.
+priority $S $var $|→.
 (* 
 La priorité de S étant 2, on peut écrire (sans parenthèses) :
 *)
-print var S N0 |-> var N0.
+print var S N0 |→ var N0.
 (*
 QUESTION: 
 	A quoi sert le "$"
@@ -59,7 +59,7 @@ ___________________*)
 (*
 On peut prouver un petit théorème:
 *)
-goal Form (var S N0 |-> var N0).
+goal Form (var S N0 |→ var N0).
 (* 
 On ouvre la définition:
 *)
@@ -105,7 +105,7 @@ QUESTION:
 (*
 On pouvait faire plus court:
 *)
-goal Form (var S N0 |-> var N0).
+goal Form (var S N0 |→ var N0).
 (* 
 Le unfold est fait automatiquement par intro ! en plus intros permet de
 faire un maximum d'intro pour les connecteurs spécifiés. En plus la commande
@@ -121,19 +121,19 @@ save mon_premier_theoreme.
 (* 
 Et même encore plus court:
 *)
-goal Form (var S N0 |-> var N0).
+goal Form (var S N0 |→ var N0).
 trivial.
 save mon_premier_theoreme.
 
 Import list.
 
 Inductive Prouvable C f =
-  axiome :  /\f,C Prouvable (f::C) f
-| affaiblissement : /\f,g,C (Prouvable C f -> Prouvable (g::C) f)
+  axiome :  ∀f,C Prouvable (f::C) f
+| affaiblissement : ∀f,g,C (Prouvable C f → Prouvable (g::C) f)
 | implication_intro :
-	/\f,g,C (Prouvable (f::C) g -> Prouvable C (f |-> g))
+	∀f,g,C (Prouvable (f::C) g → Prouvable C (f |→ g))
 | implication_elim :
-        /\f,g,C (Prouvable C (f |-> g) -> Prouvable C f -> Prouvable C g)
+        ∀f,g,C (Prouvable C (f |→ g) → Prouvable C f → Prouvable C g)
 .
 
 (*
@@ -150,21 +150,21 @@ Sémantique:
 On a besoin des lemmes suivants:
 *)
 
-claim append.associative.untyped /\l,l',l'' (l @ (l' @ l'') = (l @ l') @ l''). 
+claim append.associative.untyped ∀l,l',l'' (l @ (l' @ l'') = (l @ l') @ l''). 
 new_equation append.associative.untyped.
 
-claim append.nil_right.untyped /\l (l @ nil = l). 
+claim append.nil_right.untyped ∀l (l @ nil = l). 
 new_equation append.nil_right.untyped.
 
 (*
 Pourquoi ne peut-on les prouver ?
 *)
 
-def Force p f = /\X (
-	/\f,g,p (/\p'(/\p'' X (p''@p'@p) f -> X (p'@p) g) 
-		-> X (p) (f |-> g)) ->	  
-        /\f,g,p (X p (f |-> g) -> X p f -> X p g)  
-	-> X p f).
+def Force p f = ∀X (
+	∀f,g,p (∀p'(∀p'' X (p''@p'@p) f → X (p'@p) g) 
+		→ X (p) (f |→ g)) →	  
+        ∀f,g,p (X p (f |→ g) → X p f → X p g)  
+	→ X p f).
 
 (* 
 Question:
@@ -180,11 +180,11 @@ Une propriété de Force:
 EXERCICE: finis la preuve
 *)
 
-goal /\p,f (Force p f -> /\p' Force (p'@p) f).
-(*->*)
+goal ∀p,f (Force p f → ∀p' Force (p'@p) f).
+(*→*)
 intros.
 intros.
-prove /\p' X (p' @ p) f.
+prove ∀p' X (p' @ p) f.
 elim H.
 intros.
 elim H0. 
@@ -194,7 +194,7 @@ intros.
 elim -1 (p2'@p'') H3.
 trivial.
 elim G.
-(*->*)
+(*→*)
 save increasing.Force.
 
 (*
@@ -212,11 +212,11 @@ La correction de la sémantique:
 EXERCICE: finis la preuve
 *)
 
-goal /\f (Prouvable nil f -> /\p Force p f).
+goal ∀f (Prouvable nil f → ∀p Force p f).
 intros.
 intros.
 (* lemme *)
-prove -head /\l,f,c (/\l' List \f (X (l'@l) f) (f::c) -> /\l' X (l'@l) f).
+prove -head ∀l,f,c (∀l' List λf (X (l'@l) f) (f::c) → ∀l' X (l'@l) f).
 intros.
 (*
 QUESTION: 
@@ -227,17 +227,17 @@ left H3.
 left H5.
 from H3.
 (* second lemme, prove le *)
-prove -tail /\l,f,c (/\l' List \f (X (l'@l) f) (f::c) -> 
-			/\l' List \f (X (l'@l) f) c).
-(*->*)
+prove -tail ∀l,f,c (∀l' List λf (X (l'@l) f) (f::c) → 
+			∀l' List λf (X (l'@l) f) c).
+(*→*)
 intros.
 elim H2 with l' and [case].
 left H3.
 left H5.
 from H4.
-(*->*)
+(*→*)
 (* début de la preuve, on généralise: *)
-prove /\p (/\p' List \f (X (p'@p) f) nil -> /\p' X (p'@p) f).
+prove ∀p (∀p' List λf (X (p'@p) f) nil → ∀p' X (p'@p) f).
 (*
 On ne veut pas utiliser rec.Prouvable 
 	(pour obtenir un terme extrait plus court !
@@ -248,7 +248,7 @@ unfold_hyp H Prouvable.
 et on fait l'induction ! à vous de finir !
 *)
 elim H.
-(*->*)
+(*→*)
 (* cas de l'axiome *)
 intros.
 elim head with H2. 
@@ -277,7 +277,7 @@ elim H4.
 elim G.
 intro.
 intro.
-(*->*)
+(*→*)
 save Correcte.
 
 (*-----------------------------
@@ -288,16 +288,16 @@ La complétude de la sémantique:
 on a besoin des listes non typées:
 *)
 
-def UList p = List (\x True) p.
+def UList p = List (λx True) p.
 
 (*
 définition d'une fonction sur les listes:
 *)
 
-Cst liat : list['a] -> list['a].
+Cst liat : list['a] → list['a].
 claim liat0 liat nil = nil.
-claim liat1 /\x liat (x:: nil) = nil.
-claim liat2 /\p,p',x liat (p@(x::p')) = p@liat(x::p').
+claim liat1 ∀x liat (x:: nil) = nil.
+claim liat2 ∀p,p',x liat (p@(x::p')) = p@liat(x::p').
 new_equation liat0.
 new_equation liat1.
 new_equation liat2.
@@ -310,7 +310,7 @@ QUESTION: que fait-elle ?
 Voici la preuve de totalité de cette fonction:
 *)
 
-goal /\p (UList p -> UList (liat p)).
+goal ∀p (UList p → UList (liat p)).
 intros.
 elim H.
 (*
@@ -318,7 +318,7 @@ on réécrit une équation à la main:
 *)
 rewrite liat0.
 intro.
-prove /\y (UList (liat l') -> UList (liat (y:: l'))).
+prove ∀y (UList (liat l') → UList (liat (y:: l'))).
 elim H1.
 intros.
 rewrite liat1.
@@ -344,23 +344,23 @@ Question:
 un premier lemme:
 EXERCICE: prouves le !
 *)
-goal /\p,x (UList (p@ x::nil) -> UList p).
-(*->*)
+goal ∀p,x (UList (p@ x::nil) → UList p).
+(*→*)
 intros.
 from UList (liat (p@ x::nil)).
 intro.
 from H.
-(*->*)
+(*→*)
 save lemma1.
 
 (*
 Le lemme dont on a vraiment besoin:
 EXERCICE: prouves le !
 *)
-goal /\p,q (UList q -> UList (p@q) ->  UList p).
-(*->*)
+goal ∀p,q (UList q → UList (p@q) →  UList p).
+(*→*)
 intro 3.
-prove /\p (UList (p @ q) -> UList p).
+prove ∀p (UList (p @ q) → UList p).
 elim H.
 trivial.
 intros.
@@ -368,7 +368,7 @@ elim lemma1 with a.
 elim H2.
 from H3.
 elim G.
-(*->*)
+(*→*)
 save lemma2.
 
 (*
@@ -382,10 +382,10 @@ Question:
 La complétude, enfin !
 EXERCICE: finis le preuve !
 *)
-goal /\f (/\p:<list[form] Force p f -> Prouvable nil f).
-(*->*)
+goal ∀f (∀p:<list[form] Force p f → Prouvable nil f).
+(*→*)
 intros.
-elim -2 \C,f (UList C -> Prouvable C f) H.
+elim -2 λC,f (UList C → Prouvable C f) H.
 intros.
 intro implication_intro.
 elim H0.
@@ -407,7 +407,7 @@ from H2.
 elim H1.
 from H2.
 intro.
-(*->*)
+(*→*)
 save Complete.
 
 

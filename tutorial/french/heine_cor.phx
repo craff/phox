@@ -4,14 +4,14 @@ flag auto_lvl 1.
 
 Sort reel.
 
-Cst Infix[5] x "<" y : reel -> reel -> prop.
+Cst Infix[5] x "<" y : reel → reel → prop.
 def Infix[5] x ">" y = y < x.
-def Infix[5] x "<=" y = x < y or x=y.
-def Infix[5] x ">=" y =  y <= x .
+def Infix[5] x "⩽" y = x < y ∨ x=y.
+def Infix[5] x "⩾" y =  y ⩽ x .
 
-Cst lInfix[3] x "-" y : reel -> reel -> reel.
-Cst lInfix[3] x "+" y : reel -> reel -> reel.
-Cst lInfix[2] x "/" y : reel -> reel -> reel.
+Cst lInfix[3] x "-" y : reel → reel → reel.
+Cst lInfix[3] x "+" y : reel → reel → reel.
+Cst lInfix[2] x "/" y : reel → reel → reel.
 
 Cst zero:reel.
 Cst un : reel.
@@ -20,108 +20,108 @@ Cst deux : reel.
 Cst a:reel.
 Cst b:reel.
 
-Cst abs : reel -> reel.
-def I x  = a <= x & x <= b.
+Cst abs : reel → reel.
+def I x  = a ⩽ x ∧ x ⩽ b.
 
-def maj m X = /\y in X  y <= m.
-def Maj X = \/m maj m X.
-def sup m X = maj m X & /\y (maj y X -> m <= y).
+def maj m X = ∀y ∈ X  y ⩽ m.
+def Maj X = ∃m maj m X.
+def sup m X = maj m X ∧ ∀y (maj y X → m ⩽ y).
 def vide = { x | False}.
-def plus  X a = { x | x in X or x = a }.
+def plus  X a = { x | x ∈ X ∨ x = a }.
 
 Inductive Fini  X = Vide : Fini vide
-| plus : /\X,a (Fini X -> Fini (plus  X a)).
-def Image A h = { y | \/x in A y = h x }.
+| plus : ∀X,a (Fini X → Fini (plus  X a)).
+def Image A h = { y | ∃x ∈ A y = h x }.
 
 
-claim or1 /\x,y ~ (x < y & y < x).
-claim or2 /\x,y,z (x<y -> y<z -> x<z).
-claim or3 /\x,y (x <= y or x > y).
-claim or4 /\x,y (x<y -> \/z (x<z & z < y)).
-claim or5 /\e>zero /\x x > x-e.
-claim or6 /\e>zero /\x x < x+e.
-claim or7 /\x x - x =zero.
+claim or1 ∀x,y ¬ (x < y ∧ y < x).
+claim or2 ∀x,y,z (x<y → y<z → x<z).
+claim or3 ∀x,y (x ⩽ y ∨ x > y).
+claim or4 ∀x,y (x<y → ∃z (x<z ∧ z < y)).
+claim or5 ∀e>zero ∀x x > x-e.
+claim or6 ∀e>zero ∀x x < x+e.
+claim or7 ∀x x - x =zero.
 new_equation or7.
 claim or8  un > zero.
-claim or9 /\x,y,x0,y0 (x<x0 -> y<y0 -> x+y<x0+y0).
+claim or9 ∀x,y,x0,y0 (x<x0 → y<y0 → x+y<x0+y0).
 claim or10 a < b.
-claim abs1 /\x abs zero  = zero.
+claim abs1 ∀x abs zero  = zero.
 new_equation abs1.
-claim abs2 /\x,y abs (x-y)= abs (y-x).
+claim abs2 ∀x,y abs (x-y)= abs (y-x).
 new_equation abs2.
-claim abs3 /\e>zero /\x,m ( x<=m -> x>m-e -> abs(x-m) <e).
-claim abs4 /\e>zero /\x,m ( x<m+e -> x>m -> abs(x-m) <e).
-claim abs5 /\x,y,z abs (x-y) <= abs (x-z)+ abs(z-y).
-claim axbsup /\X (\/x X x -> Maj X -> \/m (sup  m X)).
-claim div1 /\x>zero x/deux > zero.
-claim div2 /\x>zero x/deux < x.
-claim div3 /\x x/deux + x/deux=x.
+claim abs3 ∀e>zero ∀x,m ( x⩽m → x>m-e → abs(x-m) <e).
+claim abs4 ∀e>zero ∀x,m ( x<m+e → x>m → abs(x-m) <e).
+claim abs5 ∀x,y,z abs (x-y) ⩽ abs (x-z)+ abs(z-y).
+claim axbsup ∀X (∃x X x → Maj X → ∃m (sup  m X)).
+claim div1 ∀x>zero x/deux > zero.
+claim div2 ∀x>zero x/deux < x.
+claim div3 ∀x x/deux + x/deux=x.
 new_equation div3.
- 
-prop p1 /\x,y (x<y -> x<=y).
-(*->*)
+
+prop p1 ∀x,y (x<y → x⩽y).
+(*→*)
 trivial.
-(*->*)
+(*→*)
 save.
 
-prop p2  /\x ~  x < x.
-(*->*)
+prop p2  ∀x ¬  x < x.
+(*→*)
 trivial +or1.
-(*->*)
+(*→*)
 save.
 
-prop p3 /\x,y,z (x<=y -> y<= z -> x <= z).
-(*->*)
+prop p3 ∀x,y,z (x⩽y → y⩽ z → x ⩽ z).
+(*→*)
 trivial +or2.
-(*->*)
+(*→*)
 save.
 
-prop p4 /\x,y,z (x<=y -> y< z -> x < z).
-(*->*)
+prop p4 ∀x,y,z (x⩽y → y< z → x < z).
+(*→*)
 trivial +or2.
-(*->*)
+(*→*)
 save.
 
-prop p5 /\x,y,z (x<y -> y<= z -> x < z).
-(*->*)
+prop p5 ∀x,y,z (x<y → y⩽ z → x < z).
+(*→*)
 trivial +or2.
-(*->*)
+(*→*)
 save.
 
-prop p6 /\x,y (y<=x -> x<=y  -> x=y).
-(*->*)
+prop p6 ∀x,y (y⩽x → x⩽y  → x=y).
+(*→*)
 trivial +or1.
-(*->*)
+(*→*)
 save.
 
-prop p7 /\x,y (~x<=y -> x>y).
-(*->*)
+prop p7 ∀x,y (¬x⩽y → x>y).
+(*→*)
 trivial +or1 or3.
-(*->*)
+(*→*)
 save.
 
-prop p8 /\x,y (x<y -> ~x>=y).
-(*->*)
+prop p8 ∀x,y (x<y → ¬x⩾y).
+(*→*)
 trivial +or1 or3.
-(*->*)
+(*→*)
 save.
 
-prop p9 /\x,y (x<=y -> ~y<x).
-(*->*)
+prop p9 ∀x,y (x⩽y → ¬y<x).
+(*→*)
 trivial +or1 or3.
-(*->*)
+(*→*)
 save.
 
-prop p10  /\x,y (~x<y -> y <=x).
-(*->*)
+prop p10  ∀x,y (¬x<y → y ⩽x).
+(*→*)
 intros.
 elim or3 with y and x.
 trivial.
-(*->*)
+(*→*)
 save.
 
-prop p12 /\e>zero /\x,y (x<y -> \/z (x<z & z< y & z<x+e)).
-(*->*)
+prop p12 ∀e>zero ∀x,y (x<y → ∃z (x<z ∧ z< y ∧ z<x+e)).
+(*→*)
 intros.
 elim or3 with x+e and y.
 prove x < x+e.
@@ -136,11 +136,11 @@ left G.
 intro.
 instance ?2 z.
 trivial +or2 p3 p4 p5.
-(*->*)
+(*→*)
 save.
 
-prop p13 /\A:Fini ((/\x in A x>zero) -> \/c>zero /\x in A c<=x).
-(*->*)
+prop p13 ∀A:Fini ((∀x ∈ A x>zero) → ∃c>zero ∀x ∈ A c⩽x).
+(*→*)
 intro 2.
 elim H.
 intros.
@@ -148,7 +148,7 @@ intros.
 from or8.
 trivial =.
 intros.
-prove /\x in X  x > zero.
+prove ∀x ∈ X  x > zero.
 trivial = H2.
 elim H1 with G.
 left H3.
@@ -161,11 +161,11 @@ trivial +or2 p3 p4 p5.
 intro.
 instance ?3 c.
 trivial +or2 p3 p4 p5.
-(*->*)
+(*→*)
 save.
 
-prop p14 /\P,m (sup m P -> /\e>zero \/x in P x>m-e).
-(*->*)
+prop p14 ∀P,m (sup m P → ∀e>zero ∃x ∈ P x>m-e).
+(*→*)
 intros.
 unfold_hyp H sup.
 by_absurd.
@@ -178,11 +178,11 @@ elim p10 with G.
 apply H with G.
 apply p9 with G0.
 trivial + or5.
-(*->*)
+(*→*)
 save.
 
-prop p15 /\A:Fini /\h Fini (Image A h).
-(*->*)
+prop p15 ∀A:Fini ∀h Fini (Image A h).
+(*→*)
 intros.
 elim H.
 prove Image vide h = vide.
@@ -191,17 +191,17 @@ intro.
 prove Image (plus X a0) h = plus (Image X h) (h a0).
 trivial.
 intro.
-(*->*)
+(*→*)
 save.
 
-prop compact /\h (/\x h x > zero ->  
-  \/A:Fini (A subset I & /\x(a<=x -> x<=b -> \/y in A  abs (x-y)  < (h y)))).
+prop compact ∀h (∀x h x > zero →
+  ∃A:Fini (A ⊂ I ∧ ∀x(a⩽x → x⩽b → ∃y ∈ A  abs (x-y)  < (h y)))).
 
 intro 2.
-local  P c = I c & 
-  \/A:Fini (A subset  I & /\x(a <= x -> x <= c -> \/y in A  abs (x-y) < (h y))).
+local  P c = I c ∧
+  ∃A:Fini (A ⊂  I ∧ ∀x(a ⩽ x → x ⩽ c → ∃y ∈ A  abs (x-y) < (h y))).
 prove   P a.
-(*->*)
+(*→*)
 intro.
 trivial +or10.
 intro.
@@ -212,45 +212,45 @@ intros.
 prove x = a.
 trivial =H0 H1 + or1.
 trivial.
-(*->*)
+(*→*)
 (*fin Pa*)
 
 prove maj ? P.
-(*->*)
+(*→*)
 intros.
 instance ?2 b.
 trivial.
-(*->*)
+(*→*)
 (* fin Maj P*)
 
-prove   \/m sup m P.
-(*->*)
+prove   ∃m sup m P.
+(*→*)
 elim axbsup.
 trivial =G.
 trivial =G0.
-(*->*)
-(*fin \/m sup m P*)
+(*→*)
+(*fin ∃m sup m P*)
 
 left G1.
 prove   I m.
-(*->*)
+(*→*)
 trivial 1.
 (* trivial trop long ! *)
-(*->*)
+(*→*)
 (*fin I m*)
 
 prove  P m.
-(*->*)
+(*→*)
 intro.
 local e = h m.
 prove e > zero.
 elim H.
 apply p14 with H0 and G2.
-lefts G3 $& $\/.
-prove m - e <= x.
+lefts G3 $∧ $∃.
+prove m - e ⩽ x.
 trivial =G2 H2 +or3.
 left H1.
-lefts H3 $& $\/.
+lefts H3 $∧ $∃.
 intro.
 instance ?3 (plus A m).
 intros.
@@ -259,7 +259,7 @@ trivial =H4 G1.
 intros.
 elim or3 with x0 and x.
 apply H5 with H8.
-lefts G4 $& $\/.
+lefts G4 $∧ $∃.
 intro 2.
 select 2.
 axiom H10.
@@ -269,19 +269,19 @@ trivial =.
 from ? < e.
 elim abs3.
 trivial =H8 G3 +or2 p3 p4 p5.
-(*->*)
+(*→*)
 (*fin P m*)
 
-prove  ~m<b.
-(*->*)
+prove  ¬m<b.
+(*→*)
 intro.
 local e = h m.
 prove e > zero.
 elim H.
-apply p12 with G3 and H1. 
-lefts G4 $& $\/.
+apply p12 with G3 and H1.
+lefts G4 $∧ $∃.
 prove P z.
-lefts G2 P $& $\/.
+lefts G2 P $∧ $∃.
 intro.
 trivial =G1 H2 H3 +or2 p3 p4 p5.
 intro.
@@ -303,30 +303,30 @@ elim abs4.
 trivial =H10 H4 +or2 p3 p4 p5.
 apply H0 with G4.
 trivial =H2 G5 +or1.
-(*->*)
-(* fin  ~m < b*)
+(*→*)
+(* fin  ¬m < b*)
 
 prove  m=b.
-(*->*)
+(*→*)
 trivial= G1 G3.
-(*->*)
+(*→*)
 (* fin m = b*)
 
 (* fin de la preuve *)
-(*->*)
+(*→*)
 unfold_hyp G2 P.
 left G2.
 axiom H2.
-(*->*)
+(*→*)
 save.
 
 def continue f =
- \/g (/\e>zero /\x (g e x) >zero & /\x in I /\e > zero /\y in I (abs (x - y) < g e x 
--> abs (f x - f y)< e)).
+ ∃g (∀e>zero ∀x (g e x) >zero ∧ ∀x ∈ I ∀e > zero ∀y ∈ I (abs (x - y) < g e x
+              → abs (f x - f y)< e)).
 
-def UC f = /\e>zero \/c>zero /\x,y in I (abs (x-y) <c -> abs (f x-f y) <e).
+def UC f = ∀e>zero ∃c>zero ∀x,y ∈ I (abs (x-y) <c → abs (f x-f y) <e).
 
-prop Heine /\f (continue f -> UC f).
+prop Heine ∀f (continue f → UC f).
 
 intro 2.
 left H.
@@ -337,15 +337,15 @@ local e1 = e/deux.
 local h x = (g e1 x) / deux.
 apply compact with h and ?.
 (* finir la preuve*)
-(*->*)
-trivial 6 =H H1 +div1. 
-lefts G $& $\/.
+(*→*)
+trivial 6 =H H1 +div1.
+lefts G $∧ $∃.
 prove Fini (Image A h).
 elim p15.
 apply p13 with G then ?.
 trivial 6 =H H1 +div1.
-lefts G0 $& $\/.
-intros $& $\/.
+lefts G0 $∧ $∃.
+intros $∧ $∃.
 axiom H5.
 intros.
 elim H4 with x and ? and ?.
@@ -381,7 +381,5 @@ elim abs5.
 elim or9.
 axiom G1.
 axiom G3.
-(*->*)
+(*→*)
 save.
-
-

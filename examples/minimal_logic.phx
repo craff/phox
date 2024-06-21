@@ -30,7 +30,7 @@ flag auto_lvl 1.
 \newcommand{\LC}{\hbox{\tt lam$_{\hbox{\tt\scriptsize cp}}$}}
 \newcommand{\AC}{\hbox{\tt app$_{\hbox{\tt\scriptsize cp}}$}}
 
-\section{Introduction} 
+\section{Introduction}
 
 The Curry-Howard isomorphism \cite{How80}
 establishes a correspondence between proofs and programs. We can
@@ -52,7 +52,7 @@ mean by a Debruijn representation an encoding of $\lambda$-terms in
 $\lambda$-calculus where a bound variable is encoded by the number of
 abstractions separating it from its binder.
 
-We establish a similar result (theorem \ref{truthreprbis}) 
+We establish a similar result (theorem \ref{truthreprbis})
 for a proof that a formula $F$ is true
 in every models, but instead of a Debruijn representation, we get a
 {\em higher-order representation}, where bound variables are encoded
@@ -63,7 +63,7 @@ the concatenation of two paths in a Kripke tree. Using functions
 allows us to use equationnal axioms which enjoy a trivial algorithmic
 contents.
 
-From this two results, we deduce (theorem \ref{main}) 
+From this two results, we deduce (theorem \ref{main})
 that any term extracted from a proof
 of the completeness theorem \ref{completeness} translates an higher-order encoding of a
 simply typed $\lambda$-term to the Debruijn encoding of a term of the same
@@ -74,7 +74,7 @@ An important point in this work is the precise choice of the
 definition to simplify as much as possible the term and get only the
 essential algorithmic meaning of the theorem. Indeed, the natural
 definition of provable and true would have had more information (all
-quantifications would have been restricted to formulas or contexts)
+quantifications would have been restricted to formulas ∨ contexts)
 inducing some noise in the extracted program.
 
 This simplification of the definitions results in a more general
@@ -88,12 +88,12 @@ logic \cite{Kri96}, with one main difference: we find a proof of the
 completeness theorem whose extracted term translates an higher-order
 encoding of any $\lambda$-term $t$ to the Debruijn encoding of the
 same term (see theorem \ref{Cextract}). We think that the same
-result is impossible for the classical logic or the intuitionnistic
-logic with the disjunction or the existential quantifier (for
+result is impossible for the classical logic ∨ the intuitionnistic
+logic with the disjunction ∨ the existential quantifier (for
 semantics similar to the usual Kripke semantics). A proof of these
 conjectures would give a concrete argument to say that the semantics
 of minimal logic is much simpler and nearer to the syntax than the
-semantics of classical logic or the Kripke semantics for the full
+semantics of classical logic ∨ the Kripke semantics for the full
 intuitionnistic logic. This let us hope that programs extraction could
 be a tool to compare the strength of similar theorems which are not
 formally related.
@@ -119,14 +119,14 @@ notations:
 \item $\forall x,y{:}A \;B$ for $\forall x (A(x) \rightarrow \forall y
 (A(y) \rightarrow B))$.
 \item $\Lambda$ is the set of all $\lambda$-terms.
-\item ${\mathcal P}_\beta(\Lambda)$ is the set of subsets of $\Lambda$ closed under
+\item ${\mathcal P}_\beta(\Lambda)$ is the set of ⊂s of $\Lambda$ closed under
 $\beta$-equivalence
 \end{itemize}
 
 We recall the following definitions and lemma from \cite{Kri90e}:
 
-\begin{defn}[Interpretation] An {\em interpretation} $\sigma$:
-is given by three mappings: 
+\begin{defn}[⋂pretation] An {\em interpretation} $\sigma$:
+is given by three mappings:
 \begin{itemize}
 \item A mapping from first order variables to $\lambda$-terms denoted $x
 \mapsto |x|^\sigma$
@@ -137,7 +137,7 @@ from $\Lambda^n$ to $\Lambda$ denoted $f
 from $\Lambda^n$ to ${\mathcal P}(\Lambda)_\beta$  denoted $X
 \mapsto |X|^\sigma$
 \end{itemize}
-As usual, we write $\sigma[x \Leftarrow t]$ or $\sigma[X
+As usual, we write $\sigma[x \Leftarrow t]$ ∨ $\sigma[X
 \Leftarrow \Phi]$ when we change the value of the mapping $\sigma$ for $x$ or
 $X$ only.
 This mapping is extended to any term and formula by:
@@ -166,7 +166,7 @@ $$ \vdash_{AF_2} t : F \hbox{ implies } t \in |F|^\sigma $$
   interpretation $\sigma$ if and only if for any first order term $v$
   and any $\lambda$-term $t$, $t \in |D(v)|^\sigma$ implies $t
   \sim_\beta |v|^\sigma$.  \end{defn}
- 
+
 \section{The formalization of minimal logic}
 *)
 
@@ -176,35 +176,35 @@ def Var = N.
 tex_syntax Var Math "{\\mathcal V}".
 
 Sort form.
-Cst Prefix [3] "var" x : nat -> form.
+Cst Prefix [3] "var" x : nat → form.
 tex_syntax $var Prefix[3] "\\overline{" ! x ! "}".
 
-Cst rInfix [4] x "|->" y : form -> form -> form.
-tex_syntax $|-> rInfix [4] x "\\Rightarrow" y.
+Cst rInfix [4] x "|→" y : form → form → form.
+tex_syntax $|→ rInfix [4] x "\\Rightarrow" y.
 
-def Form f = /\X (
-	/\x (Var x -> X (var x)) ->
-	/\g,h (X g -> X h -> X (g |-> h)) -> X f ).
+def Form f = ∀X (
+	∀x (Var x → X (var x)) →
+	∀g,h (X g → X h → X (g |→ h)) → X f ).
 tex_syntax Form Math "{\\mathcal F}".
 
 
-goal /\x:Var Form (var x). 
+goal ∀x:Var Form (var x).
 trivial. (* à remplacer ! *)
 save var.Form.
 
-goal /\f,g:Form Form (f |-> g). 
+goal ∀f,g:Form Form (f |→ g).
 trivial. (* à remplacer ! *)
 save impl.Form.
 
 new_intro -c -i var var.Form.
 new_intro -c -i impl impl.Form.
 
-goal /\X (
-	/\x:Var  X (var x) -> 
-	/\g,h:Form (X g -> X h -> X (g |-> h)) ->
-  /\f:Form X f).
+goal ∀X (
+	∀x:Var  X (var x) →
+	∀g,h:Form (X g → X h → X (g |→ h)) →
+  ∀f:Form X f).
 intros.
-prove Form f & X f.
+prove Form f ∧ X f.
 next 1.
 left G.
 elim H1.
@@ -218,7 +218,7 @@ new_elim Form rec rec.Form.
 \begin{defn}
 Let us choose an infinite countable set of variables $\[ Var \]$, one
 unary function symbol $x \mapsto \[ var x \]$ and one
-binary function symbol $\[ f |-> g \]$. We define the set of formulas as
+binary function symbol $\[ f |→ g \]$. We define the set of formulas as
 the smallest set such that\footnote{We cannot identify the formula $x$ and
 the variable $x$ if we want the proposition \ref{data} to hold}:
 $$
@@ -236,46 +236,46 @@ Import list.
 tex_syntax $:: rInfix[4] x ! "\\," ! y.
 
 
-def Prouvable C f = /\X (
-	/\f,C X (f::C) f -> 
-	/\f,g,C (X C f -> X (g::C) f) ->
-	/\f,g,C (X (f::C) g -> X C (f |-> g)) ->
-        /\f,g,C (X C (f |-> g) -> X C f -> X C g) -> 
+def Prouvable C f = ∀X (
+	∀f,C X (f::C) f →
+	∀f,g,C (X C f → X (g::C) f) →
+	∀f,g,C (X (f::C) g → X C (f |→ g)) →
+        ∀f,g,C (X C (f |→ g) → X C f → X C g) →
           X C f).
 tex_syntax Prouvable Infix[5] C "\\Vdash" f.
 
 (* les règles d'intros *)
 
-goal /\C,f Prouvable (f::C) f.
+goal ∀C,f Prouvable (f::C) f.
 trivial.
 save Axiome.
 
-goal /\C,f,g (Prouvable C f -> Prouvable (g::C) f).
+goal ∀C,f,g (Prouvable C f → Prouvable (g::C) f).
 trivial.
 save Affaiblissement.
 
-goal /\C,f,g (Prouvable (f::C) g -> Prouvable C (f |-> g)).
+goal ∀C,f,g (Prouvable (f::C) g → Prouvable C (f |→ g)).
 trivial.
 save Impl_intro.
 
-goal /\C,f,g (Prouvable C (f |-> g) -> Prouvable C f -> Prouvable C g).
+goal ∀C,f,g (Prouvable C (f |→ g) → Prouvable C f → Prouvable C g).
 trivial.
 save Impl_elim.
 
 new_intro fe Impl_elim.
-new_intro -i ax Axiome. 
-new_intro af Affaiblissement. 
-new_intro fi Impl_intro. 
+new_intro -i ax Axiome.
+new_intro af Affaiblissement.
+new_intro fi Impl_intro.
 
-goal  /\X (
-	/\f,C X (f::C) f ->            
-	/\f,g,C (Prouvable C f -> X C f -> X (g::C) f) ->
-	/\f,g,C (Prouvable (f::C) g -> X (f::C) g -> X C (f |-> g)) ->
-        /\f,g,C (Prouvable C (f |-> g) -> Prouvable C f -> 
-			X C (f |-> g) -> X C f -> X C g)
-	-> /\f,C (Prouvable C f -> X C f)).
+goal  ∀X (
+	∀f,C X (f::C) f →
+	∀f,g,C (Prouvable C f → X C f → X (g::C) f) →
+	∀f,g,C (Prouvable (f::C) g → X (f::C) g → X C (f |→ g)) →
+        ∀f,g,C (Prouvable C (f |→ g) → Prouvable C f →
+			X C (f |→ g) → X C f → X C g)
+	→ ∀f,C (Prouvable C f → X C f)).
 intros.
-prove Prouvable C f & X C f.
+prove Prouvable C f ∧ X C f.
 elim H3.
 trivial.
 trivial.
@@ -296,13 +296,13 @@ $$List D l \] $$
 \end{defn}
 
 \begin{thm}\label{data}
-The predicates $\[ Form \]$ and 
+The predicates $\[ Form \]$ and
 $\[ List Form  \]$ are data-types (definition \ref{datadef}) for an interpretation $\sigma$ if the
 following holds:
 \begin{itemize}
 \item The predicate  $\[ Var \]$ defining variables is a data-type for $\sigma$
 \item $| \[ var x \] |^\sigma \sim_\beta \lambda a \lambda b (a\, |x|^\sigma)$
-\item $| \[ f |-> g \] |^\sigma \sim_\beta \lambda a \lambda b (b\, |f|^\sigma
+\item $| \[ f |→ g \] |^\sigma \sim_\beta \lambda a \lambda b (b\, |f|^\sigma
 \,|g|^\sigma)$
 \item $| \[ nil \] |^\sigma \sim_\beta \lambda a \lambda b\,a$
 \item $| \[ x::l \] |^\sigma \sim_\beta \lambda a \lambda b (b\, |x|^\sigma\,
@@ -311,7 +311,7 @@ following holds:
 \end{thm}
 
 \begin{proof}
-The proofs for lists and trees can be found in \cite{Kri90e} and the proof for 
+The proofs for lists and trees can be found in \cite{Kri90e} and the proof for
 formulas is identical to the proof for trees. \qed
 \end{proof}
 
@@ -320,7 +320,7 @@ We define the provability as the smallest binary relation \[ Prouvable
 \] such that:
 $$
 \begin{array}{ll}
-\[ /\C,f {{ Prouvable (f::C) f }} \] & \text{(axiom)} \cr
+\[ ∀C,f {{ Prouvable (f::C) f }} \] & \text{(axiom)} \cr
 \[ $$Affaiblissement \] & \text{(weakening)} \cr
 \[ $$Impl_intro \] & \text{(implication introduction)} \cr
 \[ $$Impl_elim \] & \text{(implication elimination)} \cr
@@ -333,14 +333,14 @@ $$
 \end{defn}
 
 One should note that with this definition, \[ Prouvable C f \] does
-not imply that $\[ C \]$ is a list of formulas or $\[ f \]$ is a
+not imply that $\[ C \]$ is a list of formulas ∨ $\[ f \]$ is a
 formula. We could add more conditions in the definition, but the
 $\lambda$-term extracted from a proof of $\[ Prouvable C f \]$ will
 then be more complex.
 
 \begin{defn}
 We say that a $\lambda$-term $t$ is an internal Debruijn
-representation of a closed 
+representation of a closed
 term $u$ if $t = \lambda z \lambda s \lambda l
 \lambda a\,t'$ and $||t'||_{\emptyset} = u$ where $||t'||_c$ is the partial
 function taking as arguments a term and a list of variables and defined by
@@ -351,7 +351,7 @@ function taking as arguments a term and a list of variables and defined by
 \item $||(a\,t_1\,t_2)||_c = (||t_1||_c\,||t_2||_c)$.
 \end{itemize}
 Formally, the definition of $||t'||_c$ depends on the choice of the
-variables $z,s,l,a$ but we omit these parameters in the notation.  
+variables $z,s,l,a$ but we omit these parameters in the notation.
 \end{defn}
 
 You may notice that the internal Debruijn representations of a term $u$
@@ -361,12 +361,12 @@ variable level). For instance, $\lambda z \lambda s \lambda l \lambda
 a\,(l\,(l\,(s\,(a\,z\,z))))$ and $\lambda z \lambda s \lambda l \lambda
 a\,(l\,(l\,(a\,(s\,z)(s,z))))$ are two internal Debruijn representations for
 the term $\lambda x \lambda y (x\,x)$.
- 
+
 \begin{thm}\label{prvrepr}
 For any term $t$ and any formula $f$, if $\vdash_{AF_2} t
-: (\[ Prouvable nil f \])$ then $t$ is $\beta$-equivalent to an 
+: (\[ Prouvable nil f \])$ then $t$ is $\beta$-equivalent to an
 internal Debruijn representation of a closed $\lambda$-term $u$ such that
-$\vdash_{S} u : \[ f \]$.  
+$\vdash_{S} u : \[ f \]$.
 \end{thm}
 
 This theorem means that a term $t$ extracted form a proof, in
@@ -380,7 +380,7 @@ for any interpretation $\sigma$ we have $t \in |\[ Prouvable nil f
 \] |^\sigma$.
 
 We choose an interpretation $\sigma$ such that for any first-order
-terms $\phi$ and $\phi'$ designing formulas or lists of formulas, we have
+terms $\phi$ and $\phi'$ designing formulas ∨ lists of formulas, we have
 $|\phi|^\sigma \sim_\beta |\phi'|^\sigma$ implies $\phi = \phi'$ (i). Such an
 interpretation exists, we just need to choose $\sigma$ such that the
 type of formulas and lists of formulas are data-types using
@@ -390,15 +390,15 @@ We choose four $\lambda$-variables $z,s,a,l$ not free in $t$ and we
 define, for any $\lambda$-terms $t,t'$, $\Phi(t,t')$ the
 smallest sets closed under
 $\beta$-equivalence such that:
-\begin{itemize} 
+\begin{itemize}
 \item $z \in \Phi(|\[ fC\] |^\sigma, |\[ f\] |^\sigma)$
-\item $(s\,t_1) \in \Phi(|\[ gC\] |^\sigma, |\[ f\] |^\sigma)$ 
+\item $(s\,t_1) \in \Phi(|\[ gC\] |^\sigma, |\[ f\] |^\sigma)$
         if $t_1 \in \Phi(|\[ C\] |^\sigma, |\[ f\] |^\sigma)$
-\item $(l\,t_1) \in \Phi(|\[ C\] |^\sigma, |\[ f |-> g \] |^\sigma)$ 
+\item $(l\,t_1) \in \Phi(|\[ C\] |^\sigma, |\[ f |→ g \] |^\sigma)$
         if $t_1 \in \Phi(|\[ fC\] |^\sigma, |\[ g\] |^\sigma)$
-\item $(a\,t_1\,t_2) \in \Phi(|\[ C\] |^\sigma, |\[ g\] |^\sigma)$ 
+\item $(a\,t_1\,t_2) \in \Phi(|\[ C\] |^\sigma, |\[ g\] |^\sigma)$
         if $t_1 \in \Phi(|\[ C\] |^\sigma, |\[ f\] |^\sigma)$
-        and $t_2 \in \Phi(|\[ C\] |^\sigma, |\[ f |-> g\] |^\sigma)$
+        and $t_2 \in \Phi(|\[ C\] |^\sigma, |\[ f |→ g\] |^\sigma)$
 \end{itemize}
 
 We first show, by induction on the definition of $\Phi$, that  $t_1
@@ -408,13 +408,13 @@ $x_1 : f_1,\dots, x_n:f_n \vdash_S ||t_1||_l : f$ (ii).  Each case in the
 induction is immediate using the property (i) and the definition of
 $\Phi$ and $||t_1||_l$.
 
-Then we define the interpretation $\sigma' = \sigma[X/\Phi]$ and 
+Then we define the interpretation $\sigma' = \sigma[X∀Phi]$ and
 we prove the following properties:
 \begin{itemize}
-\item $z \in |\[/\f,C X (f::C) f\] |^{\sigma'}$
-\item $s \in |\[/\f,g,C (X C f -> X (g::C) f)\] |^{\sigma'}$
-\item $l \in |\[/\f,g,C (X (f::C) g -> X C (f |-> g))\] |^{\sigma'}$
-\item $a \in |\[/\f,g,C (X C (f |-> g) -> X C f -> X C g)\] |^{\sigma'}$
+\item $z \in |\[∀f,C X (f::C) f\] |^{\sigma'}$
+\item $s \in |\[∀f,g,C (X C f → X (g::C) f)\] |^{\sigma'}$
+\item $l \in |\[∀f,g,C (X (f::C) g → X C (f |→ g))\] |^{\sigma'}$
+\item $a \in |\[∀f,g,C (X C (f |→ g) → X C f → X C g)\] |^{\sigma'}$
 \end{itemize}
 This is immediate: when we apply the definition of the interpretation,
 each condition corresponds to one of the condition in the definition of
@@ -436,27 +436,27 @@ representation of a term $u$ ($u = ||t'||_\emptyset$) with $\vdash_S u
 *)
 
 
-def M0 h = /\p,q,r (h p (h q r) = h (h p q) r).
-def M1 h e = /\p (h e p = p).
-def M2 h M = 
-    /\f,g,p (/\q(/\r M (h r (h q p)) f -> M (h q p) g) -> M p (f |-> g)).
-def M3 M = 
-    /\f,g,p (M p (f |-> g) -> M p f -> M p g).
+def M0 h = ∀p,q,r (h p (h q r) = h (h p q) r).
+def M1 h e = ∀p (h e p = p).
+def M2 h M =
+    ∀f,g,p (∀q(∀r M (h r (h q p)) f → M (h q p) g) → M p (f |→ g)).
+def M3 M =
+    ∀f,g,p (M p (f |→ g) → M p f → M p g).
 
-def Truth M o e f = M0 o -> M1 o e -> M2 o M -> M3 M -> /\p M p f.
+def Truth M o e f = M0 o → M1 o e → M2 o M → M3 M → ∀p M p f.
 
-Cst h : 'a -> 'a -> 'a.
-tex_syntax h Infix[4] x "\\circ" y. 
-  
+Cst h : 'a → 'a → 'a.
+tex_syntax h Infix[4] x "\\circ" y.
+
 (*! math
 \begin{defn}
 A model is given by a binary operation \[ h \] , a constant \[ e \] , and a
 predicate \[ M \] satisfying the following conditions:
 \begin{itemize}
-\item $\[ M0 h \] = \[ $$M0 h \]$ \hspace{7mm}(\[ h \] is associative) 
-\item $\[ M1 h e\] = \[ $$M1 h e\]$ 
-\item $\[ M2 h M \] = {\textwidth=10cm \[[ $$M2 h M \]] }$ 
-\item $\[ M3 M \] = \[ $$M3 M \]$ 
+\item $\[ M0 h \] = \[ $$M0 h \]$ \hspace{7mm}(\[ h \] is associative)
+\item $\[ M1 h e\] = \[ $$M1 h e\]$
+\item $\[ M2 h M \] = {\textwidth=10cm \[[ $$M2 h M \]] }$
+\item $\[ M3 M \] = \[ $$M3 M \]$
 \end{itemize}
 \end{defn}
 
@@ -468,7 +468,7 @@ to the usual one. We just replace $p > q$ by \[ p = h r q \].
 The only difference is that we do not require the
 truth to increase when we climb in the tree. Instead, in $\[ M2 \]$, we
 check that the formula is true at every point above $\[ h q p \]$.
-The truth of $\[ f \]$ at $\[ p \]$ is not $\[ M p f \]$ but $\[ /\q M (h q
+The truth of $\[ f \]$ at $\[ p \]$ is not $\[ M p f \]$ but $\[ ∀q M (h q
 p) f \]$.
 
 *)
@@ -480,7 +480,7 @@ del h.
 \begin{defn}
 The truth can be defined as being true in every model. This is
 formalized by the following predicate:
-$$ 
+$$
 \[ Truth M o e f \] = {\textwidth=10.7cm \[[ $$Truth M o e f \]] }
 $$
 \end{defn}
@@ -488,7 +488,7 @@ $$
 \begin{defn}
 We say that a $\lambda$-term $t$ is an higher-order
 representation of a term $u$ if $t$ is closed, $t =
- \lambda l \lambda a\,t'$ and 
+ \lambda l \lambda a\,t'$ and
 $||t'|| = u$ where $||t'||$ is the partial
 function taking a term as argument and defined by:
 \begin{itemize}
@@ -499,15 +499,15 @@ start with $\lambda$ and $x$ not free in $t_1$.
 \item $||(a\,t_1\,t_2)|| = (||t_1||\,||t_2||)$.
 \end{itemize}
 This definition is well founded, because the number of occurrences of
-$l$ or $a$ decreases in each recursive call.
+$l$ ∨ $a$ decreases in each recursive call.
 Formally, $||t'||$ depends on the choice of the variables $l$ and $a$
-but we omit these parameters in the notation.  
+but we omit these parameters in the notation.
 \end{defn}
 
 
 We need the two cases for $l$, because we can extract terms
 containing sub-terms of the form $(l\,(a,t)) \sim_\eta (l\,\lambda x (a\,t\,
-x))$ from proofs of $\[ Truth M o e f \]$. 
+x))$ from proofs of $\[ Truth M o e f \]$.
 
 \begin{prop}\label{truthrepr}
 For any term $t$ and any formula $f$, if $\vdash_{AF_2} t
@@ -523,11 +523,11 @@ theorem that also states that $u$ is of type $f$ will be given later
 (theorem \ref{truthreprbis}).
 
 \begin{proof}
-Let us call \[ T \] the follwing formula: 
-$$ \[ T \] = {\textwidth=10.7cm \[[ /\M (/\X (X -> X) -> /\X (X -> X) -> ((M -> M) -> M) -> (M -> M ->
-M) -> M)\]] }$$
+Let us call \[ T \] the follwing formula:
+$$ \[ T \] = {\textwidth=10.7cm \[[ ∀M (∀X (X → X) → ∀X (X → X) → ((M → M) → M) → (M → M →
+M) → M)\]] }$$
 This formula is obtained from \[ Truth M o e f \] by erasing all
-first-order information. 
+first-order information.
 
 We choose $t$ such that $\vdash_{AF_2} t : \[ Truth M o e f
 \]$. Therefore, we have $\vdash_{AF_2} t : \[ T \]$ and using the
@@ -540,18 +540,18 @@ not free in $t$.
 We define $\Phi$ the
 smallest set closed under
 $\beta$-equivalence such that:
-\begin{itemize} 
+\begin{itemize}
 \item $x_{n} \in \Phi$ for all $n \in \[ N \]$
-\item $(l\,t_1) \in \Phi$ 
-        if $\forall n \in \[ N \] \, (t_1\,x_n) \in \Phi$ 
-\item $(a\,t_1\,t_2) \in \Phi$ 
+\item $(l\,t_1) \in \Phi$
+        if $\forall n \in \[ N \] \, (t_1\,x_n) \in \Phi$
+\item $(a\,t_1\,t_2) \in \Phi$
         if $t_1 \in \Phi$
         and $t_2 \in \Phi$
 \end{itemize}
 
-We show, by induction on the definition of $\Phi$, that 
-$t \in \Phi$ and $t$ normal imply 
-that $||t||$ is defined (i) and the free variables of 
+We show, by induction on the definition of $\Phi$, that
+$t \in \Phi$ and $t$ normal imply
+that $||t||$ is defined (i) and the free variables of
 $||t||$ are among $\\{a,b\} \cup \\{x_{n}\}_{n \in \[ N \] }$ (ii).
 The only non trivial case is when $t = (l\,t_1)$. Then we choose  $x_n$ not
 free in $t_1$ and and we distinguish two
@@ -561,7 +561,7 @@ cases:
 $\Phi$). By induction hypothesis, we get $||(t_1\,x_n)||$ defined and
 (ii) for $(t_1\,x_n)$. Therefore $||(l\,t_1)|| = \lambda x_n\,||(t_1\,x_n)||$ is defined and
 $(l\,t_1)$ satisfies (ii).
-\item If $t_1 = \lambda x\,t_2$ then 
+\item If $t_1 = \lambda x\,t_2$ then
 $t_2[x/x_n]$ is normal and $t_2[x/x_n] \in \Phi$. Thus by induction
 hypothesis, we get $||t_2[x/x_n]||$ defined and
 (ii) for $t_2[x/x_n]$. Therefore $||(l\,t_1)|| = \lambda x\,||t_2|| =
@@ -570,10 +570,10 @@ hypothesis, we get $||t_2[x/x_n]||$ defined and
 $(l\,t_1)$ satisfies (ii).
 \end{itemize}
 
-We define the interpretation $\sigma' = \sigma[M/\Phi]$ and we prove
+We define the interpretation $\sigma' = \sigma[M∀Phi]$ and we prove
 the following properties: \begin{itemize} \item $\lambda x\,x \in
-|\[/\X(X -> X)\] |^{\sigma'}$ \item $l \in |\[(M -> M) -> M\]
-|^{\sigma'}$ \item $a \in |\[M -> M -> M\] |^{\sigma'}$ \end{itemize}
+|\[∀X(X → X)\] |^{\sigma'}$ \item $l \in |\[(M → M) → M\]
+|^{\sigma'}$ \item $a \in |\[M → M → M\] |^{\sigma'}$ \end{itemize}
 The first condition is trivial and the last one uses the third case in
 the definition of $\Phi$. For the second one, we choose $v \in \Phi
 \rightarrow \Phi$ and we must prove $(l\,v) \in \Phi$. For any $n \in
@@ -594,10 +594,10 @@ $||t'||$. \qed \end{proof}
 
 *)
 
-goal /\f (Prouvable nil f -> /\M,o,e Truth M o e f).
+goal ∀f (Prouvable nil f → ∀M,o,e Truth M o e f).
 (*! math
 \begin{thm}[Correctness of the semantics]\label{correctness}
-$$ \[ $0 \] $$ 
+$$ \[ $0 \] $$
 \end{thm}
 
 \begin{proof} Together with the proof, we give the extracted term.
@@ -611,7 +611,7 @@ unfold_hyp H0 M0.
 We assume $\[ $$H \]$ and we choose an arbitrary model defined by \[ o
 \] , \[ e \] , \[ M \]. We must prove \[ $0 \].
 *)
-local M_L p C = /\q List \f (M (o q p) f) C.
+local M_L p C = ∀q List λf (M (o q p) f) C.
 (*! math
 We define the following predicate:
 $$ \[  M_L p C \] = \[ $$M_L p C \] $$
@@ -619,11 +619,11 @@ $$ \[  M_L p C \] = \[ $$M_L p C \] $$
 above p.
 *)
 (* lemme *)
-prove -head /\p,f,c (M_L p (f::c) -> /\q M (o q p) f).
+prove -head ∀p,f,c (M_L p (f::c) → ∀q M (o q p) f).
 intros.
 elim H4 with [case] ;; trivial.
 (* lemme *)
-prove -tail /\p,f,c (M_L p (f::c) -> M_L p c).
+prove -tail ∀p,f,c (M_L p (f::c) → M_L p c).
 intros.
 intro.
 elim H4 with [case] ;; trivial.
@@ -636,23 +636,23 @@ We easily prove the following lemmas about \[ M_L \] :
 \end{enumerate}
 The term $\Car$ and $\Cdr$ extracted respectively from (1) and (2)
 implement the usual destructors for lists (this is an easy consequence
-of the proposition \ref{data} and the adequation lemma). 
-*) 
+of the proposition \ref{data} and the adequation lemma).
+*)
 (* debut de la preuve: on généralise: *)
 (*! math
-Now to do the induction, we substitute the following predicate  
+Now to do the induction, we substitute the following predicate
 to the variable $X$ in $\[ $$ H \]$:
-$$\[ \C \f /\p (M_L p C -> /\q M (h q p) f) \]$$
+$$\[ λC λf ∀p (M_L p C → ∀q M (h q p) f) \]$$
 Therefore, we will get the expected conclusion \[ $0 \] if we prove the
 following properties:
 \begin{itemize}
 *)
-prove /\p (M_L p nil -> /\q M (o q p) f).
-(* 
-On ne veut pas utiliser rec.Prouvable 
+prove ∀p (M_L p nil → ∀q M (o q p) f).
+(*
+On ne veut pas utiliser rec.Prouvable
 	(pour obtenir un terme extrait plus court !
 On ouvre donc la définition a la main !
-*) 
+*)
 unfold_hyp H Prouvable.
 (*
 et on fait l'induction !
@@ -663,7 +663,7 @@ elim H.
 *)
 (* cas de l'axiome *)
 intros.
-elim -4 H4 head. 
+elim -4 H4 head.
 (* cas affaiblissement *)
 (*! math
 \item {\textwidth=11cm $\[[ $0 \]]$} which is immediate using (2).
@@ -671,7 +671,7 @@ The extracted term is $\CW = \lambda u \lambda c (u\,(\Cdr\,c))$.
 *)
 intros.
 elim H4.
-elim -4 H5 tail. 
+elim -4 H5 tail.
 (* cas de l'impl_introduction *)
 (*! math
 \item {\textwidth=11cm $\[[ $0 \]]$}
@@ -689,7 +689,7 @@ elim H6.
 elim H5.
 (* cas de l'impl_élimination *)
 (*! math
-\item {\textwidth=11cm $\[[ $0 \]]$} 
+\item {\textwidth=11cm $\[[ $0 \]]$}
 which is easy using \[ $$H0 \] , \[ $$H1 \] and $a : \[ $$H3 \]$.
 The extracted term is $\CA[a] = \lambda u \lambda v \lambda c (a\,(u\,c)\,(v\,c))$.
 *)
@@ -704,27 +704,27 @@ elim H6.
 elim G.
 (*! math
 \item \[ $0 \] which is trivial.
-The extracted term is $\Nil = \lambda x \lambda f\,x$. 
+The extracted term is $\Nil = \lambda x \lambda f\,x$.
 *)
 intro.
 intro.
 save Correcte.
 (*!math
-\end{itemize} 
+\end{itemize}
 The term extracted from the all proof is
 $$\CP = \lambda t \lambda e_1 \lambda e_2 \lambda l \lambda a (t \;\Car \;\CW \;\CL[l] \;\CA[a] \;\Nil)$$
 \end{proof}
 
 \begin{lem}
-We define $\sigma = [z/\Car,s/\CW,l/\CL[l],a/\CA[a]]$ and, for $c =
-x_n\dots x_1$, $\overline{c} = 
+We define $\sigma = [z∀Car,s∀CW,l∀CL[l],a∀CA[a]]$ and, for $c =
+x_n\dots x_1$, $\overline{c} =
 \lambda a \lambda f (f\,x_n\,(f\,x_{n-1}\,\dots(f\,x_1\,a)\dots))$.  We have $||t'||_c
 = u$ implies that $t''$ the normal form of $(t'\sigma)\overline{c}$
 exists and $||t''|| = u$.
 \end{lem}
 
 \begin{proof}
-We prove this by induction on the term $t'$. By definition of 
+We prove this by induction on the term $t'$. By definition of
  $||t'||_c$, we are in one of the following cases:
 \begin{itemize}
 \item If $t' = z$ then $(t'\sigma\,\overline{c}) \sim_\beta
@@ -741,7 +741,7 @@ which gives what we want using the induction hypothesis.
 ||t'_1||_{xc}$
 and the induction hypothesis gives $(t'_1\sigma\,(\hbox{\it Cons}\,x\,\overline{c})) \sim_\beta
 t''_1$ normal
-with $||t''_1|| = ||t'_1||_{xc}$. 
+with $||t''_1|| = ||t'_1||_{xc}$.
 Then, we take $t'' = (l\,\lambda x\,t''_1)$ and we get
 what we expected.
 \item If $t' = (a\,t'_1\,t'_2)$ then  $(t'\sigma\,\overline{c}) \sim_\beta
@@ -750,14 +750,14 @@ what we expected.
 We have $||t'||_c = (||t'_1||_c)||t'_2||_c$
 and the induction hypothesis gives $(t'_1\sigma)c \sim_\beta
 t''_1$ normal
-with $||t''_1|| = ||t'_1||_c$ and the same for $t'_2$. 
+with $||t''_1|| = ||t'_1||_c$ and the same for $t'_2$.
 We take $t'' = (a\,t''_1\,t''_2)$ and we get
 what we wanted. \qed
 \end{itemize}
 \end{proof}
 
 
-\begin{thm}\label{extractone} 
+\begin{thm}\label{extractone}
 If $t$ is $\beta$-quivalent to
 an internal Debruijn representation of a term $u$ then $(\CP\,t)$ is
 $\beta$-equivalent to an higher-order representation of $u$.
@@ -784,18 +784,18 @@ Before proving the completeness of our semantics, we need a few
 definition and axioms:
 *)
 
-def UList l = /\X (X nil -> /\a,l' (X l' -> X (a::l')) -> X l).
+def UList l = ∀X (X nil → ∀a,l' (X l' → X (a::l')) → X l).
 tex_syntax UList Math "\\rm I\\hspace{-0.2em}L".
 
 (*! math
 \begin{defn}
-We define the type of untyped list by 
+We define the type of untyped list by
 $$ \[ UList l \] = \[ $$UList l \] $$
 \end{defn}
 
 \begin{lem}\label{UList}
 If $\vdash_{AF2} t : \[ UList l \] $ then $t$ is $\beta$-equivalent to
-the church numeral $\overline{n} = \lambda x \lambda f (f^n\,x)$ where $n$ 
+the church numeral $\overline{n} = \lambda x \lambda f (f^n\,x)$ where $n$
 is the length of the list $l$.
 \end{lem}
 
@@ -810,22 +810,22 @@ numeral itself (see \cite{Kri90e}). \qed
 définition d'une fonction sur les listes:
 *)
 
-claim append.associative.untyped /\l,l',l'' (l @ (l' @ l'') = (l @ l') @ l''). 
+claim append.associative.untyped ∀l,l',l'' (l @ (l' @ l'') = (l @ l') @ l'').
 new_equation append.associative.untyped.
 
-claim append.nil_right.untyped /\l (l @ nil = l). 
+claim append.nil_right.untyped ∀l (l @ nil = l).
 new_equation append.nil_right.untyped.
 
-claim append.nil_left.untyped /\l (nil @ l = l). 
+claim append.nil_left.untyped ∀l (nil @ l = l).
 new_equation append.nil_left.untyped.
 
-claim append.cons.untyped /\a,l,l' (a:: l @ l' = a:: (l @ l')). 
+claim append.cons.untyped ∀a,l,l' (a:: l @ l' = a:: (l @ l')).
 new_equation append.cons.untyped.
 
-Cst tail_total : list['a] -> list['a].
+Cst tail_total : list['a] → list['a].
 claim tail_total0 tail_total nil = nil.
-claim tail_total1 /\a tail_total (a:: nil) = nil.
-claim tail_total2 /\l,l',a tail_total (l@(a::l')) = l@tail_total(a::l').
+claim tail_total1 ∀a tail_total (a:: nil) = nil.
+claim tail_total2 ∀l,l',a tail_total (l@(a::l')) = l@tail_total(a::l').
 new_equation tail_total0.
 new_equation tail_total1.
 new_equation tail_total2.
@@ -845,7 +845,7 @@ We then assume the following axioms:
 \item \[ $$append.cons.untyped \]
 \item \[ $$append.nil_left.untyped \]
 \item \[ $$append.nil_right.untyped \]
-\item \[ /\l,l',l'' (l @ {{l' @ l''}} = (l @ l') @ l'') \]
+\item \[ ∀l,l',l'' (l @ {{l' @ l''}} = (l @ l') @ l'') \]
 \item \[ $$tail_total0 \]
 \item \[ $$tail_total1 \]
 \item \[ $$tail_total2 \]
@@ -871,16 +871,16 @@ goal UList nil.
 trivial.
 save nil.UList.
 
-goal /\a,l (UList l -> UList (a::l)).
+goal ∀a,l (UList l → UList (a::l)).
 trivial.
 save cons.UList.
 
 new_intro -i nil nil.UList.
 new_intro -i cons cons.UList.
 
-goal  /\X (X nil -> /\a/\l':UList (X l' -> X (a::l')) -> /\l:UList X l).
+goal  ∀X (X nil → ∀a∀l':UList (X l' → X (a::l')) → ∀l:UList X l).
 intros.
-prove UList l & $0.
+prove UList l ∧ $0.
 elim H1.
 trivial.
 trivial.
@@ -888,18 +888,18 @@ trivial.
 save rec.UList.
 new_elim UList rec rec.UList.
 
-goal /\l:UList (l = nil or \/a\/l':UList l = a::l').
+goal ∀l:UList (l = nil ∨ ∃a∃l':UList l = a::l').
 trivial.
 save case.UList.
 new_elim -n UList case case.UList.
 
-goal /\l (UList l -> UList (tail_total l)).
+goal ∀l (UList l → UList (tail_total l)).
 intros.
 elim H.
 trivial.
 elim -1 [case] H0.
 trivial.
-lefts H2 $\/ $&.
+lefts H2 $∃ $∧.
 from UList (tail_total (a::nil @  l')).
 rewrite tail_total2.
 rewrite append.lcons.List append.lnil.List .
@@ -909,16 +909,16 @@ save tail_total.total.
 new_intro -t tail_total tail_total.total.
 tex_syntax tail_total.total "(i)".
 
-goal /\l,a (UList (l@ a::nil) -> UList l).
+goal ∀l,a (UList (l@ a::nil) → UList l).
 intros.
 from UList (tail_total (l@ a::nil)).
 intro.
 save lemma1.
 tex_syntax lemma1 "(ii)".
 
-goal /\l1,l2 (UList (l2@l1) -> UList l1 -> UList l2).
+goal ∀l1,l2 (UList (l2@l1) → UList l1 → UList l2).
 intros.
-prove /\l2 (UList (l2 @ l1) -> UList l2).
+prove ∀l2 (UList (l2 @ l1) → UList l2).
 elim H0.
 trivial.
 intros.
@@ -945,7 +945,7 @@ structure of the list \[ l1 \] using (i) for the cons case. \qed
 \begin{lem} \label{subext}
 If $t$ is a term extracted from a proof of lemma \ref{sublem}
 then $t$ computes the subtraction of two Church integers (when the
-first argument is greater or equal to the second one). 
+first argument is greater ∨ equal to the second one).
 \end{lem}
 
 \begin{proof}
@@ -953,10 +953,10 @@ This is an immediate consequence of the lemma \ref{UList}. \qed
 \end{proof}
 *)
 
-goal /\f (/\M/\o/\e:<list[form] Truth M o e f -> Prouvable nil f).
+goal ∀f (∀M∀o∀e:<list[form] Truth M o e f → Prouvable nil f).
 (*! math
 \begin{thm}\label{completeness}
-The semantics is complete: 
+The semantics is complete:
 $$ \[ $0 \] $$
 \end{thm}
 
@@ -970,20 +970,20 @@ intros.
 Using the definition of \[ Prouvable \] , we prove \[ $0 \] using
 the following hypothesis:
 \begin{enumerate}
-\item $x : \[$$H \]$ 
-\item $z : \[$$H0\]$ 
+\item $x : \[$$H \]$
+\item $z : \[$$H0\]$
 \item $s : \[$$H1\]$
 \item $l : \[$$H2\]$
 \item $a : \[$$H3\]$
 \end{enumerate}
 We replace \[ o \] by the concatenation of lists,
-$e$ by \[ nil \] and \[ M \] by \[ \C,f (UList C -> X C f) \] in (1).
+$e$ by \[ nil \] and \[ M \] by \[ λC,f (UList C → X C f) \] in (1).
 This means that we consider the model whose points are contexts and
 where \[ X \] defines the truth.
-Thus we have to prove the following: 
+Thus we have to prove the following:
 \begin{itemize}
 *)
-elim -2 $@ -3 nil -1 \C,f (UList C -> X C f) H.
+elim -2 $@ -3 nil -1 λC,f (UList C → X C f) H.
 (*! math
 \item \[ $0 \] and \[1 $0 \] are among the axioms we assumed. We can
 always consider that $\Idt = \lambda x\,x$ is the algorithmic content of
@@ -995,7 +995,7 @@ trivial.
 \item To prove \[ $0 \] , we assume
 *)
 intros.
-(*! math 
+(*! math
 \begin{itemize}
 \item $f : {\textwidth=10cm \[[ $$H4 \]] }$ (i)
 \item $n : \[ $$H5 \]$ (ii)
@@ -1024,18 +1024,18 @@ Using lemma\ref{sublem}, $n : \[ $$H5 \]$ and $p : \[ $$H6 \]$, we get $(\Sub\,p
 $$G \]$ ($\Succ$ is
 a term computing the successor of a Church numeral and by lemma \ref{subext}, $\Sub$
 is a term computing the subtraction of two Church numerals).
-*)  
+*)
 unfold_hyp G UList.
-(*! math 
+(*! math
 Then we prove \[ $0 \] by induction on \[ r \].
 *)
 elim G.
-(*! math 
+(*! math
  For the nil case, we get \[ $0 \] using our equational axioms and (2).
 *)
 elim H0.
 intro 2.
-(*! math 
+(*! math
  For the cons case, we get \[ $0 \] using
  (3). The term extracted from this sub-proof is
 $$\LC[l] = \lambda f \lambda n\,(l\;(f\;(\lambda p\,(\Sub\;p\;(\Succ\,n)\;z\;s))\;(\Succ\,n)))$$
@@ -1057,24 +1057,24 @@ intro.
 (*! math
 \end{itemize}
 The term extracted from the all proof is
-$$\PC = \lambda k \lambda z \lambda s \lambda l \lambda a (k \;\Idt \;\Idt \;\LC[l] \;\AC[a] \;\Nil)$$ 
+$$\PC = \lambda k \lambda z \lambda s \lambda l \lambda a (k \;\Idt \;\Idt \;\LC[l] \;\AC[a] \;\Nil)$$
 \end{proof}
 *)
 save Complete.
 
 (*! math
 \begin{lem}\label{ess}
-We define $\sigma_n =  [l/\LC[l],a/\AC[a],x_1/\KK[\overline{1}],\dots,x_n/\KK[\overline{n}]]$ 
-where $\KK[q] = \lambda p (\Sub\,p\,q\,z\,s)$. 
+We define $\sigma_n =  [l∀LC[l],a∀AC[a],x_1∀KK[\overline{1}],\dots,x_n∀KK[\overline{n}]]$
+where $\KK[q] = \lambda p (\Sub\,p\,q\,z\,s)$.
 If $||t'|| = u$ where
 $x_1,\dots x_n$ are distinct and are the free variables of $u$,  then
 $||t''||_{x_n\dots x_1} = u$ with
-$t''$ the 
+$t''$ the
 normal form of $(t'\sigma_n)\overline{n}$.
 \end{lem}
 
-\begin{proof} 
-We first notice that 
+\begin{proof}
+We first notice that
 $$(\LC[l]\,v\,\overline{q}) \sim_\beta (l\,(v\,\KK[\overline{q+1}]\,\overline{q+1})) \;\;\;\; (i)$$
 Then we prove the result by induction on $u$:
 \begin{itemize}
@@ -1084,19 +1084,19 @@ get what we wanted by an easy induction on $n-q$.
 \item If $u = \lambda x_{n+1}\,u_1$, then
 $t' = (l\,\lambda x_{n+1}\,t'_1)$ with $||t'_1|| = u_1$.
 Using (i), we find $(t'\sigma_n\,\overline{n}) \sim_{\beta}
-(\LC[l]\,(\lambda x_{n+1} t'_1\sigma_n)\,\overline{n}) 
+(\LC[l]\,(\lambda x_{n+1} t'_1\sigma_n)\,\overline{n})
 \sim_{\beta}
 (l\,t'_1\sigma_{n+1}\,\overline{n+1})
-\sim_{\beta} (l\,t''_1) = t''$ 
+\sim_{\beta} (l\,t''_1) = t''$
 where $t''_1$ is the normal form of
 $(t'_1\sigma_{n+1})\overline{n+1}$.
  Using the induction hypothesis,
 we find $||t''||_{x_{n}\dots x_1} =
 \lambda x_{n+1} ||t''_1||_{x_{n+1}\dots x_1} =
 \lambda x_{n+1} u_1 = u$ which is what we wanted.
-\item If $u = (u_1\,u_2)$,  then 
-$t' = (a\,t'_1\,t'_2)$. We have 
-$(t'\sigma_n\,\overline{n}) \sim_{\beta} (\AC[a]\,t'_1\,t'_2\,\overline{n}) \sim_{\beta} 
+\item If $u = (u_1\,u_2)$,  then
+$t' = (a\,t'_1\,t'_2)$. We have
+$(t'\sigma_n\,\overline{n}) \sim_{\beta} (\AC[a]\,t'_1\,t'_2\,\overline{n}) \sim_{\beta}
 (a\,(t'_1\sigma_n\,\overline{n})\,(t'_2\sigma_n\,\overline{n}))$ and we
 easily get the expected result using the induction hypothesis and the
 definition of $||t''||_{x_{n}\dots x_1}$. \qed
@@ -1107,13 +1107,13 @@ definition of $||t''||_{x_{n}\dots x_1}$. \qed
 \begin{prop}\label{Cextract}
 If $(t\,\Idt\,\Idt)$ is $\beta$-equivalent an higher-order representation of a term $u$ then $(\PC\,t)$
 is $\beta$-equivalent to an internal
-Debruijn representation $t''$ of $u$. 
+Debruijn representation $t''$ of $u$.
 \end{prop}
 
 \begin{proof}
 By definition, we have $(t\,\Idt\,\Idt) \sim_{\beta} \lambda l \lambda a t'$
-with $||t'|| = u$. 
-We have $(\PC\,t) \sim_{\beta} (t'[l/\LC[l],a/\AC[a]]\,\Nil) =
+with $||t'|| = u$.
+We have $(\PC\,t) \sim_{\beta} (t'[l∀LC[l],a∀AC[a]]\,\Nil) =
 (t'\sigma_0\,\Nil)$.
 Using the previous lemma, we find $(\PC\,t) \sim_{\beta} t''$ with $||t''||_\emptyset = u$
 which means that $(\PC\,t)$ is $\beta$-equivalent to an internal
@@ -1133,7 +1133,7 @@ This theorem is a refinement of the proposition \ref{truthrepr}.
 \begin{proof}
 Let t be a term such that $\vdash_{AF_2} t
 : \[ Truth M o e f \]$. Then by the proposition \ref{truthrepr}
-$(t\,\Idt\,\Idt)$ is $\beta$-equivalent to an 
+$(t\,\Idt\,\Idt)$ is $\beta$-equivalent to an
 higher-order representation of a term $u$.
 Using the proposition \ref{Cextract}, we find
 that $(\CP\,t) \sim_{\beta} t''$ where $t''$ is an
@@ -1155,7 +1155,7 @@ representation $t''$ of a term $u$ with $\vdash_S u : f$. \qed \end{proof}
 \begin{thm}\label{main}
 Any term $T$ extracted from a proof of the completeness
 (resp. correctness) theorem translates an higher-order (resp. internal
-Debruijn) representation of a term $u$ such that $\vdash_S u : f$ into 
+Debruijn) representation of a term $u$ such that $\vdash_S u : f$ into
 an internal Debruijn  (resp. higher-order) representation of a term
 $u'$ such that $\vdash_S u' : f$.
 \end{thm}
@@ -1166,15 +1166,15 @@ This theorem is an immediate consequence of the theorems
 (which are the converse of these theorems):
 \begin{enumerate}
 \item If $t$ is an internal Debruijn representation of $u$ and
-$\vdash_S u : f$ then $\vdash_{AF_2} t : \emptyset \Vdash f$.   
+$\vdash_S u : f$ then $\vdash_{AF_2} t : \emptyset \Vdash f$.
 We prove this by proving by induction on the proof that
 $||t||_{x_n\dots x_1} = u$ and $x_1 : f_1, \dots, x_n : f_n
 \vdash_S u : f$ implies $\vdash_{AF_2} t : f_n\dots f_1 \Vdash f$.
 The proof is easy using the definition of $||t||_{x_n\dots x_1}$.
 \item If $t$ is an higher-order representation of $u$ and
-$\vdash_S u : f$ then $\vdash_{AF_2} t : \[ Truth M o e f \]$. 
+$\vdash_S u : f$ then $\vdash_{AF_2} t : \[ Truth M o e f \]$.
 This result is a consequence of (1), the correctness theorem and the proposition
-\ref{extractone}. \qed 
+\ref{extractone}. \qed
 \end{enumerate}
 \end{proof}
 
@@ -1182,13 +1182,3 @@ This result is a consequence of (1), the correctness theorem and the proposition
 \bibliographystyle{plain}
 
 *)
- 
-
-
-
-
-
-
-
-
-

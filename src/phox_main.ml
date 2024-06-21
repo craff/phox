@@ -80,7 +80,11 @@ let global = ref true
 let rec loop f =
   try
     catch_break true;
-    while true do f (); flush stdout done
+    while true do
+      if !server then print_prompt ();
+      f ();
+      flush stdout
+    done
   with
     Sys.Break ->
       catch_break false; print_endline "Interrupt.";
@@ -128,7 +132,7 @@ let main(inCh) =
     else
       let bol = ref true in
       (fun _ ->
-        if !bol && is_top () then print_prompt();
+        if !bol && is_top () && not !server then print_prompt();
         try
     	  let c = inCh !cur_input in
     	  if !bol then begin

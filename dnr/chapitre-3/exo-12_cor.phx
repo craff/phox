@@ -1,0 +1,61 @@
+Sort term.
+
+def union U V x = (U x) ∨ (V x).
+def intervide U V  = ¬ ∃ x ((U x) ∧ (V x)).
+def inclus A B = ∀ x ((A x) → (B x)).
+
+Cst ouvert : (term → prop) → prop.
+
+def connexe A = ∀ U, V (ouvert U → ouvert V → (inclus A (union U
+V)) → (intervide U V) → (inclus A U) ∨ (inclus A V)).
+
+goal
+  ∀A,B (connexe A → connexe B → ∃ x ((A x) ∧ (B x)) → connexe (union A B)).
+intros.
+intros.
+prove inclus A (union U V).
+intros.
+elim H4.
+intro l.
+axiom H6.
+prove inclus B (union U V).
+intros.
+elim H4.
+intro r.
+axiom H6.
+apply H with H2 and H3 and G and H5.
+apply H0 with H2 and H3 and G0 and H5.
+left G1.
+left G2.
+intro l.
+intros.
+left H8.
+elim H6.
+axiom H8.
+elim H7.
+axiom H8.
+left H1.
+left H1.
+elim H5.
+intro 2.
+elim H6.
+axiom H1.
+elim H7.
+axiom H8.
+left G2.
+left H1.
+left H1.
+elim H5.
+intro 2.
+elim H7.
+axiom H8.
+elim H6.
+axiom H1.
+intro r.
+intros.
+left H8.
+elim H6.
+axiom H8.
+elim H7.
+axiom H8.
+save th.

@@ -2,9 +2,9 @@ Import requis.
 Import reel.
 
 def limite u l = 
-  /\epsilon > 0 \/N in IN /\p in IN (p > N -> abs (u p - l) < epsilon).
+  ∀epsilon > 0 ∃N in IN ∀p in IN (p > N → abs (u p - l) < epsilon).
 
-fact limite_plus /\u,v /\l,l' (limite u l -> limite v l' -> limite (u ++ v) (l + l')).
+fact limite_plus ∀u,v ∀l,l' (limite u l → limite v l' → limite (u ++ v) (l + l')).
 intros.
 intros.
 local e = epsilon / 2.
@@ -13,11 +13,11 @@ elim div_pos.
 axiom H1.
 from deux_pos.
 apply H with G.
-lefts G0 $& $\/.
+lefts G0 $∧ $∃.
 apply H0 with G.
-lefts G0 $& $\/.
+lefts G0 $∧ $∃.
 apply max with H2 and H4.
-lefts G0 $& $\/.
+lefts G0 $∧ $∃.
 rename p N1.
 intros.
 instance ?1 N1.

@@ -1,0 +1,59 @@
+
+Sort N.
+
+Cst N0 : N.
+Cst Prefix[1] "S" x : N → N.
+tex_syntax N0 Math "0".
+tex_syntax $S Prefix[1] "\\hbox{S}" x.
+
+Cst rInfix[3] x "+" y : N → N → N.
+tex_syntax $+ rInfix[3] x "+" y.
+
+Cst rInfix[2] x "×" y : N → N → N.
+tex_syntax $× rInfix[2] x "\\times" y.
+
+claim A1 ∀x (S x ≠ N0).
+claim A2 ∀x (x = N0 ∨ ∃y x = S y).
+claim A3 ∀x,y (S x = S y → x = y).
+claim A4 ∀x (x + N0 = x).
+claim A5 ∀x, y (x + S y = S (x + y)).
+claim A6 ∀x (x × N0 = N0).
+claim A7 ∀x,y (x × S y  = x × y + x).
+
+claim P0 ∀F (F N0 → ∀x (F x → F (S x)) → ∀x F x).
+
+def Infix[5] x "⩽" y = ∃z y = x + z.
+def Infix[5] x "<" y = S x ⩽ y.
+def Infix[5] x ">" y = y < x.
+def Infix[5] x "⩾" y = y ⩽ x.
+
+lemma A4' ∀x (N0 + x = x).
+elim P0.
+rewrite A4.
+intro.
+intros.
+rewrite A5.
+rewrite H.
+intro.
+save.
+
+lemma A5' ∀x,y (S x + y = S (x + y)).
+intro.
+elim P0.
+rewrite A4.
+intro.
+intros.
+rewrite A5.
+rewrite H.
+intro.
+save.
+
+lemma plus_assoc ∀x,y,z ((x + y) + z = x + (y + z)).
+elim P0.
+rewrite A4'.
+intros.
+intro.
+intros.
+rewrite A5 A5' H.
+intro.
+save.

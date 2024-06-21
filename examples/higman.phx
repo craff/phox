@@ -6,13 +6,13 @@ flag auto_lvl 1.
 
 (* lemma to make the previous definition usable in a more standard way *)
 
-fact increasing'' /\f:(N => N) (increasing f -> 
-  /\x,y:N (x <= y -> f x <= f y)).
+fact increasing'' ∀f:(N ⇒ N) (increasing f → 
+  ∀x,y:N (x ⩽ y → f x ⩽ f y)).
 intros.
 elim H3 with [rec].
 intros.
 elim H.
-prove f z <= f (S z).
+prove f z ⩽ f (S z).
 elim H0.
 trivial.
 trivial.
@@ -20,23 +20,23 @@ trivial.
 save.
 
 Inductive Embed D R l l' =
-  nil : /\l:(List D) Embed D R nil l
-| cons1 : /\l,l':(List D) /\x':D (
-    Embed D R l l' -> Embed D R l (x'::l'))
-| cons2 : /\l,l':(List D) /\x,x':D (
-    Embed D R l l' -> R x x' -> Embed D R (x::l) (x'::l'))
+  nil : ∀l:(List D) Embed D R nil l
+| cons1 : ∀l,l':(List D) ∀x':D (
+    Embed D R l l' → Embed D R l (x'::l'))
+| cons2 : ∀l,l':(List D) ∀x,x':D (
+    Embed D R l l' → R x x' → Embed D R (x::l) (x'::l'))
 .
 
 Import bin_rel.
 
-fact Embed.reflexive /\D,R (reflexive D R -> reflexive (List D) (Embed D R)).
+fact Embed.reflexive ∀D,R (reflexive D R → reflexive (List D) (Embed D R)).
 auto.
 save.
 
-fact Embed.transitive /\D,R (transitive D R -> transitive (List D) (Embed D R)).
+fact Embed.transitive ∀D,R (transitive D R → transitive (List D) (Embed D R)).
 intros.
 intros.
-prove /\a:(List D) (Embed D R a b ->  Embed D R a c).
+prove ∀a:(List D) (Embed D R a b →  Embed D R a c).
 elim H4;; rmh H0 H1 H2 H3 H4.
 intros.
 elim H1 with [case] ;; trivial.
@@ -71,28 +71,28 @@ axiom H11.
 trivial.
 save.
 
-def wqo D R =  reflexive D R & transitive D R & /\f:(N => D) \/i,j:N (i < j & R (f i) (f j)).
+def wqo D R =  reflexive D R ∧ transitive D R ∧ ∀f:(N ⇒ D) ∃i,j:N (i < j ∧ R (f i) (f j)).
 
-lemma lem1 /\X (\/n:N X n -> \/n:N (X n & /\p:N (X p -> n <= p))).
+lemma lem1 ∀X (∃n:N X n → ∃n:N (X n ∧ ∀p:N (X p → n ⩽ p))).
 intros.
-lefts H $& $\/.
+lefts H $∧ $∃.
 by_absurd.
 elim False.
 rewrite_hyp H1 demorganl.
-use /\n:N ~ X n.
+use ∀n:N ¬ X n.
 trivial.
 intros.
 elim well_founded.N with H2.
 intros.
 intros.
 apply H1 with H5.
-lefts G $& $\/.
+lefts G $∧ $∃.
 apply not.lesseq.imply.less.N with H8.
 trivial.
 save.
 
 
-fact higman /\D,R (wqo D R -> wqo (List D) (Embed D R)).
+fact higman ∀D,R (wqo D R → wqo (List D) (Embed D R)).
 intros.
 lefts H.
 intros.
@@ -101,42 +101,42 @@ elim Embed.transitive.
 by_absurd.
 rewrite_hyp H2 demorganl.
 elim False.
-lefts H2 $& $\/.
+lefts H2 $∧ $∃.
 rename x f0.
-local good f = /\x,x0:N  (x < x0 -> ~ Embed D R (f x) (f x0)).
+local good f = ∀x,x0:N  (x < x0 → ¬ Embed D R (f x) (f x0)).
 prove good f0.
 axiom H3.
 rmh H3.
-local eqstart f g n = /\i:N (i < n -> f i = g i).
-local nextgood f g n = eqstart f g n & good g & /\h:(N => List D) (good h -> eqstart f h n -> length (g n) <= length (h n)).
-prove /\n:N /\f:(N => List D) (good f -> \/g:(N => List D) (nextgood f g n)).
+local eqstart f g n = ∀i:N (i < n → f i = g i).
+local nextgood f g n = eqstart f g n ∧ good g ∧ ∀h:(N ⇒ List D) (good h → eqstart f h n → length (g n) ⩽ length (h n)).
+prove ∀n:N ∀f:(N ⇒ List D) (good f → ∃g:(N ⇒ List D) (nextgood f g n)).
 intros.
-prove \/s:N\/g:(N => List D) (eqstart f g n & good g & length (g n) = s).
-intros $& $\/.
+prove ∃s:N∃g:(N ⇒ List D) (eqstart f g n ∧ good g ∧ length (g n) = s).
+intros $∧ $∃.
 instance ?1 length (f n).
 instance ?2 f.
 trivial.
 trivial.
 trivial.
 apply lem1 with G0.
-lefts G1 $& $\/.
-intros $& $\/.
+lefts G1 $∧ $∃.
+intros $∧ $∃.
 instance ?3 g.
 intros.
 intros.
 elim H8.
 trivial =H12 H3.
-intros $& $\/.
+intros $∧ $∃.
 instance ?4 h.
 trivial =.
-local next n f = Def \g ((N => List D) g & nextgood f g n).
-prove /\n:N  /\f:(N => List D)  (good f -> (N => List D) (next n f) & nextgood f (next n f) n).
+local next n f = Def λg ((N ⇒ List D) g ∧ nextgood f g n).
+prove ∀n:N  ∀f:(N ⇒ List D)  (good f → (N ⇒ List D) (next n f) ∧ nextgood f (next n f) n).
 intros.
 elim AC.
 elim G0.
 rmh G0.
 local psi = def_rec.N f0 next.
-prove /\n:N ((N => List D) (psi n) & good (psi n)).
+prove ∀n:N ((N ⇒ List D) (psi n) ∧ good (psi n)).
 intro 2.
 elim H3.
 rewrite psi def_rec.N0.N.
@@ -151,9 +151,9 @@ left G0.
 left H8.
 elim H9.
 local f1 n = psi (S n) n.
-prove (N => List D) f1.
+prove (N ⇒ List D) f1.
 trivial =G0.
-prove /\n,p:N (n <= p -> eqstart (psi n) (psi p) n).
+prove ∀n,p:N (n ⩽ p → eqstart (psi n) (psi p) n).
 intro 2.
 elim H3.
 trivial =.
@@ -188,7 +188,7 @@ prove psi (S x) x = psi (S x0) x.
 elim G3;; trivial 2.
 rewrite G5.
 elim G0 with [r] ;; trivial 1.
-prove /\n:N /\f: (N => List D) (good f -> eqstart f f1 n -> length (f1 n) <= length (f n)).
+prove ∀n:N ∀f: (N ⇒ List D) (good f → eqstart f f1 n → length (f1 n) ⩽ length (f n)).
 intros.
 rewrite f1 psi def_rec.S.N.
 apply G0 with H3.
@@ -211,7 +211,7 @@ rewrite -r H6.
 intro.
 
 rmh H2 G G1 G0 G3.
-prove /\n:N \/a:D \/w:(List D) (f1 n = a::w).
+prove ∀n:N ∃a:D ∃w:(List D) (f1 n = a::w).
 intros.
 apply G2 with H2.
 elim G with [case].
@@ -229,26 +229,26 @@ trivial 1.
 local fa n = head (f1 n).
 local fw n = tail (f1 n).
 
-prove -NN /\n:N (f1 n != nil).
+prove -NN ∀n:N (f1 n ≠ nil).
 trivial.
 
-prove /\n:N (D (fa n)).
+prove ∀n:N (D (fa n)).
 intros.
 intro head.
 elim G2.
 trivial.
 
-prove /\n:N (List D (fw n)).
+prove ∀n:N (List D (fw n)).
 intros.
 intro tail.
 elim G2.
 trivial.
 
-prove /\n:N f1 n = fa n::fw n.
+prove ∀n:N f1 n = fa n::fw n.
 intros.
 trivial.
 
-local color n p = (n <= p & R (fa n) (fa p)) or (p <= n & R (fa p) (fa n)).
+local color n p = (n ⩽ p ∧ R (fa n) (fa p)) ∨ (p ⩽ n ∧ R (fa p) (fa n)).
 prove coloring color.
 intros.
 intros.
@@ -268,15 +268,15 @@ intros.
 elim equal.proposition.
 trivial =.
 
-apply ramsey2 with (\x x) and G6.
+apply ramsey2 with (λx x) and G6.
 trivial =.
-lefts G7 $& $\/.
+lefts G7 $∧ $∃.
 unfold_hyp H4 constant2.
 elim G6 with [l] then (h N0) and (h N1).
 trivial =H2.
 trivial =H2.
 next.
-prove /\n,p:N (n < p -> R (fa (h n)) (fa (h p))).
+prove ∀n,p:N (n < p → R (fa (h n)) (fa (h p))).
 intros.
 prove color (h n) (h p).
 apply H4 with N0 and n and N1 and p and H9.
@@ -296,7 +296,7 @@ elim H10.
 left H10.
 
 local f2 n = if n < h N0 then f1 n else fw (h (n - h N0)).
-prove  (N => List D) f2.
+prove  (N ⇒ List D) f2.
 intros.
 elim lesseq.case1.N with (h N0) and N x.
 elim H2.
@@ -324,7 +324,7 @@ intro.
 next -1.
 prove x < h N0.
 trivial =H7 H8 H9 H10.
-from ~ Embed D R (f1 x) (f1 x0).
+from ¬ Embed D R (f1 x) (f1 x0).
 elim G4.
 apply lesseq.imply.not.greater.N with H10.
 elim H2.
@@ -335,7 +335,7 @@ intro.
 apply lesseq.imply.not.greater.N with H11.
 elim H2.
 intro.
-from ~ Embed D R (fw (h (x - h N0))) (fw (h (x0 - h N0))).
+from ¬ Embed D R (fw (h (x - h N0))) (fw (h (x0 - h N0))).
 intro.
 prove  Embed D R (f1 (h (x - h N0))) (f1 (h (x0 - h N0))).
 rewrite -nc G3.
@@ -397,7 +397,7 @@ elim H2.
 intro.
 trivial =G11 G13.
 
-from ~ Embed D R (f1 x) (fw (h (x0 - h N0))).
+from ¬ Embed D R (f1 x) (fw (h (x0 - h N0))).
 intro.
 prove  Embed D R (f1 x) (f1 (h (x0 - h N0))).
 rewrite -p 1 -nc G3.
@@ -419,7 +419,7 @@ elim H2.
 intro.
 
 prove x < (h (x0 - h N0)).
-prove h N0 <= h (x0 - h N0).
+prove h N0 ⩽ h (x0 - h N0).
 elim increasing'' with H3.
 intro.
 intro.
@@ -446,11 +446,11 @@ rewrite_hyp G10 G3.
 rewrite_hyp G10 -nc length.cons.List.
 rewrite_hyp G10 f2.
 rewrite_hyp G10 -nc False.if.B.
-prove S length (fw (h N0)) <= length (fw (h N0)).
+prove S length (fw (h N0)) ⩽ length (fw (h N0)).
 axiom G10.
 elim G11 with [Sx_x].
 intro.
-elim List_increasing with D and \x True.
+elim List_increasing with D and λx True.
 intros.
 intro.
 elim G1.
@@ -460,16 +460,16 @@ intro.
 elim H7 with [Sx_x].
 elim H2.
 intro.
-elim List_increasing with D and \x True.
+elim List_increasing with D and λx True.
 intros.
 intro.
 elim G1.
 elim H2.
 intro.
 
-prove /\n,p:N (n < p -> ~ R (fa (h n)) (fa (h p))).
+prove ∀n,p:N (n < p → ¬ R (fa (h n)) (fa (h p))).
 intros.
-prove ~ color (h n) (h p).
+prove ¬ color (h n) (h p).
 apply H4 with N0 and n and N1 and p and H8.
 intro.
 intro.
@@ -481,11 +481,11 @@ intro l.
 intro.
 elim increasing'' with H3.
 trivial = H6 H7 H8 H9.
-apply H1 with \x (fa (h x)) and ?.
+apply H1 with λx (fa (h x)) and ?.
 intros.
 elim G0.
 elim H2.
-lefts G8 $& $\/.
+lefts G8 $∧ $∃.
 apply G7 with H9.
 elim G8.
 save.

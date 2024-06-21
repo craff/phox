@@ -19,28 +19,28 @@ flag auto_lvl 1.
 flag auto_type true.
 
 
-def exists f l = def_rec.List False \x,l,r (f x or r) l.
+def exists f l = def_rec.List False λx,l,r (f x ∨ r) l.
 
-goal /\f exists f nil = False.
+goal ∀f exists f nil = False.
 trivial.
 save exists.nil.List.
 new_equation exists.nil.List.
 
-goal /\f/\a/\l:(List \x True) exists f (a::l) = (f a or exists f l).
+goal ∀f∀a∀l:(List λx True) exists f (a::l) = (f a ∨ exists f l).
 trivial.
 save exists.cons.List.
 new_equation exists.cons.List.
 
 close_def exists.
 
-goal /\D /\f:(D => B)/\l:(List D) B (exists f l).
+goal ∀D ∀f:(D ⇒ B)∀l:(List D) B (exists f l).
 trivial 6.
 save exists.total.List.
 new_intro -i -t exists exists.total.List.
 
 
-goal /\D/\f:(D => B)/\l,l':(List D) 
-	exists f (l@l') = (exists f l or exists f l').
+goal ∀D∀f:(D ⇒ B)∀l,l':(List D)
+	exists f (l@l') = (exists f l ∨ exists f l').
 intros.
 elim H0.
 rewrite append.lnil.List exists.nil.List.
@@ -70,27 +70,27 @@ $$\begin{array}{ll}
 \end{proposition}
 *)
 
-def forall f l = def_rec.List True \x,l,r (f x & r) l.
+def forall f l = def_rec.List True λx,l,r (f x ∧ r) l.
 
-goal /\f forall f nil = True.
+goal ∀f forall f nil = True.
 trivial.
 save forall.nil.List.
 new_equation forall.nil.List.
 
-goal /\f/\a/\l:(List \x True) forall f (a::l) = (f a & forall f l).
+goal ∀f∀a∀l:(List λx True) forall f (a::l) = (f a ∧ forall f l).
 trivial.
 save forall.cons.List.
 new_equation forall.cons.List.
 
 close_def forall.
 
-goal /\D /\f:(D => B)/\l:(List D) B (forall f l).
+goal ∀D ∀f:(D ⇒ B)∀l:(List D) B (forall f l).
 trivial 6.
 save forall.total.List.
 new_intro -i -t forall forall.total.List.
 
-goal /\D/\f:(D => B)/\l,l':(List D) 
-	forall f (l@l') = (forall f l & forall f l').
+goal ∀D∀f:(D ⇒ B)∀l,l':(List D)
+	forall f (l@l') = (forall f l ∧ forall f l').
 intros.
 elim H0.
 rewrite append.lnil.List forall.nil.List.
@@ -120,26 +120,26 @@ $$\begin{array}{ll}
 \end{proposition}
 *)
 
-def mem x l = exists \y (x = y) l.
+def mem x l = exists λy (x = y) l.
 
-goal /\x (mem x nil = False).
+goal ∀x (mem x nil = False).
 trivial.
 save mem.nil.List.
 new_equation mem.nil.List.
 
-goal /\x,y/\l:(List \x True) (mem x (y::l) = (x = y or mem x l)).
+goal ∀x,y∀l:(List λx True) (mem x (y::l) = (x = y ∨ mem x l)).
 intros.
 rewrite mem exists.cons.List.
 intro.
 save mem.cons.List.
 new_equation mem.cons.List.
 
-goal /\D/\x:D/\l : (List D) (equal.decidable D -> B (mem x l)).
+goal ∀D∀x:D∀l : (List D) (equal.decidable D → B (mem x l)).
 trivial 6.
 save mem.total.List.
 new_intro -i -t mem mem.total.List.
 
-goal /\D/\x:D/\l,l' : (List D) (equal.decidable D -> mem x (l @ l') = (mem x l or mem x l')). 
+goal ∀D∀x:D∀l,l' : (List D) (equal.decidable D → mem x (l @ l') = (mem x l ∨ mem x l')).
 intros.
 unfold mem.
 rewrite exists.append.List.

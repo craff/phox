@@ -15,15 +15,15 @@ Import bool.
 flag auto_lvl 2.
 flag auto_type true.
 
-def Infix[5.0] p "divise" q = \/r:N p * r = q.
+def Infix[5.0] p "divise" q = ∃r:N p × r = q.
 
 def Pgcd n m p =
-  N p & p divise n & p divise m &
-  /\q:N (q divise n & q divise m -> q divise p).
+  N p ∧ p divise n ∧ p divise m ∧
+  ∀q:N (q divise n ∧ q divise m → q divise p).
 
-Cst pgcd : nat -> nat -> nat.
+Cst pgcd : nat → nat → nat.
 
-claim pgcd_ax /\n,m:N (
+claim pgcd_ax ∀n,m:N (
   pgcd n m =
     if n = N0 then
       m
@@ -34,15 +34,15 @@ claim pgcd_ax /\n,m:N (
 
 new_equation pgcd_ax.
 
-goal /\n:N n divise N0.
+goal ∀n:N n divise N0.
 trivial.
 save divise.N0.
 
-goal /\n:N n divise n.
+goal ∀n:N n divise n.
 trivial.
 save divise.self.
 
-goal /\n:N (n != N0 -> Pgcd N0 n n).
+goal ∀n:N (n ≠ N0 → Pgcd N0 n n).
 intros.
 intros.
 elim divise.N0.
@@ -51,7 +51,7 @@ intros.
 trivial.
 save Pgcd.N0.
 
-goal /\p/\n,m:N (Pgcd n m p -> Pgcd m n p).
+goal ∀p∀n,m:N (Pgcd n m p → Pgcd m n p).
 intros.
 lefts H1.
 intros.
@@ -60,11 +60,11 @@ elim H4.
 trivial =H6.
 save Pgcd.symmetric.
 
-goal /\n,m:N/\p (n <= m -> Pgcd n (m - n) p -> Pgcd n m p).
+goal ∀n,m:N∀p (n ⩽ m → Pgcd n (m - n) p → Pgcd n m p).
 intros.
 lefts H2.
-lefts H3 $\/ $& $divise.
-lefts H4 $\/ $& $divise.
+lefts H3 $∃ $∧ $divise.
+lefts H4 $∃ $∧ $divise.
 intros.
 trivial =H3 H6.
 intro.
@@ -76,18 +76,18 @@ left H9.
 intro.
 elim H8 with [case].
 trivial.
-lefts H9 Pgcd $\/ $& $divise.
-lefts H10 Pgcd $\/ $& $divise.
+lefts H9 Pgcd $∃ $∧ $divise.
+lefts H10 Pgcd $∃ $∧ $divise.
 intro.
 instance ?2 (r2 - r1).
-prove r1 <= r2.
+prove r1 ⩽ r2.
 elim lesseq.lmul_left.N with ? and ? and ? and ? and q.
 trivial.
 from H1.
 trivial.
 save Pgcd.sub.
 
-goal /\n,m:N (n != N0 or m != N0 -> Pgcd n m (pgcd n m)).
+goal ∀n,m:N (n ≠ N0 ∨ m ≠ N0 → Pgcd n m (pgcd n m)).
 intro 2.
 elim well_founded.N with H.
 intro 5.
@@ -106,7 +106,7 @@ rewrite True.if.B.
 elim Pgcd.symmetric.
 elim H1.
 trivial =H5 H7 H6.
-prove ~ a0 < a.
+prove ¬ a0 < a.
 trivial =H0 H3 H8 +lesseq.contradiction.N.
 rewrite False.if.B.
 elim Pgcd.sub.

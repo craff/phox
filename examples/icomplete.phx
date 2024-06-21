@@ -2,34 +2,34 @@ flag auto_lvl 3.
 
 Sort K.
 Cst Bot : K.
-Cst rInfix [3] x "|->" y : K -> K -> K.
-Cst fresh : K -> K -> K.
-Cst sub : K -> K -> K.
-Cst lInfix [3] l "::" x : K -> K -> K.
+Cst rInfix [3] x "|→" y : K → K → K.
+Cst fresh : K → K → K.
+Cst sub : K → K → K.
+Cst lInfix [3] l "::" x : K → K → K.
 Cst Nil : K.
-Cst lInfix [4] l "@" q : K -> K -> K.
+Cst lInfix [4] l "@" q : K → K → K.
 def Prefix "{" x "}" = Nil::x.
 
-claim append_nil /\l l @ Nil = l.
-claim append_cons /\l,p,x l @ (p::x) = (l @ p):: x.
-claim append_nil_left /\l Nil @ l = l.
-claim append_assoc /\l,p,q l @ (p @ q) = (l @ p) @ q.
+claim append_nil ∀l l @ Nil = l.
+claim append_cons ∀l,p,x l @ (p::x) = (l @ p):: x.
+claim append_nil_left ∀l Nil @ l = l.
+claim append_assoc ∀l,p,q l @ (p @ q) = (l @ p) @ q.
 new_equation append_nil.
 new_equation append_cons.
 new_equation append_nil_left.
 new_equation append_assoc.
 
-def L p = /\X (X Nil -> /\r,y (X r -> X (r::y)) -> X p).
+def L p = ∀X (X Nil → ∀r,y (X r → X (r::y)) → X p).
 
 goal L Nil.
 trivial.
 save nil_total.
 
-goal /\p : L/\x  L (p :: x).
+goal ∀p : L∀x  L (p :: x).
 trivial.
 save cons_total.
 
-goal /\p,q : L  L (p @ q).
+goal ∀p,q : L  L (p @ q).
 trivial 6.
 save append_total.
 
@@ -37,29 +37,29 @@ new_intro Nil nil_total.
 new_intro Cons cons_total.
 new_intro -t append append_total.
 
-Cst cdr : K -> K.
-claim cdr_nil /\x cdr {x} = Nil.
+Cst cdr : K → K.
+claim cdr_nil ∀x cdr {x} = Nil.
 claim cdr_nill cdr Nil = Nil.
-claim cdr_cons /\x,y,p cdr (p :: x:: y) = cdr (p::x) :: y. 
-claim cdr_left /\x,p cdr ({x} @ p) = p.
+claim cdr_cons ∀x,y,p cdr (p :: x:: y) = cdr (p::x) :: y. 
+claim cdr_left ∀x,p cdr ({x} @ p) = p.
 new_equation cdr_cons.
 new_equation cdr_nil.
 new_equation cdr_nill.
 new_equation cdr_left.
 
-goal /\X (X Nil -> /\r,y (L r -> X r -> X (r::y)) -> /\p:L X p).
+goal ∀X (X Nil → ∀r,y (L r → X r → X (r::y)) → ∀p:L X p).
 intros.
-prove X p & L p.
+prove X p ∧ L p.
 trivial.
 trivial.
 save list_rec.
 new_elim L n list_rec.
 
-goal /\p (L p -> L (cdr p)).
+goal ∀p (L p → L (cdr p)).
 intros.
 elim H.
 trivial =.
-prove /\y (L (cdr r) -> L (cdr (r :: y))).
+prove ∀y (L (cdr r) → L (cdr (r :: y))).
 elim H0.
 trivial =.
 intros.
@@ -68,15 +68,15 @@ elim G.
 save cdr_total.
 new_intro -t cdr cdr_total.
 
-goal /\p,x (L ({x} @ p) -> L p). 
+goal ∀p,x (L ({x} @ p) → L p). 
 intros.
 from L (cdr ?).
 trivial.
 save ax1.
 
-goal /\p,q (L p -> L (p @ q) -> L q).
+goal ∀p,q (L p → L (p @ q) → L q).
 intro 3.
-prove /\q (L (p @ q) -> L q).
+prove ∀q (L (p @ q) → L q).
 elim H.
 trivial =.
 intros.
@@ -86,38 +86,38 @@ from H2.
 elim G.
 save ax2.
 
-def M0 M = /\x,p (M p Bot -> M p x).
+def M0 M = ∀x,p (M p Bot → M p x).
 
-def M1 M = /\x,y,p (M p x -> M p (x |-> y) -> M p y).
+def M1 M = ∀x,y,p (M p x → M p (x |→ y) → M p y).
 
 def M2 M = 
-  /\x,y,p (/\q (/\r M (p@q@r) x -> M (p@q) y) -> M p (x |-> y)).
+  ∀x,y,p (∀q (∀r M (p@q@r) x → M (p@q) y) → M p (x |→ y)).
 
 def M3 M =
-  /\x,y,p (M p x -> M p (sub x y)). 
+  ∀x,y,p (M p x → M p (sub x y)). 
 
 def M4 M =
-  /\x,p (/\y M p (sub x y) -> M p x).
+  ∀x,p (∀y M p (sub x y) → M p x).
 
-def TI P x = /\M/\p (M0 M -> M1 M -> M2 M -> M3 M -> M4 M -> 
-                      /\x,p (P x -> M p x) -> M p x).
+def TI P x = ∀M∀p (M0 M → M1 M → M2 M → M3 M → M4 M → 
+                      ∀x,p (P x → M p x) → M p x).
 
-def Infix [5] x "E" p = /\X (/\q X (q::x) -> /\q,y (X q -> X (q::y)) -> X p).
+def Infix [5] x "E" p = ∀X (∀q X (q::x) → ∀q,y (X q → X (q::y)) → X p).
 
-def D0 J = /\x,p (J p Bot -> J p x).
-def D1 J = /\l /\x E l  J l x.
-def D2 J = /\x,y,p (J p x -> J p (x |-> y) -> J p y).
-def D3 J = /\x,y,p (J (p::x) y -> J p (x |-> y)).
-def D4 J = /\x,y,p (J p x -> J p (sub x y)).
-def D5 J = /\x,p (J p (sub x (fresh p x)) -> J p x).
+def D0 J = ∀x,p (J p Bot → J p x).
+def D1 J = ∀l ∀x E l  J l x.
+def D2 J = ∀x,y,p (J p x → J p (x |→ y) → J p y).
+def D3 J = ∀x,y,p (J (p::x) y → J p (x |→ y)).
+def D4 J = ∀x,y,p (J p x → J p (sub x y)).
+def D5 J = ∀x,p (J p (sub x (fresh p x)) → J p x).
 
-def PI P x = /\J (D0 J -> D1 J -> D2 J -> D3 J -> D4 J -> D5 J -> 
-              /\x,p (P x -> J p x) -> J Nil x).
+def PI P x = ∀J (D0 J → D1 J → D2 J → D3 J → D4 J → D5 J → 
+              ∀x,p (P x → J p x) → J Nil x).
 
-goal /\x/\P (TI P x -> PI P x).
+goal ∀x∀P (TI P x → PI P x).
 intros.
 intros.
-elim -1 (\p \x (L p -> J p x)) H.
+elim -1 (λp λx (L p → J p x)) H.
 intros.
 elim H0.
 elim H7.

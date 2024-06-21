@@ -22,7 +22,7 @@ local-js: js
 	cd phox-js/lib; make depend
 	cd phox-js/lib; make PHOXPATH='node -- ../../_build/default/src/phox.bc.js' all
 	mkdir -p phox-js/tutorial
-	for d in tutorial/* ; do \
+	for d in tutorial/* dnr/chapitre-*; do \
 	  rsync -avx $$d/Makefile $$d/*.phx  phox-js/$$d/; \
 	  cd phox-js/$$d;\
           make depend ;\
@@ -57,17 +57,20 @@ install:
 WWW=/var/www/html/phox
 #WWW=my:public/phox/
 
-install-www:
+phox-js/files.js: lib/*.phx examples/*.phx tutorial/*/*.phx
+	- mkdir phox-js
 	echo 'phoxMenus = [];' > phox-js/files.js; \
-	for f in lib examples tutorial/*; do \
+	for f in dnr/chapitre-* tutorial/* examples lib; do \
 	  echo -n 'phoxMenus.push({ folder: "'$${f}'" , files: ["' >> phox-js/files.js; \
 	  cd $$f; ls *.phx > tmp.txt; \
           cd -; cat $$f/tmp.txt | xargs echo -n | sed 's/ /", "/g' >> phox-js/files.js; \
 	  rm $$f/tmp.txt; \
 	  echo '"]});' >>  phox-js/files.js; \
         done
-	rsync -vr phox-js/* $(WWW)/
-	rsync -v www/*.html www/*.js  $(WWW)
+
+install-www: phox-js/files.js
+	rsync -vr phox-js/* phox-js/files.js $(WWW)/
+	rsync -vr www/*.html www/pics www/*.js www/fonts $(WWW)
 	rsync -v _build/default/src/phox.bc.js $(WWW)
 
 uninstall:
@@ -87,11 +90,17 @@ check:
 	cd examples; $(MAKE) check
 	cd tutorial/french; $(MAKE) check
 	cd tutorial/english; $(MAKE) check
+	cd dnr/chapitre-1; $(MAKE) check
+	cd dnr/chapitre-3; $(MAKE) check
+	cd dnr/chapitre-4; $(MAKE) check
 
 depend:
 	cd examples; $(MAKE) depend
 	cd tutorial/french; $(MAKE) depend
 	cd tutorial/english; $(MAKE) depend
+	cd dnr/chapitre-1; $(MAKE) depend
+	cd dnr/chapitre-3; $(MAKE) depend
+	cd dnr/chapitre-4; $(MAKE) depend
 
 clean:
 	./tools/cleandir .
@@ -104,6 +113,9 @@ clean:
 	if [ -d private ]; then  cd private; $(MAKE) clean; fi
 	cd tutorial/french; $(MAKE) clean
 	cd tutorial/english; $(MAKE) clean
+	cd dnr/chapitre-1; $(MAKE) clean
+	cd dnr/chapitre-3; $(MAKE) clean
+	cd dnr/chapitre-4; $(MAKE) clean
 	rm -rf phox-js
 	cd tools; $(MAKE) clean
 
@@ -118,7 +130,12 @@ veryclean:
 	if [ -d private ]; then cd private; $(MAKE) veryclean; fi
 	cd tutorial/french; $(MAKE) veryclean
 	cd tutorial/english; $(MAKE) veryclean
-	rm -f doc/TAGS lib/TAGS
+	cd dnr/chapitre-1; $(MAKE) veryclean
+	cd dnr/chapitre-3; $(MAKE) veryclean
+	cd dnr/chapitre-4; $(MAKE) veryclean
+	rm -rf phox-js
+	cd tools; $(MAKE) veryclean
+
 
 distclean: veryclean
 

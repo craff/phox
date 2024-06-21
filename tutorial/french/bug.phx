@@ -1,22 +1,22 @@
 Sort E.
 Sort F.
 
-Cst f : E -> F.
+Cst f : E → F.
 
 
-def injective f   = /\x,y (f x = f y -> x = y).
-def surjective f  = /\y \/x f x = y.
+def injective f   = ∀x,y (f x = f y → x = y).
+def surjective f  = ∀y ∃x f x = y.
 
 
-def image A f y = \/x:A y= f x.
+def image A f y = ∃x:A y= f x.
 def inverse B f x = B ( f x). 
 
-def Infix[5] A "inclusdans" B = /\x:A (B x).
+def Infix[5] A "inclusdans" B = ∀x:A (B x).
 
 
-prop exo3 injective f <-> /\A (inverse (image A f) f) inclusdans A.
-(*  prove injective f -> /\A inverse (image A f) f inclusdans A then
-   prove /\A inverse (image A f) f inclusdans A -> injective f  *)
+prop exo3 injective f ↔ ∀A (inverse (image A f) f) inclusdans A.
+(*  prove injective f → ∀A inverse (image A f) f inclusdans A then
+   prove ∀A inverse (image A f) f inclusdans A → injective f  *)
 intros.
 (*  let A assume injective f [H]
    prove inverse (image A f) f inclusdans A  *)
@@ -30,18 +30,18 @@ lefts H0.
 apply H with H1.
 (*  Trivial ?  *)
 trivial.
-(*  assume /\A inverse (image A f) f inclusdans A [H] prove injective f  *)
+(*  assume ∀A inverse (image A f) f inclusdans A [H] prove injective f  *)
 intros.
 (*  let x and y assume f x = f y [H0] prove x = y  *)
 intros.
-(*  D'après H avec  \z(z=x)   on a
-   inverse (image \z (z = x) f) f inclusdans \z (z = x) [G] 
+(*  D'après H avec  λz(z=x)   on a
+   inverse (image λz (z = x) f) f inclusdans λz (z = x) [G] 
      *)
-apply H with  \z(z=x) .
-(*  D'après G avec y  on a inverse (image \z (z = x) f) f y -> y = x [G0]   *)
+apply H with  λz(z=x) .
+(*  D'après G avec y  on a inverse (image λz (z = x) f) f y → y = x [G0]   *)
 apply G with y.
-(*  Prouvons  inverse (image \z (z = x) f) f y.  *)
-prove  inverse (image \z (z = x) f) f y.
+(*  Prouvons  inverse (image λz (z = x) f) f y.  *)
+prove  inverse (image λz (z = x) f) f y.
 (*  cherchons ?1 tel que ?1 = x puis tel que f y = f ?1  *)
 intros.
 (*  immédiat  *)
@@ -51,6 +51,6 @@ intros.
 (*  immédiat  *)
 elim G0 with G1.
 
-(*  \z(z=x)  *)
-(* bug : quand je selectionne \z(z=x) et que je clique sur H , phox repond syntax error*)
+(*  λz(z=x)  *)
+(* bug : quand je selectionne λz(z=x) et que je clique sur H , phox repond syntax error*)
 

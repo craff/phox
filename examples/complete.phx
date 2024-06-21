@@ -21,27 +21,27 @@ Cst N0 : K.
 tex_syntax N0 "0".
 Cst Bot : K.
 tex_syntax Bot Math "\\bot".
-Cst Prefix[3] "S" x : K -> K.
+Cst Prefix[3] "S" x : K → K.
 tex_syntax $S Prefix[3] "\\text{s}" x.
-Cst rInfix[4] x "|->" y : K -> K -> K.
-tex_syntax $|-> rInfix[4] x "\\hookrightarrow" y.
-Cst Sub : K -> K -> K.
+Cst rInfix[4] x "|→" y : K → K → K.
+tex_syntax $|→ rInfix[4] x "\\hookrightarrow" y.
+Cst Sub : K → K → K.
 tex_syntax Sub "S".
-Cst Fresh : K -> K -> K.
-tex_syntax Fresh Math "\@".
+Cst Fresh : K → K → K.
+tex_syntax Fresh Math "\\@".
 
-Cst lInfix [3] l "@" x : K -> K -> K.
+Cst lInfix [3] l "@" x : K → K → K.
 tex_syntax $@ lInfix [3] l "::" x.
 Cst Nil : K.
 tex_syntax Nil Math "\\emptyset".
 
-(*! math 
+(*! math
 \section{Introduction.}
 We will write the completeness theorem for classical predicate
 calculus as a provable formula $ TC $ of second order logic using only
 the following function symbols: \[ N0 \] (a constante symbol for zero),
 \[ $S \] (a unary symbol for successor), \[ Bot \] (a constant
-symbol for false), \[ $|-> \] (a binary symbol for implication), \[
+symbol for false), \[ $|→ \] (a binary symbol for implication), \[
 Sub \] (a binary symbol for substitution), \[ Fresh \] (a binary
 symbol ``choosing fresh variables''), \[ $@ \] (a binary symbol for
 ``list consing''), \[ Nil \] (a constant symbol for the empty list).
@@ -75,11 +75,11 @@ t_n $ of all closed first-order terms and a last enumeration $n
 
 Then we can interpret the other symbols as follows:
 \begin{itemize}
-  \item \[ n |-> p = q \] for a $q$ such that $ F_q = F_n \rightarrow F_p $
+  \item \[ n |→ p = q \] for a $q$ such that $ F_q = F_n \rightarrow F_p $
   \item \[ Bot = q \] for a $q$ such that $ F_q = \bot $.
   \item \[ Sub n p = q \] for a $q$ such that $ F_q = A[x/t_p] $ if
-$F_n = \forall x A $ or $ F_q = F_n $ if $ F_n $ does not start with a
-quantifier. 
+$F_n = \forall x A $ ∨ $ F_q = F_n $ if $ F_n $ does not start with a
+quantifier.
   \item \[ Fresh n p = q \] for a $q$ such that $ t_q $ is a constant
 with no free occurrence in $ L_n $ and $ F_p $.
   \item \[ Nil = q \] for a $q$ such that $L_q$ is the empty list.
@@ -89,47 +89,47 @@ obtained by adding $F_p$ to the end of the list $L_n$.
 
 We also assume that the model $ {\cal M}_0 $ is a full model of second
  order logic: the predicate symbols of arity $n$ range over the set of
- all subsets of $ {N}^n $.
+ all ⊂s of $ {N}^n $.
 
 *)
 
-def Nat x = /\X (X N0 -> /\y (X y -> X S y) -> X x).
+def Nat x = ∀X (X N0 → ∀y (X y → X S y) → X x).
 
-def M0 M = M Bot -> /\x M x.
-def M1 M = /\x,y (M (x |-> y) -> M x -> M y).
-def M2 M = /\x,y (Nat x -> (M x -> M y) -> M (x |-> y)).
-def M2' M = /\x,y ((M x -> M y) -> M (x |-> y)).
-def M3 M = /\x (M x -> /\y M (Sub x y)).
-def M4 M = /\x (Nat x -> /\y M (Sub x y) -> M x).
-def M4' M = /\x (/\y M (Sub x y) -> M x).
+def M0 M = M Bot → ∀x M x.
+def M1 M = ∀x,y (M (x |→ y) → M x → M y).
+def M2 M = ∀x,y (Nat x → (M x → M y) → M (x |→ y)).
+def M2' M = ∀x,y ((M x → M y) → M (x |→ y)).
+def M3 M = ∀x (M x → ∀y M (Sub x y)).
+def M4 M = ∀x (Nat x → ∀y M (Sub x y) → M x).
+def M4' M = ∀x (∀y M (Sub x y) → M x).
 
 
-def TT x = /\M (M0 M -> M1 M -> M2 M -> M3 M -> M4 M -> M x).
-def TT' x = /\M (M0 M -> M1 M -> M2' M -> M3 M -> M4' M -> M x).
+def TT x = ∀M (M0 M → M1 M → M2 M → M3 M → M4 M → M x).
+def TT' x = ∀M (M0 M → M1 M → M2' M → M3 M → M4' M → M x).
 
 (*! math
   \begin{definition}
     Let us choose a unary predicate variable $M$. We define
   the following formulas\,:
     $$\begin{array}{lcl}
-       \[ M0 M \] &=& \[ $$M0 M\] \cr
-       \[ M1 M \] &=& \[ $$M1 M\] \cr
-       \[ M2' M \] &=& \[ $$M2' M\] \cr
-       \[ M3 M \] &=& \[ $$M3 M\] \cr
-       \[ M4' M \] &=& \[ $$M4' M\] \cr
+       \[ M0 M \] ∧=∧ \[ $$M0 M\] \cr
+       \[ M1 M \] ∧=∧ \[ $$M1 M\] \cr
+       \[ M2' M \] ∧=∧ \[ $$M2' M\] \cr
+       \[ M3 M \] ∧=∧ \[ $$M3 M\] \cr
+       \[ M4' M \] ∧=∧ \[ $$M4' M\] \cr
     \end{array}$$
   Then we can define
-    $$ \[ TT' x \] = \[ $$TT' x \] $$ 
+    $$ \[ TT' x \] = \[ $$TT' x \] $$
   \end{definition}
 
 It is clear that the set of all formulas $F_n$ such that \[ TT n \]
-is true in ${\cal M}_0$ is either the set of all formulas or the set of
+is true in ${\cal M}_0$ is either the set of all formulas ∨ the set of
 all formulas true in a model whose base set is the set of all the
 closed terms of $\cal L$ and where all the function symbols have their
-canonical interpretation. 
+canonical interpretation.
 *)
 
-def Not x = x |-> Bot.
+def Not x = x |→ Bot.
 tex_syntax Not Prefix[1] "\\neg" x.
 (*! math
   \begin{definition}
@@ -137,35 +137,35 @@ tex_syntax Not Prefix[1] "\\neg" x.
   \end{definition}
 *)
 
-def J0 J = /\l (J l Bot -> /\x J l x).
-def J1 J = /\x,y,l (J l (x |-> y) -> J l x -> J l y).
-def J2 J = /\x,y,l (J (l@x) y -> J l (x |-> y)).
-def J3 J = /\x,l (J l x -> /\y J l (Sub x y)).
-def J4 J = /\x,l (J l (Sub x (Fresh l x)) -> J l x).
-def J5 J = /\x,l (J (l@Not x) x -> J l x).
-def J6 J = /\x,l (J (l@x) x).
-def J7 J = /\x,y,l (J l x -> J (l@y) x).
+def J0 J = ∀l (J l Bot → ∀x J l x).
+def J1 J = ∀x,y,l (J l (x |→ y) → J l x → J l y).
+def J2 J = ∀x,y,l (J (l@x) y → J l (x |→ y)).
+def J3 J = ∀x,l (J l x → ∀y J l (Sub x y)).
+def J4 J = ∀x,l (J l (Sub x (Fresh l x)) → J l x).
+def J5 J = ∀x,l (J (l@Not x) x → J l x).
+def J6 J = ∀x,l (J (l@x) x).
+def J7 J = ∀x,y,l (J l x → J (l@y) x).
 
 
-def PP x = /\J (J0 J -> J1 J -> J2 J -> J3 J -> J4 J -> J5 J -> 
-                J6 J -> J7 J -> J Nil x).
+def PP x = ∀J (J0 J → J1 J → J2 J → J3 J → J4 J → J5 J →
+                J6 J → J7 J → J Nil x).
 
 (*! math
   \begin{definition}
     Let us chose a binary predicate variable $J$. We define
   the following formulas\,:
     $$\begin{array}{lcll}
-       \[ J0 J \] &=& \[ $$J0 J\] &\hspace{1cm} \text{false elim.}\cr
-       \[ J1 J \] &=& \[ $$J1 J\] &\hspace{1cm} \text{arrow elim.}\cr
-       \[ J2 J \] &=& \[ $$J2 J\] &\hspace{1cm} \text{arrow intro.}\cr
-       \[ J3 J \] &=& \[ $$J3 J\] &\hspace{1cm} \text{for all elim.}\cr
-       \[ J4 J \] &=& \[ $$J4 J\] &\hspace{1cm} \text{for all intro.}\cr
-       \[ J5 J \] &=& \[ $$J5 J\] &\hspace{1cm} \text{classical absurdity}\cr
-       \[ J6 J \] &=& \[ $$J6 J\] &\hspace{1cm} \text{axiom}\cr
-       \[ J7 J \] &=& \[ $$J7 J\] &\hspace{1cm} \text{weakening}\cr
+       \[ J0 J \] ∧=∧ \[ $$J0 J\] ∧\hspace{1cm} \text{false elim.}\cr
+       \[ J1 J \] ∧=∧ \[ $$J1 J\] ∧\hspace{1cm} \text{arrow elim.}\cr
+       \[ J2 J \] ∧=∧ \[ $$J2 J\] ∧\hspace{1cm} \text{arrow intro.}\cr
+       \[ J3 J \] ∧=∧ \[ $$J3 J\] ∧\hspace{1cm} \text{for all elim.}\cr
+       \[ J4 J \] ∧=∧ \[ $$J4 J\] ∧\hspace{1cm} \text{for all intro.}\cr
+       \[ J5 J \] ∧=∧ \[ $$J5 J\] ∧\hspace{1cm} \text{classical absurdity}\cr
+       \[ J6 J \] ∧=∧ \[ $$J6 J\] ∧\hspace{1cm} \text{axiom}\cr
+       \[ J7 J \] ∧=∧ \[ $$J7 J\] ∧\hspace{1cm} \text{weakening}\cr
     \end{array}$$
   Then we can define
-    \[[ PP x <-> $$PP x \]]
+    \[[ PP x ↔ $$PP x \]]
   \end{definition}
 
 We can remark that the formulas \[ J0 \] to \[ J7 \] correspond to the
@@ -174,26 +174,26 @@ in the context \[ l \]). Therefore \[ PP n \] is true in ${\cal M}_0$ if
 and only if $F_n$ is provable.
 
 So the following formula can be interpreted as the completeness
-theorem: \[[ /\x (TT' x -> PP x) \]] However this formula is not
-provable as such. To prove it we need to use the axiom \[ /\x Nat x \]
+theorem: \[[ ∀x (TT' x → PP x) \]] However this formula is not
+provable as such. To prove it we need to use the axiom \[ ∀x Nat x \]
 where \[ Nat x \] = \[ $$Nat x \] is the formula defining natural
 numbers (this axiom is true in the model ${\cal M}_0$).
 
-This means that we could prove \[/\x Nat x -> /\x (TT' x -> PP x) \]. 
+This means that we could prove \[∀x Nat x → ∀x (TT' x → PP x) \].
 But will prove a more precise result:
   \begin{definition}
     Let us chose a unary predicate variable $M$. We define
   the following formulas\,:
     $$\begin{array}{lcl}
-       \[ M2 M \] &=& \[ $$M2 M\] \cr
-       \[ M4 M \] &=& \[ $$M4 M\] \cr
+       \[ M2 M \] ∧=∧ \[ $$M2 M\] \cr
+       \[ M4 M \] ∧=∧ \[ $$M4 M\] \cr
     \end{array}$$
   Then we can define
-    $$ \[ TT x \] = \[ $$TT x \] $$ 
+    $$ \[ TT x \] = \[ $$TT x \] $$
   \end{definition}
 *)
 
-goal /\x Nat x -> {{ /\x ( TT x -> PP x) <->  /\x (TT' x -> PP x) }}.
+goal ∀x Nat x → {{ ∀x ( TT x → PP x) ↔  ∀x (TT' x → PP x) }}.
 (*! math
 \begin{proposition}
   It is trivial to see that the following formula is provable:\[[ $0 \]]
@@ -216,8 +216,8 @@ save cisc.
 def Prefix "{" x "}" = Nil @ x.
 tex_syntax ${ Prefix [3] "" ! x.
 
-goal /\x (TT x -> PP x).
-(*! math 
+goal ∀x (TT x → PP x).
+(*! math
 \begin{theorem}[completeness]
   The formula \[ $0 \] is provable in classical second order logic.
 \end{theorem}
@@ -231,18 +231,18 @@ tex_syntax J Infix[5] l "\\vdash" x.
 We choose an arbitrary constant \[ a \] and we assume \[ $$H \]. We
 also choose an arbitrary binary predicate \[ J \] and we assume \[ $$H0
 \] , \[ $$H1 \] , \dots, \[ $$H7 \]. Then we must prove that $a$ is
-provable, that is \[ $0 \]. 
+provable, that is \[ $0 \].
 *)
 local Sub_p l x = l@ Not (Sub x (Fresh l x)).
 tex_syntax Sub_p Math "S'".
 local Prefix "[" n1 "::" l1 "]" "<" "[" n2 "::" l2 "]" =
-  /\Z (/\q,l (Z q l -> J l q -> Z (S q) l) ->
-       /\q,l (Z q l -> ~ J l q -> Z (S q) (Sub_p l q)) ->
-       Z n1 l1 -> Z n2 l2).
+  ∀Z (∀q,l (Z q l → J l q → Z (S q) l) →
+       ∀q,l (Z q l → ¬ J l q → Z (S q) (Sub_p l q)) →
+       Z n1 l1 → Z n2 l2).
 tex_syntax $[ Prefix "(" ! n "," ln ! ")" "<" "(" ! p "," lp ! ")".
 local Phi n l = [ N0 :: { Not a } ] < [ n :: l ].
 tex_syntax Phi Math "\\Phi".
-local MM y = \/n,l (Phi n l & J l y).
+local MM y = ∃n,l (Phi n l ∧ J l y).
 tex_syntax MM Math "\\tilde M".
 by_absurd.
 
@@ -250,17 +250,17 @@ by_absurd.
 To do so, we assume \[ $$H8 \] and we construct a model \[ MM \] by
 the following definitions:
 $$\begin{array}{lcl}
-  \[ Sub_p l x \] &=& \[ $$Sub_p l x \] \cr
-  \[ [ n1 :: l1 ] < [ n2 :: l2 ] \] &=& {\textwidth=9cm \[[ $$[ n1 l1 n2
+  \[ Sub_p l x \] ∧=∧ \[ $$Sub_p l x \] \cr
+  \[ [ n1 :: l1 ] < [ n2 :: l2 ] \] ∧=∧ {\textwidth=9cm \[[ $$[ n1 l1 n2
 l2 \]] } \cr
-  \[ Phi n l \] &=& \[ $$Phi n l \] \cr
-  \[ MM y \] &=& \[ $$MM y \]
+  \[ Phi n l \] ∧=∧ \[ $$Phi n l \] \cr
+  \[ MM y \] ∧=∧ \[ $$MM y \]
 \end{array}$$
 
 Let us explain informally how this model is constructed. A sequence $n
 \mapsto \phi_n $ of context (list of formulas) is constructed by
 induction: \[ Phi n l \] means $ \[ l \] = \phi_n $\footnote{We can
-not prove \[ /\n\/!l Phi n l \] without using axioms telling
+not prove \[ ∀n∃!l Phi n l \] without using axioms telling
 that \[ N0 \] is always distinct from \[ S n \] and \[ $S \] is
 injective.}.  $\phi_n$ is defined by $\phi_0 = \[ { Not a } \]$, if $
 \phi_n \vdash F_n $ then $\phi_{n+1} = \phi_n$ and if $\phi_n
@@ -274,13 +274,13 @@ follows: a formula is true if it is provable using one of the context
 $\phi_n$.
 
 *)
-prove /\x (J Nil x -> MM x).
+prove ∀x (J Nil x → MM x).
 next 1.
 tex_syntax G "(i)".
 next 1.
-(*! math 
-The first property we prove about the model is its correctness: 
-$$ \[$0 \] \hspace{2cm} \[1 G \] $$ 
+(*! math
+The first property we prove about the model is its correctness:
+$$ \[$0 \] \hspace{2cm} \[1 G \] $$
 *)
 intros.
 (*! math
@@ -291,60 +291,60 @@ trivial.
 prove J { Not a } x.
 trivial = H9 H7.
 (*! math
-To do so, it is enough to remark that we can easily prove 
-\[ $$G \] and \[ $$G0 \] (using weakening (\[ $$H7 \]) for the second). 
+To do so, it is enough to remark that we can easily prove
+\[ $$G \] and \[ $$G0 \] (using weakening (\[ $$H7 \]) for the second).
 
 *)
 trivial = G G0.
 (* *)
-use /\n,l (Phi n l -> J l (Not a)).
-tex_syntax G0 "(ii)". 
-next 1. 
+use ∀n,l (Phi n l → J l (Not a)).
+tex_syntax G0 "(ii)".
+next 1.
 (*! math
 Then we prove that all the contexts used in the construction of the
 model \[ MM \] implies \[ Not a \] :
 $$ \[ $0 \] \hspace{2cm} \[1 G0 \] $$
 *)
 intros.
-elim -1 (\p,l (J l (Not a))) H9.
+elim -1 (λp,l (J l (Not a))) H9.
 (*! math
 This is immediate by replacing \[ Z p l \] by \[J l (Not a)\] in the
-definition of \[ Phi \]. 
+definition of \[ Phi \].
 *)
 trivial.
 intros.
 elim H7.
 elim H6.
 (* *)
-use /\n,l (Phi n l -> ~ J l Bot).
-tex_syntax G1 "(iii)". 
-next 1. 
-(*! math 
+use ∀n,l (Phi n l → ¬ J l Bot).
+tex_syntax G1 "(iii)".
+next 1.
+(*! math
 We also show that that all the context used in the construction of the
 model \[ MM \] are consistent:
 $$ \[ $0 \] \hspace{2cm} \[1 G1 \]$$
 *)
 intros.
-elim -1 (\p,l (~ J l Bot)) H9.
+elim -1 (λp,l (¬ J l Bot)) H9.
 (*! math
-We replace \[ Z p l \] by \[~ J l Bot\] in the
-definition of \[ Phi \]. Therefore, we have to prove 
+We replace \[ Z p l \] by \[¬ J l Bot\] in the
+definition of \[ Phi \]. Therefore, we have to prove
 $$
 \begin{array}{l}
-\[ $0 \] \cr 
-\[1 $0 \] \cr 
+\[ $0 \] \cr
+\[1 $0 \] \cr
 \[2 $0 \]
-\end{array}$$ 
+\end{array}$$
 *)
 trivial.
-(*! math 
-the first one is trivial. 
+(*! math
+the first one is trivial.
 *)
 intros.
 intro.
-(*! math 
+(*! math
 For the second one, we assume \[ $$H10 \] , \[ $$H11 \] and
-\[ $$H12 \]. 
+\[ $$H12 \].
 *)
 elim H11.
 elim H4.
@@ -365,7 +365,7 @@ elim H8.
 elim H5.
 elim H0.
 (* *)
-use ~ MM a.
+use ¬ MM a.
 tex_syntax G2 "(iv)".
 next 1.
 (*! math
@@ -390,10 +390,10 @@ elim G0.
 trivial.
 trivial.
 (* now the real work start ! *)
-use -lemma0 /\x,y (MM y -> MM (x |-> y)). 
+use -lemma0 ∀x,y (MM y → MM (x |→ y)).
 tex_syntax lemma0 "lemma 0".
 next 1.
-(*! math 
+(*! math
 
 Now to finish the proof we must prove that \[ MM \] is a model, that
 is \[ M0 MM \] , \dots, \[ M4 MM \]. Then from the hypothesis \[ $$H \]
@@ -404,14 +404,14 @@ MM \] is a model, we will prove some lemmas. The first one is
 \end{lemma}
 *)
 intros.
-(*! math 
+(*! math
 To prove \[1 lemma0 \] , we assume \[ $$H9 \]
 *)
 left H9 n H10.
 left H10 [l] l H11.
-(*! math 
+(*! math
 and we prove \[ $0 \]. So we can find \[ n \] and \[ l \] such that \[ $$H11 \] holds.
-*) 
+*)
 intro.
 intro.
 intro.
@@ -425,7 +425,7 @@ elim H2.
 elim H7.
 trivial = H11.
 (* *)
-use -lemma1 /\m (Nat m -> MM m or \/r MM(Not (Sub m r))). 
+use -lemma1 ∀m (Nat m → MM m ∨ ∃r MM(Not (Sub m r))).
 tex_syntax lemma1 "lemma 1".
 next 1.
 (*! math
@@ -435,16 +435,16 @@ next 1.
 *)
 intros.
 (*! math
-To prove \[1 lemma1 \] , we assume \[ $$H9 \]. 
+To prove \[1 lemma1 \] , we assume \[ $$H9 \].
 *)
-prove \/l Phi m l.
+prove ∃l Phi m l.
 (*! math
 Then we can prove \[ $0 \] by induction on \[ m \] (because \[ Phi
-\] is a function !). 
+\] is a function !).
 *)
 elim H9.
 (*!math
-The 0 case (\[ $0 \]) is trivial. 
+The 0 case (\[ $0 \]) is trivial.
 *)
 trivial =.
 intros.
@@ -456,16 +456,16 @@ left H10 [l] l H11.
 (*! math
 We can find \[ l \] such that \[ $$H11 \] holds.
 *)
-prove J l y or ~ J l y.
+prove J l y ∨ ¬ J l y.
 elim excluded_middle.
 left G3.
 select 2.
 (*!math
- We distinguish two cases depending if \[ J l y \] holds or if \[ ~ J
+ We distinguish two cases depending if \[ J l y \] holds ∨ if \[ ¬ J
 l y \] holds. *)
 next 1.
 intro.
-instance ?7 l. 
+instance ?7 l.
 (*! math
 In the first case we get \[ $0 \] and
 *)
@@ -486,10 +486,10 @@ left G3 l.
 (*! math
 Thus, we can find \[ l \] such that \[ $$H10 \] holds and prove \[ $0 \].
 *)
-prove J l m or ~ J l m.
+prove J l m ∨ ¬ J l m.
 elim excluded_middle.
 (*! math
- we distinguish two cases depending if \[ J l m \] holds or if \[ ~ J
+ we distinguish two cases depending if \[ J l m \] holds ∨ if \[ ¬ J
 l m \] holds. *)
 left G3.
 select 2.
@@ -513,7 +513,7 @@ Phi \]) and \[1 $0 \] (this is an axiom, by definition of
 *)
 trivial = H10 H11.
 elim H6.
-use -lemma2 /\m (Nat m -> MM m or MM(Not m)). 
+use -lemma2 ∀m (Nat m → MM m ∨ MM(Not m)).
 tex_syntax lemma2 "lemma 2".
 next 1.
 (*! math
@@ -529,7 +529,7 @@ trivial 0 = H10.
 To prove \[1 lemma2 \] , we choose \[ m \] such that \[ $$H9 \] holds
 and we use \[ lemma1 \]. When \[ MM m \] holds, we get immediatly the
 wanted result.
-*) 
+*)
 left H10 r.
 intro r.
 (*! math
@@ -548,7 +548,7 @@ instance ?13 l.
 intro.
 trivial = H10.
 (*! math
-So we just need to prove \[ $0 \] which follows from 
+So we just need to prove \[ $0 \] which follows from
 \[ J l (Not (Sub m r)) \] using the hypothesis \[ $$H1 \] , \[ $$H2 \]
 , \[ $$H3 \] , \[ $$H6 \] and \[ $$H7 \].
 *)
@@ -559,9 +559,9 @@ trivial = H10.
 elim H3.
 elim H6.
 (* *)
-(* we introduce MM sat. (i) as an hyp because we want to use it 
+(* we introduce MM sat. (i) as an hyp because we want to use it
    to prove MM sat. (ii) ! *)
-use -lemma3 /\x,y (MM (x |-> y) -> MM x -> MM y). 
+use -lemma3 ∀x,y (MM (x |→ y) → MM x → MM y).
 tex_syntax lemma3 "lemma 3".
 next 1.
 (*! math
@@ -582,10 +582,10 @@ and using the definition of \[ MM \] , we can find \[ m_x \] , \[ l_x
 \] , \[ m_y \] , \[ l_y \] such that \[ $$H10 \] and \[ $$ H9 \]
 holds.
 *)
-prove -lemma4 /\m_x,m_y,l_x,l_y ([m_x :: l_x ] < [m_y :: l_y] -> 
-  (m_x = m_y & l_x = l_y) or
-  (J l_x m_x & [S m_x :: l_x ] < [m_y :: l_y]) or
-  (~ J l_x m_x & [S m_x :: Sub_p l_x m_x] < [m_y :: l_y])).
+prove -lemma4 ∀m_x,m_y,l_x,l_y ([m_x :: l_x ] < [m_y :: l_y] →
+  (m_x = m_y ∧ l_x = l_y) ∨
+  (J l_x m_x ∧ [S m_x :: l_x ] < [m_y :: l_y]) ∨
+  (¬ J l_x m_x ∧ [S m_x :: Sub_p l_x m_x] < [m_y :: l_y])).
 intros.
 elim H11.
 trivial =.
@@ -595,29 +595,29 @@ tex_syntax lemma4 "lemma 4".
 (*! math
 \begin{lemma}[ \[ lemma4 \] ]
 From the definition of \[ [m_x :: l_x ] < [m_y :: l_y] \] , we
-can easely prove (by induction on this definition) that 
+can easely prove (by induction on this definition) that
 if \[ [m_x :: l_x ] < [m_y :: l_y] \] holds, then one of this holds:
 \begin{enumerate}
-\item \[ m_x = m_y & l_x = l_y \]
-\item \[ J l_x m_x & [ S m_x :: l_x ] < [ m_y :: l_y ] \]
-\item \[ ~ J l_x m_x & [ S m_x :: Sub_p l_x m_x ] < [ m_y :: l_y ] \]
+\item \[ m_x = m_y ∧ l_x = l_y \]
+\item \[ J l_x m_x ∧ [ S m_x :: l_x ] < [ m_y :: l_y ] \]
+\item \[ ¬ J l_x m_x ∧ [ S m_x :: Sub_p l_x m_x ] < [ m_y :: l_y ] \]
 \end{enumerate}
 \end{lemma}
 We can also easely show that the relation  \[ [m_x :: l_x ] < [m_y ::
-l_y] \] is transitive and reflexive. 
+l_y] \] is transitive and reflexive.
 *)
-prove Phi m_x l_x -> Phi m_y l_y -> 
-  /\z (J l_x z -> J l_y z) or /\z (J l_y z -> J l_x z).
+prove Phi m_x l_x → Phi m_y l_y →
+  ∀z (J l_x z → J l_y z) ∨ ∀z (J l_y z → J l_x z).
 intros.
-use -lemma5 [m_x :: l_x ] < [m_y :: l_y] or [m_y :: l_y ] < [m_x :: l_x]. 
+use -lemma5 [m_x :: l_x ] < [m_y :: l_y] ∨ [m_y :: l_y ] < [m_x :: l_x].
 tex_syntax lemma5 "lemma 5".
 next 1.
-local Zp p y = [ p :: y ] < [ m_y :: l_y ] or [ m_y :: l_y ] < [ p :: y ].
+local Zp p y = [ p :: y ] < [ m_y :: l_y ] ∨ [ m_y :: l_y ] < [ p :: y ].
 tex_syntax Zp Math "Z'".
 (*! math
 Using these, we can prove the following lemma:
-\begin{lemma}[ \[1 lemma5 \] ] 
-\[[ $0 \]] 
+\begin{lemma}[ \[1 lemma5 \] ]
+\[[ $0 \]]
 \end{lemma}
 To prove \[1 lemma5 \] , we introduce the following notation:
 $$ \[ Zp n_0 l_0 \] = \[ $$Zp n_0 l_0 \] $$
@@ -626,7 +626,7 @@ from Zp m_x l_x.
 (*! math
 So we must prove \[ $0 \]. Then we can substitute \[ Zp \] for \[ Z \]
 in \[ $$H11 \].
-*) 
+*)
 elim H11.
 (*! math
 Therefore, we have to prove the following
@@ -636,15 +636,15 @@ Therefore, we have to prove the following
 intros.
 prove ([q :: l] < [S q :: l]).
 trivial = H14.
-(*! math 
+(*! math
 We assume \[ $$H13 \] and \[ $$H14 \]. From this we get \[ $$ G3 \].
 *)
 elim H13.
 next 1.
 intros.
 (*! math
-Here we distinguish two cases: 
-\begin{itemize} 
+Here we distinguish two cases:
+\begin{itemize}
   \item If \[ $$H15 \] holds then \[ $0 \] holds using \[ $$G3 \] and
 the transitivity of the relation.
 *)
@@ -655,19 +655,19 @@ trivial = G3 H15.
 elim -5 H15 lemma4.
 (*! math
 Either we have \[ $$H16 \] which implies \[ $0 \] using \[ $$H14 \].
-\end{itemize} 
+\end{itemize}
 *)
 trivial = H14 H16.
 elim H16.
 (*! math
 Either we have \[ $$H17 \] which implies \[ $0 \] directly.
 
-*) 
-trivial = H17. 
+*)
+trivial = H17.
 (*! math
 Either we have \[ $$H17 \] which implies \[ $0 \] using \[H14\].
 
-*) 
+*)
 trivial = H14 H17.
 (*! math
 \item \[ $0 \] :
@@ -675,14 +675,14 @@ trivial = H14 H17.
 intros.
 prove ([q :: l] < [S q :: Sub_p l q]).
 trivial = H14.
-(*! math 
-We assume \[ $$H13 \] and \[ $$H14 \]. From this we get \[ $$ G3 \]. 
+(*! math
+We assume \[ $$H13 \] and \[ $$H14 \]. From this we get \[ $$ G3 \].
 *)
 elim H13.
 next 1.
 (*! math
-Here we distinguish again two cases: 
-\begin{itemize} 
+Here we distinguish again two cases:
+\begin{itemize}
   \item If \[ $$H15 \] holds then \[ $0 \] holds using \[ $$G3 \] and
 the transitivity of the relation.
 *)
@@ -695,12 +695,12 @@ elim -5 H15 lemma4.
 Either we have \[ $$H16 \] which implies \[ $0 \] using \[ $$G3 \].
 
 \end{itemize}
-*) 
+*)
 trivial = G3 H16.
 elim H16.
 (*! math
 Either we have \[ $$H17 \] which implies \[ $0 \] using \[ $$H14 \].
-*) 
+*)
 trivial = H14  H17.
 (*! math
 Either we have \[ $$H17 \] which implies \[ $0 \] directly.
@@ -713,8 +713,8 @@ trivial = H17.
 trivial = H12.
 (* *)
 (*! math
-From lemma5, we can get \[ $0 \] using the weakening \[ $$H7 \]. 
-Indeed, \[ lemma5 \] implies that either \[ l_x \] 
+From lemma5, we can get \[ $0 \] using the weakening \[ $$H7 \].
+Indeed, \[ lemma5 \] implies that either \[ l_x \]
 is an extenstion of \[ l_y \] or
 vice versa.
 *)
@@ -727,8 +727,7 @@ intro r.
 trivial = H13 H7.
 (*! math
 Therefore, using \[ $$H9 \] and \[ $$H10 \] , it is easy to deduce \[
-$0 \] using \[ lemma5 \] , \[ /\z (J l_x z -> J l_y z) or /\z (J l_y z
--> J l_x z ) 
+$0 \] using \[ lemma5 \] , \[ ∀z (J l_x z → J l_y z) ∨ ∀z (J l_y z → J l_x z )
 \] and the arrow elimination rule ( \[ $$H1 \] ). This ends the proof
 of \[1 lemma3 \].
 *)
@@ -745,7 +744,7 @@ So we can now prove that \[ MM \] is a model:
 \item \[ $0 \] :
 *)
 intros.
-(*! math 
+(*! math
 Assuming \[ $$H9 \] , we must prove \[ $0 \]. But we get a
 contradiction using \[ $$H9 \] and \[ G1 \].
 *)
@@ -773,7 +772,7 @@ left H11 m.
 left H11 l.
 (*! math
 Then, by definition of \[ MM \] , we can find \[ m \] and \[ l \] such
-that \[ $$H11 \] holds. 
+that \[ $$H11 \] holds.
 *)
 intro 2.
 intro.
@@ -781,7 +780,7 @@ trivial = H11.
 (*! math
 And we easely get \[ $0 \] from \[ J l (Not x) \] using \[ $$H0 \] , \[
 $$H1 \] , \[ $$H2 \] , \[ $$H6 \] and \[ $$H7 \].
-*) 
+*)
 elim H2.
 elim H0.
 elim H1.
@@ -805,7 +804,7 @@ intro 2.
 intro.
 trivial = H9.
 (*! math
-and we get \[ $0 \] from \[ J l x \] using the for all elimination 
+and we get \[ $0 \] from \[ J l x \] using the for all elimination
 (\[ $$H3 \]).
 *)
 elim H3.
@@ -816,7 +815,7 @@ trivial = H9.
 intros.
 (*! math
 We assume \[ $$H9 \] and \[ $$H10 \] and we must prove \[ $0 \].
-Using \[ lemma1 \] , we know that either \[ $0 \] or 
+Using \[ lemma1 \] , we know that either \[ $0 \] ∨
 *)
 elim -1 x lemma1.
 intro.
@@ -824,7 +823,7 @@ intro.
 (*! math
 \[ $$H11 \] holds.
 *)
-prove ~ MM Bot.
+prove ¬ MM Bot.
 trivial = G1.
 (*! math
 From \[ G1 \] we get \[ $$G3 \].
@@ -843,7 +842,7 @@ save complete.
 \end{proof}
 *)
 
-(* 
+(*
 compile complete.
 #print complete.
 *)
@@ -854,7 +853,7 @@ compile complete.
 Yet to be written ...
 *)
 
-goal TT (N0 |-> N0).
+goal TT (N0 |→ N0).
 trivial.
 save itrue.
 
@@ -862,53 +861,53 @@ save itrue.
 compile itrue.
 
 #(complete itrue).
-\x0 \x1 \x2 \x3 \x4 \x5 \x6 \x7 
-  |- x -> x
- (x5 
-  ~(x -> x) |- x -> x
- (x0 
-  ~(x -> x) |- Bot
+\x0 λx1 λx2 λx3 λx4 λx5 λx6 λx7
+  |- x → x
+ (x5
+  ¬(x → x) |- x → x
+ (x0
+  ¬(x → x) |- Bot
  (x1
-    ~(x -> x) |- ~(x -> x) 
-    x6 
-    
-    ~(x -> x) |- x -> x
-    (x2 
-    ~(x -> x), x |- x
-    (x7 
-    ~(x -> x) |- x
-    (x4 
-    ~(x -> x) |- Sub x (Fresh l x)
+    ¬(x → x) |- ¬(x → x)
+    x6
+
+    ¬(x → x) |- x → x
+    (x2
+    ¬(x → x), x |- x
+    (x7
+    ¬(x → x) |- x
+    (x4
+    ¬(x → x) |- Sub x (Fresh l x)
     (x5
-    ~(x -> x), ~Sub x (Fresh l x) |- Sub x (Fresh l x)
-    (x0 
-    ~(x -> x), ~Sub x (Fresh l x) |- Bot
+    ¬(x → x), ¬Sub x (Fresh l x) |- Sub x (Fresh l x)
+    (x0
+    ¬(x → x), ¬Sub x (Fresh l x) |- Bot
     (x1
-      ~(x -> x), ~Sub x (Fresh l x) |- ~(x -> x)
-      (x7 x6) 
-      ~(x -> x), ~Sub x (Fresh l x) |- x -> x
-      (x2 
-      ~(x -> x), ~Sub x (Fresh l x), x |- x
-      (x0 
-      ~(x -> x), ~Sub x (Fresh l x), x |- Bot
+      ¬(x → x), ¬Sub x (Fresh l x) |- ¬(x → x)
+      (x7 x6)
+      ¬(x → x), ¬Sub x (Fresh l x) |- x → x
+      (x2
+      ¬(x → x), ¬Sub x (Fresh l x), x |- x
+      (x0
+      ¬(x → x), ¬Sub x (Fresh l x), x |- Bot
       (x1
-        ~(x -> x), ~Sub x (Fresh l x), x |- ~ x
-        (x7 
-        ~(x -> x), ~Sub x (Fresh l x) |- ~ x 
-        (x2 
-        ~(x -> x), ~Sub x (Fresh l x), x |- Bot 
+        ¬(x → x), ¬Sub x (Fresh l x), x |- ¬ x
+        (x7
+        ¬(x → x), ¬Sub x (Fresh l x) |- ¬ x
+        (x2
+        ¬(x → x), ¬Sub x (Fresh l x), x |- Bot
         (x1
-           ~(x -> x), ~Sub x (Fresh l x) |- ~Sub x (Fresh l x) 
-           (x7 x6) 
-           ~(x -> x), ~Sub x (Fresh l x),x |- Sub x (Fresh l x) 
+           ¬(x → x), ¬Sub x (Fresh l x) |- ¬Sub x (Fresh l x)
+           (x7 x6)
+           ¬(x → x), ¬Sub x (Fresh l x),x |- Sub x (Fresh l x)
            (x3 x6))))
-        ~(x -> x), ~Sub x (Fresh l x), x |- x 
+        ¬(x → x), ¬Sub x (Fresh l x), x |- x
         x6))))))))))))
 
 *)
 
-goal ((N0 |-> Bot) |-> Bot = S N0 ->
-      TT (((N0 |-> Bot) |-> Bot) |-> N0)).
+goal ((N0 |→ Bot) |→ Bot = S N0 →
+      TT (((N0 |→ Bot) |→ Bot) |→ N0)).
 intros.
 intros.
 elim H2.
@@ -919,11 +918,11 @@ intro.
 by_absurd.
 elim H6.
 elim H0.
-elim -1 (N0 |-> Bot) H1.
+elim -1 (N0 |→ Bot) H1.
 elim H2.
 trivial.
 intro.
-trivial = H7 H6.	
+trivial = H7 H6.
 save ipierce.
 
 
@@ -933,25 +932,25 @@ compile ipierce.
 *)
 
 (*! math
-\section{Proof of G\"odel's Incompleteness Theorems} 
+\section{Proof of G\"odel's Incompleteness Theorems}
 
 We are now going to prove the first and the second G\"odel's
 Incompleteness Theorems. We will use the same abstract notion of
 provability expressed by the formula \[ PP \] , but we wil not use the
-completeness theorem nor then notion of semantics. 
+completeness theorem nor then notion of semantics.
 *)
 
-Cst Prv x : K -> K.
-Cst Code_Form x : K -> K.
+Cst Prv x : K → K.
+Cst Code_Form x : K → K.
 tex_syntax Code_Form Prefix[1.0] "\\overline{" ! x ! "}".
-Cst Code_Pred : (K -> K) -> K.
+Cst Code_Pred : (K → K) → K.
 (*! math
 \def\eatone#1{}
 *)
 tex_syntax Code_Pred Prefix[1.0] "\\overline{" ! f ! "}^{" ! \f\ ! "}".
-Cst app : K -> K -> K.
+Cst app : K → K → K.
 
-(*! math 
+(*! math
 We first need to do some assumption about the deduction
 system: namely the existence of an {\em arithmetisation}. So we assume
 a deduction system $D$ with a langage {\cal L} whose provable formule
@@ -960,18 +959,18 @@ Then we assume the following:
 \begin{itemize}
 \item \[ Code_Form x \] is a term of {\cal L} for any formula of {\cal
 L} $x$.
-\item \[ Code_Pred \v (x v) \] is a term of {\cal L} for any formula
+\item \[ Code_Pred λv (x v) \] is a term of {\cal L} for any formula
 of {\cal L} $x$ with a free variable $v$.
 \item \[ Prv v \] is a formula of {\cal L} with one free variable $v$.
 \item \[ app t u \] is a function of arity 2 of {\cal L}.
 \end{itemize}
 *)
 
-claim Prv_correct /\x (PP (Prv (Code_Form x)) -> PP x).
+claim Prv_correct ∀x (PP (Prv (Code_Form x)) → PP x).
 tex_syntax Prv_correct "correctness of Prv".
-claim Prv_complete /\x (PP x -> PP (Prv (Code_Form x))).
+claim Prv_complete ∀x (PP x → PP (Prv (Code_Form x))).
 tex_syntax Prv_complete "completeness of Prv".
-claim app_correct /\f/\x (app (Code_Pred \x (f x)) x = Code_Form (f x)).
+claim app_correct ∀f∀x (app (Code_Pred λx (f x)) x = Code_Form (f x)).
 tex_syntax app_correct "correctness of application".
 new_equation app_correct.
 
@@ -979,7 +978,7 @@ new_equation app_correct.
 
 \begin{axiom}
 To prove the first incompleteness theorem, we must assume that the
-following are theorems of $D$: 
+following are theorems of $D$:
 \begin{itemize}
 \item \[ $$Prv_correct \] (\[Prv_correct\]).
 \item \[ $$Prv_complete \] (\[Prv_complete\]).
@@ -993,13 +992,13 @@ as well as the notion of provability.
 *)
 
 def G x = Not (Prv (app x x)).
-def Godel = G (Code_Pred \x (G x)).
+def Godel = G (Code_Pred λx (G x)).
 
-goal (PP Godel -> PP Bot) & (PP (Not Godel) -> PP Bot).
+goal (PP Godel → PP Bot) ∧ (PP (Not Godel) → PP Bot).
 (*! math
 \begin{theorem}[G\"odel's first incompleteness theorem]
 There exists a formula \[ Godel \] which can not be proved in $D$ and
-whose negation can not be prove in $D$ except if $D$ is inconsistent. 
+whose negation can not be prove in $D$ except if $D$ is inconsistent.
 This is expressed by the following:
 
 \[[ $0 \]]
@@ -1028,12 +1027,12 @@ from H.
 Then to prove \[ $0 \]
 *)
 intros.
-tex_syntax J Infix[5] l "\\vdash_D" x. 
+tex_syntax J Infix[5] l "\\vdash_D" x.
 (*! math
  we can choose an arbitrary binary predicate \[ J \] ,
  assume \[ J0 J \] , \[ J1 J \] , \dots,
 \[ J7 J \] and prove \[ $0 \].
-*) 
+*)
 elim H1.
 next 1.
 elim H.
@@ -1041,14 +1040,14 @@ elim H.
 Using \[ H \] , we just need to prove \[ $0 \] ,
 *)
 elim H2.
-(*! math 
+(*! math
 that is \[ $0 \].
 *)
 elim H1.
 elim H7.
 elim G0.
 (*! math
-And we get it because \[ Godel = Not (Prv (Code_Form Godel)) \] and 
+And we get it because \[ Godel = Not (Prv (Code_Form Godel)) \] and
 because the \[ Prv_complete \] implies \[ $0 \].
 
 *)
@@ -1061,26 +1060,26 @@ To prove the other part of the theorem, we assume \[ $$H \] \[ H \]
 and we must prove \[ $0 \].
 *)
 intros.
-tex_syntax J Infix[5] l "\\vdash_D" x. 
+tex_syntax J Infix[5] l "\\vdash_D" x.
 (*! math
  To do so, we can choose an arbitrary binary predicate \[ J \] ,
  assume \[ J0 J \] , \[ J1 J \] , \dots,
 \[ J7 J \] and prove \[ $0 \].
-*) 
+*)
 elim H1.
 elim H.
 (*! math
  Thus using \[ H \] , we must prove \[ $0 \].
-*) 
+*)
 elim -1 Godel Prv_correct.
 slh H.
 intros.
-tex_syntax J8 Infix[5] l "\\vdash_D" x. 
+tex_syntax J8 Infix[5] l "\\vdash_D" x.
 (*! math
 Using the \[ Prv_correct \] , it is enough to prove
 \[ $0 \]
 *)
-elim H5. 
+elim H5.
 elim H0.
 elim H1.
 next 1.
@@ -1098,9 +1097,9 @@ save first_godel_incompleteness.
 def Coh = Not (Prv (Code_Form Bot)).
 
 claim lifted_Prv_complete
-  /\x PP (Prv x |-> Prv (Code_Form (Prv x))).
+  ∀x PP (Prv x |→ Prv (Code_Form (Prv x))).
 claim lifted_contradiction
-  /\x PP (Prv (Code_Form x) |-> Prv (Code_Form (Not x)) |-> 
+  ∀x PP (Prv (Code_Form x) |→ Prv (Code_Form (Not x)) |→
             Prv (Code_Form Bot)).
 
 (*! math
@@ -1114,7 +1113,7 @@ following extra hypothesis:
 \end{axiom}
 *)
 
-goal PP Coh -> PP Bot.
+goal PP Coh → PP Bot.
 (*! math
 \begin{theorem}[G\"odel's second incompleteness theorem] If a
 deduction system can prove it's own consistency then it is
@@ -1129,8 +1128,8 @@ intros.
 (*! math
 \begin{proof}
 We assume \[ $$H \] and \[ $$H0 \] and prove a contradiction.
-*) 
-prove ~ PP (Godel).
+*)
+prove ¬ PP (Godel).
 (*! math
 First we can get \[ $0 \] from G\"odel's first incompleteness theorem.
 *)
@@ -1144,20 +1143,20 @@ tex_syntax Epsilon Math "\\epsilon".
 Let us call \[ Epsilon = $$ Epsilon \] (so we have \[ Godel = Not
 Epsilon \]).
 *)
-prove PP (Epsilon |-> Not Coh).
+prove PP (Epsilon |→ Not Coh).
 next.
 elim G0.
 (*! math
 First let us assume \[ $$G1 \] and prove \[ $0 \] (which give the
-contradiction we want). 
+contradiction we want).
 *)
 intros.
-tex_syntax J Infix[5] l "\\vdash_D" x. 
+tex_syntax J Infix[5] l "\\vdash_D" x.
 (*! math
  We can choose an arbitrary binary predicate \[ J \] ,
  assume \[ J0 J \] , \[ J1 J \] , \dots,
 \[ J7 J \] and prove \[ $0 \] ,
-*) 
+*)
 elim H3.
 from J (Nil @ Epsilon) Bot.
 (*! math
@@ -1178,14 +1177,14 @@ elim H.
   So we have left to prove \[ $0 \] ,
 *)
 intros.
-tex_syntax J Infix[5] l "\\vdash_D" x. 
+tex_syntax J Infix[5] l "\\vdash_D" x.
 elim H3.
 (*! math
   that is \[ $0 \].
 *)
 prove J (Nil @ Epsilon) (Prv (Code_Form Epsilon)).
 (*! math
-Using \[ Epsilon \] in the context we get \[ $0 \] using 
+Using \[ Epsilon \] in the context we get \[ $0 \] using
 \[  lifted_Prv_complete \] and
 *)
 elim H2.
@@ -1206,8 +1205,7 @@ elim -1 (Prv (Code_Form Epsilon)) H2.
 elim H8.
 elim -2 J lifted_contradiction.
 (*! math
-From these, it is easy to finish the proof using \[
-lifted_contradiction \].\qed
+From these, it is easy to finish the proof using \[lifted_contradiction \].\qed
 \end{proof}
 *)
 save godel_second_incompleteness.

@@ -1,0 +1,148 @@
+Cst a : prop.
+Cst b : prop.
+Cst c : prop.
+
+
+theorem numero4 ((a → b → c) →  c) → (((a → c → c) → ((b →
+c → c) → c)) → c).
+intros.
+elim H.
+intros.
+elim H0.
+intros.
+trivial.
+intros.
+trivial.
+save numero4.
+
+theorem numero5  (a → b ∧ c) ↔ (a → b) ∧ (a → c).
+intro.
+intro 2.
+intro.
+elim H.
+axiom H0.
+intro.
+elim H.
+axiom H0.
+intro 3.
+left H.
+elim H.
+axiom H0.
+left H.
+elim H1.
+axiom H0.
+save numero5.
+
+theorem numero8 (a ∧ b → c) ↔ (a → c) ∨ (b → c).
+intro.
+intro.
+by_absurd.
+rewrite_hyp H0 disjunction.demorgan.
+left H0.
+rewrite_hyp H0 arrow.demorgan.
+left H0.
+rewrite_hyp H1 arrow.demorgan.
+left H1.
+intro 2.
+elim H.
+trivial.
+
+intro 2.
+left H0.
+left H.
+trivial.
+trivial.
+save numero8.
+
+theorem numero9 (a ∧ b) ∨ c ↔ (a ∨ c) ∧ (b ∨ c).
+intro.
+intro 2.
+left H.
+left H.
+trivial.
+trivial.
+left H.
+left H.
+trivial.
+trivial.
+
+intro.
+left H.
+left H.
+left H0.
+trivial.
+trivial.
+left H0.
+trivial.
+intro r.
+trivial.
+save numero9.
+
+theorem numero10 (a ∨ b)∧c↔(a∧c)∨(b∧c).
+intros.
+intro.
+left H.
+left H.
+intro l.
+intro.
+axiom H.
+axiom H0.
+intro r.
+intro.
+axiom H.
+axiom H0.
+intro 2.
+left H.
+intro l.
+elim H.
+intro r.
+elim H.
+left H.
+elim H.
+elim H.
+save numero10.
+
+theorem numero12 (a ∨ b)↔((a →b)→b).
+intro.
+intro 2.
+elim H.
+elim H0.
+axiom H1.
+axiom H1.
+intro.
+use a ∨ ¬ a.
+elim G.
+intro l.
+axiom H0.
+intro r.
+elim H.
+intro.
+elim H0.
+axiom H1.
+elim  excluded_middle.
+save numero12.
+
+theorem numero14 (a ↔ b) ↔ (a ∨ b → a ∧ b).
+intros.
+intros.
+left H0.
+intro.
+axiom H0.
+elim H.
+axiom H0.
+intro.
+elim H.
+axiom H0.
+axiom H0.
+
+intros.
+intros.
+intros.
+elim H.
+intro l.
+axiom H0.
+intros.
+elim H.
+intro r.
+axiom H0.
+save numero14.

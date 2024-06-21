@@ -1,0 +1,70 @@
+Sort term.
+Cst f : term → term.
+def inj f = ∀x,y (f x = f y → x = y).
+def surj f = ∀y ∃x (f x = y).
+Cst a : term.
+Cst b : term.
+def au_plus_deux = ∀x (x = a ∨ x = b).
+
+goal au_plus_deux → (inj f ↔ surj f).
+intros.
+intros.
+intros.
+intros.
+
+elim H with y.
+elim H with f a.
+intro.
+axiom H2.
+elim H with f b.
+intro.
+axiom H3.
+apply 3 H0 with a and b.
+intro.
+intro.
+axiom H2.
+elim H with f a.
+elim H with f b.
+apply 3 H0 with a and b.
+intro.
+intro.
+axiom H2.
+intro.
+axiom H3.
+intro.
+axiom H2.
+
+intros.
+intros.
+elim H with x.
+elim H with y.
+intro.
+elim H with f a.
+prove f b = a.
+intro.
+elim H0 with b.
+elim H with x0.
+intro.
+intro.
+prove f b = b.
+intro.
+elim H0 with a.
+elim H with x0.
+intro.
+intro.
+elim H with y.
+elim H with f a.
+prove f b = a.
+intro.
+elim H0 with b.
+elim H with x0.
+intro.
+intro.
+prove f b = b.
+intro.
+elim H0 with a.
+elim H with x0.
+intro.
+intro.
+intro.
+save th.

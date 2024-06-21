@@ -1,33 +1,30 @@
 
 
-def Infix[5] x "in" A = A x.
-def Infix[5] x "notin" A = ~ x in A.
-def Infix[5] A "subset" B = /\x (x in A -> x in B).
+def Infix[5] x "∈" A = A x.
+def Infix[5] x "∉" A = ¬ x ∈ A.
+def Infix[5] A "⊂" B = ∀x (x ∈ A → x ∈ B).
 
-goal /\A,B (A subset B -> B subset A  -> A = B).
+goal ∀A,B (A ⊂ B → B ⊂ A  → A = B).
 trivial +equal.extensional.
 save equal.extensional.intro.
 new_intro ext equal.extensional.intro .
 
 def Prefix "{" \B\ "|" B "}" = B.
- 
-def Infix[4.5] A "inter" B = { x | x in A & x in B}.
-def Infix[4.7] A "union" B = { x | x in A or x in B}.
-def Infix[4.7] A "minus" B = { x | x in A & x notin B}.
-def Postfix[4.2] A "cpl" = { x | x notin A}.
+
+def Infix[4.5] A "∩" B = { x | x ∈ A ∧ x ∈ B}.
+def Infix[4.7] A "∪" B = { x | x ∈ A ∨ x ∈ B}.
+def Infix[4.7] A "∖" B = { x | x ∈ A ∧ x ∉ B}.
+def Postfix[4.2] A "cpl" = { x | x ∉ A}.
 
 (*
 Bonne idée, mais boucle ...
 
-fact notineq /\x,A (~ x in A = (x notin A)).
+fact notineq ∀x,A (¬ x ∈ A = (x ∉ A)).
 intros.
 intro.
 save.
 
-def_thlist demorgan = notineq. 
-def_thlist demorganl = notineq. 
-def_thlist demorganr = notineq. 
+def_thlist demorgan = notineq.
+def_thlist demorganl = notineq.
+def_thlist demorganr = notineq.
 *)
-
-
-

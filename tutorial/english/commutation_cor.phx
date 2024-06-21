@@ -5,12 +5,12 @@ two permutation with disjoint support commute.
 
 flag auto_lvl 2.
 
-def injective f = /\x,y (f x = f y -> x = y).
+def injective f = ∀x,y (f x = f y → x = y).
 
 prop exo1 
-  /\h,g (injective h & injective g &  /\x (h x = x or g x = x) 
-      -> /\x (h (g x)) = (g (h x))).
-(*->*)
+  ∀h,g (injective h ∧ injective g ∧  ∀x (h x = x ∨ g x = x) 
+      → ∀x (h (g x)) = (g (h x))).
+(*→*)
 intros.
 lefts H.
 apply H1 with x.
@@ -26,5 +26,5 @@ left G.
 apply H with H3.
 intro.
 intro.
-(*->*)
+(*→*)
 save.

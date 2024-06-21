@@ -4,22 +4,22 @@
 (*header
 	title = "About the axiom of choice"
 	author = "Christophe Raffalli"
-	institute = "Paris VII \\& Paris XII university"
+	institute = "Paris VII λ∧ Paris XII university"
 *)
 
 claim AC
-  /\Q (\/z Q z -> Q (Def Q)).
+  ∀Q (∃z Q z → Q (Def Q)).
 
-def Def2_1 Q = Def (\x \/y (Q x y)).
-def Def2_2 Q = Def (\y (Q (Def2_1 Q) y)).
+def Def2_1 Q = Def (λx ∃y (Q x y)).
+def Def2_2 Q = Def (λy (Q (Def2_1 Q) y)).
 
 fact AC2
-  /\Q (\/x,y (Q x y) -> Q (Def2_1 Q) (Def2_2 Q)).
+  ∀Q (∃x,y (Q x y) → Q (Def2_1 Q) (Def2_2 Q)).
 intros.
-prove \/y (Q (Def2_1 Q) y).
+prove ∃y (Q (Def2_1 Q) y).
 elim AC.
 axiom H.
-elim AC. 
+elim AC.
 axiom G.
 save.
 
@@ -27,25 +27,25 @@ Use set.
 Use bin_rel.
 
 def Chaine X R C =
-  \/x C x & C subset X & /\x,y:C (R x y or R y x). 
+  ∃x C x ∧ C ⊂ X ∧ ∀x,y:C (R x y ∨ R y x).
 
 flag auto_lvl 1.
 
 theorem Zorn
-  /\X,R (\/x X x -> order X R -> 
-	 /\C (Chaine X R C -> \/m:X/\y:C (R y m)) ->
-         \/M:X/\x:X (R M x -> M = x)).
+  ∀X,R (∃x X x → order X R →
+	 ∀C (Chaine X R C → ∃m:X∀y:C (R y m)) →
+         ∃M:X∀x:X (R M x → M = x)).
 intros.
 by_absurd.
 rewrite_hyp H2 demorganl.
 
-prove /\C (Chaine X R C -> \/m:X /\y:C (R y m & y != m)).
+prove ∀C (Chaine X R C → ∃m:X ∀y:C (R y m ∧ y ≠ m)).
 intros.
 apply H1 with H3.
-lefts G $& $\/.
+lefts G $∧ $∃.
 apply H2 with H4.
-lefts G $& $\/.
-intros $& $\/.
+lefts G $∧ $∃.
+intros $∧ $∃.
 axiom H6.
 intros.
 intro.
@@ -57,15 +57,15 @@ axiom H9.
 elim H8.
 trivial.
 
-local f C = Def (\m (X m & /\y:C  (R y m & y != m))).
-prove /\C:(Chaine X R) (X (f C) & /\y:C  (R y (f C) & y != (f C))).
+local f C = Def (λm (X m ∧ ∀y:C  (R y m ∧ y ≠ m))).
+prove ∀C:(Chaine X R) (X (f C) ∧ ∀y:C  (R y (f C) ∧ y ≠ (f C))).
 intros.
 elim AC.
 elim G.
 
-local Succ C = C union \x (x = f C).
+local Succ C = C ∪ λx (x = f C).
 
-prove /\C (Chaine X R C -> Chaine X R (Succ C)).
+prove ∀C (Chaine X R C → Chaine X R (Succ C)).
 slh G0 H0.
 intros.
 lefts H.
@@ -86,10 +86,10 @@ intro l.
 trivial.
 trivial =H2 H3 H4.
 
-prove /\F (Chaine (Chaine X R) $subset F -> Chaine X R (Union F)).
+prove ∀F (Chaine (Chaine X R) $⊂ F → Chaine X R (⋃ F)).
 intros.
 intro.
-lefts H3 Chaine $& $\/.
+lefts H3 Chaine $∧ $∃.
 apply H4 with H3.
 trivial.
 intro.
@@ -116,18 +116,18 @@ intro l.
 
 left H.
 
-local CI I C = /\K (
-  K I ->
-  /\C:K K (Succ C) ->
-  /\F (Chaine K $subset F -> /\C:F F (Succ C) -> K (Union F)) -> K C).
+local CI I C = ∀K (
+  K I →
+  ∀C:K K (Succ C) →
+  ∀F (Chaine K $⊂ F → ∀C:F F (Succ C) → K (⋃ F)) → K C).
 
-prove -CI_x /\I CI I I.
+prove -CI_x ∀I CI I I.
 trivial =.
 
-prove -CI_f  /\I/\C:(CI I) CI I (Succ C).
+prove -CI_f  ∀I∀C:(CI I) CI I (Succ C).
 trivial =.
 
-prove -CI_U  /\I/\F (Chaine (CI I) $subset F ->  /\C:F F (Succ C) -> CI I (Union F)).
+prove -CI_U  ∀I∀F (Chaine (CI I) $⊂ F →  ∀C:F F (Succ C) → CI I (⋃ F)).
 intros.
 intros.
 elim H7.
@@ -137,25 +137,25 @@ axiom H3.
 intros.
 elim H8 with H10.
 
-prove -CI_chaine /\I:(Chaine X R) /\C:(CI I) (Chaine X R C).
+prove -CI_chaine ∀I:(Chaine X R) ∀C:(CI I) (Chaine X R C).
 intros.
 elim H4.
 intros.
 elim G2.
 
-prove -CI_inc /\C,C' (CI C C' -> C subset C').
+prove -CI_inc ∀C,C' (CI C C' → C ⊂ C').
 intros.
 elim H3.
 trivial =.
 trivial =.
 trivial =.
 
-prove -CI_rec /\K,I,C (CI I C ->
-  K I ->
-  /\C:(CI I) (K C -> K (Succ C)) ->
-  /\F (Chaine (CI I) $subset F -> Chaine K $subset F -> /\C:F F (Succ C) -> K (Union F)) -> K C).
+prove -CI_rec ∀K,I,C (CI I C →
+  K I →
+  ∀C:(CI I) (K C → K (Succ C)) →
+  ∀F (Chaine (CI I) $⊂ F → Chaine K $⊂ F → ∀C:F F (Succ C) → K (⋃ F)) → K C).
 intros.
-prove CI I C & K C.
+prove CI I C ∧ K C.
 elim H3.
 intro.
 elim CI_x.
@@ -172,10 +172,10 @@ elim H6.
 trivial =H7.
 trivial =H7.
 left G3.
- 
+
 (* Local close_def CI. *)
 
-prove -CI_case  /\I,C (CI I C -> I = C or \/C':(CI I) C = Succ C' or \/F:(Chaine (CI I) $subset) (/\C:F F (Succ C) & C = Union F)).
+prove -CI_case  ∀I,C (CI I C → I = C ∨ ∃C':(CI I) C = Succ C' ∨ ∃F:(Chaine (CI I) $⊂) (∀C:F F (Succ C) ∧ C = ⋃ F)).
 intros.
 elim CI_rec with H3.
 intro l.
@@ -187,7 +187,7 @@ intros.
 intro r r.
 trivial =H4 H6.
 
-prove -CI_trans /\C1,C2,C3 (CI C1 C2 -> CI C2 C3 -> CI C1 C3).
+prove -CI_trans ∀C1,C2,C3 (CI C1 C2 → CI C2 C3 → CI C1 C3).
 intros.
 elim CI_rec with H4.
 intros.
@@ -195,14 +195,14 @@ elim CI_f.
 intros.
 elim CI_U.
 
-prove -CI_Nf /\C1 (Chaine X R C1 -> ~ C1 (f C1)).
+prove -CI_Nf ∀C1 (Chaine X R C1 → ¬ C1 (f C1)).
 intros.
 intro.
 elim G0 with H4.
 intro.
 
 (*
-prove -CI_NS /\C1 (Chaine X R C1 -> ~ CI (Succ C1) C1).
+prove -CI_NS ∀C1 (Chaine X R C1 → ¬ CI (Succ C1) C1).
 intros.
 intro.
 elim CI_Nf with H3.
@@ -210,7 +210,7 @@ elim CI_inc with H4.
 trivial =.
 *)
 
-prove -CI_finc /\C,C' (CI C C' -> CI (Succ C) (Succ C')).
+prove -CI_finc ∀C,C' (CI C C' → CI (Succ C) (Succ C')).
 intros.
 elim CI_rec with H3.
 intros.
@@ -218,7 +218,7 @@ intros.
 elim CI_f.
 intros.
 elim CI_f.
-prove Union F = Union \C (\/C':F C = Succ C').
+prove ⋃ F = ⋃ λC (∃C':F C = Succ C').
 elim equal.extensional.
 intro.
 elim equal.proposition.
@@ -231,32 +231,32 @@ intro.
 trivial =H4.
 intro.
 intros.
-lefts H7 $& $\/.
+lefts H7 $∧ $∃.
 apply H6 with H7.
 elim H5 with H7.
 intros.
-lefts H7 $& $\/.
-lefts H8 $& $\/.
-lefts H5 Chaine $& $\/.
+lefts H7 $∧ $∃.
+lefts H8 $∧ $∃.
+lefts H5 Chaine $∧ $∃.
 elim H12.
 elim H6.
 elim H6.
 intros.
-lefts H7 $& $\/.
+lefts H7 $∧ $∃.
 intros.
 select 2.
 intro.
 elim H6.
 
-local CIS C C' = \/C'' (CI C C'' & C' = Succ C'').
+local CIS C C' = ∃C'' (CI C C'' ∧ C' = Succ C'').
 
-prove -CIS_U /\C,F (Chaine X R C -> /\C':F (CI C C' & F (Succ C')) -> ~ CIS C (Union F)).
+prove -CIS_U ∀C,F (Chaine X R C → ∀C':F (CI C C' ∧ F (Succ C')) → ¬ CIS C (⋃ F)).
 intros.
 intro.
-lefts H5 CIS $& $\/.
-prove Union F (f C'').
+lefts H5 CIS $∧ $∃.
+prove (⋃ F) (f C'').
 rewrite H6. trivial =.
-prove /\C:(Union F) R C (f C'').
+prove ∀C:(⋃ F) R C (f C'').
 intros.
 rewrite_hyp H7  H6.
 left H7.
@@ -270,13 +270,13 @@ trivial =G5 G3 H6.
 trivial =H0 H7 G4.
 elim G0 with H7.
 elim CI_chaine with H5.
-lefts G3 Union $& $\/.
+lefts G3 $⋃ $∧ $∃.
 apply H4 with H7.
 left G3.
 prove R (f X0) (f C'').
 elim G4.
-unfold Union.
-intros $& $\/.
+unfold $⋃.
+intros $∧ $∃.
 axiom H10.
 trivial =.
 apply G0 with H8.
@@ -291,7 +291,7 @@ apply CI_chaine with G6.
 trivial =G7.
 trivial =H0 G5 G6 G3 H11.
 
-prove -CI_SF /\C,C' (Chaine X R C -> CI C C' -> ~CIS C C' -> C = C' or CI (Succ C) C').
+prove -CI_SF ∀C,C' (Chaine X R C → CI C C' → ¬CIS C C' → C = C' ∨ CI (Succ C) C').
 intro 4.
 elim CI_rec with H4.
 trivial =.
@@ -300,13 +300,13 @@ elim H7.
 trivial =H5.
 intros.
 intro r.
-prove Union F = Union \C' (F C' & C' != C).
+prove ⋃ F = ⋃ λC' (F C' ∧ C' ≠ C).
 elim equal.extensional.
 intro.
 elim equal.proposition.
 intros.
 intros.
-lefts H9 Union $& $\/.
+lefts H9 $⋃ $∧ $∃.
 prove CI C X0.
 trivial = H9 H5.
 apply H7 with H9.
@@ -330,14 +330,14 @@ select 2.
 intro.
 intros.
 elim excluded_middle with CIS C x0.
-lefts H12 $& $\/ CIS.
+lefts H12 $∧ $∃ CIS.
 elim CI_finc.
 left H11.
 apply H6 with H11 then H12.
 trivial =H13 G4.
 select 2.
 left H5.
-intros $& $\/.
+intros $∧ $∃.
 elim H7 with H5.
 intros.
 prove CI C x0.
@@ -366,7 +366,7 @@ trivial =.
 elim CI_Nf with Chaine X R C0.
 elim CI_chaine with G4.
 
-prove /\I (Chaine X R I -> /\C,C':(CI I) (CI C C' or CI C' C)).
+prove ∀I (Chaine X R I → ∀C,C':(CI I) (CI C C' ∨ CI C' C)).
 intro I HC.
 intro 2.
 elim CI_rec with H3.
@@ -385,17 +385,17 @@ elim CI_finc.
 intro l.
 elim CI_finc.
 intros.
-elim H5 with CI I (Union F).
+elim H5 with CI I (⋃ F).
 elim CI_U.
-elim CI_SF with C0 and (Union F).
+elim CI_SF with C0 and (⋃ F).
 elim CI_chaine with HC.
-prove ~ CIS I (Union F).
+prove ¬ CIS I (⋃ F).
 elim CIS_U.
 trivial =H7 H9.
 intro.
-lefts H11 CIS $& $\/.
+lefts H11 CIS $∧ $∃.
 elim G3.
-intros $& $\/ CIS.
+intros $∧ $∃ CIS.
 elim CI_trans with H4 and H11.
 intro r.
 elim CI_f.
@@ -410,15 +410,15 @@ elim CI_U.
 intros.
 left H9.
 select 2.
-elim CI_SF with C0 and (Union F).
+elim CI_SF with C0 and (⋃ F).
 elim CI_chaine with HC.
-prove ~ CIS I (Union F).
+prove ¬ CIS I (⋃ F).
 elim CIS_U.
 trivial =H6 H4.
 intro.
-lefts H10 CIS $& $\/.
+lefts H10 CIS $∧ $∃.
 elim G3.
-intros $& $\/ CIS.
+intros $∧ $∃ CIS.
 elim CI_trans with H8 and H10.
 intro l.
 elim CI_f.
@@ -428,29 +428,29 @@ intro l.
 elim CI_f.
 intros.
 
-prove /\x:F /\x0:F0 (CI x x0 or CI x0 x).
+prove ∀x:F ∀x0:F0 (CI x x0 ∨ CI x0 x).
 intros.
 apply H8 with H12.
 apply H5 with H11 then G3.
 
-prove Union F = Union F0 or \/x:F CI (Union F0) x or \/x:F0 CI (Union F) x.
+prove ⋃ F = ⋃ F0 ∨ ∃x:F CI (⋃ F0) x ∨ ∃x:F0 CI (⋃ F) x.
 by_absurd.
-Local close_def CI. 
+Local close_def CI.
 rewrite_hyp H11 demorganl.
 lefts H11.
-prove /\C:F (CI C (Union F0) or CI (Union F0) C).
+prove ∀C:F (CI C (⋃ F0) ∨ CI (⋃ F0) C).
 intros.
-apply H5 with H14 then (Union F0) then ?.
+apply H5 with H14 then (⋃ F0) then ?.
 elim CI_U.
-prove /\C:F0 (CI C (Union F) or CI (Union F) C).
+prove ∀C:F0 (CI C (⋃ F) ∨ CI (⋃ F) C).
 intros.
 apply H9 with H14.
 trivial =G5.
-prove /\X,A,B (/\x:X (A x or B x) -> /\x:X A x or \/x:X B x).
+prove ∀X,A,B (∀x:X (A x ∨ B x) → ∀x:X A x ∨ ∃x:X B x).
 intros.
 by_absurd.
 rewrite_hyp H15 demorganl.
-lefts H15 $& $\/.
+lefts H15 $∧ $∃.
 apply H16 with ? then H15.
 elim H14 with ? then H15.
 elim H17.
@@ -469,21 +469,21 @@ intros.
 elim equal.proposition.
 intros.
 intros.
-lefts H16 Union $& $\/.
+lefts H16 $⋃ $∧ $∃.
 apply H14 with H16.
 elim CI_inc with G7 then H17.
 intros.
-lefts H16 Union $& $\/.
+lefts H16 $⋃ $∧ $∃.
 apply H15 with H16.
 elim CI_inc with G7 then H17.
-prove /\X,F (Chaine X $subset F -> /\C:F (Union F = Union \C' (F C' & C subset C'))).
+prove ∀X,F (Chaine X $⊂ F → ∀C:F (⋃ F = ⋃ λC' (F C' ∧ C ⊂ C'))).
 intros.
 elim equal.extensional.
 intros.
 elim equal.proposition.
 intros.
 intros.
-lefts H13 Union $& $\/.
+lefts H13 $⋃ $∧ $∃.
 elim H11 with H12 then H13.
 trivial =H12 H13 H14 H15.
 trivial =H12 H13 H14 H15.
@@ -491,7 +491,7 @@ trivial =.
 lefts G4.
 select 2.
 select 3.
-lefts H11 $& $\/.
+lefts H11 $∧ $∃.
 apply G5 with (CI I) then F0 then H11.
 intro l.
 rewrite G4.
@@ -501,8 +501,8 @@ intro.
 trivial =H11.
 intros.
 left H13.
-elim H9 with H13. 
-prove Union F = x1.
+elim H9 with H13.
+prove ⋃ F = x1.
 elim equal.extensional.
 intros.
 elim equal.proposition.
@@ -515,7 +515,7 @@ elim CI_inc with H15.
 elim CI_x.
 trivial =H8.
 trivial =H10.
-lefts H11 $& $\/.
+lefts H11 $∧ $∃.
 apply G5 with (CI I) then F then H11.
 intro r.
 rewrite G4.
@@ -525,9 +525,9 @@ intro.
 trivial =H11.
 intros.
 left H13.
-elim H5 with H13 then (Union F0) then ?. 
+elim H5 with H13 then (⋃ F0) then ?.
 elim CI_U.
-prove Union F0 = x1.
+prove ⋃ F0 = x1.
 elim equal.extensional.
 intros.
 elim equal.proposition.
@@ -544,7 +544,7 @@ intro l.
 elim CI_x.
 
 local I y = x = y.
-local C0 = Union (CI I).
+local C0 = ⋃ (CI I).
 
 prove -I_chaine Chaine X R I.
 intros.
@@ -577,7 +577,7 @@ elim CI_chaine with CI_C0.
 prove C0 (f C0).
 apply CI_f with CI_C0.
 unfold -l 1 C0.
-unfold Union.
+unfold $⋃.
 intro.
 intros.
 axiom G4.
@@ -586,22 +586,22 @@ trivial =.
 elim CI_Nf with C0_chaine.
 save.
 
-theorem Zermelo /\X \/R well.order X R.
+theorem Zermelo ∀X ∃R well.order X R.
 intros.
 
-elim excluded_middle with \/u,v (X u & X v & u != v).
+elim excluded_middle with ∃u,v (X u ∧ X v ∧ u ≠ v).
 left H 2.
 left H Xu Xd.
 left Xd Xv Xd.
 
- 
-local Domain R x = X x & \/y:<'a (R x y or R y x). 
-local well.partial.order R = R u v & well.order (Domain R) R.
 
-local Less R R' = 
-  R subset_2 R' &
-  /\x,y:(Domain R) (R x y <-> R' x y) &
-  /\x:(Domain R') (~Domain R x -> /\y:(Domain R) R' y x).
+local Domain R x = X x ∧ ∃y:<'a (R x y ∨ R y x).
+local well.partial.order R = R u v ∧ well.order (Domain R) R.
+
+local Less R R' =
+  R ⊂_2 R' ∧
+  ∀x,y:(Domain R) (R x y ↔ R' x y) ∧
+  ∀x:(Domain R') (¬Domain R x → ∀y:(Domain R) R' y x).
 
 prove -WO order well.partial.order Less.
 intros.
@@ -629,9 +629,9 @@ intros.
 elim equal.proposition.
 trivial =H1.
 
-prove -EX \/R well.partial.order R.
+prove -EX ∃R well.partial.order R.
 intro.
-instance ?1 \x,x' (x = u & x' = v).
+instance ?1 λx,x' (x = u ∧ x' = v).
 intros.
 intro.
 intro.
@@ -648,17 +648,17 @@ intros.
 trivial =Xd H2.
 lefts H0.
 elim H.
-lefts H1 $& $or $\/.
+lefts H1 $∧ $∨ $∃.
 select 2.
 trivial.
 trivial =H0 H1.
 intros.
 axiom G.
 
-prove -IND /\C (Chaine well.partial.order Less C -> \/R:well.partial.order/\R':C (Less R' R)).
+prove -IND ∀C (Chaine well.partial.order Less C → ∃R:well.partial.order∀R':C (Less R' R)).
 intros.
 intro.
-instance ?2 Union_2 C.
+instance ?2 ⋃_2 C.
 intro.
 intros.
 left H.
@@ -670,8 +670,8 @@ trivial =H G.
 intros.
 intros.
 intros.
-lefts H3 Union_2 $& $\/.
-lefts H4 Union_2 $& $\/.
+lefts H3 $⋃_2 $∧ $∃.
+lefts H4 $⋃_2 $∧ $∃.
 apply H with [r] then H3 and H4.
 left G.
 select 2.
@@ -699,23 +699,23 @@ elim H7 with a.
 trivial =H1 H0 H2.
 
 intros.
-prove \/R:C (Domain R y & Domain R x).
-prove \/R:C Domain R x.
+prove ∃R:C (Domain R y ∧ Domain R x).
+prove ∃R:C Domain R x.
 trivial =H0.
-prove \/R:C Domain R y.
+prove ∃R:C Domain R y.
 trivial =H1.
-lefts G Domain $& $\/.
-lefts G0 Domain $& $\/.
+lefts G Domain $∧ $∃.
+lefts G0 Domain $∧ $∃.
 elim H with [r] then [r] then H2 and H5.
-intros $& $\/.
+intros $∧ $∃.
 axiom H5.
 trivial =H6 H7.
 trivial =H3 H4 H8.
-intros $& $\/.
+intros $∧ $∃.
 axiom H2.
 trivial =H6 H7 H8.
 trivial =H3 H4.
-lefts G $& $\/.
+lefts G $∧ $∃.
 apply H with H2.
 lefts G.
 lefts H6.
@@ -723,9 +723,9 @@ apply H7 with ? then H3 and ? then H4.
 trivial =H2 G.
 
 intros.
-prove \/R:C Domain R a.
+prove ∃R:C Domain R a.
 trivial =H1.
-lefts G Domain $& $\/.
+lefts G Domain $∧ $∃.
 apply H with H2.
 lefts G.
 lefts H6.
@@ -770,9 +770,9 @@ elim H6.
 elim H5.
 
 intros.
-prove \/R:C Domain R x.
+prove ∃R:C Domain R x.
 trivial =H1.
-lefts G $& $\/.
+lefts G $∧ $∃.
 elim H with [r] then [r] then H0 and H4.
 lefts H6.
 intros.
@@ -781,7 +781,7 @@ elim H8.
 trivial =H2 H5 H6.
 
 apply Zorn with Less and IND.
-lefts G $& $\/.
+lefts G $∧ $∃.
 intros.
 instance ?8 M.
 lefts H.
@@ -794,13 +794,13 @@ intros.
 trivial.
 intros.
 by_absurd.
-local M' y z = M y z or (Domain M y & z = x).
+local M' y z = M y z ∨ (Domain M y ∧ z = x).
 prove Less M M'.
 intros.
 trivial =.
 trivial =H5.
 intros.
-prove Domain M x0 or x0 = x.
+prove Domain M x0 ∨ x0 = x.
 trivial =H6.
 left G.
 select 2.
@@ -865,7 +865,7 @@ apply H2 with G0 and G1.
 trivial =G2.
 
 intros.
-prove /\c:(Domain M) X0 c.
+prove ∀c:(Domain M) X0 c.
 intros.
 elim H3.
 intros.
@@ -896,6 +896,6 @@ axiom H3.
 
 rewrite_hyp H demorganl.
 intro.
-instance ?11 \x,x' False.
+instance ?11 λx,x' False.
 auto.
 save.

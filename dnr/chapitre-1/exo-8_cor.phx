@@ -1,0 +1,125 @@
+Sort term.
+Cst A : term → prop.
+Cst B : term → prop.
+
+theorem numero1 ∀ x ( A x ∧ B x) ↔ (∀ x A x ∧ ∀ x B x).
+intro.
+intro 2.
+intro.
+elim H.
+intro.
+elim H.
+intro 3.
+elim H.
+elim H.
+save numero1.
+
+Sort term.
+Cst A : term → prop.
+Cst B :  term → prop.
+
+theorem numero2 ∃ x ( A x ∧ B x) → (∃ x A x ∧ ∃ x B x).
+intro 2.
+elim H.
+left H0.
+intro.
+axiom H0.
+elim H.
+left H0.
+intro.
+axiom H1.
+save numero2.
+
+
+
+Sort term.
+Cst A : term → prop.
+Cst B1 : prop.
+
+theorem numero3  ∃ x ( A x ∧ B1) ↔ (∃ x A x ∧ B1).
+intro.
+intro 2.
+elim H.
+left H0.
+intro.
+axiom H0.
+elim H.
+left H0.
+axiom H1.
+intro.
+left H.
+elim H.
+intro 2.
+axiom H1.
+axiom H0.
+save numero3.
+
+
+
+
+Sort term.
+Cst A : term → prop.
+Cst B :  term → prop.
+
+theorem numero4 ∃ x ( A x ∨ B x) ↔ (∃ x A x ∨ ∃ x B x).
+intro.
+intro.
+elim H.
+left H0.
+intro l.
+intro.
+axiom H0.
+intro r.
+intro.
+axiom H0.
+intro.
+left H.
+elim H.
+intro.
+intro l.
+axiom H0.
+elim H.
+intro.
+intro r.
+axiom H0.
+save numero4.
+
+
+
+Sort term.
+Cst A : term → prop.
+Cst B :  term → prop.
+Cst A1 : prop.
+Cst B1 : prop.
+
+theorem numero5 (∀x A x  ∨ ∀x B x)→ ∀x (A x ∨ B x).
+intro 2.
+left H.
+intro l.
+elim H.
+intro r.
+elim H.
+save numero5.
+
+theorem numero7 ∀x(A1 → B x)↔(A1→ ∀x B x).
+intros.
+intro 3.
+elim H.
+axiom H0.
+intro 3.
+elim H.
+axiom H0.
+save numero7.
+
+theorem numero8 ∀x(A x → B1)↔(∃x A x → B1).
+intros.
+intros.
+left H0.
+elim H.
+axiom H0.
+
+intros.
+elim H.
+intro.
+axiom H0.
+save numero8.

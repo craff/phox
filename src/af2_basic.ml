@@ -68,16 +68,16 @@ let init_data_af2 b =
   let kUnit = KAtom(oUnit, []) in
   let kTheorem_list = KAtom (iList, [kTheorem]) in
 
-  let _ = add_sym "->"
+  let _ = add_sym "→"
         (KArrow(kForm,KArrow(kForm,kForm)))
         Cst
-        (snd (syntax_of_string false "rInfix[9] x \"->\" y ;"))
+        (snd (syntax_of_string false "rInfix[9] x \"→\" y ;"))
         true true Kernel None in
-  let _ = add_sym "/\\"
+  let _ = add_sym "∀"
         (KArrow(KArrow(mk_Var (),kForm),kForm))
         Cst
         (snd (syntax_of_string false
-          "Prefix[6] \"/\\\\\" \\A,(\\R,x(R x)):$-> \\ A ;"))
+          "Prefix[6] \"∀\" \\A,(λR,x(R x)):$→ \\ A ;"))
         true true Kernel None in
   let _ = add_sym "="
         (let v = mk_Var () in KArrow(v,KArrow(v,kForm)))
@@ -160,7 +160,7 @@ let init_data_af2 b =
   let _ = add_sym "equal.reflexive"
         kTheorem
         (let t = (EApp(EApp(aobj (sym_get "theorems"),
-           EApp(aobj (sym_get "/\\"),
+           EApp(aobj (sym_get "∀"),
              EAbs("x",EApp(EApp(aobj (sym_get "="),EVar 0),EVar 0),mk_Var()))),
                aobj (sym_get "claim"))) in type_strong t kTheorem; Def t)
         Trivial true true Kernel None in
@@ -228,230 +228,6 @@ let init_data_af2 b =
         (snd (syntax_of_string false
            "Infix[10] x \":=\" y ;"))
         true true Kernel None in
-(*
-  let _ = add_sym "#-"
-      	(KArrow(kInt,KArrow(kInt,kInt)))
-	(Fun 1)
-        (snd (syntax_of_string false
-          "lInfix[9.95] x \"#-\" y ;"))
-	  true true Kernel None in
-  let _ = add_sym "#*"
-      	(KArrow(kInt,KArrow(kInt,kInt)))
-	(Fun 2)
-        (snd (syntax_of_string false
-          "lInfix[9.94] x \"#*\" y ;"))
-	  true true Kernel None in
-  let _ = add_sym "#/"
-      	(KArrow(kInt,KArrow(kInt,kInt)))
-	(Fun 3)
-        (snd (syntax_of_string false
-          "lInfix[9.94] x \"#/\" y ;"))
-	  true true Kernel None in
-  let _ = add_sym "#="
-      	(let v = mk_Var () in KArrow(v,KArrow(v,kForm)))
-	(Fun 4)
-        (snd (syntax_of_string false
-          "lInfix[9.99] x \"#=\" y ;"))
-	  true true Kernel None in
-  let _ = add_sym "#<"
-      	(let v = mk_Var () in KArrow(v,KArrow(v,kForm)))
-	(Fun 5)
-        (snd (syntax_of_string false
-          "lInfix[9.99] x \"#<\" y ;"))
-	  true true Kernel None in
-  let _ = add_sym "#<="
-      	(let v = mk_Var () in KArrow(v,KArrow(v,kForm)))
-	(Fun 6)
-        (snd (syntax_of_string false
-          "lInfix[9.99] x \"#<=\" y ;"))
-	  true true Kernel None in
-  let _ = add_sym "#>"
-      	(let v = mk_Var () in KArrow(v,KArrow(v,kForm)))
-	(Fun 7)
-        (snd (syntax_of_string false
-          "lInfix[9.99] x \"#>\" y ;"))
-	  true true Kernel None in
-  let _ = add_sym "#>="
-      	(let v = mk_Var () in KArrow(v,KArrow(v,kForm)))
-	(Fun 8)
-        (snd (syntax_of_string false
-          "lInfix[9.99] x \"#>=\" y ;"))
-	  true true Kernel None in
-  let _ = add_sym "IF"
-      	(let v = mk_Var () in KArrow(kForm,(KArrow(v,KArrow(v,v)))))
-	(Fun 9)
-        (snd (syntax_of_string false
-          "Prefix[9.995] \"IF\" b \"THEN\" a \"ELSE\" c ;"))
-	  true true Kernel None in
-  let _ = add_sym "FIX"
-      	(let v = mk_Var () in KArrow(KArrow(v,v), v))
-	(Fun 10)
-        Trivial true true Kernel None in
-  let _ = add_sym "RAISE"
-      	(let v = mk_Var () in KArrow(kString,v))
-	(Fun 11)
-        Trivial true true Kernel None in
-  let _ = add_sym "CATCH"
-      	(let v = mk_Var () in KArrow(v,KArrow(KArrow(kString,v), v)))
-	(Fun 12)
-        Trivial true true Kernel None in
-  let _ = add_sym "CALL"
-      	(let v = mk_Var () and w = mk_Var () in
-           KArrow(KArrow(v,w), KArrow(v,w)))
-	(Fun 13)
-        Trivial true true Kernel None in
-  let _ = add_sym "UNIT"
-      	kUnit
-	Cst
-        Trivial true true Kernel None in
-  let _ = add_sym "NONE"
-      	(let v = mk_Var () in KAtom(iOption,[v]))
-	Cst
-        Trivial true true Kernel None in
-  let _ = add_sym "SOME"
-      	(let v = mk_Var () in KArrow(v,KAtom(iOption,[v])))
-	Cst
-        Trivial true true Kernel None in
-  let _ = add_sym "NIL"
-      	(let v = mk_Var () in KAtom(iList,[v]))
-	Cst
-        Trivial true true Kernel None in
-  let _ = add_sym "#:"
-      	(let v = mk_Var () in
-           KArrow(v,KArrow(KAtom(iList,[v]),KAtom(iList,[v]))))
-	Cst
-        (snd (syntax_of_string false
-          "rInfix[9.97] x \"#:\" y ;"))
-	  true true Kernel None in
-  let _ = add_sym "NEW_ELIM"
-      	(let v = mk_Var () in
-           lArrow[v;kString;kInt;kTheorem;kForm;kForm;kForm;kUnit])
-	(Fun 14)
-        Trivial true true Kernel None in
-  let _ = add_sym "NEW_INTRO"
-        (lArrow[kString;kTheorem;kForm;kForm;kForm;kForm;kForm;kUnit])
-	(Fun 15)
-        Trivial true true Kernel None in
-  let _ = add_sym "CLOSE_DEF"
-        (lArrow[kString;kForm;kUnit])
-	(Fun 16)
-        Trivial true true Kernel None in
-  let _ = add_sym "ELIM_AFTER_INTRO"
-      	(let v = mk_Var () in
-           lArrow[v;kForm;kUnit])
-	(Fun 17)
-        Trivial true true Kernel None in
-  let _ = add_sym "TEX_SYNTAX"
-      	(let v = mk_Var () in
-           lArrow[v;kString;kSyntax;kForm;kUnit])
-	(Fun 18)
-        Trivial true true Kernel None in
-  let _ = add_sym "DEF"
-      	(let v = mk_Var () in
-           lArrow[kString;v;kSyntax;kForm;kUnit])
-	(Fun 19)
-        Trivial true true Kernel None in
-  let _ = add_sym "FUN"
-      	(let v = mk_Var () in
-           lArrow[kString;v;kSyntax;kForm;kUnit])
-	(Fun 20)
-        Trivial true true Kernel None in
-  let _ = add_sym "NEW_REWRITE"
-        (lArrow[kForm;kForm;kTheorem;kForm;kUnit])
-	(Fun 21)
-        Trivial true true Kernel None in
-  let _ = add_sym "SAVE"
-        (lArrow[kString;kForm;kUnit])
-	(Fun 22)
-        Trivial true true Kernel None in
-  let _ = add_sym "QUIT"
-        kUnit
-	(Fun 23)
-        Trivial true true Kernel None in
-  let _ = add_sym "CST"
-        (lArrow[kString;kString;kSyntax;kUnit])
-	(Fun 24)
-        Trivial true true Kernel None in
-  let _ = add_sym "LOCAL"
-      	(let v = mk_Var () in
-           lArrow[kString;v;kSyntax;kUnit])
-	(Fun 25)
-        Trivial true true Kernel None in
-  let _ = add_sym "GOAL"
-        (lArrow[kForm; kUnit])
-	(Fun 26)
-        Trivial true true Kernel None in
-  let _ = add_sym "INTRO_NUM"
-        (lArrow[kInt; kInt])
-	(Fun 27)
-        Trivial true true Kernel None in
-  let _ = add_sym "INTRO_NAMES"
-        (lArrow[KAtom(iList,[kString]); kInt])
-	(Fun 28)
-        Trivial true true Kernel None in
-  let _ = add_sym "INTRO_OBJS"
-        (lArrow[KAtom(iList,[kString]); kInt])
-	(Fun 29)
-        Trivial true true Kernel None in
-  let _ = add_sym "MATCH"
-      	(let v = mk_Var () in
-         lArrow[v;v;kUnit])
-	(Fun 30)
-        Trivial true true Kernel None in
-  let _ = add_sym "TRIVIAL"
-        (lArrow[kForm;KAtom(iList,[kString]);KAtom(iList,[kString]);
-                kInt;kUnit])
-	(Fun 31)
-        Trivial true true Kernel None in
-  let _ = add_sym "AUTO"
-        (lArrow[kForm;KAtom(iList,[kString]);KAtom(iList,[kString]);
-                kUnit])
-	(Fun 32)
-        Trivial true true Kernel None in
-  let _ = add_sym "USE"
-        (lArrow[kString;kForm;kUnit])
-	(Fun 33)
-        Trivial true true Kernel None in
-  let _ = add_sym "RMH"
-        (lArrow[KAtom(iList,[kString]);kUnit])
-	(Fun 34)
-        Trivial true true Kernel None in
-  let _ = add_sym "SLH"
-        (lArrow[KAtom(iList,[kString]);kUnit])
-	(Fun 35)
-        Trivial true true Kernel None in
-  let _ = add_sym "AXIOM"
-        (lArrow[kString;kUnit])
-	(Fun 36)
-        Trivial true true Kernel None in
-  let _ = add_sym "#,"
-        (let v = mk_Var () and w = mk_Var () in
-         lArrow[v;w;KAtom(iPair,[v;w])])
-	Cst
-        (snd (syntax_of_string false
-          "rInfix[9.96] x \"#,\" y ;"))
-        true true Kernel None in
-  let _ = add_sym "FST"
-        (let v = mk_Var () and w = mk_Var () in
-         lArrow[KAtom(iPair,[v;w]);v])
-	(Fun 37)
-        Trivial true true Kernel None in
-  let _ = add_sym "SND"
-        (let v = mk_Var () and w = mk_Var () in
-         lArrow[KAtom(iPair,[v;w]);w])
-	(Fun 38)
-        Trivial true true Kernel None in
-  let _ = add_sym "INL"
-        (let v = mk_Var () and w = mk_Var () in
-         lArrow[v;KAtom(iSum,[v;w])])
-	Cst
-        Trivial true true Kernel None in
-  let _ = add_sym "INR"
-        (let v = mk_Var () and w = mk_Var () in
-         lArrow[w;KAtom(iSum,[v;w])])
-	Cst
-        Trivial true true Kernel None in
-*)
   ()
 
 
@@ -499,9 +275,9 @@ let iSum = tsym_get "sum"
 
 let kTheorem_list = KAtom (iList, [kTheorem])
 
-let arrow_obj  = tsym_get "->"
+let arrow_obj  = tsym_get "→"
 let _ = farrow_obj := arrow_obj
-let forall_obj = tsym_get "/\\"
+let forall_obj = tsym_get "∀"
 let equal_obj = tsym_get "="
 let theorem_obj = tsym_get "theorems"
 let _ = ftheorem_obj := theorem_obj
@@ -631,15 +407,15 @@ let false_elim_obj = ref dummy_obj
 
 let after_pervasives () =
   if not init then begin
-    and_obj := tsym_get "&";
+    and_obj := tsym_get "∧";
     let_obj := tsym_get "Let";
-    or_obj := tsym_get "or";
-    diff_obj := tsym_get "!=";
-    not_obj := tsym_get "~";
+    or_obj := tsym_get "∨";
+    diff_obj := tsym_get "≠";
+    not_obj := tsym_get "¬";
     false_obj := tsym_get "False";
     true_obj := tsym_get "True";
-    exists_obj := tsym_get "\\/";
-    exists_one_obj := tsym_get "\\/";
+    exists_obj := tsym_get "∃";
+    exists_one_obj := tsym_get "∃!";
     and_elim_l_obj := tsym_get "conjunction.left.elim";
     and_elim_r_obj := tsym_get "conjunction.right.elim";
     peirce_law_obj := tsym_get "peirce_law";
@@ -876,7 +652,7 @@ let add_basic_tex () =
   let n,sy = (syntax_of_string true "rInfix[8] x \"\\\\rightarrow\" y ;") in
   add_tex_syntax [0] arrow_obj n sy false;
   let n,sy = (syntax_of_string true
-          "Prefix[6] \"\\\\forall\" \\A,(\\R,x(R x)):$-> \\ A ;") in
+          "Prefix[6] \"\\\\forall\" \\A,(λR,x(R x)):$→ \\ A ;") in
   add_tex_syntax [0] forall_obj n sy false;
   let n,sy = (syntax_of_string true "Infix[5] x \"=\" y ;") in
   add_tex_syntax [0] equal_obj n sy false

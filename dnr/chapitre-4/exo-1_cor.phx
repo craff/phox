@@ -1,0 +1,129 @@
+Cst a : prop.
+Cst b : prop.
+Cst c : prop.
+
+theorem numero2 ( ¬ ¬  b → b ) → (¬ ¬ (a → b)→a →b).
+(*->*)
+intro 3.
+elim H.
+intro.
+elim H0.
+intro.
+elim H2.
+elim H3.
+axiom H1.
+(*->*)
+save.
+
+theorem numero3 ¬ ¬ ((a → b) → ((¬ a → c) → ((b → c) → c))).
+(*->*)
+intro.
+elim H.
+intro 3.
+elim H1.
+intro.
+elim H.
+intro 3.
+elim H2.
+elim H0.
+axiom H3.
+(*->*)
+save.
+
+theorem numero4 ¬ ¬ (( ¬ b → ¬ a) →  (a → b)).
+(*->*)
+intro.
+elim H.
+intro 2.
+elim H0.
+intro.
+elim H.
+intro 2.
+axiom H2.
+axiom H1.
+(*->*)
+save.
+
+theorem numero5 ¬ ¬ (((a →b)→a)→a).
+(*->*)
+intro.
+elim H.
+intro.
+elim H0.
+intro.
+(* la commande suivante correspond à la règle d'absurdité intuitionniste*)
+elim False.
+elim H.
+intro.
+axiom H1.
+(*->*)
+save.
+
+theorem numero6 ¬ ¬ ((a∧b →c)→(a→c) ∨ (b→c)).
+(*->*)
+intro.
+elim H.
+intro.
+intro l.
+intro.
+(* la commande suivante correspond à la règle d'absurdité intuitionniste*)
+elim H.
+intro.
+intro r.
+intro.
+elim H0.
+intro.
+axiom H1.
+axiom H3.
+(*->*)
+save.
+
+theorem numero7 ¬ ¬ ((a → b ∨ c)→(a→b) ∨ (a→c)).
+(*->*)
+intros.
+elim H.
+intros.
+intro l.
+intro.
+elim H0.
+axiom H1.
+axiom H2.
+elim H.
+intros.
+intro r.
+intro.
+axiom H2.
+(*->*)
+save.
+
+theorem numero8 ¬ ¬ ((a → b ∨ c)→(a → b) ∨ c).
+(*->*)
+intros.
+elim H.
+intros.
+intro l.
+intro.
+elim H0.
+axiom H1.
+axiom H2.
+elim H.
+intros.
+intro r.
+axiom H2.
+(*->*)
+save.
+
+theorem numero10 ¬ ¬ (((a → b) → b)→ a ∨ b).
+(*->*)
+intros.
+elim H.
+intros.
+intro r.
+elim H0.
+intro.
+elim H.
+intros.
+intro l.
+axiom H1.
+(*->*)
+save.

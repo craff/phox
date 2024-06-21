@@ -1,10 +1,10 @@
 function lit_correction(){
   print "....";
   getline;
-  while( $0 !~ /\(\*->\*\)/ ) {
+  while( $0 !~ /\(\*(->)|(→)\*\)/ ) {
     getline;
   }
-  getline;	
+  getline;
 }
 
 function lit_comment(){
@@ -12,18 +12,17 @@ function lit_comment(){
   while( $0 !~ /\(\*<-\*\)/ ) {
     getline;
   }
-  getline;	
+  getline;
 }
 
-( $1 ~ /\(\*->\*\)/ ) {
+( $1 ~ /\(\*(->)|(→)\*\)/ ) {
   lit_correction();
-} 
+}
 
 ( $1 ~ /\(\*<-\*\)/ ) {
   lit_comment();
-} 
-
-( $1 !~ /\(\*(->)|(<-)\*\)/ ) {
-  print $0;
 }
 
+( $1 !~ /\(\*(->)|(→)|(<-)\*\)/ ) {
+  print $0;
+}

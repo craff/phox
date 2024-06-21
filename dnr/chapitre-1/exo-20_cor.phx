@@ -1,0 +1,40 @@
+Sort term.
+Cst R : term → term →  prop.
+Cst Infix[3] x "o" y : term → term → term.
+Cst Infix[3] x "#" y : term → term → term.
+Cst Infix[5] x "⩽" y : term → term → prop.
+
+goal
+  ∀x,a,b ((R x (a o b))↔ ∀y(x ⩽ y →(R y a → R y b))) →
+  ∀x,a,b (R x (a # b) ↔ (R x a ∨ R x b)) →
+  ∀x,y,z (x ⩽ y → x ⩽ z → (y ⩽ z ∨ z ⩽ y)) →
+  ∀x,y,a (R x a ∧ x ⩽ y → (R y a)) →
+∀x,a,b (R x ((a o b) # (b o a))).
+
+intro F1 F2 F3 F4.
+intro 3.
+elim F2 with [r].
+by_absurd.
+elim False.
+rewrite_hyp H demorganl.
+left H.
+elim H.
+elim F1 with [r].
+intros.
+by_absurd.
+elim H0.
+elim F1 with [r].
+intros.
+by_absurd.
+elim F3 with H1 and H4.
+elim H6.
+elim F4 with H2 ∧ H7.
+intro.
+axiom H2.
+axiom H7.
+elim H3.
+elim F4 with H5 ∧ H7.
+intro.
+axiom H5.
+axiom H7.
+save th.

@@ -10,23 +10,23 @@ flag auto_lvl 1.
 Sort ringelt.
 
 (* Sum and product. *)
-Cst lInfix[4]  x"+"y  : ringelt -> ringelt -> ringelt.
-Cst lInfix[3] x"*"y   : ringelt -> ringelt -> ringelt.
+Cst lInfix[4]  x"+"y  : ringelt → ringelt → ringelt.
+Cst lInfix[3] x"*"y   : ringelt → ringelt → ringelt.
 
 (* The two neutral elements *)
 Cst  zero : ringelt.
 Cst one : ringelt.
 
 (* The properties we need *)
-claim plusassoc /\x,y,z  x+(y+z)=x+y+z.
-claim pluscom /\x,y x+y=y+x.
-claim multassoc /\x,y,z x*(y*z)=x*y*z.
-claim multcom /\x,y x*y=y*x.
-claim eltabs /\x (x*zero=zero & zero*x=zero).
-claim eltneutrezero /\x (x+zero=x & zero+x=x).
-claim eltneutreone /\x (x*one=x & one*x=x).
-claim distributivity /\a,x,y a*(x+y)=a*x+a*y.
-claim distributivityr /\a,x,y (x+y)*a=x*a+y*a.
+claim plusassoc ∀x,y,z  x+(y+z)=x+y+z.
+claim pluscom ∀x,y x+y=y+x.
+claim multassoc ∀x,y,z x*(y*z)=x*y*z.
+claim multcom ∀x,y x*y=y*x.
+claim eltabs ∀x (x*zero=zero ∧ zero*x=zero).
+claim eltneutrezero ∀x (x+zero=x ∧ zero+x=x).
+claim eltneutreone ∀x (x*one=x ∧ one*x=x).
+claim distributivity ∀a,x,y a*(x+y)=a*x+a*y.
+claim distributivityr ∀a,x,y (x+y)*a=x*a+y*a.
 
 (* We indicate to PhoX that the automatic equationnal reasonning 
   can use these equations. *)
@@ -47,22 +47,22 @@ def_thlist calcul = eltabs eltneutreone eltneutrezero  plusassoc multassoc.
 def_thlist develop = eltabs eltneutreone eltneutrezero  plusassoc multassoc distributivity distributivityr.
 
 (* Some definitions.  *)
-def ideal I = /\x,y:I (I (x+y)) & /\x:I /\z (I (z*x)) & I zero.
+def ideal I = ∀x,y:I (I (x+y)) ∧ ∀x:I ∀z (I (z*x)) ∧ I zero.
 
-def principal I = \/a /\x (I x <-> \/y x = a*y).
+def principal I = ∃a ∀x (I x ↔ ∃y x = a*y).
 
-def Infix[5] I "subset" J = /\x:I J x.
+def Infix[5] I "⊂" J = ∀x:I J x.
 
-def maximal I = ideal I & ~(I one) & /\J (ideal J & I subset J -> J subset I or J one).
+def maximal I = ideal I ∧ ¬(I one) ∧ ∀J (ideal J ∧ I ⊂ J → J ⊂ I ∨ J one).
 
-def prime I = ideal I & ~(I one) & /\x,y ((I (x*y)) -> I x or I y).
+def prime I = ideal I ∧ ¬(I one) ∧ ∀x,y ((I (x*y)) → I x ∨ I y).
 
 (* We will prove this lemma after the theorem. *)
-claim lemme /\I:ideal /\x (maximal I ->  ~ I x -> \/i:I \/a (i+a*x=one)).
+claim lemme ∀I:ideal ∀x (maximal I →  ¬ I x → ∃i:I ∃a (i+a*x=one)).
 
 (* le sens direct du théorème *)
-goal /\I:ideal (maximal I -> prime I).
-(*->*)
+goal ∀I:ideal (maximal I → prime I).
+(*→*)
 intros.
 unfold prime.
 intros.
@@ -95,17 +95,17 @@ elim H9 with H6.
 elim H9 with H1.
 lefts H0.
 elim H9.
-(*->*)
+(*→*)
 save thm1.
 
 (* two more definitions *)
-def regular = /\x,y,a (a*x=a*y -> a=zero or x=y).
-def Aprincipal =  regular & /\I (ideal I  -> principal I).
+def regular = ∀x,y,a (a*x=a*y → a=zero ∨ x=y).
+def Aprincipal =  regular ∧ ∀I (ideal I  → principal I).
 
 (* the converse of the previous theorem *)
-goal Aprincipal -> 
-     /\I:ideal ((\/x:I ~x=zero) -> prime I -> ~ I one -> maximal I).
-(*->*)
+goal Aprincipal → 
+     ∀I:ideal ((∃x:I ¬x=zero) → prime I → ¬ I one → maximal I).
+(*→*)
 intro.
 left H.
 intros.
@@ -129,7 +129,7 @@ elim H6.
 elim H8 with G1.
 rename y x.
 lefts H3.
-apply H10 with I (q * x).
+apply H10 with I (q × x).
 axiom G.
 elim G2.
 intro l.
@@ -138,10 +138,10 @@ elim H7 with H12.
 elim H8 with H13.
 elim H7 with [r].
 intro.
-instance ?1 y * y0.
+instance ?1 y × y0.
 intro.
 elim H7 with H12.
-prove  x * one = x * (q * y).
+prove  x × one = x × (q × y).
 intro.
 apply regular with G3.
 left G4.
@@ -156,70 +156,70 @@ left H2.
 elim H15.
 elim H7 with H2.
 intro.
-(*->*)
+(*→*)
 save thm2.
 
 (* one definition useful to prove the lemma: 
    generates I x is the smallest ideal containing I and x. *)
-def generates I x y = \/i:I \/a (y=i+a*x).
+def generates I x y = ∃i:I ∃a (y=i+a*x).
 
 (* First property of genrates *)
-prop lemme1 /\I:ideal /\x ideal (generates I x).
-(*->*)
+prop lemme1 ∀I:ideal ∀x ideal (generates I x).
+(*→*)
 intros.
 lefts H.
 intros.
 intros.
 rename x0 z.
-lefts H2 $& $\/ generates.
+lefts H2 $∧ $∃ generates.
 rename x0 j.
-lefts H3 $& $\/ generates.
+lefts H3 $∧ $∃ generates.
 rename x0 i.
 rewrite H4 H5.
-intros generates $& $\/.
+intros generates $∧ $∃.
 select 2.
 instance ?2 a + a0.
 instance ?1 j + i.
 intro.
 elim H.
 intros.
-lefts H2 $& $\/ generates.
+lefts H2 $∧ $∃ generates.
 rename x1 i.
 rewrite H3.
-intros generates $& $\/.
+intros generates $∧ $∃.
 select 2.
 instance ?4 z*a.
 instance ?3 z*i.
 intro.
 elim H1.
-intros generates $& $\/.
+intros generates $∧ $∃.
 axiom H0.
 intro.
-(*->*)
+(*→*)
 save.
 
 (* second proprerty of generates (trivial) *)
-prop  lemme2 /\I,x I subset (generates I x).
+prop  lemme2 ∀I,x I ⊂ (generates I x).
 trivial.
 save.
 
 (* third proprerty of generates (trivial) *)
-prop  lemme3 /\I:ideal /\x generates I x x.
+prop  lemme3 ∀I:ideal ∀x generates I x x.
 trivial.
 save.
 
 (* proff of the lemma *)
 prove_claim lemme.
-(*->*)
+(*→*)
 intros.
 local J = generates I x.
 prove ideal J.
 elim lemme1.
-prove I subset J.
+prove I ⊂ J.
 elim lemme2.
 prove J x.
 elim lemme3.
-apply H0 with G & G0.
+apply H0 with G ∧ G0.
 intro.
 elim G2.
 elim H1.
@@ -230,5 +230,5 @@ left H4.
 intro 2.
 axiom H3.
 intro 2.
-(*->*)
+(*→*)
 save.

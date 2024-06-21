@@ -15,7 +15,7 @@ tex
   author = "Frito y Fede - Febrero 1996"
   institute = "Chalmers institute of Technology"
   documents = math
-. 
+.
 
 flag auto_lvl 3.
 
@@ -29,18 +29,18 @@ flag auto_lvl 3.
 
 Sort set.
 (* Membership relation *)
-Cst Infix[3] x "E" y : set -> set -> prop.
-tex_syntax $E Infix[3] x "\\in" y.
+Cst Infix[3] x "∈" y : set → set → prop.
+tex_syntax $∈ Infix[3] x "\\in" y.
 
 (*! math
 \begin{definition}
-  We introduce a binary relation \[ x E y \].
+  We introduce a binary relation \[ x∈y \].
 \end{definition}
 *)
 
 (* Set inclusion relation *)
-def Infix[3] x "<<" y = /\z E x  z E y.
-tex_syntax $<< Infix[3] x "\\subset" y.
+def Infix[3] x "<<" y = ∀z∈x  z∈y.
+tex_syntax $<< Infix[3] x "\\⊂" y.
 
 (*! math
 \begin{definition}
@@ -53,25 +53,25 @@ tex_syntax $<< Infix[3] x "\\subset" y.
 (* AXIOM: Extensionality axiom *)
 (* *************************** *)
 
-claim ext /\x/\y (/\z (z E x <-> z E y) -> x = y).
+claim ext ∀x∀y (∀z (z∈x ↔ z∈y) → x = y).
 tex_syntax ext "extensionality".
 
 (*! math
 \begin{axiom}[\[ ext \] ]
   The axiom of extensionaly expresses that two sets with the same
-elements are equal: 
+elements are equal:
   \[[ $$ ext \]]
 \end{axiom}
 *)
 
 (* Mutual inclusion iff equality *)
-goal /\x/\y (x << y & y << x <-> x = y).
-prove ext. 
+goal ∀x∀y (x << y ∧ y << x ↔ x = y).
+prove ext.
 trivial.
 save exti.
 
 (* Transitivity of inclusion *)
-goal /\x/\y/\z (x << y & y << z -> x << z).
+goal ∀x∀y∀z (x << y ∧ y << z → x << z).
 trivial.
 save inc_tran.
 
@@ -90,21 +90,21 @@ save inc_tran.
 (* AXIOM: Pair axiom and properties *)
 (* ******************************** *)
 
-def Pair x y z = /\u (u E z <-> (x = u or y = u)).
-claim pair_ax /\x/\y\/z Pair x y z.
+def Pair x y z = ∀u (u∈z ↔ (x = u ∨ y = u)).
+claim pair_ax ∀x∀y∃z Pair x y z.
 tex_syntax pair_ax "pair axiom".
 
 (*! math
 \begin{axiom}[\[ pair_ax \] ]
   This axiom expresses that for any two sets, there
   exists a set whose elements are exactly those two sets:
-  $$ \[ $$pair_ax \] \;\text{where}\; 
+  $$ \[ $$pair_ax \] \;\text{where}\;
      \[ Pair x y z \] := \[ $$Pair x y z \] $$
 \end{axiom}
 *)
 
 (* unicity of the pair set (to apply consistently the definition principle) *)
-goal /\x/\y\/!z Pair x y z.
+goal ∀x∀y∃!z Pair x y z.
 (*! math
 \begin{proposition}[pair unicity].
   We ca prove the unicity of pair:
@@ -120,7 +120,7 @@ elim pair_ax.
 intros.
 intro.
 (*! math
-  Using the \[ pair_ax \] we can assume \[ $$H \] and we must prove \[ $0 \]. 
+  Using the \[ pair_ax \] we can assume \[ $$H \] and we must prove \[ $0 \].
   This is immediate using the \[ ext \] axiom. \qed
 \end{proof}
 *)
@@ -136,39 +136,39 @@ tex_syntax pair Prefix "\\{" x "," y "\\}".
 (*! math
 \begin{definition}
   Using the definition principle, we can give a name to a pair:
-  $$ \[ pair x y\] := \[Def \z (Pair x y z) \].$$
+  $$ \[ pair x y\] := \[Def λz (Pair x y z) \].$$
 *)
 
 (* pair x y IS the pair between x and y *)
-goal /\x/\y Pair x y (pair x y).
+goal ∀x∀y Pair x y (pair x y).
 intros.
 intro.
 trivial + pair_unique.
 save pair_is_pair.
 
-(*!math 
-  Then using the \[definite_description\] axiom and the \[pair_unique\] theorem, 
+(*!math
+  Then using the \[definite_description\] axiom and the \[pair_unique\] theorem,
   we can prove immediately \[ $$pair_is_pair \].
 \end{definition}
 *)
 
-goal /\x,y,z/\X ((x = y -> X) -> (x = z -> X) -> x E pair y z -> X).
+goal ∀x,y,z∀X ((x = y → X) → (x = z → X) → x∈pair y z → X).
 trivial + pair_is_pair.
 save pair_elim.
 tex_syntax pair_elim "pair elimination".
 
-new_elim -i $E pair pair_elim.
+new_elim -i $∈ pair pair_elim.
 
 (* ** Pair set properties ** *)
 
 (* Pairs contain both of their elements *)
-goal /\x/\y x E pair x y.
+goal ∀x∀y x∈pair x y.
 intros.
 trivial + pair_is_pair.
 save x_in_pairxy.
 tex_syntax x_in_pairxy "pair left introduction".
 
-goal /\x/\y y E pair x y.
+goal ∀x∀y y∈pair x y.
 intros.
 trivial + pair_is_pair.
 save y_in_pairxy.
@@ -180,8 +180,8 @@ new_intro rpair y_in_pairxy.
 close_def pair.
 
 (*!math
-  \begin{proposition} 
-    Then, it is easy to prove the following ``introduction and 
+  \begin{proposition}
+    Then, it is easy to prove the following ``introduction and
     elimination rule'' for \[ pair x y \] :
     $$ \begin{array}{ll}
     \[ $$ x_in_pairxy \] &\hspace{1cm} \[ x_in_pairxy \] \cr
@@ -192,31 +192,31 @@ close_def pair.
 *)
 
 (* Symmetry of pairs *)
-goal /\x/\y pair x y = pair y x.
+goal ∀x∀y pair x y = pair y x.
 trivial +ext.
 save pair_symm.
 
 (* Two pairs are equal iff they are obtained by pairing the same elements *)
-goal /\x1/\y1/\x2/\y2 (pair x1 y1 = pair x2 y2 <-> 
-                      ((x1 = x2 & y1 = y2) or (x1 = y2 & y1 = x2))).
+goal ∀x1∀y1∀x2∀y2 (pair x1 y1 = pair x2 y2 ↔
+                      ((x1 = x2 ∧ y1 = y2) ∨ (x1 = y2 ∧ y1 = x2))).
 intros.
 intro.
 intro.
-prove x1 = x2 or x1 = y2.
- prove x1 E pair x2 y2. trivial. trivial.
-prove y1 = x2 or y1 = y2.
- prove y1 E pair x2 y2. trivial. trivial.
-prove x2 = x1 or x2 = y1.
- prove x2 E pair x1 y1. trivial. trivial.
-prove y2 = x1 or y2 = y1.
- prove y2 E pair x1 y1. trivial. trivial.
+prove x1 = x2 ∨ x1 = y2.
+ prove x1∈pair x2 y2. trivial. trivial.
+prove y1 = x2 ∨ y1 = y2.
+ prove y1∈pair x2 y2. trivial. trivial.
+prove x2 = x1 ∨ x2 = y1.
+ prove x2∈pair x1 y1. trivial. trivial.
+prove y2 = x1 ∨ y2 = y1.
+ prove y2∈pair x1 y1. trivial. trivial.
 rmh H.
 trivial.
 trivial + pair_symm.
 save pair_ext.
 
 (* pair x y is the smallest set containing x and y *)
-goal /\x,y,z (x E z & y E z <-> pair x y << z).
+goal ∀x,y,z (x∈z ∧ y∈z ↔ pair x y << z).
 trivial.
 save pair_1.
 
@@ -229,7 +229,7 @@ def sing x = pair x x.
 (* ** Singleton properties ** *)
 
 (* two singletons are equal iff they are singletons of the same element *)
-goal /\x/\y (sing x = sing y <-> x = y).
+goal ∀x∀y (sing x = sing y ↔ x = y).
 intros.
 intro.
 next.
@@ -240,28 +240,28 @@ trivial.
 trivial.
 save sing_ext.
 
-goal /\x (x E sing x).
+goal ∀x (x∈sing x).
 trivial.
 save sing_intro.
 
-new_intro sing sing_intro. 
+new_intro sing sing_intro.
 
-goal /\x,y,X ((x = y -> X) -> y E (sing x) ->  X ).
+goal ∀x,y,X ((x = y → X) → y∈(sing x) →  X ).
 trivial.
 save sing_elim.
 
-new_elim -i $E sing sing_elim. 
+new_elim -i $∈ sing sing_elim.
 
 (* ****************** *)
 (* AXIOM: Union axiom *)
 (* ****************** *)
 
-def Union x z = /\u (u E z <-> \/y (y E x & u E y)).
+def Union x z = ∀u (u∈z ↔ ∃y (y∈x ∧ u∈y)).
 
-claim union_ax /\x\/z Union x z.
+claim union_ax ∀x∃z Union x z.
 
 (* Unicity of the union *)
-goal /\x\/!z Union x z.
+goal ∀x∃!z Union x z.
 intro.
 elim union_ax.
 intro.
@@ -276,7 +276,7 @@ save union_unique.
 def union x = Def (Union x).
 
 (* the union is a union *)
-goal /\x Union x (union x).
+goal ∀x Union x (union x).
 trivial + union_unique.
 save union_is_union.
 
@@ -284,17 +284,17 @@ save union_is_union.
 
 close_def union.
 
-goal /\x/\y E x /\z E y  z E union x.
+goal ∀x∀y∈x ∀z∈y  z∈union x.
 trivial + union_is_union.
 save union_intro.
 
 new_intro union union_intro.
 
-goal /\X/\x,y (/\z (z E y -> x E z -> X) -> x E (union y) -> X).
+goal ∀X∀x,y (∀z (z∈y → x∈z → X) → x∈(union y) → X).
 trivial + union_is_union.
-save union_elim. 
+save union_elim.
 
-new_elim -i $E union union_elim.
+new_elim -i $∈ union union_elim.
 
 (* ************ *)
 (* Binary union *)
@@ -305,39 +305,39 @@ def Infix[2] x "U" y = union (pair x y).
 (* ** Binary union properties *)
 
 (* The bin-union includes both its uniends *)
-goal /\a/\b/\z(z E a -> z E a U b).
+goal ∀a∀b∀z(z∈a → z∈a U b).
 trivial.
 save x_inc_unionxy.
 
-goal /\a/\b/\z(z E b -> z E a U b).
+goal ∀a∀b∀z(z∈b → z∈a U b).
 trivial.
 save y_inc_unionxy.
 
 new_intro U_left x_inc_unionxy.
 new_intro U_right y_inc_unionxy.
 
-goal /\x,y,z,X ((z E x -> X) -> (z E y -> X) -> z E (x U y) -> X). 
+goal ∀x,y,z,X ((z∈x → X) → (z∈y → X) → z∈(x U y) → X).
 trivial 6.
 save U_elim.
 
-new_elim -i $E U_elim U_elim.
+new_elim -i $∈ U_elim U_elim.
 
 close_def $U.
 
 (* Bin-union is idempotent *)
-goal /\a a = a U a.
+goal ∀a a = a U a.
 trivial +ext.
 save union_idemp.
 new_equation -r union_idemp.
 
 (* Bin-union is symetric *)
-goal /\x/\y (x U y = y U x).
+goal ∀x∀y (x U y = y U x).
 trivial +ext.
 save union_sym.
 new_equation union_sym.
 
 (* Bin-union is associative *)
-goal /\x/\y/\z (x U (y U z) = (x U y) U z).
+goal ∀x∀y∀z (x U (y U z) = (x U y) U z).
 intros.
 elim ext.
 trivial 7.
@@ -348,15 +348,15 @@ new_equation union_assoc.
 (* AXIOM: Subset axiom *)
 (* ******************* *)
 
-def Subset y F z = /\x (x E z <-> x E y & F x).
+def Subset y F z = ∀x (x∈z ↔ x∈y ∧ F x).
 
-claim subset_ax /\F/\y\/z Subset y F z.
+claim subset_ax ∀F∀y∃z Subset y F z.
 
 
-goal /\F/\y\/!z Subset y F z.
+goal ∀F∀y∃!z Subset y F z.
 intros.
 elim subset_ax.
-instance ?1 y. instance ?2 F. 
+instance ?1 y. instance ?2 F.
 intros.
 intro.
 intro.
@@ -366,38 +366,38 @@ save subset_unique.
 
 (* Subset definition *)
 
-def Prefix "{" \F\ "E" y "|" F "}" = Def (Subset y F).
+def Prefix "{" \F\ "∈" y "|" F "}" = Def (Subset y F).
 
-goal /\F/\y Subset y F {x E y | F x}.
+goal ∀F∀y Subset y F {x∈y | F x}.
 trivial + subset_unique.
 save sub_is_sub.
 
 close_def ${.
 
-goal /\F/\x,y (x E y -> F x -> x E { x E y | F x}).
+goal ∀F∀x,y (x∈y → F x → x∈ { x∈y | F x}).
 trivial +sub_is_sub.
 save sub_intro.
 
 new_intro sub sub_intro.
 
-goal /\x,y,F,X ((x E y -> F x -> X) -> x E { x E y | F x} -> X).
+goal ∀x,y,F,X ((x∈y → F x → X) → x∈ { x∈y | F x} → X).
 intros.
 elim H.
 elim -4 [l] -6 [l] sub_is_sub.
 elim -4 [l] -6 [r]  sub_is_sub.
 save sub_elim.
 
-new_elim -i $E sub sub_elim.
+new_elim -i $∈ sub sub_elim.
 
 (* **************** *)
 (* AXIOM: Empty Set *)
 (* **************** *)
 
-def Empty x = /\y(~ y E x). 
+def Empty x = ∀y(¬ y∈x).
 
-claim empty_ax \/x Empty x.
+claim empty_ax ∃x Empty x.
 
-goal \/!x Empty x.
+goal ∃!x Empty x.
 elim empty_ax.
 intros.
 intro.
@@ -415,27 +415,27 @@ save empty_is_empty.
 
 (* ** Empty set properties ** *)
 
-goal /\x,X (x E {} -> X).
+goal ∀x,X (x∈ {} → X).
 intros.
 elim empty_is_empty.
 save empty_empty.
-new_elim -i $E empty empty_empty.
+new_elim -i $∈ empty empty_empty.
 
-goal /\x ({} << x).
+goal ∀x ({} << x).
 trivial.
 save empty_bottom.
 
 close_def ${}.
 
-goal /\x (x << {} -> x = {}).
+goal ∀x (x << {} → x = {}).
 trivial +ext.
 save empty_minimal.
 
-goal /\x (x U {} = x).
+goal ∀x (x U {} = x).
 trivial 8 +ext.
 save union_neut_r.
 
-goal /\x ({} U x = x).
+goal ∀x ({} U x = x).
 trivial + union_sym union_neut_r.
 save union_neut_l.
 
@@ -443,11 +443,11 @@ save union_neut_l.
 (* Intersection definition *)
 (* *********************** *)
 
-def inter x = {z E union x | /\y (y E x -> z E y)}.
+def inter x = {z∈union x | ∀y (y∈x → z∈y)}.
 
 (* ** Properties ** *)
 
-goal /\x,y,a (a E y -> /\z E y  x E z -> x E inter y).
+goal ∀x,y,a (a∈y → ∀z∈y  x∈z → x∈inter y).
 trivial 8.
 save inter_intro_non_empty.
 
@@ -457,24 +457,24 @@ save inter_empty.
 
 new_intro inter inter_intro_non_empty.
 
-goal /\x,y,a/\X (a E y -> (/\z E y x E z -> X) -> 
-                 x E inter y -> X). 
+goal ∀x,y,a∀X (a∈y → (∀z∈y x∈z → X) →
+                 x∈inter y → X).
 trivial.
 save inter_elim_non_empty.
 
-new_elim -i $E inter 2 inter_elim_non_empty.
+new_elim -i $∈ inter 2 inter_elim_non_empty.
 
 close_def inter.
 
-goal /\x/\y (x E y -> inter y << x).
+goal ∀x∀y (x∈y → inter y << x).
 trivial.
 save inter_1.
 
-goal /\x ({} E x -> inter x = {}).
+goal ∀x ({} ∈x → inter x = {}).
 trivial 8 + ext.
 save inter_2.
 
-goal /\y(\/z(z E  y) -> /\x (/\z (z E y -> x << z) -> x << inter y)).
+goal ∀y(∃z(z∈ y) → ∀x (∀z (z∈y → x << z) → x << inter y)).
 trivial.
 save inter_3.
 
@@ -486,48 +486,48 @@ def Infix [1.5] x "I" y = inter (pair x y).
 
 (* ** Binary intersection properties ** *)
 
-goal /\x,y,z (z E x -> z E y -> z E x I y).
+goal ∀x,y,z (z∈x → z∈y → z∈x I y).
 trivial.
 save binter_intro.
 
 new_intro binter binter_intro.
 
-goal /\x,y,z (z E x I y -> z E x).
+goal ∀x,y,z (z∈x I y → z∈x).
 trivial.
 save binter_elim_l. (* bad elimination rule ! *)
 
-goal /\x,y,z (z E x I y -> z E y).
+goal ∀x,y,z (z∈x I y → z∈y).
 trivial.
 save binter_elim_r. (* bad elimination rule ! *)
 
-goal /\x,y,z,X ((z E x -> z E y -> X) -> z E x I y -> X). 
+goal ∀x,y,z,X ((z∈x → z∈y → X) → z∈x I y → X).
 intros.
 elim H.
-elim binter_elim_l. 
-elim binter_elim_r. 
+elim binter_elim_l.
+elim binter_elim_r.
 save binter_elim.
 
-new_elim -i $E binter binter_elim.
+new_elim -i $∈ binter binter_elim.
 
 close_def $I.
 
-goal /\x (x I {} = {}).
+goal ∀x (x I {} = {}).
 trivial 6 +ext.
 save r_binter_null.
 
-goal /\x ({} I x = {}).
+goal ∀x ({} I x = {}).
 trivial 6 +ext.
 save l_binter_null.
 
-goal /\x/\y (x I y = y I x).
+goal ∀x∀y (x I y = y I x).
 trivial 6 + ext.
 save inter_symm.
 
-goal /\x (x I x = x).
+goal ∀x (x I x = x).
 trivial 6 +ext.
 save inter_idemp.
 
-goal /\x/\y/\z (((x I y) I z) = x I (y I z)).
+goal ∀x∀y∀z (((x I y) I z) = x I (y I z)).
 trivial 8 +ext.
 save inter_assoc.
 
@@ -535,11 +535,11 @@ save inter_assoc.
 (* AXIOM: Power Set *)
 (* **************** *)
 
-def Power x z = /\y(y E z <-> y << x).
+def Power x z = ∀y(y∈z ↔ y << x).
 
-claim power_ax /\x\/z Power x z.
+claim power_ax ∀x∃z Power x z.
 
-goal /\x\/!z Power x z.
+goal ∀x∃!z Power x z.
 intro.
 elim power_ax.
 instance ?1 x.
@@ -552,7 +552,7 @@ save power_unique.
 
 def power x = Def (Power x).
 
-goal /\x Power x (power x).
+goal ∀x Power x (power x).
 trivial +power_unique.
 save power_is_power.
 
@@ -561,29 +561,29 @@ close_def power.
 
 (* ** Power set properties ** *)
 
-goal /\x, y (x << y -> x E power y).
+goal ∀x, y (x << y → x∈power y).
 trivial +power_is_power.
 save power_intro.
 
 new_intro power power_intro.
 
-goal /\x,y,X ((x << y -> X) -> x E (power y) -> X).
+goal ∀x,y,X ((x << y → X) → x∈(power y) → X).
 trivial +power_is_power.
 save power_elim.
 
-new_elim -i $E power power_elim.
+new_elim -i $∈ power power_elim.
 
 close_def power.
 
-goal /\x ((pair {} x) << power x).
+goal ∀x ((pair {} x) << power x).
 trivial 6.
 save power_1.
 
-goal /\x (union (power x) = x).
+goal ∀x (union (power x) = x).
 trivial 7 +ext.
 save power_2.
 
-goal /\x (inter (power x) = {}).
+goal ∀x (inter (power x) = {}).
 trivial 10 +ext.
 save power_3.
 
@@ -591,13 +591,13 @@ save power_3.
 (* AXIOM: Replacement *)
 (* ****************** *)
 
-def isPropFun F = /\x/\y/\z (F x y & F x z -> y = z).
+def isPropFun F = ∀x∀y∀z (F x y ∧ F x z → y = z).
 
-def Range x F z = /\y (y E z <-> \/w (w E x & F w y)).
+def Range x F z = ∀y (y∈z ↔ ∃w (w∈x ∧ F w y)).
 
-claim repl_ax /\F (isPropFun F -> /\x\/z Range x F z).
+claim repl_ax ∀F (isPropFun F → ∀x∃z Range x F z).
 
-goal /\F (isPropFun F -> /\x\/!z Range x F z).
+goal ∀F (isPropFun F → ∀x∃!z Range x F z).
 intro.
 intro.
 intro.
@@ -611,7 +611,7 @@ save range_unique.
 
 def range x F = Def (Range x F).
 
-goal /\F (isPropFun F -> /\x Range x F (range x F)).
+goal ∀F (isPropFun F → ∀x Range x F (range x F)).
 intro.
 intro.
 intro.
@@ -629,7 +629,7 @@ def Prefix "[" x "," y "]" = pair (sing x) (pair x y).
 
 (* ** Ordered pair properties ** *)
 
-goal /\x1/\x2/\y1/\y2 ([x1,y1] = [x2,y2] -> x1 = x2 & y1 = y2).
+goal ∀x1∀x2∀y1∀y2 ([x1,y1] = [x2,y2] → x1 = x2 ∧ y1 = y2).
 intros.
 elim -6 H pair_ext.
 rmh H.
@@ -641,7 +641,7 @@ rmh H.
 prove x1 = y2.
  prove sing x1 = pair x2 y2. trivial.
  elim -6 G pair_ext. trivial. trivial.
-prove x1 = y1 & x1 = x2.
+prove x1 = y1 ∧ x1 = x2.
  prove pair x1 y1 = sing x2. trivial.
  elim -6 G0 pair_ext. trivial. trivial.
 trivial - H0.
@@ -652,18 +652,18 @@ save couple_ext.
 (* **************************** *)
 
 def lInfix[2.0]
-     x "*" y = {c E power (power (x U y)) | \/a\/b (a E x & b E y & c = [a,b])}.
+     x "×" y = {c∈power (power (x U y)) | ∃a∃b (a∈x ∧ b∈y ∧ c = [a,b])}.
 
 (* ** Cartesian product properties ** *)
 
-goal /\x,y /\a E x/\b E y [a , b] E x * y.
+goal ∀x,y ∀a∈x ∀b∈y [a , b] ∈x × y.
 intros.
 elim -4 [r] sub_is_sub.
 intro.
 elim -3 [r] power_is_power.
 elim -4 [l] pair_1.
-prove a E x U y. trivial + x_inc_unionxy. 
-prove b E x U y. trivial + y_inc_unionxy. 
+prove a∈x U y. trivial + x_inc_unionxy.
+prove b∈x U y. trivial + y_inc_unionxy.
 intro.
 trivial.
 trivial.
@@ -672,27 +672,27 @@ save cart_intro.
 
 new_intro cart cart_intro.
 
-goal /\x,y,z,X (/\a E x /\b E y (z = [a , b] -> X) -> z E (x * y) -> X).
+goal ∀x,y,z,X (∀a∈x ∀b∈y (z = [a , b] → X) → z∈(x × y) → X).
 trivial.
 save cart_elim.
 
-new_elim -i $E cart cart_elim.
+new_elim -i $∈ cart cart_elim.
 
-close_def $*.
+close_def $×.
 close_def $[.
 
-goal /\x/\y/\z(z E x * y -> \/a\/b (a E x & b E y & z = [a,b])).
+goal ∀x∀y∀z(z∈x × y → ∃a∃b (a∈x ∧ b∈y ∧ z = [a,b])).
 trivial.
 save cart_prod_1.
 
-goal /\x/\y/\z/\a/\b (a E x & b E y & z = [a,b] -> z E x * y).
+goal ∀x∀y∀z∀a∀b (a∈x ∧ b∈y ∧ z = [a,b] → z∈x × y).
 trivial.
 save cart_prod_2.
 
-goal /\x,y,a,b ([a, b ] E x * y -> a E x & b E y).
+goal ∀x,y,a,b ([a, b ] ∈x × y → a∈x ∧ b∈y).
 intros.
 elim H.
-prove a = a0 & b = b0.
+prove a = a0 ∧ b = b0.
 trivial +couple_ext.
 trivial.
 save cart_prod_3.
@@ -701,50 +701,50 @@ save cart_prod_3.
 (* Relations and functions *)
 (* *********************** *)
 
-def Rel x y = x * y.
+def Rel x y = x × y.
 
-def Fun x y = { z E power(x * y) | /\a E x \/! b [a,b] E z }.
+def Fun x y = { z∈power(x × y) | ∀a∈x ∃! b [a,b] ∈z }.
 
-goal /\x,y/\f << (x * y) (/\a E x \/! b [a,b] E f -> f E Fun x y).
+goal ∀x,y∀f << (x × y) (∀a∈x ∃! b [a,b] ∈f → f∈Fun x y).
 intros.
 trivial.
 save fun_intro.
 
 new_intro fun fun_intro.
 
-goal /\x,y,f,X ((f << x * y -> /\a E x \/! b [a,b] E f -> X) ->
-                  f E (Fun x y) -> X).
+goal ∀x,y,f,X ((f << x × y → ∀a∈x ∃! b [a,b] ∈f → X) →
+                  f∈(Fun x y) → X).
 trivial 8.
 save fun_elim.
 
-new_elim -i $E fun fun_elim.
+new_elim -i $∈ fun fun_elim.
 
 close_def Fun.
 
-goal /\x,y /\f E (Fun x y) /\a E x \/! b [a,b] E f.
+goal ∀x,y ∀f∈(Fun x y) ∀a∈x ∃! b [a,b] ∈f.
 trivial.
 save fun_is_fun.
 
-def Infix[0.5] f "[[" x "]]" = Def \y ([x,y] E f).
+def Infix[0.5] f "[[" x "]]" = Def λy ([x,y] ∈f).
 
-goal /\x,y /\f E (Fun x y)/\a E x f[[a]] E y.
+goal ∀x,y ∀f∈(Fun x y)∀a∈x f[[a]] ∈y.
 intros.
-prove ([a,f[[a]] ] E f).
+prove ([a,f[[a]] ] ∈f).
 elim Def.axiom.
 elim fun_is_fun.
-prove f << x * y.
+prove f << x × y.
 trivial.
 trivial = G G0 +cart_prod_3.
 save fun_total.
 
-def Inj x y = 
-  { f E Fun x y | /\b E y/\a1,a2 E x (b = f[[a1]] & b = f[[a2]] -> a1 = a2)}.
-def Surj x y = 
-  { f E Fun x y | /\b E y\/a E x b = f[[a]] }.
+def Inj x y =
+  { f∈Fun x y | ∀b∈y∀a1,a2∈x (b = f[[a1]] ∧ b = f[[a2]] → a1 = a2)}.
+def Surj x y =
+  { f∈Fun x y | ∀b∈y∃a∈x b = f[[a]] }.
 def Bij x y =
-  { f E Fun x y | /\b E y\/!a (a E x & b = f[[a]]) }.
+  { f∈Fun x y | ∀b∈y∃!a (a∈x ∧ b = f[[a]]) }.
 
-goal /\x,y,f (f E Inj x y -> f E Surj x y -> f E Bij x y). 
+goal ∀x,y,f (f∈Inj x y → f∈Surj x y → f∈Bij x y).
 intros.
 elim H.
 elim H0.
@@ -756,7 +756,7 @@ intro.
 trivial.
 save Bij_1.
 
-goal /\x,y,f (f E Bij x y -> f E Surj x y). 
+goal ∀x,y,f (f∈Bij x y → f∈Surj x y).
 intros.
 elim H.
 elim H0.
@@ -766,16 +766,18 @@ elim H1.
 trivial.
 save Bij_2.
 
-goal /\x,y,f (f E Bij x y -> f E Inj x y). 
+goal ∀x,y,f (f∈Bij x y → f∈Inj x y).
 intros.
 elim H.
 elim H0.
 intros.
 intros.
-elim H1.
-prove a1 = z.
+left H7.
+apply H1 with H4.
+left G.
+prove a1 = a.
 trivial.
-prove a2 = z.
+prove a2 = a.
 trivial.
 save Bij_3.
 
@@ -785,7 +787,7 @@ save Bij_3.
 
 def succ x = x U sing x.
 
-goal /\x,y (y E succ x <-> y = x or y E x).
+goal ∀x,y (y∈succ x ↔ y = x ∨ y∈x).
 trivial.
 save succ_ext.
 
@@ -794,27 +796,27 @@ save succ_ext.
 (* when restricted to a given set.                             *)
 (* *********************************************************** *)
 
-def PertTrans x = /\w,y,z(w E x -> y E x -> z E x -> w E y -> y E z -> w E z).
+def PertTrans x = ∀w,y,z(w∈x → y∈x → z∈x → w∈y → y∈z → w∈z).
 
-def PertAntiRefl x = /\y(y E x -> ~ y E y).
+def PertAntiRefl x = ∀y(y∈x → ¬ y∈y).
 
-def PertOrder x = PertTrans x & PertAntiRefl x.
+def PertOrder x = PertTrans x ∧ PertAntiRefl x.
 
-def PertWellFded x = /\y(y << x -> \/z(z E y) -> 
-                     \/z(z E y & /\w(w E y -> z = w or z E w))).
+def PertWellFded x = ∀y(y << x → ∃z(z∈y) →
+                     ∃z(z∈y ∧ ∀w(w∈y → z = w ∨ z∈w))).
 
-def PertWFOrder x = PertOrder x & PertWellFded x.
+def PertWFOrder x = PertOrder x ∧ PertWellFded x.
 
-def PertTotal x = /\y,z (y E x -> z E x -> y E z or y = z or z E y).
+def PertTotal x = ∀y,z (y∈x → z∈x → y∈z ∨ y = z ∨ z∈y).
 
-goal /\x (PertWellFded x -> PertTotal x).
+goal ∀x (PertWellFded x → PertTotal x).
 intros.
 intros.
 elim -1 (pair y z) H.
 trivial + pair_1 - H.
 trivial =.
-prove z0 = y or z0 = z. trivial - H H0 H1.
-prove /\ w E (pair y z)  (z0 = w or z0 E w). trivial - H H0 H1 G. rmh H H0 H1 H2.
+prove z0 = y ∨ z0 = z. trivial - H H0 H1.
+prove ∀ w∈(pair y z)  (z0 = w ∨ z0∈w). trivial - H H0 H1 G. rmh H H0 H1 H2.
 elim G.
 elim -1 z G0.
 elim y_in_pairxy.
@@ -831,7 +833,7 @@ save pert_total.
 (* Transitive set definition *)
 (* ************************* *)
 
-def Transet x = /\y,z (z E y & y E x -> z E x).
+def Transet x = ∀y,z (z∈y ∧ y∈x → z∈x).
 
 (* ************************************************* *)
 (* ORDINALS defined without the well founded axiom.  *)
@@ -839,7 +841,7 @@ def Transet x = /\y,z (z E y & y E x -> z E x).
 (* definition.                                       *)
 (* ************************************************* *)
 
-def WFOrd x = Transet x & PertWFOrder x.
+def WFOrd x = Transet x ∧ PertWFOrder x.
 
 goal WFOrd {}.
 intros.
@@ -849,7 +851,7 @@ trivial + empty_empty.
 save zero_wford.
 
 (*
-goal /\x(WFOrd x -> WFOrd (succ x)).
+goal ∀x(WFOrd x → WFOrd (succ x)).
 intros.
 intro.
 intro.
@@ -865,8 +867,8 @@ intros.
 elim -1 x -2 z0 succ_ext.
 trivial.
 intro.
-prove y0 E x. trivial - H1 H2 H3 H4. 
-prove w E x. trivial - H1 H2 H3 H5 H6.
+prove y0∈x. trivial - H1 H2 H3 H4.
+prove w∈x. trivial - H1 H2 H3 H5 H6.
 prove PertTrans x. trivial - H1 H2 H3 H4 H5 H6 G G0.
 elim -1 w -2 y0 -3 z0 G1.
 intro.
@@ -877,14 +879,11 @@ trivial.
 intro. trivial.
 intro.
 intros.
-prove y2 << x or \/y3(y3 << x & y2 = (sing x) U y3).
+prove y2 << x ∨ ∃y3(y3 << x ∧ y2 = (sing x) U y3).
 
 
-goal /\y(\/z(z E y) -> /\z (z E y -> WFOrd z) -> (inter y) E y).
+goal ∀y(∃z(z∈y) → ∀z (z∈y → WFOrd z) → (inter y)∈y).
 
 
-goal /\y(\/z(z E y) -> /\z (z E y -> WFOrd z) -> WFOrd (inter y)).
+goal ∀y(∃z(z∈y) → ∀z (z∈y → WFOrd z) → WFOrd (inter y)).
 *)
-
-
-

@@ -15,34 +15,34 @@ Module semigroup.
     \section{Definitions and first properties.}
   *)
 
-  Sort set 0.	
-  Cst G : set -> prop.
-  Cst rInfix[3] x "op" y : set -> set -> set.
-  tex_syntax $op rInfix[3] x "\\circ" y. 
+  Sort set 0.
+  Cst G : set → prop.
+  Cst rInfix[3] x "op" y : set → set → set.
+  tex_syntax $op rInfix[3] x "\\circ" y.
 
-  claim op_total /\x,y:G  G (x op y).
+  claim op_total ∀x,y:G  G (x op y).
   new_intro -t total op_total.
   tex_syntax op_total "totality of $\\circ$".
 
-  claim assoc /\x,y,z:G x op (y op z) = (x op y) op z.
+  claim assoc ∀x,y,z:G x op (y op z) = (x op y) op z.
   new_equation -b assoc.
   tex_syntax assoc "associativity of $\\circ$".
 
   (*! math doc
-    \begin{definition} 
+    \begin{definition}
       A semi-group $< \[ G \] , \[ $op \] >$ is a set (or predicate) \[
-    G \] with an associative 
+    G \] with an associative
       binary function \[ x op y \].
       This is expressed by the following axiom:
        $$\begin{array}{ll}
        \[ $$op_total \] &  (\[ op_total \])\cr
-       \[ $$assoc \]    &  (\[ assoc \]) 
+       \[ $$assoc \]    &  (\[ assoc \])
        \end{array}$$
     \end{definition}
 
     The binary function is written in a right-associative way:
         $$ \[ x op y op z\] = \[ x op {{ y  op z }} \] $$
-  *)  
+  *)
 
   (*! doc
 
@@ -51,7 +51,7 @@ Module semigroup.
     syntax and a priority level of 3. The axiom \[ op_total \] (\{
     op_total \} in ascii) is added as an introduction rule for \[ G \]
     (with abbreviation \verb#op#) and the axiom \[ assoc \] (\{ assoc
-    \} in ascii) is added to the rewriting rules.  
+    \} in ascii) is added to the rewriting rules.
   *)
 
 end.
@@ -60,23 +60,23 @@ Module sub.
 
   Use semigroup.
 
-  Cst H : set -> prop.
+  Cst H : set → prop.
 
-  claim sub.H      /\x:H  G x.
-  tex_syntax sub.H Math "\\text{subset}_{\\text{H}}".
-  claim op_total.H /\x,y:H  H (x op y).
+  claim sub.H      ∀x:H  G x.
+  tex_syntax sub.H Math "\\text{⊂}_{\\text{H}}".
+  claim op_total.H ∀x,y:H  H (x op y).
 
   new_intro sub sub.H.
 
-  goal /\x,y,z:H x op (y op z) = (x op y) op z.
+  goal ∀x,y,z:H x op (y op z) = (x op y) op z.
   trivial.
   save assoc.H.
 
   Use semigroup with
-    G -> H
-  | set -> _  
-  | op -> _ 
-  | _ -> _.H 
+    G → H
+  | set → _
+  | op → _
+  | _ → _.H
   .
 
   (*!math doc
@@ -91,10 +91,10 @@ Module sub.
 
     \begin{proposition}
       From this, it is easy to see that if \[ H \] is a sub-semi-group
-      of a 
+      of a
       semi-group $ < \[ G \] , \[$op\] > $ then $ < \[ H \] , \[ $op
       \] > $ is
-      itself a semi-group. The only thing to prove is \[ $$assoc.H \] 
+      itself a semi-group. The only thing to prove is \[ $$assoc.H \]
       (\[assoc.H\]) which is immediate using \[ sub.H \].
     \end{proposition}
   *)
@@ -108,24 +108,24 @@ Module hmorph.
   *)
 
   Use semigroup with
-    _ -> _.D
+    _ → _.D
   .
 
   Use semigroup with
-    _ -> _.I
+    _ → _.I
   .
 
-  Cst f : set.D -> set.I. 
+  Cst f : set.D → set.I.
 
-  claim totality.f /\x:G.D  G.I (f x).
+  claim totality.f ∀x:G.D  G.I (f x).
   new_intro -t f totality.f.
 
-  claim compatibility.f /\x1,x2:G.D  f (x1 op.D x2) = f x1 op.I f x2.
+  claim compatibility.f ∀x1,x2:G.D  f (x1 op.D x2) = f x1 op.I f x2.
   new_equation compatibility.f.
 
   (*! math doc
     \begin{definition}
-    If we consider two semi-groups $ <\[ G.D \] , \[ $op.D \] > $ and 
+    If we consider two semi-groups $ <\[ G.D \] , \[ $op.D \] > $ and
     $ <\[ G.I \] , \[ $op.I \] > $. A function $ \[ f \] $ is an
     homomorphism from \[ G.D \] to \[ G.I \] if the following holds:
     $$ \begin{array}{ll}
@@ -143,7 +143,7 @@ Module hmorph_img.
 
   (* can define Image, but not kernel *)
 
-  def Img y = \/x:G.D y = f x.
+  def Img y = ∃x:G.D y = f x.
 
   (*! math doc
     \begin{definition}
@@ -152,16 +152,16 @@ Module hmorph_img.
     \end{definition}
   *)
 
-  goal /\x:G.D  Img (f x).
+  goal ∀x:G.D  Img (f x).
   trivial.
   save intro.Img.
   new_intro -t fI intro.Img.
 
-  goal /\y:Img G.I y.
+  goal ∀y:Img G.I y.
   trivial.
   save sub.Img.
 
-  goal /\y1,y2: Img  Img (y1 op.I y2).
+  goal ∀y1,y2: Img  Img (y1 op.I y2).
   intros.
   elim -n [x1] H. rmh H.
   elim -n [x2] H0. rmh H0.
@@ -171,11 +171,11 @@ Module hmorph_img.
   save op_total.Img.
 
   Use semigroup.sub with
-    op -> rInfix[3] x "op.I" y
-  | G -> G.I
-  | H -> Img
-  | _.H -> _.Img
-  | _ -> _.I
+    op → rInfix[3] x "op.I" y
+  | G → G.I
+  | H → Img
+  | _.H → _.Img
+  | _ → _.I
   .
 
   (*! math doc
@@ -194,40 +194,40 @@ Module hmorph_img.
     third are just what we need to prove the last one. \qed
     \end{proof}
   *)
-    
+
 end.
 
 Module hmorph_comp.
 
   Use hmorph with
-    _.D -> _.1
-  | _.I -> _.2
-  | f -> f
-  | _.f -> _.f
+    _.D → _.1
+  | _.I → _.2
+  | f → f
+  | _.f → _.f
   .
 
   Use hmorph with
-    _.D -> _.2
-  | _.I -> _.3
-  | f -> g
-  | _.f -> _.g
+    _.D → _.2
+  | _.I → _.3
+  | f → g
+  | _.f → _.g
   .
-  
+
   def h x = g (f x).
 
-  goal /\x:G.1 (G.3 (h x)).
+  goal ∀x:G.1 (G.3 (h x)).
   trivial.
   save total.h.
 
-  goal /\x,y:G.1 h (x op.1 y) = h x op.3 h y.
+  goal ∀x,y:G.1 h (x op.1 y) = h x op.3 h y.
   trivial.
   save compat.h.
 
   Use hmorph with
-    _.D -> _.1
-  | _.I -> _.3
-  | f -> h
-  | _.f -> _.h
+    _.D → _.1
+  | _.I → _.3
+  | f → h
+  | _.f → _.h
   .
 
 end.

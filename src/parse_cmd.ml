@@ -672,10 +672,10 @@ and parse_tactic tstr =
         !auto_lvl, "newcmd", interpret_newcmd ncmd
 
 
-let parse_cmd cstrm tstr = (try match tstr with parser
-(* commande globale *)
-  [< 'Dot >] ->
-       ()
+let parse_cmd cstrm tstr =
+  (try match tstr with parser
+  (* commande globale *)
+  [< 'Dot >] -> raise (Gen_error "This is an exercise you have to complete")
 | [< 'Ident "quit"; 'Dot ?? terror Dot tstr >] ->
         raise Quit
 | [< 'Ident "flag"; 'Ident s ?? serror "an identifier" tstr;

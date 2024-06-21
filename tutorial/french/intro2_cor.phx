@@ -28,25 +28,25 @@ séance de TP1. *)
 (*** Signature. *)
 Sort d.  
 
-Cst Infix[5] x "<" y : d -> d -> prop.
+Cst Infix[5] x "<" y : d → d → prop.
 
 (*** Axiomes. *)
 
-claim ordre_transitif /\x,y,z(x < y -> y < z -> x < z).
-claim ordre_antireflexif /\z ~ z < z.
+claim ordre_transitif ∀x,y,z(x < y → y < z → x < z).
+claim ordre_antireflexif ∀z ¬ z < z.
 
 (*** Quelques propriétés. *)
 
-prop  ordre_strict_antisymetrique  /\x,y(x< y -> ~ y < x).
-(*output    |- /\x,y (x < y -> ~ y < x) *)
+prop  ordre_strict_antisymetrique  ∀x,y(x< y → ¬ y < x).
+(*output    |- ∀x,y (x < y → ¬ y < x) *)
 intros.
-(*output H := x < y   |- ~ y < x *)
+(*output H := x < y   |- ¬ y < x *)
 intro.
 (*output H0 := y < x   |- False *)
 apply ordre_transitif with H and H0.
 (*output G := x < x *)
 apply ordre_antireflexif with x.
-(*output G0 := ~ x < x *)
+(*output G0 := ¬ x < x *)
 apply G0 with G.
 (*output G1 := False   |- False *)
 axiom G1.
@@ -56,20 +56,20 @@ save.
 automatiquement les axiomes, ce qui allégera les preuves. *) 
 flag auto_lvl 1.
 
-def Infix[5] x "<=" y = x < y or x = y.
+def Infix[5] x "⩽" y = x < y ∨ x = y.
 
-fact ordre_reflexif /\x x <= x.
+fact ordre_reflexif ∀x x ⩽ x.
 intro.
-(*output    |- x <= x *)
+(*output    |- x ⩽ x *)
 intro r.
 (*output    |- x = x *)
 intro.
 save.
 
 prop ordre_large_antisymetrique
-/\x,y (x <= y -> y <= x -> x = y).
+∀x,y (x ⩽ y → y ⩽ x → x = y).
 intros.
-(*output H := x <= y,  H0 := y <= x  |- x = y *)
+(*output H := x ⩽ y,  H0 := y ⩽ x  |- x = y *)
 left H. (* raisonnement par cas, le cas x = y est traité automatiquement *)
 (*output H := x < y *)
 left H0. (* raisonnement par cas *)
@@ -82,9 +82,9 @@ select 2.
   elim G.
 save.
 
-fact ordre_large_transitif /\x,y,z (x<= y -> y <= z -> x <= z).
+fact ordre_large_transitif ∀x,y,z (x⩽ y → y ⩽ z → x ⩽ z).
 intros.
-(*output H := x <= y  H0 := y <= z     |- x <= z *)
+(*output H := x ⩽ y  H0 := y ⩽ z     |- x ⩽ z *)
 left H. (* raisonnement par cas *)
 select 2.
 (* cas H := x = y *)
@@ -105,11 +105,11 @@ save.
 
 (*** Axiomatisation d'ordre strict total. *)
 
-claim ordre_total /\x,y (x<y or x= y or y < x).
+claim ordre_total ∀x,y (x<y ∨ x= y ∨ y < x).
 
 (*texte Montrez que l'ordre large est un ordre large total : *)
-fact ordre_large_total /\x,y(x<= y or y <= x).
-(*->*)
+fact ordre_large_total ∀x,y(x⩽ y ∨ y ⩽ x).
+(*→*)
 intros.
 apply ordre_total with x and y.
 lefts G.
@@ -121,20 +121,20 @@ lefts G.
 
   intro r.
   intro l.
-(*->*)
+(*→*)
 save.
 (*texte cette variante est utile pour la dernière proposition *)
 
 lem ordre_total2
-/\x,y (x <= y or y < x).
-(* -> *)
+∀x,y (x ⩽ y ∨ y < x).
+(* → *)
 intros.
 apply ordre_total with x and y.
 lefts G.
  intro l. intro l.
  intro l. intro r.
  intro r.
-(* -> *)
+(* → *)
 save.
 
 (*** Le sup de deux éléments, la règle d'introduction de l'existentielle. *)
@@ -149,10 +149,10 @@ langage. On peut "remplacer" cette variable existentielle par n'importe
 quel terme #t# du langage grâce à la commande #instance ?1 t#. C'est ce
 que montre l'exemple qui suit. *)
 
-prop uval4 /\A /\x(A x -> \/ x A x).
+prop uval4 ∀A ∀x(A x → ∃ x A x).
 intros.
 (*output H := A x
-   |- \/x0 A x0 *)
+   |- ∃x0 A x0 *)
 intro.
 (*output    |- A ?1 *)
 instance ?1 x.
@@ -165,8 +165,8 @@ l'instanciation à choisir n'est pas immédiate, et que l'on a besoin de
 plus tard la règle d'élimination. Vous êtes en mesure de prouver la proposition
 suivante (qui utilise que l'ordre est total !). *)
 
-lem ordre_maj /\x,y \/ z (x <= z & y <= z).
-(*->*)
+lem ordre_maj ∀x,y ∃ z (x ⩽ z ∧ y ⩽ z).
+(*→*)
 intros.
 elim ordre_large_total with x and y.
   intro.
@@ -178,7 +178,7 @@ elim ordre_large_total with x and y.
   instance ?2 x.
   intro.
   elim ordre_reflexif.
-(*->*)
+(*→*)
 save.
 
 (*** La fonction sup. *)
@@ -186,8 +186,8 @@ save.
 (*texte Pour prouver qu'une relation est fonctionnelle, on montre
 l'existence et l'unicité de l'image. *)
 
-prop def_sup /\x,y\/!z ((z=x or z=y) & x <= z & y <= z).
-(*->*)
+prop def_sup ∀x,y∃!z ((z=x ∨ z=y) ∧ x ⩽ z ∧ y ⩽ z).
+(*→*)
 intros.
 elim ordre_large_total with x and y.
   intro.
@@ -215,26 +215,26 @@ elim ordre_large_total with x and y.
       left H0.
       rewrite_hyp H -r H0.
       elim  ordre_large_antisymetrique.
-(*->*)
+(*→*)
 save.
 
 (*** Opérateur de description définie (approche très partielle). *)
 
 (*texte En logique du premier ordre, si l'on a montré un énoncé de la
-forme #/\x1, x2 ...xn\/!z P x1...xn z# alors "on ne change pas la
+forme #∀x1, x2 ...xn∃!z P x1...xn z# alors "on ne change pas la
 théorie" (on ne démontre pas de nouveau théorème dans le langage non
 étendu) en ajoutant un nouveau symbole de fonction n-aire f vérifiant 
 #P x1 ... xn (f x1...xn)#.  C'est ce que permet dans PhoX l'opérateur
-#Def#. On peut lire #Def \z P x1...xn z# comme "l'unique z vérifiant P
+#Def#. On peut lire #Def λz P x1...xn z# comme "l'unique z vérifiant P
 x1...xn z". *)
 
-def sup x y = Def \z ((z=x or z=y) & x <= z & y <= z).
+def sup x y = Def λz ((z=x ∨ z=y) ∧ x ⩽ z ∧ y ⩽ z).
 
 (*texte Les énoncés qui suivent sont des "redites" partielles du résultat
 #def_sup#.  Ne vous attardez pas sur les preuves. Certains résultats peuvent
 être utiles par la suite. Il faudrait les compléter. *)
 
-fact sup_l /\x,y x <= sup x y.
+fact sup_l ∀x,y x ⩽ sup x y.
 intros.
 apply def_sup with x and y.
 apply Def.axiom with G.
@@ -242,7 +242,7 @@ lefts G0.
 from H0.
 save.
 
-fact sup_r /\x,y y <= sup x y.
+fact sup_r ∀x,y y ⩽ sup x y.
 intros.
 apply def_sup with x and y.
 apply Def.axiom with G.
@@ -253,13 +253,13 @@ save.
 (*texte Il va s'avérer parfois plus lisible d'utiliser ces notations. *)
 
 def Infix[5] x ">" y = y < x.
-def Infix[5] x ">=" y = y <= x.
+def Infix[5] x "⩾" y = y ⩽ x.
 
 (** Un résultat d'analyse élémentaire. *)
 
 (*texte On se propose de démontrer le résultat suivant sur IR: si une fonction
 est positive sur IR+, si elle a une limite nulle en l'infini et si elle possède
-un maximum qu'elle atteint sur tout intervalle fermé borné (c'est le cas des
+un maximum qu'elle atteint sur tout ∩valle fermé borné (c'est le cas des
 fonctions continues), alors elle possède un maximum qu'elle atteint sur IR+. Il
 s'avère que pour démontrer ce résultat exprimé ainsi on a besoin seulement des
 propriétés d'ordre total pour IR. dans la suite IR est identifié aux objets de
@@ -271,43 +271,43 @@ sortes #d#. *)
 
 Cst  zero:d.
 
-(*texte Quelques prédicats sur une fonction #f:d->d#.  D'abord, la fonction #f#
+(*texte Quelques prédicats sur une fonction #f:d→d#.  D'abord, la fonction #f#
 est positive sur les réels positifs. *)
 
-def positive f = /\ x >=zero (zero <= f(x)).
+def positive f = ∀ x ⩾zero (zero ⩽ f(x)).
 
 (*texte Ce prédicat signifie pour une fonction #f#, dont on sait par
 ailleurs qu'elle est positive sur les réels positifs, qu'elle a une
 limite nulle en +infini. *)
 
-def pseudo_lim f = /\ eps > zero \/ N >=zero /\ x > N (f(x) < eps).  
+def pseudo_lim f = ∀ eps > zero ∃ N ⩾zero ∀ x > N (f(x) < eps).  
 
 (*texte La fonction #f# a un majorant qu'elle atteint sur tout
-intervalle fermé [o,a]. *)
+∩valle fermé [o,a]. *)
 
 def maj_comp f = 
-/\ a (zero <= a -> \/ c ((zero<=c & c<= a) & /\x(zero<= x -> x <= a -> f(x) <= f(c)))).
+∀ a (zero ⩽ a → ∃ c ((zero⩽c ∧ c⩽ a) ∧ ∀x(zero⩽ x → x ⩽ a → f(x) ⩽ f(c)))).
 
 
 
 (*** Une conséquence du tiers-exclu. *)
 
-(*texte Le principe du tiers-exclu #/\A (A or ~ A)# se démontre avec le
+(*texte Le principe du tiers-exclu #∀A (A ∨ ¬ A)# se démontre avec le
 raisonnement par l'absurde. Il est parfois pratique d'utiliser ce principe
 directement : complétez la preuve du lemme qui suit. *)
 
 (*note Ce n'est pas un énoncé de la logique du premier ordre. *)
 
 lem nulle_ou_nonnulle  
-/\f(positive f -> /\ x >=zero f(x)=zero or \/ x >= zero zero < f(x)).
+∀f(positive f → ∀ x ⩾zero f(x)=zero ∨ ∃ x ⩾ zero zero < f(x)).
 intros.
-elim excluded_middle with \/x>=zero zero < f x.
-(* cas H0 := \/x >= zero  zero < f x *)
-(*->*)
+elim excluded_middle with ∃x⩾zero zero < f x.
+(* cas H0 := ∃x ⩾ zero  zero < f x *)
+(*→*)
   intro r.
-(*->*)
-(* cas H0 := ~ \/x >= zero  zero < f x *)
-(*->*)
+(*→*)
+(* cas H0 := ¬ ∃x ⩾ zero  zero < f x *)
+(*→*)
   intro l.
   intros.
   apply H with H1.
@@ -319,16 +319,16 @@ elim excluded_middle with \/x>=zero zero < f x.
     intro.
     instance ?1 x.
     intro.
-(*->*)
+(*→*)
 save.
 
 (*** La règle d'élimination de l'existentielle. *) 
 
 (*texte La commande #elim# permet d'utiliser un énoncé existentiel. *)
 
-prop uval5 /\C/\A (/\x(A x -> C) -> (\/x A x -> C)).
+prop uval5 ∀C∀A (∀x(A x → C) → (∃x A x → C)).
 intros.
-(* H := /\x(A x ->) C  H0 := \/x A x   |- C *)
+(* H := ∀x(A x →) C  H0 := ∃x A x   |- C *)
 elim H0.
 (* H1 := A x *)
 elim H with H1.
@@ -337,7 +337,7 @@ save.
 (*texte Comme pour la disjonction, la commande #left# peut être aussi utilisée
 (elle ne conserve pas la formule à laquelle elle est appliquée). *)
 
-prop uval6 /\C/\A (/\x(A x -> C) -> (\/x A x -> C)).
+prop uval6 ∀C∀A (∀x(A x → C) → (∃x A x → C)).
 intros.
 left H0.
 (* H0 := A x *)
@@ -353,19 +353,19 @@ lemme #ordre_maj#.
 Idée d'une preuve -- Après avoir éliminé le cas trivial où f est partout
 nulle, choisir x tel que f(x) non nul et N tel qu'au delà de N f est
 majorée par f(x) (propriété #pseudo_lim#). Utilisez la propriété (#maj_comp#
-f) -- f atteint son majorant sur un intervalle fermé borné -- sur un
-l'intervalle [0,N]. Remarquez que forcément x <= N (utilisez
+f) -- f atteint son majorant sur un ∩valle fermé borné -- sur un
+l'∩valle [0,N]. Remarquez que forcément x ⩽ N (utilisez
 #ordre_total2# et résoudre le cas x > N par antireflexivité). *)
 
 (*note Ce n'est pas un énoncé de la logique du premier ordre. *)
 
 prop maj_atteinte
- /\f(positive f -> pseudo_lim f -> maj_comp f ->
-                         \/ d (zero<=d & /\x(zero <= x -> f(x) <= f(d)))).
+ ∀f(positive f → pseudo_lim f → maj_comp f →
+                         ∃ d (zero⩽d ∧ ∀x(zero ⩽ x → f(x) ⩽ f(d)))).
 intros.
 elim nulle_ou_nonnulle with H.
-(* cas H2 := /\x >=zero f x = zero *)
-(*->*)
+(* cas H2 := ∀x ⩾zero f x = zero *)
+(*→*)
    intro.
    instance ?1 zero.
    intro.
@@ -375,7 +375,7 @@ elim nulle_ou_nonnulle with H.
      intro r.
      rewrite H2.
      intro.
-(* cas H2 := \/x >=zero zero < f x *)
+(* cas H2 := ∃x ⩾zero zero < f x *)
    left H2.
    left H2.
    apply H0 with H3.
@@ -397,9 +397,9 @@ elim nulle_ou_nonnulle with H.
         elim ordre_antireflexif with G0.
 
         apply H7 with H11 and H2.
-        elim ordre_large_transitif with f x0 <= f x and G0.
+        elim ordre_large_transitif with f x0 ⩽ f x and G0.
         intro l.
      
      elim H7 with H9 and H10.
-(*->*)
+(*→*)
 save.

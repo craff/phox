@@ -26,9 +26,9 @@ integers!), then you should use the module #nat_ax.phx#.
 (*** Definition by induction. *)
 
 def (* graph of a function defined by induction *)
-    def_rec_P.N a f n z = /\X (
-	X N0 a ->
-	/\y:N/\r (X y r  -> X (S y) (f y r)) -> X n z).
+    def_rec_P.N a f n z = ∀X (
+	X N0 a →
+	∀y:N ∀r (X y r  → X (S y) (f y r)) → X n z).
 tex_syntax def_rec_P.N Math "\\text{\\rm DEF}_{\\rm I\\hspace{-0.2em}N}^{rec}".
 
 (*texte
@@ -38,13 +38,13 @@ base case (when [ x = N0 ]) and [ f ] for the successor case.
 *)
 
 Local lemma (* The predicate [ def_rec_P.N] defines a function *) def_rec_unique.N
-      /\a,f,n (N n -> \/!z def_rec_P.N a f n z).
+      ∀a,f,n (N n → ∃!z def_rec_P.N a f n z).
 intros.
 elim H.
 intro.
 trivial.
 intros.
-elim -1 \x,z (N0 = x -> z = a) H0.
+elim -1 λx,z (N0 = x → z = a) H0.
 trivial.
 trivial.
 trivial.
@@ -52,7 +52,7 @@ left H1.
 intro.
 trivial.
 intros.
-elim -1 \x,z' (def_rec_P.N a f x z' & (x = S y -> z' = f y z)) -4 [s] H3.
+elim -1 λx,z' (def_rec_P.N a f x z' ∧ (x = S y → z' = f y z)) -4 [s] H3.
 trivial.
 intros.
 left H5.
@@ -70,7 +70,7 @@ save.
 
 
 def (* function defined by induction *)
-	def_rec.N a f n = Def \z (def_rec_P.N a f n z).
+	def_rec.N a f n = Def λz (def_rec_P.N a f n z).
 tex_syntax def_rec.N Math "\\text{\\rm def}_{\\rm I\\hspace{-0.2em}N}^{rec}".
 
 (*texte
@@ -79,7 +79,7 @@ Using the definite description, we can introduce a function symbol
 *)
 
 (*fact Basic properties of [ def_rec.N ] *)
-fact def_rec.N0.N /\f/\a def_rec.N a f N0 = a.
+fact def_rec.N0.N ∀f∀a def_rec.N a f N0 = a.
 intros.
 elim Def.lemma.
 elim def_rec_unique.N.
@@ -89,7 +89,7 @@ save def_rec.N0.N.
 
 new_equation def_rec.N0.N.
 
-fact def_rec.S.N /\f/\a/\n:N def_rec.N a f (S n) = f n (def_rec.N a f n).
+fact def_rec.S.N ∀f∀a∀n:N def_rec.N a f (S n) = f n (def_rec.N a f n).
 intros.
 elim Def.lemma.
 elim def_rec_unique.N.
@@ -110,7 +110,7 @@ definite description operator.
 *)
 
 fact (* Totality of a function defined by induction *) def_rec.total.N
-		 /\X/\f:(N => X => X)/\a:X/\n:N  X (def_rec.N a f n).
+		 ∀X∀f:(N ⇒ X ⇒ X)∀a:X∀n:N  X (def_rec.N a f n).
 intros.
 trivial.
 save def_rec.total.N.
@@ -125,17 +125,17 @@ addition, multiplication and exponentiation *)
 
 (*** Addition. *)
 
-def (* addition *) lInfix[3.5] x "+" y = def_rec.N y (\n,r S r) x.
-(* x + y = def_rec.N y (\n,r S r) x *)
+def (* addition *) lInfix[3.5] x "+" y = def_rec.N y (λn,r S r) x.
+(* x + y = def_rec.N y (λn,r S r) x *)
 tex_syntax $+ lInfix[3.5] x "+" y.
 
 (*fact Basic properties *)
-fact add.lN0.N /\y:N (N0 + y = y).
+fact add.lN0.N ∀y:N (N0 + y = y).
 trivial.
 save add.lN0.N.
 new_equation add.lN0.N.
 
-fact add.lS.N /\x,y:N ((S x) + y = S (x + y)).
+fact add.lS.N ∀x,y:N ((S x) + y = S (x + y)).
 trivial.
 save add.lS.N.
 new_equation add.lS.N.
@@ -145,24 +145,24 @@ close_def $+.
 
 (*** Multiplication. *)
 
-def (* multiplication *) lInfix[3.0] x "*" y = def_rec.N N0 \n,r (r + y)
+def (* multiplication *) lInfix[3.0] x "×" y = def_rec.N N0 λn,r (r + y)
 x.
-(* x * y = def_rec.N N0 \n,r (r + y) *)
-tex_syntax $* lInfix[3.0] x ! "." ! y.
+(* x × y = def_rec.N N0 λn,r (r + y) *)
+tex_syntax $× lInfix[3.0] x ! "." ! y.
 
 (*fact Basic properties *)
-fact mul.lN0.N /\y:N (N0 * y = N0).
+fact mul.lN0.N ∀y:N (N0 × y = N0).
 trivial.
 save mul.lN0.N.
 new_equation mul.lN0.N.
 
-fact mul.lS.N /\x,y:N ((S x) * y = x * y + y).
+fact mul.lS.N ∀x,y:N ((S x) × y = x × y + y).
 trivial.
 save mul.lS.N.
 new_equation mul.lS.N.
 (*endfact *)
 
-close_def $*.
+close_def $×.
 
 (*** Exponentiation. *)
 
@@ -171,18 +171,18 @@ goal N N1. trivial. save N1.total.N. new_intro -i -t N1 N1.total.N.
 tex_syntax N1 Math "1".
 
 def (* exponentiation *)
-	Infix[2.5] x "^" y %as $^ y x = def_rec.N N1 \n,r (r * x) y.
-(* x ^ y = def_rec.N N1 \n,r (x * r) y *)
+	Infix[2.5] x "^" y %as $^ y x = def_rec.N N1 λn,r (r × x) y.
+(* x ^ y = def_rec.N N1 λn,r (x × r) y *)
 tex_syntax $^ Infix[2.5] x ! "^" ! "{" ! y ! "}"  %as $^ y x.
 
 (*fact Basic properties *)
-fact exp.rN0.N /\x:N x^N0 = N1.
+fact exp.rN0.N ∀x:N x^N0 = N1.
 trivial.
 save.
 new_equation exp.rN0.N.
 
 
-fact exp.rS.N /\x,y:N x^(S y) = x^y * x.
+fact exp.rS.N ∀x,y:N x^(S y) = x^y × x.
 trivial.
 save exp.rS.N.
 new_equation exp.rS.N.
@@ -195,13 +195,13 @@ close_def $^.
 (*texte
 We will define the predecessor as a partial function (if we define it
 as a total function, we can not make it coincide with the predecessor
-on integer when we consider natural numbers as a subset of integers).
+on integer when we consider natural numbers as a ⊂ of integers).
 *)
 
-def (* graph of predecessor *) predP x z = N z & x = S z.
+def (* graph of predecessor *) predP x z = N z ∧ x = S z.
 
 lemma (* [predP] defines a partial function *) predP_unique
-		 /\x:N \/!z (predP (S x) z).
+		 ∀x:N ∃!z (predP (S x) z).
 intros.
 intro.
 trivial.
@@ -212,11 +212,11 @@ Local save.
 Using the definite description operator, we can define the
 predecessor as follows. *)
 
-def (* predecessor *) Prefix[2] "P" n = Def \z(predP n z).
-(* P n = Def \z(predP n z) *)
+def (* predecessor *) Prefix[2] "P" n = Def λz(predP n z).
+(* P n = Def λz(predP n z) *)
 tex_syntax $P Prefix[2] "\\text{\\rm P}" n.
 
-fact (* Basic property of predecessor *) pred.rS.N /\n:N P (S n) = n.
+fact (* Basic property of predecessor *) pred.rS.N ∀n:N P (S n) = n.
 trivial 6 +predP_unique.
 save pred.rS.N.
 new_equation pred.rS.N.
@@ -225,13 +225,13 @@ close_def $P.
 
 (*** Subtraction. *)
 
-def (* subtraction *) lInfix[3.5] x "-" y = def_rec.N x \n,r (P r) y.
-(* x - y = def_rec.N x \n,r (P r) y *)
+def (* subtraction *) lInfix[3.5] x "-" y = def_rec.N x λn,r (P r) y.
+(* x - y = def_rec.N x λn,r (P r) y *)
 
-def (* inferior or equal *)
-	Infix[5] x "<=" y = /\X (X x -> /\z (X z -> X S z) -> X y).
-(* x <= y = /\X (X x -> /\z (X z -> X S z) -> X y) *)
-tex_syntax $<= Infix[5] x "\\leq" y.
+def (* inferior ∨ equal *)
+	Infix[5.0] x "⩽" y = ∀X (X x → ∀z (X z → X S z) → X y).
+(* x ⩽ y = ∀X (X x → ∀z (X z → X S z) → X y) *)
+tex_syntax $⩽ Infix[5] x "\\leq" y.
 
 (*note see module  #nat_ax.phx#,  section ordering, for definitions of
 orders on natural numbers *)
@@ -239,14 +239,14 @@ orders on natural numbers *)
 
 (*fact Basic properties *)
 fact sub.rN0.N
-	/\x:N x - N0 = x.
+	∀x:N x - N0 = x.
 trivial.
 save.
 new_equation sub.rN0.N.
 
 
 fact sub.S.N
-	 /\x,y:N (y <= x -> (S x) - (S y) = x - y).
+	 ∀x,y:N (y ⩽ x → (S x) - (S y) = x - y).
 intro 2.
 elim H.
 intros.

@@ -35,7 +35,7 @@ let input_char, add_chars, set_cont, reset_cont =
         r
       end),
   (fun e ->
-      Firebug.console##log_2 (Js.string "receive:") e;
+      (*Firebug.console##log_2 (Js.string "receive:") e;*)
       let s = Js.to_string e in
       buf := String.sub !buf !index (String.length !buf - !index) ^ s;
       index := 0;
@@ -53,6 +53,7 @@ let input_char, add_chars, set_cont, reset_cont =
        cont := None; Effect.Deep.discontinue k Files.Quit)
 
 let set_path () =
+  Files.server := true;
   Files.path_list := "/phox/lib" :: "/phox/examples" :: [];
   Files.set_path()
 
@@ -61,7 +62,7 @@ let start_phox () =
   Sys_js.set_channel_flusher stdout
     (fun s ->
       let s = Js.string s in
-      Firebug.console##log s;
+      (*Firebug.console##log s;*)
       Worker.post_message s);
   Sys_js.mount ~path:"/phox" load_file;
   Worker.set_onmessage add_chars;

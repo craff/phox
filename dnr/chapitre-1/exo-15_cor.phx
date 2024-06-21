@@ -1,0 +1,20 @@
+Sort term.
+Cst R : term → term → prop.
+Cst f : term → term → term.
+
+goal
+  ∀x,y,z (R x y ∧ R y z → R x z) → 
+  ∀x,y,z (R(f (f x y) z) (f x (f y z))) → 
+  ∀x,y,z (R x y → R (f x z) (f y z)) →
+  ∀x,y (R x y → R y x) → 
+∀x,y,u,v (R (f x (f (f y u) v)) (f (f (f x y) u) v)).
+intro A1 A2 A3 A4.
+intros.
+elim A4.
+elim A1.
+intro.
+next.
+elim A2.
+elim A3.
+elim A2.
+save th.

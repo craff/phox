@@ -1,5 +1,5 @@
 
-(* The goal of this exercise is  to show that in a metric space, then union of the closures of two sets is equal to the closure of the union of these sets.
+(* The goal of this exercise is  to show that in a metric space, then ∪ of the closures of two sets is equal to the closure of the ∪ of these sets.
 We will remark that we need no property of the distance and only two simple
 property of "<".
 *)
@@ -12,27 +12,27 @@ Sort real.
 Cst R0 : real.
 
 (* We introduce the "<" relation on reals. *)
-Cst Infix[5.0] x "<" y : real -> real -> prop.
+Cst Infix[5.0] x "<" y : real → real → prop.
 def Infix[5.0] x ">" y = y < x.
 
 (* We need two lemmas about "<": *)
-claim lemme /\e_1, e_2 >R0 \/e >R0 (e<e_1 & e<e_2).
+claim lemme ∀e_1, e_2 >R0 ∃e >R0 (e<e_1 ∧ e<e_2).
 
-claim transitif /\x,y,z (x<y -> y<z -> x<z).
+claim transitif ∀x,y,z (x<y → y<z → x<z).
 
 (* d x y is the distance between two elements of our set *)
-Cst d : set -> set -> real.
+Cst d : set → set → real.
 
-(* Union A B x should be read as "x" belongs to the union of "A" and "B".
-   Therefore Union A B is the union of A and B. Here is its definition: *)
-def Union A B = \x (A x or B x).
+(* Union A B x should be read as "x" belongs to the ∪ of "A" and "B".
+   Therefore Union A B is the ∪ of A and B. Here is its definition: *)
+def Union A B = λx (A x ∨ B x).
 
 (* Adh A x should be read as "x" belongs to the closure of the set "A".
    Therefore Adh A is the closure of A. Here is its definition: *)
-def Adh A x  =  /\e > R0 \/y (A y & d x y < e).
+def Adh A x  =  ∀e > R0 ∃y (A y ∧ d x y < e).
 
-goal /\A /\B /\x (Union (Adh A) (Adh B) x <-> Adh (Union A B) x).
-(*->*)
+goal ∀A ∀B ∀x (Union (Adh A) (Adh B) x ↔ Adh (Union A B) x).
+(*→*)
 intros.
 intro.
 
@@ -48,22 +48,15 @@ by_absurd.
 elim False.
 
 rewrite_hyp H0 demorganl.
-lefts H0 $& $\/.
+lefts H0 $∧ $∃.
 apply lemme with H1 and H0.
-lefts G $& $\/.
+lefts G $∧ $∃.
 apply H with H4.
-lefts G $& $\/.
+lefts G $∧ $∃.
 left H7.
 apply H3 with H7.
 trivial +transitif.
 apply H2 with H7.
 trivial +transitif.
-(*->*)
+(*→*)
 save th.
-
-
-
-
-
-
-

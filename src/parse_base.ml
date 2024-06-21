@@ -91,7 +91,7 @@ and parse_kind_aux = parser
   [< t = parse_kind_aux2; t' = parse_kind_suit t >] -> t'
 
 and parse_kind_suit t str = match str with parser
-  [< 'Kwd "->";
+  [< 'Kwd "→";
      t' = parse_kind_aux2 ?? serror "a kind" str ;
      t'' = parse_kind_suit t' >] ->
        KArrow(t,t'')
@@ -396,7 +396,7 @@ and treat_pattern stack stack_term tstr  =
   | _ -> assert false
 
 and parse_right_member tstr = match tstr with parser
-  [< 'Kwd "->"; e = parse_aux max_level >] -> e
+  [< 'Kwd "→"; e = parse_aux max_level >] -> e
 
 and parse_match tstr = match tstr with parser
   [< e = parse_aux max_level; 'Ident "with"; e' = parse_patmatch (mk_Var ());  >] ->
@@ -430,7 +430,7 @@ and parse_nextmatch k tstr = match tstr with parser
 
 and parse_atom tstr = match tstr with parser
   [< lt = parse_prefix >] ->  lt
-| [< 'Kwd "\\"; s = bind_ident ?? serror "an identifier or \"_\"" tstr;
+| [< 'Kwd "λ"; s = bind_ident ?? serror "an identifier or \"_\"" tstr;
      sl,k = parse_type_lass [s];
      t = parse_atom ?? serror "an expression" tstr>] ->
         let k = match k with Noass | IAss _ -> mk_Var () | Ass k -> k in
@@ -820,7 +820,7 @@ let rec parse_renaming str =
   let from = ref [] in
   let rec fn tstr = match tstr with parser
     [< 'Joker "";
-       'Kwd "->" ?? serror "->" tstr;
+       'Kwd "→" ?? serror "→" tstr;
        'Joker s when s <> "" ?? serror "a _.xxx" tstr >] ->
       if !default <> "" then
         failwith "Two suffixes specified in one renaming.";
@@ -829,15 +829,15 @@ let rec parse_renaming str =
        ren = parse_renaming; 'Dot ?? terror Dot tstr  >] ->
       from := (s, ren)::!from; gn str
   | [< 'Joker s ;
-       'Kwd "->" ?? serror "->" tstr;
+       'Kwd "→" ?? serror "→" tstr;
        'Joker s' ?? serror "a _.xxx" tstr >] ->
        general := (s,s')::!general; gn str
-  | [< 'Kwd s; ' Kwd "->" ?? serror "->" tstr;
+  | [< 'Kwd s; ' Kwd "→" ?? serror "→" tstr;
        (s', sy) = parser [< 'Joker "" >] -> ("", Trivial)
                        | [< (s', sy, _) = parse_syntax_def false >] -> s', sy
                      ?? serror "a syntax definition" tstr >] ->
       local:=(s,(s',sy))::!local; gn str
-  | [< 'Ident s; ' Kwd "->" ?? serror "->" tstr;
+  | [< 'Ident s; ' Kwd "→" ?? serror "→" tstr;
        (s', sy) = parser [< 'Joker "" >] -> ("", Trivial)
                        | [< (s', sy, _) = parse_syntax_def false >] -> s', sy
                      ?? serror "a syntax definition" tstr >] ->

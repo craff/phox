@@ -10,18 +10,18 @@ flag auto_lvl 1.
 
 (** Basic definitions. *)
 
-(*texte 
+(*texte
 To define the natural numbers, we extend the language with one
-contant symbol [ N0 ] and one unary function symbol [ S x]. 
+contant symbol [ N0 ] and one unary function symbol [ S x].
 Then the natural numbers are defined by the following predicate [N x]
 *)
 
 (*definition  Church integers  *)
 Sort nat.
 Cst N0 : nat.
-Cst Prefix[2] "S" x : nat -> nat.
+Cst Prefix[2] "S" x : nat → nat.
 (* S x *)
-def N x = /\X (X N0 -> /\y (X y -> X (S y)) -> X x).
+def N x = ∀X (X N0 → ∀y (X y → X (S y)) → X x).
 (*enddefinition *)
 
 tex_syntax N0 Math "0".
@@ -32,13 +32,13 @@ tex_syntax N Math "{\\rm I\\hspace{-0.2em}N}".
 (*** Introduction rules for $N. *)
 
 
-fact (* $N0 is an integer *) N0.total.N 
+fact (* $N0 is an integer *) N0.total.N
 		N N0.
 intros.
 save.
 
-fact (* The successor function $S is total *) S.total.N 
-		/\x:N N(S x).
+fact (* The successor function $S is total *) S.total.N
+		∀x:N N(S x).
 trivial.
 save.
 
@@ -49,21 +49,21 @@ new_intro -i -c S S.total.N.
 
 (**** Induction on natural number as an elimination rule. *)
 
-fact (* Induction on $N *) rec.N 
- /\X (X N0 -> /\y:N (X y -> X (S y)) -> /\x:N X x).
+fact (* Induction on $N *) rec.N
+ ∀X (X N0 → ∀y:N (X y → X (S y)) → ∀x:N X x).
 intro 5.
 (*§ 1 goal created.
 H := X N0
-H0 := /\y:N  (X y -> X (S y))
+H0 := ∀y:N  (X y → X (S y))
 H1 := N x
    |- X x
 *)
-elim -1 [r] N x & X x.
+elim -1 [r] N x ∧ X x.
 elim H1.
 intros.
 intro.
 (*§ ...
-   |- /\y (N y & X y -> N (S y) & X (S y))
+   |- ∀y (N y ∧ X y → N (S y) ∧ X (S y))
 *)
 trivial.
 save.
@@ -71,8 +71,8 @@ save.
 
 (**** Elimination by case on $N. *)
 
-fact (* case on $N *) case.N 
-	 /\x : N (x = N0 or \/z:N x = S z).
+fact (* case on $N *) case.N
+	 ∀x : N (x = N0 ∨ ∃z:N x = S z).
 intros.
 elim H.
 trivial.
@@ -80,7 +80,7 @@ trivial.
 save.
 
 fact case_left.N
-   /\X,x ((x = N0 -> X N0) -> /\y (N y -> x = S y -> X (S y)) -> N x -> X x).
+   ∀X,x ((x = N0 → X N0) → ∀y (N y → x = S y → X (S y)) → N x → X x).
 intros.
 apply case.N with H1.
 trivial.
@@ -95,16 +95,16 @@ close_def N.
 The introduction rules are added with the command #new_intro -c#.
 The option #-c# indicates that $N0  and  $S  are
 constructors and the trivial tactic will try to use these rules when
-the goal is of the form [P N0] or [P (S t)] even if [P] is a
+the goal is of the form [P N0] ∨ [P (S t)] even if [P] is a
 unification variable.
 
 The elimination rules are added  with the command #new_elim#
 using the option #-n# for [ case.N]. This tells PhoX that this
-second rule is not necessary for completeness. 
+second rule is not necessary for completeness.
 
-The abbreviations are given with the rules. For instance, 
+The abbreviations are given with the rules. For instance,
 #elim case.N with H# is equivalent to #elim H with \[case\]#
-and 
+and
 #elim N0.total.N # is equivalent to #intro N0#.
 *)
 
@@ -112,8 +112,8 @@ and
 
 (*texte We add usual axioms of Peano Arithmetic.   *)
 (*axiom *)
-claim (* zero and successor distinct *) N0_not_S.N /\x:N (N0 != S x).
-claim (* successor injective *) S_inj.N /\x,y:N (S x = S y -> x = y).
+claim (* zero and successor distinct *) N0_not_S.N ∀x:N (N0 ≠ S x).
+claim (* successor injective *) S_inj.N ∀x,y:N (S x = S y → x = y).
 (*endaxiom *)
 
 (*texte
@@ -123,29 +123,29 @@ an axiom ).
 
 (*fact Showing that integers are distincts. *)
 
-fact S_not_N0.N /\x:N S x != N0.
+fact S_not_N0.N ∀x:N S x ≠ N0.
 trivial +N0_not_S.N.
 save.
 new_elim -i -n $= S_not_N0 S_not_N0.N.
 new_elim -i -n $= N0_not_S N0_not_S.N.
 
-fact S_inj_left.N /\X/\x,y:N ((x = y -> X) -> S x = S y -> X).
+fact S_inj_left.N ∀X∀x,y:N ((x = y → X) → S x = S y → X).
 trivial +S_inj.N.
 save.
 new_elim -i -n $= S_inj S_inj_left.N.
 
-fact x_not_Sx.N /\x:N (x != S x).
+fact x_not_Sx.N ∀x:N (x ≠ S x).
 trivial 6.
 save.
 new_elim -i -n $= x_not_Sx x_not_Sx.N.
 
-fact Sx_not_x.N /\x:N (S x != x).
-trivial +x_not_Sx.N. 
+fact Sx_not_x.N ∀x:N (S x ≠ x).
+trivial +x_not_Sx.N.
 save.
 new_elim -i -n $= Sx_not_x Sx_not_x.N.
 (*endfact *)
 
-(* texte 
+(* texte
 These rules are added as elimination rule using the command
 #new_elim -i -n#. The system automaticaly detects that these are
 left rules (because the right most atomic formula is a predicate

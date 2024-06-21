@@ -56,10 +56,10 @@ Lorsque l'on est en train de faire une preuve, on peut utiliser le
 bouton "State" pour afficher les buts à prouver.
 
 Les premiers exercices utilisent les constantes "A", "B" et "C" ainsi que
-l'implication "->", la conjonction "&", la disjonction "or", la négation "~"
+l'implication "→", la conjonction "∧", la disjonction "or", la négation "¬"
 et le faux "False".
 
-Note: "~ A" est défini comme "A -> False".
+Note: "¬ A" est défini comme "A → False".
 
 On doit définir les variables propositionnelles A, B, C.
 Pour cela entrez les lignes qui suivent:
@@ -74,17 +74,17 @@ Cst C : prop.
 On peut maintenant prouver une formule:
 *)
 
-goal A -> A.
+goal A → A.
 
 (* 
 
 La commande "goal" indique à PhoX que l'on veut commencer la preuve de
-la formule "A -> A" (il ne faut pas oublier le point et le retour
+la formule "A → A" (il ne faut pas oublier le point et le retour
 chariot qui suit).
 
 PhoX répond :
 
-|- A -> A
+|- A → A
 
 Le signe "|-" précède la formule à prouver
 
@@ -136,7 +136,7 @@ Building proof ....
 Typing proof .... 
 Verifying proof .... 
 Saving proof ....
-mon_premier_theoreme = A -> A : Theorem
+mon_premier_theoreme = A → A : Theorem
 
 PhoX construit et revérifie la preuve, puis la sauvegarde dans la machine
 sous le nom indiqué.
@@ -144,7 +144,7 @@ sous le nom indiqué.
 Prouvons une formule un peu plus compliquée:
 *)
 
-goal ((A & B) -> C) -> A -> B -> C  .
+goal ((A ∧ B) → C) → A → B → C  .
 
 (* 
 On pourrait tapez trois fois "intro.", on peut aussi tapez "intro 3.":
@@ -158,7 +158,7 @@ PhoX répond:
 1 goal created.
 New goal is:
 
-H := A & B -> C
+H := A ∧ B → C
 H0 := A
 H1 := B
    |- C
@@ -187,13 +187,13 @@ PhoX répond:
 
 New goals are:
 goal 1/2
-H := A & B -> C
+H := A ∧ B → C
 H0 := A
 H1 := B
    |- A
 
 goal 2/2
-H := A & B -> C
+H := A ∧ B → C
 H0 := A
 H1 := B
    |- B
@@ -228,8 +228,8 @@ adéquates):
 
 *)
 
-goal ((((A -> B) -> A) -> A) -> B) -> B.
-(*->*)
+goal ((((A → B) → A) → A) → B) → B.
+(*→*)
 intro.
 elim H.
 intro.
@@ -238,14 +238,14 @@ intro.
 elim H.
 intro.
 axiom H1.
-(*->*)
+(*→*)
 save th3.
 
 (*
 On peut aussi prouver la formule suivante:
 *)
 
-goal ((A or B) -> C) -> A -> C.
+goal ((A ∨ B) → C) → A → C.
 intro 2.
 elim H.
 
@@ -260,14 +260,14 @@ PhoX répond:
 1 goal created.
 New goal is:
 
-H0 := A or B -> C
+H0 := A ∨ B → C
 H1 := A
    |- B
 
 et on ne pourra pas finir la preuve ! que s'est il passé ? il y a deux
 règles d'introduction pour la disjonction et PhoX a choisi la
 mauvaise. On peut écrire dans ce cas "intro l" pour préciser que l'on
-veut la règle quit dit "A |- A or B" (l pour left). Pour revenir en
+veut la règle quit dit "A |- A ∨ B" (l pour left). Pour revenir en
 arrière, on utilise "undo." et on remplace "intro" par "intro l". On
 peut alors finir la preuve: *)
 
@@ -282,19 +282,19 @@ Exercice: finir la preuve suivante:
 
 *)
 
-goal (A or B -> C)  ->  (A -> C) & (B -> C).
+goal (A ∨ B → C)  →  (A → C) ∧ (B → C).
 intro.
 intro.
 intro.
 elim H.
-(*->*)
+(*→*)
 intro l.
 axiom H0.
 intro.
 elim H.
 intro r.
 axiom H0.
-(*->*)
+(*→*)
 save th5.
 
 (*
@@ -304,15 +304,15 @@ prouvons:
 
 *)
 
-goal (B -> C) & (A -> C)  ->  (A or B -> C).
+goal (B → C) ∧ (A → C)  →  (A ∨ B → C).
 intro 2.
 
 (*
 
 PhoX répond:
 
-H0 := (A -> C) & (B -> C)
-H1 := A or B
+H0 := (A → C) ∧ (B → C)
+H1 := A ∨ B
    |- C
 
 On peut faire alors une élimination de la disjonction en tapant:
@@ -327,14 +327,14 @@ On a alors les deux buts suivant à prouver:
 2 goals created.
 New goals are:
 
-H0 := (A -> C) & (B -> C)
-H1 := A or B
+H0 := (A → C) ∧ (B → C)
+H1 := A ∨ B
 H2 := A
    |- C
 
 
-H0 := (A -> C) & (B -> C)
-H1 := A or B
+H0 := (A → C) ∧ (B → C)
+H1 := A ∨ B
 H2 := B
    |- C
 
@@ -352,14 +352,14 @@ save th6.
 
 (*
 
-L'option "with [l]" indique de prendre la règle qui dit "A & B |- A"
+L'option "with [l]" indique de prendre la règle qui dit "A ∧ B |- A"
 pour la première élimination. 
 
 On pouvait aussi faire la même preuve en utlisant des règles gauches:
 
 *)
 
-goal (B -> C) & (A -> C)  ->  (A or B -> C).
+goal (B → C) ∧ (A → C)  →  (A ∨ B → C).
 intro 2.
 left H.
 left H0.
@@ -378,30 +378,30 @@ Exercice: prouver les formules suivantes:
 *)
 
 
-goal (A -> C) or (B -> C)  ->  (A & B) -> C.
-(*->*)
+goal (A → C) ∨ (B → C)  →  (A ∧ B) → C.
+(*→*)
 intros.
 left H.
 elim H.
 elim H0.
 elim H.
 elim H0.
-(*->*)
+(*→*)
 save th7.
 
-goal (A -> B & C) -> (A -> B) & (A -> C).
-(*->*)
+goal (A → B ∧ C) → (A → B) ∧ (A → C).
+(*→*)
 intro 3.
 elim H.
 axiom H0.
 elim H.
 axiom H0.
-(*->*)
+(*→*)
 save th8.
 
 (*
 
-PhoX connait aussi la négation noté " ~A " pour "non A" et l'absurde noté
+PhoX connait aussi la négation noté " ¬A " pour "non A" et l'absurde noté
 "False".
 
 PhoX permet alors de faire de la logique classique en utilisant la
@@ -411,7 +411,7 @@ by_absurd. comme l'illustre la preuve suivante:
 
 *)
 
-goal ~ (A & B) -> ~A or ~B.
+goal ¬ (A ∧ B) → ¬A ∨ ¬B.
 intro.
 by_absurd.
 intro l.
@@ -433,12 +433,12 @@ difficiles car on a plus de choix.
 
 On peut aussi faire des preuves par l'absurde en utilisant le tiers exclu:
 
-excluded_middle = /\X (X or ~ X) : Theorem
+excluded_middle = ∀X (X ∨ ¬ X) : Theorem
 
 Il suffit de taper "elim excluded_middle with A" pour distinguer les cas
 A vrai et A faux.
 
-Remarque: Le /\X indique que ce théorème est valable pour toutes formules X.
+Remarque: Le ∀X indique que ce théorème est valable pour toutes formules X.
 
 L'utilisation du tiers exclu sera surtout utilse en calcul des prédicats.
 
@@ -446,10 +446,10 @@ Terminer la preuve suivante:
 
 *)
 
-goal (A & B -> C) -> (A -> C) or (B -> C).
+goal (A ∧ B → C) → (A → C) ∨ (B → C).
 intro.
 by_absurd.
-(*->*)
+(*→*)
 intro l.
 intro.
 elim H0.
@@ -459,7 +459,7 @@ elim H.
 intro.
 axiom H1.
 axiom H2.
-(*->*)
+(*→*)
 save th10.
 
 (*
@@ -490,15 +490,15 @@ constante de prédicat binaire et si "t, u" sont deux termes alors "R t u" est
 une formule.
 
 On peut aussi construire des formules utilisant des quantificateur:
-"/\x A x" signifie "pour tout x on a (A x)" et "\/x A x" signifie "il
+"∀x A x" signifie "pour tout x on a (A x)" et "∃x A x" signifie "il
 existe x tel que (A x)". 
 
 Remarque: si l'on ecrit "E x" cela veut dire que "x" peut apparaître
 dans "E". Si l'on écrit "A", "x" ne peut pas apparaître dans "A".
  
-Remarque: on rencontre aussi l'abréviation "/\x:D E x" qui veut dire 
-"/\x (D x -> E x)" et l'abréviation "\/x:D E x" qui veut dire 
-"\/x (D x & E x)".
+Remarque: on rencontre aussi l'abréviation "∀x:D E x" qui veut dire 
+"∀x (D x → E x)" et l'abréviation "∃x:D E x" qui veut dire 
+"∃x (D x ∧ E x)".
 
 Les exercices qui suivent utilisent les constantes de prédicat unaire
 "D x" et "E x", les constantes de prédicat binaire "T x y" et "R x y"
@@ -507,14 +507,14 @@ ainsi que le symbol de fonction unaire "f x":
 *)
 
 Sort term.
-Cst D : term -> prop.
-Cst E : term -> prop.
-Cst R : term -> term -> prop.
-Cst T : term -> term -> prop.
-Cst f : term -> term.
+Cst D : term → prop.
+Cst E : term → prop.
+Cst R : term → term → prop.
+Cst T : term → term → prop.
+Cst f : term → term.
 
 (* 
-Cst D : term -> prop. veut dire que D prend un terme en argument et
+Cst D : term → prop. veut dire que D prend un terme en argument et
 donne une proposition comme résultat: c'est bien la définition d'une
 constante de prédicat unaire.
 
@@ -522,7 +522,7 @@ Entrez ces deux preuves:
 
 *)
 
-goal /\x (D x & E x) -> /\x D x & /\x E x.
+goal ∀x (D x ∧ E x) → ∀x D x ∧ ∀x E x.
 intro.
 intro.
 intro.
@@ -531,7 +531,7 @@ intro.
 elim H.
 save th11.
 
-goal \/x (D x or E x) -> \/x D x or \/x E x.
+goal ∃x (D x ∨ E x) → ∃x D x ∨ ∃x E x.
 intro.
 elim H.
 elim H0.
@@ -560,14 +560,14 @@ aurait aussi deviné la valeur des inconnues.
 
 On remarque qu'il y a en fait deux types de variables:
   - Les variables dites existentielles ("x", "y", ...) (introduite par 
-    l'élimination d'un quantificateur existentiel "\/x" ou
-    l'introduction d'un quantificateur universelle "/\x"). Ce sont des 
+    l'élimination d'un quantificateur existentiel "∃x" ou
+    l'introduction d'un quantificateur universelle "∀x"). Ce sont des 
     constantes dont les seules propriétés sont données par les 
     hypothèses de chaque buts. On ne peut pas changer "la valeur de
     ces variables"
   - Les variables universelles ("?1", "?2", ...) (introduite par 
-    l'élimination d'un quantificateur universelle "/\x" ou
-    l'introduction d'un quantificateur existentiel "\/x"). Ce sont des
+    l'élimination d'un quantificateur universelle "∀x" ou
+    l'introduction d'un quantificateur existentiel "∃x"). Ce sont des
     variables dont on peut choisir la valeur à l'aide de la commande
     "instance" afin de finir une preuve. 
   
@@ -576,7 +576,7 @@ Remarque les règles logiques introduisent des contraintes de la forme
 
 Ces contraintes peuvent être affichées grâce à la commande
 "constraints". Une bonne illustration de ce phénomène consiste à
-essayer de prouver la formule "\/x R x -> /\x R x". 
+essayer de prouver la formule "∃x R x → ∀x R x". 
 
 Ces contraintes peuvent aussi empêcher de terminer une preuve, si
 on applique certaines règles dans un ordre inadéquate.
@@ -588,19 +588,19 @@ seulement quand c'est nécéssaire):
 
 *)
 
-goal \/x (D x & E x) -> \/x D x & \/x E x.
-(*->*)
+goal ∃x (D x ∧ E x) → ∃x D x ∧ ∃x E x.
+(*→*)
 intro.
 left H.
 left H.
 intro 2.
 axiom H.
 axiom H0.
-(*->*)
+(*→*)
 save th13.
 
-goal \/x (B & D x) -> \/x D x & B.
-(*->*)
+goal ∃x (B ∧ D x) → ∃x D x ∧ B.
+(*→*)
 intro.
 left H.
 left H.
@@ -608,11 +608,11 @@ intro.
 intro.
 axiom H0.
 axiom H.
-(*->*)
+(*→*)
 save th14.
 
-goal /\x D x or /\x E x -> /\x (D x or E x).
-(*->*)
+goal ∀x D x ∨ ∀x E x → ∀x (D x ∨ E x).
+(*→*)
 intro.
 left H.
 intro.
@@ -621,7 +621,7 @@ elim H.
 intro.
 intro r.
 elim H.
-(*->*)
+(*→*)
 save th15.
 
 (*
@@ -631,12 +631,12 @@ lois de De Morgan (il faut finir la preuve ...) :
 
 *)
 
-goal (/\x D x -> \/x E x) -> \/x (D x -> E x).
+goal (∀x D x → ∃x E x) → ∃x (D x → E x).
 intro.
-elim excluded_middle with  /\x D x.
+elim excluded_middle with  ∀x D x.
 select 2. (* change le but courant *)
 rewrite_hyp H0 demorgan.
-(*->*)
+(*→*)
 left H0.
 intro 2.
 elim H0.
@@ -646,7 +646,7 @@ axiom H0.
 intro 2.
 instance ?2 x.
 axiom H1.
-(*->*)
+(*→*)
 save th16.
 
 (*
@@ -655,9 +655,9 @@ Exercice: Prouver les formules suivantes:
 
 *)
 
-goal \/x /\y (D x -> D y).
-(*->*)
-elim excluded_middle with /\x D x.
+goal ∃x ∀y (D x → D y).
+(*→*)
+elim excluded_middle with ∀x D x.
 intros.
 intros.
 elim H.
@@ -667,12 +667,12 @@ intros.
 intros.
 elim H.
 axiom H0.
-(*->*)
+(*→*)
 save th17.
 
-goal /\x \/y \/z (D x -> R x y & T x z) <-> 
- (/\x \/y  (D x -> R x y) & /\x \/y (D x -> T x y)).
-(*->*)
+goal ∀x ∃y ∃z (D x → R x y ∧ T x z) ↔ 
+ (∀x ∃y  (D x → R x y) ∧ ∀x ∃y (D x → T x y)).
+(*→*)
 intros.
 intros.
 intros.
@@ -703,22 +703,22 @@ elim H1.
 axiom H3.
 elim H2.
 axiom H3.
-(*->*)
+(*→*)
 save th18.
 
 Cst a : term.
 Cst b : term.
 
-goal /\x /\x' \/y (R y x & R y x') ->
-     /\x (f x = a or f x = b) ->
-        /\x \/y (R y x & f y = a) or /\x \/y (R y x & f y = b).
-(*->*)
+goal ∀x ∀x' ∃y (R y x ∧ R y x') →
+     ∀x (f x = a ∨ f x = b) →
+        ∀x ∃y (R y x ∧ f y = a) ∨ ∀x ∃y (R y x ∧ f y = b).
+(*→*)
 intros.
 by_absurd.
 rewrite_hyp H1 demorganl.
-lefts H1 $& $\/.
+lefts H1 $∧ $∃.
 apply H with x and x0.
-lefts G $& $\/.
+lefts G $∧ $∃.
 apply H2 with H3.
 apply H1 with H4.
 elim H0 with y.
@@ -726,6 +726,6 @@ elim G0.
 axiom H5.
 elim G.
 axiom H5.
-(*->*)
+(*→*)
 save th19.
 

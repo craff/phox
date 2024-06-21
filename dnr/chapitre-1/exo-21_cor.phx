@@ -1,0 +1,115 @@
+Cst a : prop.
+Cst b : prop.
+Cst c : prop.
+Cst d : prop.
+
+theorem numero1 (a ↔ b) → (¬ a ↔ ¬ b).
+intro 2.
+intro 2.
+left H.
+elim H0.
+elim H2.
+axiom H1.
+
+intro 2.
+left H.
+elim H0.
+elim H.
+axiom H1.
+save.
+
+theorem numero2 (a ↔ b) → (c ↔ d) → (a ∧ c ↔ b ∧ d).
+intro 3.
+
+intro 2.
+left H.
+left H1.
+elim H.
+axiom H1.
+left H0.
+left H1.
+elim H0.
+axiom H3.
+
+intro 2.
+left H.
+left H1.
+elim H2.
+axiom H1.
+
+left H0.
+left H1.
+elim H2.
+axiom H3.
+save.
+
+theorem numero3 (a ↔ b) → (c ↔ d) → (a ∨ c ↔ b ∨ d).
+intro 2.
+left H.
+left H0.
+intro.
+
+intro.
+left H3.
+intro l.
+trivial.
+intro r.
+trivial.
+intro.
+left H3.
+intro l.
+trivial.
+intro r.
+trivial.
+save.
+
+
+theorem numero4 (a ↔ b) → (c ↔ d) → ((a → c) ↔ (b → d)).
+intro 2.
+left H.
+left H0.
+intro.
+intro 2.
+elim H0.
+elim H3.
+elim H1.
+axiom H4.
+
+intro 2.
+elim H2.
+elim H3.
+elim H.
+axiom H4.
+save.
+
+
+
+Sort term.
+Cst A : term → prop.
+Cst B : term → prop.
+
+theorem numero5 ∀x (A x ↔ B x) → (∀x A x ↔ ∀x B x).
+intro 4.
+elim H.
+elim H0.
+
+elim H.
+elim H0.
+save.
+
+
+theorem numero6 ∀x (A x ↔ B x) → (∃x A x ↔ ∃x B x).
+intro 2.
+intro.
+elim H0.
+elim H.
+intro.
+elim H2.
+axiom H1.
+intro.
+elim H0.
+elim H.
+intro.
+elim H3.
+axiom H1.
+save.

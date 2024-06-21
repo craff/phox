@@ -11,51 +11,51 @@ flag auto_lvl 1.
 (** Usual definitions on binary relations. *)
 
 def transitive D R = 
-  /\a,b,c:D (R a b -> R b c -> R a c).
+  ∀a,b,c:D (R a b → R b c → R a c).
 
-def reflexive D R = /\a:D  R a a.
+def reflexive D R = ∀a:D  R a a.
 
-def anti.reflexive D R = /\a:D (~ R a a).
+def anti.reflexive D R = ∀a:D (¬ R a a).
 
-def symmetric D R = /\a,b:D (R a b -> R b a).
+def symmetric D R = ∀a,b:D (R a b → R b a).
 
-def anti.symmetric D R = /\a,b:D (R a b & R b a -> a = b).
+def anti.symmetric D R = ∀a,b:D (R a b ∧ R b a → a = b).
 
-def preorder D R = transitive D R & reflexive D R.
+def preorder D R = transitive D R ∧ reflexive D R.
 
-def strict.order D R = transitive D R & anti.reflexive D R.
+def strict.order D R = transitive D R ∧ anti.reflexive D R.
 
-def order D R = preorder D R & anti.symmetric D R.
+def order D R = preorder D R ∧ anti.symmetric D R.
 
-def equivalence D R = preorder D R & symmetric D R.
+def equivalence D R = preorder D R ∧ symmetric D R.
 
-def total D R = /\x,y:D (R x y or R y x).
+def total D R = ∀x,y:D (R x y ∨ R y x).
 
-def strict.total D R = /\x,y:D (R x y or R y x or x = y).
+def strict.total D R = ∀x,y:D (R x y ∨ R y x ∨ x = y).
 
 (* well founded relations *)
 
 def well.founded D R =
-  /\X(/\a:D (/\b:D (R b a -> X b) -> X a) -> /\a:D X a).
+  ∀X(∀a:D (∀b:D (R b a → X b) → X a) → ∀a:D X a).
 
-def well.order D R = strict.order D R & strict.total D R & well.founded D R.
+def well.order D R = strict.order D R ∧ strict.total D R ∧ well.founded D R.
 
 (*fact Some properties of well founded relations. *)
 
 fact (* Any subset has an inf element *) inf.well_founded 
-/\D/\R (well.founded D R -> 
-  /\X (\/x:D X x -> \/x:D (X x & /\y:D (X y -> ~ R y x)))). 
+∀D∀R (well.founded D R → 
+  ∀X (∃x:D X x → ∃x:D (X x ∧ ∀y:D (X y → ¬ R y x)))). 
 intros.
-lefts H0 $& $\/. 
-prove X x -> $0. 
+lefts H0 $∧ $∃. 
+prove X x → $0. 
 rmh H1.
 elim -4 H0 H.
 intros.
-prove /\y:D  (X y -> ~ R y a) or \/y:D (X y & R y a).
+prove ∀y:D  (X y → ¬ R y a) ∨ ∃y:D (X y ∧ R y a).
 trivial = +absurd.
 left G.
 trivial.
-lefts H4 $& $\/.
+lefts H4 $∧ $∃.
 elim -3 H6 H2.
 trivial =G H1.
 save.

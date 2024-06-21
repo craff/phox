@@ -1,0 +1,66 @@
+Sort term.
+Cst f : term → term.
+Cst zero : term.
+def Im A y = ∃x (A x ∧ f x = y).
+def ker x = f x = zero.
+def inclus A B = ∀x (A x → B x).
+Cst plus : term → term → term.
+Cst moins : term → term → term.
+def Plus A B x = ∃y,z (A y ∧ B z ∧ x = (plus y z)).
+
+(* On a supposé, implicitement, que les ensembles de termes sont des espaces
+vectoriels et que f est une application linéaire. Les lemmes ci-dessous
+expriment les propriétés des espaces vectoriels (resp. des applications
+linéaires) dont on a besoin dans la preuve faite. Ils pourraient être prouvés
+sans difficulté à partir des axiomes d'espace vectoriel et de la définition
+d'une application linéaire. On a préféré ici se concentrer sur l'essentiel et
+on les admettra donc*)
+
+claim lemme1 ∀x,y (f x = f y → ker (moins y x)).
+claim lemme2 ∀x,y,z plus x (plus z (moins y x))=plus y z.
+claim lemme3 ∀x,y (ker x ∧ ker y → ker (plus x y)).
+claim lemme4 ∀y,a,b (plus a b = y →  ker b → f a = f y).
+claim lemme5 ∀A,B ∀a (A a → Plus A B a).
+
+goal ∀A,B ((inclus (Im A) (Im B)) ↔(inclus (Plus A ker) (Plus B ker))).
+intro 6.
+elim H0.
+elim H1.
+lefts H2.
+use Im B (f y).
+elim G.
+intro 2.
+instance ?1 x0.
+instance ?2 plus z (moins y x0).
+left H5.
+intros.
+axiom H5.
+use ker (moins y x0).
+elim lemme3.
+intro.
+axiom H3.
+axiom G0.
+elim lemme1.
+axiom H6.
+apply -1 x0 -2 y -3 z lemme2.
+intro.
+elim H.
+intro.
+intro.
+axiom H2.
+intro.
+left H0.
+left H0.
+use Plus B ker x0.
+left G.
+lefts H2.
+intro .
+intro.
+axiom H2.
+elim lemme4.
+intro.
+axiom H3.
+elim H.
+elim lemme5.
+axiom H0.
+save th.

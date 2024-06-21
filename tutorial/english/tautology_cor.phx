@@ -16,7 +16,7 @@
 
 There are two goals for this tutorial:
   - We introduce step by step the simplest commands of the PhoX
-    system, using simple examples of propositional or predicate logic.
+    system, using simple examples of propositional ∨ predicate logic.
   - These examples can also be used as an illustration of a 
     logic course.
 
@@ -24,7 +24,7 @@ The general principles used to construct proofs are the following:
   - We use the "goal" command to indicate the formula we want to prove.
   - At every step we have some goals to prove. One of them is the "current"
     goal (this is the goal number 1). We can print all the goals using the
-    command "goals" or the "State" button on the Emacs interface. Each
+    command "goals" ∨ the "State" button on the Emacs interface. Each
     goal has hypotheses which are automatically named (we could also
     chose the name of the hypotheses) and one conclusion that we shall
     prove using the hypotheses.
@@ -42,7 +42,7 @@ To start PhoX, open a file .phx under XEmacs with ProofGeneral, this is what
 you did if you are reading this file!
 
 Under XEmacs, we can directly send a command to PhoX using the button
-"next" or typing "LineFeed" or "Control-J". We can also send a piece
+"next" ∨ typing "LineFeed" ∨ "Control-J". We can also send a piece
 of the file by moving to the desired position and pressing the button
 "goto". The line interpreted by the system appear on a blue
 background. We can go back using the "undo" button.
@@ -56,10 +56,10 @@ When we are doing a proof, we can use the button "state" to print all
 the goals.
 
 For the first exercises, we use the constants "A", "B" and "C" and the 
-implication "->", the conjunction "&", the disjunction "or", the negation "~"
+implication "→", the conjunction "∧", the disjunction "or", the negation "¬"
 and "False".
 
-Note: "~ A" is defined as "A -> False".
+Note: "¬ A" is defined as "A → False".
 
 First we define the propositional variables A, B, C.
 To do so enter the following lines:
@@ -74,17 +74,17 @@ Cst C : prop.
 We can now prove a formula:
 *)
 
-goal A -> A.
+goal A → A.
 
 (* 
 
 The "goal" command indicates to PhoX that we want to prove the formula
-"A -> A" (It is important not to forget the point and the carriage
+"A → A" (It is important not to forget the point and the carriage
 return at the end of the command).
 
 PhoX answers:
 
-|- A -> A
+|- A → A
 
 The sign "|-" precedes the formula to be proved.
 
@@ -135,7 +135,7 @@ Building proof ....
 Typing proof .... 
 Verifying proof .... 
 Saving proof ....
-my_first_theorem = A -> A : Theorem
+my_first_theorem = A → A : Theorem
 
 PhoX constructs and recheck the proof, then it saves it in the machine
 using the given name.
@@ -143,7 +143,7 @@ using the given name.
 Let us prove a more complex formula:
 *)
 
-goal ((A & B) -> C) -> A -> B -> C  .
+goal ((A ∧ B) → C) → A → B → C  .
 
 (* 
 We could type three times "intro", we can also type "intro 3":
@@ -157,7 +157,7 @@ PhoX answers:
 1 goal created.
 New goal is:
 
-H := A & B -> C
+H := A ∧ B → C
 H0 := A
 H1 := B
    |- C
@@ -186,13 +186,13 @@ PhoX answers:
 
 New goals are:
 goal 1/2
-H := A & B -> C
+H := A ∧ B → C
 H0 := A
 H1 := B
    |- A
 
 goal 2/2
-H := A & B -> C
+H := A ∧ B → C
 H0 := A
 H1 := B
    |- B
@@ -223,8 +223,8 @@ by the proper commands):
 
 *)
 
-goal ((((A -> B) -> A) -> A) -> B) -> B.
-(*->*)
+goal ((((A → B) → A) → A) → B) → B.
+(*→*)
 intro.
 elim H.
 intro.
@@ -233,14 +233,14 @@ intro.
 elim H.
 intro.
 axiom H1.
-(*->*)
+(*→*)
 save th3.
 
 (*
 We can also prove the following:
 *)
 
-goal ((A or B) -> C) -> A -> C.
+goal ((A ∨ B) → C) → A → C.
 intro 2.
 elim H.
 
@@ -255,13 +255,13 @@ PhoX answers:
 1 goal created.
 New goal is:
 
-H0 := A or B -> C
+H0 := A ∨ B → C
 H1 := A
    |- B
 
 and we will not be able to finish the proof ! what happened ? There
 are two introduction rules for the disjunction and PhoX chooses the
-wrong one. We can say intro l to choose the rule saying "A |- A or B"
+wrong one. We can say intro l to choose the rule saying "A |- A ∨ B"
 (l for left). To go back, we use the "undo" command and we replace
 "intro" by "intro l". We can then end the proof: 
 *)
@@ -277,19 +277,19 @@ Exercise: finish the following proof:
 
 *)
 
-goal (A or B -> C)  ->  (A -> C) & (B -> C).
+goal (A ∨ B → C)  →  (A → C) ∧ (B → C).
 intro.
 intro.
 intro.
 elim H.
-(*->*)
+(*→*)
 intro l.
 axiom H0.
 intro.
 elim H.
 intro r.
 axiom H0.
-(*->*)
+(*→*)
 save th5.
 
 (*
@@ -298,15 +298,15 @@ A similar problem can arise with conjunction: let us prove the following:
 
 *)
 
-goal (B -> C) & (A -> C)  ->  (A or B -> C).
+goal (B → C) ∧ (A → C)  →  (A ∨ B → C).
 intro 2.
 
 (*
 
 PhoX answers:
 
-H0 := (A -> C) & (B -> C)
-H1 := A or B
+H0 := (A → C) ∧ (B → C)
+H1 := A ∨ B
    |- C
 
 We can then do an elimination of the conjunction using the following:
@@ -321,14 +321,14 @@ Then we have two goals to prove:
 2 goals created.
 New goals are:
 
-H0 := (A -> C) & (B -> C)
-H1 := A or B
+H0 := (A → C) ∧ (B → C)
+H1 := A ∨ B
 H2 := A
    |- C
 
 
-H0 := (A -> C) & (B -> C)
-H1 := A or B
+H0 := (A → C) ∧ (B → C)
+H1 := A ∨ B
 H2 := B
    |- C
 
@@ -346,14 +346,14 @@ save th6.
 
 (*
 
-The option "with [l]" indicates to use the rule saying "A & B |- A"
+The option "with [l]" indicates to use the rule saying "A ∧ B |- A"
 for the first elimination.
 
 We could have use left rules to write the same proof:
 
 *)
 
-goal (B -> C) & (A -> C)  ->  (A or B -> C).
+goal (B → C) ∧ (A → C)  →  (A ∨ B → C).
 intro 2.
 left H.
 left H0.
@@ -372,30 +372,30 @@ Exercises: prove the following formulas:
 *)
 
 
-goal (A -> C) or (B -> C)  ->  (A & B) -> C.
-(*->*)
+goal (A → C) ∨ (B → C)  →  (A ∧ B) → C.
+(*→*)
 intros.
 left H.
 elim H.
 elim H0.
 elim H.
 elim H0.
-(*->*)
+(*→*)
 save th7.
 
-goal (A -> B & C) -> (A -> B) & (A -> C).
-(*->*)
+goal (A → B ∧ C) → (A → B) ∧ (A → C).
+(*→*)
 intro 3.
 elim H.
 axiom H0.
 elim H.
 axiom H0.
-(*->*)
+(*→*)
 save th8.
 
 (*
 
-PhoX also knows negation written " ~A " for "non A" and absurdum
+PhoX also knows negation written " ¬A " for "non A" and absurdum
 written "False".
 
 PhoX can also be used to do classical logic using absurdity reasonning
@@ -404,7 +404,7 @@ the command "by_absurd" as in the following proof:
 
 *)
 
-goal ~ (A & B) -> ~A or ~B.
+goal ¬ (A ∧ B) → ¬A ∨ ¬B.
 intro.
 by_absurd.
 intro l.
@@ -420,26 +420,26 @@ save th9.
 
 (*
 
-Remark: when an hypothesis ends with a disjunction or a negation, we
+Remark: when an hypothesis ends with a disjunction ∨ a negation, we
 can always use the "elim" command. This makes the proof harder because
 we have more choices to finish the proof.
 
 We can also use the law of excluded middle:
 
-excluded_middle = /\X (X or ~ X) : Theorem
+excluded_middle = ∀X (X ∨ ¬ X) : Theorem
 
 To do so, we use the command "elim excluded_middle with A" to
 distinguish between the case A true and A false.
 
-Remark: The "/\X" indicates that the formula is true for any formula "X".
+Remark: The "∀X" indicates that the formula is true for any formula "X".
 
 Exercise: finish the following proof:
 *)
 
-goal (A & B -> C) -> (A -> C) or (B -> C).
+goal (A ∧ B → C) → (A → C) ∨ (B → C).
 intro.
 by_absurd.
-(*->*)
+(*→*)
 intro l.
 intro.
 elim H0.
@@ -449,7 +449,7 @@ elim H.
 intro.
 axiom H1.
 axiom H2.
-(*->*)
+(*→*)
 save th10.
 
 (*
@@ -476,16 +476,16 @@ terms: if "P" is a unary predicate constant and if "t" is a term then
 "P t" is a formula. If "R" is a binary predicate constant and if "t,
 u" are two terms then "R t u" is a formula.
 
-We can also construct formula using quantifiers: "/\x A x" means that
-for all object "x", "A x" is true and "\/x A x" means that there
+We can also construct formula using quantifiers: "∀x A x" means that
+for all object "x", "A x" is true and "∃x A x" means that there
 exists an object "x" such that "A x" is true.
 
 Remark: when we write "A x" this means that "x" can appear in the
 formula "A". When we write "A", "x" can not appear in "A".
 
-Remark: PhoX uses the abbreviation "/\x:D E x" which means  
-"/\x (D x -> E x)" and the abbreviation "\/x:D E x" which means
-"\/x (D x & E x)".
+Remark: PhoX uses the abbreviation "∀x:D E x" which means  
+"∀x (D x → E x)" and the abbreviation "∃x:D E x" which means
+"∃x (D x ∧ E x)".
 
 The following exercises use the unary predicate constants "D x" and "E x",
 the binary predicate constants "T x y" and "R x y" and the unary function
@@ -494,13 +494,13 @@ symbol "f x":
 *)
 
 Sort term.
-Cst D : term -> prop.
-Cst E : term -> prop.
-Cst R : term -> term -> prop.
-Cst T : term -> term -> prop.
-Cst f : term -> term.
+Cst D : term → prop.
+Cst E : term → prop.
+Cst R : term → term → prop.
+Cst T : term → term → prop.
+Cst f : term → term.
 
-(* Cst D : term -> prop. means that "D" waits for a term as argument
+(* Cst D : term → prop. means that "D" waits for a term as argument
 and gives a proposition (a formula) as a result: this is indeed the
 definition of a unary predicate.
 
@@ -508,7 +508,7 @@ Enter this two proofs:
 
 *)
 
-goal /\x (D x & E x) -> /\x D x & /\x E x.
+goal ∀x (D x ∧ E x) → ∀x D x ∧ ∀x E x.
 intro.
 intro.
 intro.
@@ -517,7 +517,7 @@ intro.
 elim H.
 save th11.
 
-goal \/x (D x or E x) -> \/x D x or \/x E x.
+goal ∃x (D x ∨ E x) → ∃x D x ∨ ∃x E x.
 intro.
 elim H.
 elim H0.
@@ -546,13 +546,13 @@ unknown variable.
 
 So, we remark that there are two kinds of variables:
   - The existential variables ("x", "y", ...) (introduced by the 
-    elimination if an existential quantifier "\/x" or the
-    introduction of a universal quantifier "/\x"). These are constants
+    elimination if an existential quantifier "∃x" ∨ the
+    introduction of a universal quantifier "∀x"). These are constants
     whose properties are given only by the hypothesis and we can not
     change the value of these variables.
   - The universal variables ("?1", "?2", ...) (introduced by the 
-    elimination if a universal quantifier "/\x" or the
-    introduction of an existantial quantifier "\/x"). These are
+    elimination if a universal quantifier "∀x" ∨ the
+    introduction of an existantial quantifier "∃x"). These are
     variables for which we have to find a value using the "instance"
     command to finish the proof.
   
@@ -568,19 +568,19 @@ Prove the following theorem (using classical logic only if necessary):
 
 *)
 
-goal \/x (D x & E x) -> \/x D x & \/x E x.
-(*->*)
+goal ∃x (D x ∧ E x) → ∃x D x ∧ ∃x E x.
+(*→*)
 intro.
 left H.
 left H.
 intro 2.
 axiom H.
 axiom H0.
-(*->*)
+(*→*)
 save th13.
 
-goal \/x (B & D x) -> \/x D x & B.
-(*->*)
+goal ∃x (B ∧ D x) → ∃x D x ∧ B.
+(*→*)
 intro.
 left H.
 left H.
@@ -588,11 +588,11 @@ intro.
 intro.
 axiom H0.
 axiom H.
-(*->*)
+(*→*)
 save th14.
 
-goal /\x D x or /\x E x -> /\x (D x or E x).
-(*->*)
+goal ∀x D x ∨ ∀x E x → ∀x (D x ∨ E x).
+(*→*)
 intro.
 left H.
 intro.
@@ -601,7 +601,7 @@ elim H.
 intro.
 intro r.
 elim H.
-(*->*)
+(*→*)
 save th15.
 
 (*
@@ -611,12 +611,12 @@ Moargan's laws (you just have to finish the proof):
 
 *)
 
-goal (/\x D x -> \/x E x) -> \/x (D x -> E x).
+goal (∀x D x → ∃x E x) → ∃x (D x → E x).
 intro.
-elim excluded_middle with  /\x D x.
+elim excluded_middle with  ∀x D x.
 select 2. (* change le but courant *)
 rewrite_hyp H0 demorgan.
-(*->*)
+(*→*)
 left H0.
 intro 2.
 elim H0.
@@ -626,7 +626,7 @@ axiom H0.
 intro 2.
 instance ?2 x.
 axiom H1.
-(*->*)
+(*→*)
 save th16.
 
 (*
@@ -635,9 +635,9 @@ Exercise: Prove the following formulas:
 
 *)
 
-goal \/x /\y (D x -> D y).
-(*->*)
-elim excluded_middle with /\x D x.
+goal ∃x ∀y (D x → D y).
+(*→*)
+elim excluded_middle with ∀x D x.
 intros.
 intros.
 elim H.
@@ -647,12 +647,12 @@ intros.
 intros.
 elim H.
 axiom H0.
-(*->*)
+(*→*)
 save th17.
 
-goal /\x \/y \/z (D x -> R x y & T x z) <-> 
- (/\x \/y  (D x -> R x y) & /\x \/y (D x -> T x y)).
-(*->*)
+goal ∀x ∃y ∃z (D x → R x y ∧ T x z) ↔ 
+ (∀x ∃y  (D x → R x y) ∧ ∀x ∃y (D x → T x y)).
+(*→*)
 intros.
 intros.
 intros.
@@ -683,22 +683,22 @@ elim H1.
 axiom H3.
 elim H2.
 axiom H3.
-(*->*)
+(*→*)
 save th18.
 
 Cst a : term.
 Cst b : term.
 
-goal /\x /\x' \/y (R y x & R y x') ->
-     /\x (f x = a or f x = b) ->
-        /\x \/y (R y x & f y = a) or /\x \/y (R y x & f y = b).
-(*->*)
+goal ∀x ∀x' ∃y (R y x ∧ R y x') →
+     ∀x (f x = a ∨ f x = b) →
+        ∀x ∃y (R y x ∧ f y = a) ∨ ∀x ∃y (R y x ∧ f y = b).
+(*→*)
 intros.
 by_absurd.
 rewrite_hyp H1 demorganl.
-lefts H1 $& $\/.
+lefts H1 $∧ $∃.
 apply H with x and x0.
-lefts G $& $\/.
+lefts G $∧ $∃.
 apply H2 with H3.
 apply H1 with H4.
 elim H0 with y.
@@ -706,6 +706,6 @@ elim G0.
 axiom H5.
 elim G.
 axiom H5.
-(*->*)
+(*→*)
 save th19.
 

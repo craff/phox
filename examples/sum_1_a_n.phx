@@ -37,14 +37,14 @@ les éventuelles parenthèses absentes d'abord autour des termes dont le
 symbole principal est le plus petit).  C'est une priorité usuelle pour
 les symboles de fonctions. 
 
- La notation ":nat -> nat" indique la sorte de la fonction : c'est une
+ La notation ":nat → nat" indique la sorte de la fonction : c'est une
 fonction unaire définie entre objets de sorte "nat". Les entiers sont
 des objets de sorte "nat". C'est une notation qui signifie uniquement
 que l'on peut écrire par exemple "somme N0" (où "N0" désigne l'entier
 0). Elle ne signifie pas que "somme N0" est effectivement un entier
 (voir l'énoncé de totalité ci-dessous). *)
 
-Cst Prefix[3] "somme" n : nat -> nat.
+Cst Prefix[3] "somme" n : nat → nat.
 
 (*texte 
  La fonction est définie par deux axiomes, qui sont donc ajoutés à la
@@ -52,7 +52,7 @@ théorie. Remarquez qu'alors la cohérence n'est pas assurée par le
 système. *)
 
 claim sum0 somme N0 = N0.
-claim sumS /\x:N(somme (S x) = (S x) + somme x).
+claim sumS ∀x:N(somme (S x) = (S x) + somme x).
 
 (*texte
  Les égalités définissant la somme sont orientées de gauche à droite et
@@ -67,7 +67,7 @@ new_rewrite sumS.
 pas que "x" est effectivement un entier : "N x". L'énoncé de totalité
 suivant est donc indispensable pour utiliser "somme". *)
 
-fact somme.total /\x :N N (somme x).
+fact somme.total ∀x :N N (somme x).
 trivial.
 save.
 
@@ -82,7 +82,7 @@ new_intro -t somme somme.total.
 (*texte
  Prouvons maintenant un énoncé élémentaire sur "somme".  *)
 
-lemma th /\x :N (somme x + somme x = x * (S x)).
+lemma th ∀x :N (somme x + somme x = x × (S x)).
 trivial.
 save.
 

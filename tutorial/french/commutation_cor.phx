@@ -4,18 +4,18 @@ permutations à support disjoint commutent. *)
 
 flag auto_lvl 1.
 
-def injective f = /\x,y (f x = f y -> x = y).
+def injective f = ∀x,y (f x = f y → x = y).
 
 prop exo1 
-  /\h,g (injective h & injective g &  /\x (h x = x or g x = x) 
-      -> /\x (h (g x)) = (g (h x))).
-(*->*)
+  ∀h,g (injective h ∧ injective g ∧  ∀x (h x = x ∨ g x = x) 
+      → ∀x (h (g x)) = (g (h x))).
+(*→*)
 (*  soit h, g et x supposons
-   injective h & injective g & /\x0 (h x0 = x0 or g x0 = x0)
+   injective h ∧ injective g ∧ ∀x0 (h x0 = x0 ∨ g x0 = x0)
    [H] prouvons h (g x) = g (h x)  *)
 intros.
 (*  D'après H, on a injective h [H], injective g [H0] et
-   /\x0 (h x0 = x0 or g x0 = x0) [H1]   *)
+   ∀x0 (h x0 = x0 ∨ g x0 = x0) [H1]   *)
 lefts H.
 (*  D'après H1 avec  x  distinguons 2 cas : supposons h x = x [H2] 
    puis supposons g x = x [H2]   *)
@@ -40,5 +40,5 @@ apply H with H3.
 intros.
 (*  immédiat  *)
 intros.
-(*->*)
+(*→*)
 save.
