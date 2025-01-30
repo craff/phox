@@ -22,21 +22,21 @@ all: text doc.pdf libdoc.pdf
 	- rm -f $@; \
 	$(MAKETEX) ../lib/$< > tmp.phx; \
 	export PHOXPATH=../lib; \
-	../src/$(PHOXVERS) -c tmp.phx; \
+	$(PHOX) -c tmp.phx; \
 	rm -f tmp.phx ; \
 	mv tmp.doc.tex $@
 
 .tex.pdf:
 	- export TEXINPUTS=../tex:; \
 	touch $(<:.tex=).ind; \
-	pdflatex -shell-escape $<; \
-	../tex/$(PRETTYVERS) $(<:.tex=); \
+	xelatex -shell-escape $<; \
+	$(PRETTY) $(<:.tex=); \
 	bibtex $(<:.tex=); \
 	makeindex $(<:.tex=).idx; \
-	pdflatex -shell-escape $<; \
-	../tex/$(PRETTYVERS) $(<:.tex=); \
+	xelatex -shell-escape $<; \
+	$(PRETTY) $(<:.tex=); \
 	makeindex $(<:.tex=).idx; \
-	pdflatex -shell-escape $<
+	xelatex -shell-escape $<
 
 text: $(SRCS:.phx=.pht)
 
@@ -45,23 +45,15 @@ tex: $(SRCS:.phx=.tex)
 #tex: $(SRCS:.phx=.tex)
 #	mv -f $(SRCS:.phx=.tex)  TEX/
 
-examples.phi: examples.phx ../src/$(PHOXVERS)
+examples.phi: examples.phx
 	export PHOXPATH=../lib; \
-	../src/$(PHOXVERS) -I ../lib -c examples.phx
+	$(PHOX) -c examples.phx
 
-basic.phi: basic.phx ../src/$(PHOXVERS)
+basic.phi: basic.phx
 	export PHOXPATH=../lib; \
-	../src/$(PHOXVERS) -I ../lib -c basic.phx
+	$(PHOX) -c basic.phx
 
 doc.pdf: *.tex *.bib examples.phi basic.phi
-
-html: htmldoc htmllibdoc
-
-htmldoc: doc.pdf
-	latex2html -split +2 -local_icons doc.tex
-
-htmllibdoc: libdoc.pdf
-	latex2html -split +1 -local_icons libdoc.tex
 
 libdoc.pdf: tex
 

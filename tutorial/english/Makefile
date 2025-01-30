@@ -1,7 +1,5 @@
 #path
-include ../../config
-
-PHOXPATH=../../_build/default/src/phox.exe
+include $(shell git rev-parse --show-toplevel)/config
 
 .SUFFIXES:
 .SUFFIXES: _cor.phx _quest.phx _cor.phi .phx .phi
@@ -15,10 +13,11 @@ _cor.phx_quest.phx:
 	gawk -f ../../tools/phox_tut.awk $< > $@
 
 .phx.phi:
-	$(PHOXPATH) -I ../../lib -c $<
+	$(PHOX) -c $<
 
+.PHONY: .depend
 depend: $(SRCS)
-	../../tools/phoxdep -I ../../lib *.phx > depend
+	$(PHOXDEP) *.phx > depend
 
 clean:
 	- rm *.phi *.pho

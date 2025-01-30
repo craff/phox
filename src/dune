@@ -3,7 +3,7 @@
   (public_name phox)
   (package phox)
   (modes js native)
-  (js_of_ocaml (flags (--enable=effects)))
+  (js_of_ocaml (flags (--opt=3 --enable=effects)))
   (modules :standard)
   (preprocess  (per_module
     ((action (run camlp5o %{input-file})) inductive lex new_cmd parse_base

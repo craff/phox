@@ -3,7 +3,7 @@
 
 (executable
   (name pretty)
-;  (public_name phox)
+  (public_name phox_pretty)
   (modules :standard)
   (preprocess (action (run camlp5o %{input-file})))
   (libraries camlp5))

@@ -11,51 +11,41 @@ world:
 
 js:
 	cp src/phox.js.hide src/phox.ml
-	dune build ./src/phox.bc.js
+	dune build --release ./src/phox.bc.js
 
-local-js: js
+local-js:
 	cp src/phox.native.hide src/phox.ml
-	dune build ./src/phox.bc.js
-	mkdir -p phox-js/lib
-	- cd phox-js; ln -s ../config ../tools .
-	rsync -avx lib/Makefile lib/*.phx phox-js/lib
-	cd phox-js/lib; make depend
-	cd phox-js/lib; make PHOXPATH='node -- ../../_build/default/src/phox.bc.js' all
-	mkdir -p phox-js/tutorial
-	for d in tutorial/* dnr/chapitre-*; do \
+	dune build --release ./src/phox.bc.js
+	for d in lib examples tutorial/* dnr/chapitre-*; do \
+	  mkdir -p phox-js/$$d; \
 	  rsync -avx $$d/Makefile $$d/*.phx  phox-js/$$d/; \
 	  cd phox-js/$$d;\
           make depend ;\
-          make PHOXPATH='node -- ../../../_build/default/src/phox.bc.js' all;\
-          cd ../../..; \
+          make PHOX='$(PHOXJS)' all;\
+          cd -; \
 	done
-	mkdir -p phox-js/examples
-	rsync -avx examples/Makefile examples/*.phx phox-js/examples/
-	cd phox-js/examples; make depend
-	cd phox-js/examples; make PHOXPATH='node -- ../../_build/default/src/phox.bc.js' all
 
 install-all: install installPG
 
 install:
-	if [ ! -f $(BINDIR) ] ; then mkdir -p $(BINDIR) ; fi
-	if [ ! -f $(LIBDIR) ] ; then mkdir -p $(LIBDIR) ; fi
-	if [ ! -f $(DOCDIR)/tools ] ; then mkdir -p $(DOCDIR)/tools ; fi
-	if [ ! -f $(TEXDIR) ] ; then mkdir -p $(TEXDIR) ; fi
-	if [ ! -f $(EXAMPLESDIR) ] ; then mkdir -p $(EXAMPLESDIR) ; fi
-	cd tools; $(MAKE) -S install
+	if [ ! -f $(BINDIR) ] ; then sudo mkdir -p $(BINDIR) ; fi
+	if [ ! -f $(LIBDIR) ] ; then sudo mkdir -p $(LIBDIR) ; fi
+	if [ ! -f $(DOCDIR)/tools ] ; then sudo mkdir -p $(DOCDIR)/tools ; fi
+	if [ ! -f $(TEXDIR) ] ; then sudo mkdir -p $(TEXDIR) ; fi
+	if [ ! -f $(EXAMPLESDIR) ] ; then sudo mkdir -p $(EXAMPLESDIR) ; fi
+	cd tools; sudo $(MAKE) -S install
 	cd src; $(MAKE) -S install
-	cd lib; $(MAKE) -S install
-	cd emacs; $(MAKE) -S install
-	cd tex; $(MAKE) -S install
-	cd doc; $(MAKE) -S install
-	if [ -f lib/TAGS ]; then cp lib/TAGS $(LIBDIR); fi
-	if [ -f doc/TAGS ]; then cp doc/TAGS $(TEXTDOCDIR); fi
-	cp -r examples/* $(EXAMPLESDIR)
-	cp -r tutorial $(EXAMPLESDIR)
+	cd lib; sudo $(MAKE) -S install
+	cd emacs; sudo $(MAKE) -S install
+	cd tex; sudo $(MAKE) -S install
+	cd doc; sudo $(MAKE) -S install
+	if [ -f lib/TAGS ]; then sudo cp lib/TAGS $(LIBDIR); fi
+	if [ -f doc/TAGS ]; then sudo cp doc/TAGS $(TEXTDOCDIR); fi
+	sudo cp -r examples/* $(EXAMPLESDIR)
+	sudo cp -r tutorial $(EXAMPLESDIR)
 	if [ ! -z `which texhash` ]; then texhash; fi
 
-WWW=/var/www/html/phox
-#WWW=my:public/phox/
+WWW=/home/raffalli/WWW2/Raffalli/phox
 
 phox-js/files.js: lib/*.phx examples/*.phx tutorial/*/*.phx
 	- mkdir phox-js
@@ -68,10 +58,12 @@ phox-js/files.js: lib/*.phx examples/*.phx tutorial/*/*.phx
 	  echo '"]});' >>  phox-js/files.js; \
         done
 
-install-www: phox-js/files.js
-	rsync -vr phox-js/* phox-js/files.js $(WWW)/
-	rsync -vr www/*.html www/pics www/*.js www/fonts $(WWW)
-	rsync -v _build/default/src/phox.bc.js $(WWW)
+install-www: js phox-js/files.js
+	rsync -r phox-js/* phox-js/files.js $(WWW)/online/
+	rsync -r www/*.html www/pics www/*.js www/fonts $(WWW)/online/
+	rsync _build/default/src/phox.bc.js $(WWW)/online/
+	rsync doc/doc.pdf doc/libdoc.pdf $(WWW)/
+
 
 uninstall:
 	- rm -rf $(LIBDIR) $(DOCDIR) $(TEXDIR)

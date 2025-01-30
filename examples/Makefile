@@ -1,13 +1,11 @@
 #path
-include ../config
-
-PHOXPATH=../_build/default/src/phox.exe
+include $(shell git rev-parse --show-toplevel)/config
 
 .SUFFIXES:
 .SUFFIXES:.phx .pho .phi .dvi .tex
 
 .phx.phi:
-	$(PHOXPATH) -I ../lib -c $<
+	$(PHOX) -I ../lib -c $<
 
 .tex.dvi:
 	latex $<
@@ -16,8 +14,9 @@ default: all
 
 check: all
 
+.PHONY: depend
 depend: *.phx
-	../tools/phoxdep -I../lib *.phx > depend
+	$(PHOXDEP) *.phx > depend
 
 clean:
 	- rm -f *.pho *.phi *.tex *.aux *.log *.dvi *.pin *.pout

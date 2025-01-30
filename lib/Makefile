@@ -1,27 +1,24 @@
-# $State: Exp $ $Date: 2001/01/18 10:18:46 $ $Revision: 1.4 $
-
 #path
-include ../config
-
-PHOXPATH=dune exec phox --
+include $(shell git rev-parse --show-toplevel)/config
 
 .SUFFIXES :
 .SUFFIXES : .phx .pho .phi
 
 SRCS =  prop.phx set.phx bin_rel.phx bool.phx nat_def.phx nat_ax.phx nat.phx \
 	product.phx sum.phx list.phx list_nat_ax.phx list_nat.phx \
-	quotient.phx rel_def.phx ac.phx PA.phx
+	quotient.phx rel_def.phx ac.phx
 
 all: depend $(SRCS:.phx=.phi)
 
 .phx.phi:
-	$(PHOXPATH) -I . -c $<
+	$(PHOX) -c $<
 
 prop.phi: prop.phx
-	$(PHOXPATH) -I . -c -init prop.phx
+	$(PHOX)  -c -init prop.phx
 
+.PHONY: depend
 depend: Makefile $(SRCS)
-	../tools/phoxdep $(SRCS) > depend
+	$(PHOXDEP) $(SRCS) > depend
 
 install: $(LIBS)
 	cp *.phi *.pho *.phx $(LIBDIR)

@@ -20,10 +20,10 @@ version.ml: ../version ../config Makefile
 ############
 
 all: version.ml
-	dune build
+	cd ..; dune build --release
 
 clean:
-	dune clean
+	cd ..; dune clean
 
 veryclean: clean
 	- rm -f version.ml phox.ml
@@ -33,3 +33,4 @@ veryclean: clean
 
 install:
 	dune install
+	sudo cp $$(which phox) $(BINDIR)

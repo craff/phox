@@ -35,8 +35,12 @@ TUTORIALDIR = ${DOCDIR}/tutorial
 
 # Do you want the native code compiled version of pretty (recommended)
 # (the pretty formatter for TeX document) ?
-PRETTYVERS = prettyopt     # use native-code compiler
-
+ROOT_DIR := $(shell git rev-parse --show-toplevel)/
+#ROOT_DIR = $(dir $(lastword $(MAKEFILE_LIST)))
+PRETTY = dune exec -- phox_pretty
+PHOX = dune exec -- phox -I ${ROOT_DIR}lib
+PHOXDEP = ${ROOT_DIR}tools/phoxdep -I ${ROOT_DIR}lib
+PHOXJS = node -- ${ROOT_DIR}_build/default/src/phox.bc.js -I ${ROOT_DIR}lib
 # where to find sed
 SED = `which sed`
 
@@ -44,7 +48,8 @@ SED = `which sed`
 # tables). As documentation is built in distribution, you need awk only
 # if you want to create tags table for phox files. If needed, gnu awk is
 # required.
-AWK = `which awk`
+AWK = `which gawk`
+PHOXTUT = ${AWK} -f ${ROOT_DIR}tools/phox_tut.awk
 
 # where to find PERL (used by phoxdep in a #!... comment)
 PERL = `which perl`
