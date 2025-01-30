@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2000/12/20 14:29:04 $ $Revision: 1.2 $ *)
 (*######################################################*)
 (*			undo.ml  			*)
 (*######################################################*)
@@ -19,7 +18,7 @@ let update v t =
   end;
   v := t
 
-let add_to_undo f = 
+let add_to_undo f =
   begin
     match !undo_list with
       Some l -> undo_list := Some (f::l)
@@ -39,7 +38,7 @@ let get_undo_pos () =
 
 let do_undo l =
   match !undo_list with
-    Some l' -> 
+    Some l' ->
       let rec fn l' =
 	if not (l == l') then begin
 	  match l' with

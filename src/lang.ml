@@ -1,25 +1,24 @@
-(* $State: Exp $ $Date: 2006/02/24 17:01:53 $ $Revision: 1.2 $ *)
 (*######################################################*)
 (*	       		lang.ml	       	                *)
 (*######################################################*)
 
 let language = ref `English
 
-let set_language s = 
-  if String.length s < 2 then  language := `English else 
+let set_language s =
+  if String.length s < 2 then  language := `English else
   match String.sub s 0 2  with
     "us" | "en" -> language := `English
   | "fr" -> language := `French
   | _ -> language := `English
 
-let _ = 
+let _ =
   try set_language (Sys.getenv "LANG")
   with Not_found -> try set_language (Sys.getenv "LC_LANG")
   with Not_found -> ()
 
 let get_message s = match s, !language with
-  `Immediat, `English -> "immediat"  
-| `Immediat, `French -> "immédiat"  
+  `Immediat, `English -> "immediat"
+| `Immediat, `French -> "immédiat"
 
 | `Let, `English -> "let"
 | `Let, `French -> "soit"
@@ -66,5 +65,3 @@ let get_message s = match s, !language with
 | `Induction, `English -> "By induction on"
 | `Induction, `French -> "Par récurrence sur "
 let get_format s = Obj.magic (get_message s)
-
-

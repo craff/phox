@@ -1,9 +1,8 @@
-(* $State: Exp $ $Date: 2006/02/24 17:01:53 $ $Revision: 1.8 $ *)
 (*######################################################*)
 (*			flags.mli			*)
 (*######################################################*)
 
-type flag_value = 
+type flag_value =
     Vint of int
 |   Vbool of bool
 |   Vstring of string

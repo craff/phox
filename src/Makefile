@@ -1,5 +1,3 @@
-# $State: Exp $ $Date: 2005/09/19 07:16:40 $ $Revision: 1.18 $
-
 # You should not need to modify anything in this file. If you need to
 # do so, report a bug so that I can modify my installation procedure.
 

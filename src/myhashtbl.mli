@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2000/10/12 09:58:27 $ $Revision: 1.1.1.1 $ *)
 (* Hash tables and hash functions *)
 
 (* Hash tables are hashed association tables, with in-place modification. *)

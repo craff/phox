@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2006/02/24 17:01:53 $ $Revision: 1.3 $ *)
 (* Hash tables *)
 
 (* We do dynamic hashing, and we double the size of the table when

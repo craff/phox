@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2000/10/12 09:58:27 $ $Revision: 1.1.1.1 $ *)
 (* This program is a small time-profiler for Caml-Light *)
 
 (* It requires the UNIX library *)
@@ -22,7 +21,7 @@ to rename them :
 
   let f' = .... f' ... g'
   and g' = .... f' .... g'
-  
+
 
   let f = profile "f" f'
   let g = profile "f" g'
@@ -30,7 +29,7 @@ to rename them :
 Before the program quits, you should call "print_profile ()". It
 produces a result of the following kind:
 
-  f                5.32    7.10    58%   80% 
+  f                5.32    7.10    58%   80%
   g                4.00    4.00    42%   42%
   main             0.12    9.44     1%   100%
   total           -9.44    0.00   -100%  0%
@@ -58,18 +57,18 @@ let stack = ref [tot_ptr']
 
 let print_profile () =
   let tot = 100.0 /. (-. !tot_ptr') in
-  print_newline (); 
+  print_newline ();
   let l = Sort.list (fun (_,_,p) (_,_,p') -> !p > !p') !prof_table in
   List.iter (fun (name,ptr,ptr') ->
     let pc = !ptr *. tot and pc' = !ptr' *. tot in
-    Printf.printf "%-20s %8.2f %8.2f %8.2f%% %8.2f%% \n" 
+    Printf.printf "%-20s %8.2f %8.2f %8.2f%% %8.2f%% \n"
                   name !ptr' !ptr pc' pc) l;
   flush stdout
 
-let addp name = 
+let addp name =
   let rec fn = function
-  [] -> 
-    let ptr = ref 0.0 and ptr' = ref 0.0 in 
+  [] ->
+    let ptr = ref 0.0 and ptr' = ref 0.0 in
     prof_table := (name,ptr,ptr')::!prof_table;
     ptr, ptr'
   | (name',ptr,ptr')::_ when name = name' -> ptr, ptr'
@@ -283,5 +282,3 @@ let profile8 name f =
       ptr' := !ptr' +. t;
       raise e
   )
-
-

@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2006/02/24 17:01:54 $ $Revision: 1.15 $ *)
 (*######################################################*)
 (*			print.ml			*)
 (*######################################################*)
@@ -645,6 +644,14 @@ and print_lam env = function
       	print_lam (s::env) e
   | e ->
       print_break 1 2;
+      if !in_tex then
+        print_string (
+	    if !in_mmath then
+	      "\\ibreak{"^space_of_int !min_tex_space^"}{"^
+	        (space_of_int !tex_indent)^"}"
+	    else
+	      "\\hspace{"^space_of_int !min_tex_space^"}");
+
       print_aux min_level rlvl [] env e
 
 and print_syntax the_head the_expr the_name tex = function

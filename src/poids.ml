@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2004/05/24 08:23:24 $ $Revision: 1.5 $ *)
 (*######################################################*)
 (*			poids.ml        		*)
 (*######################################################*)
@@ -21,7 +20,7 @@ let order_weight w1 w2 =
   let o =
     if
       w1 < w2
-    then 
+    then
       -1
     else
       if
@@ -32,5 +31,5 @@ let order_weight w1 w2 =
 	0
   in
   o
-    
+
 let weight_merge pds1 pds2 l = 0.
