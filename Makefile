@@ -3,7 +3,7 @@
 include version
 include config
 
-world:
+world: depend
 	cd tools; $(MAKE) all
 	cp src/phox.native.hide src/phox.ml
 	cd src; $(MAKE) all
@@ -20,8 +20,8 @@ local-js:
 	  mkdir -p phox-js/$$d; \
 	  rsync -avx $$d/Makefile $$d/*.phx  phox-js/$$d/; \
 	  cd phox-js/$$d;\
-          make depend ;\
-          make PHOX='$(PHOXJS)' all;\
+          $(MAKE) depend ;\
+          $(MAKE) PHOX='$(PHOXJS)' all;\
           cd -; \
 	done
 
@@ -60,7 +60,7 @@ phox-js/files.js: lib/*.phx examples/*.phx tutorial/*/*.phx
 
 quest:
 	for d in tutorial/* dnr/chapitre-*; do \
-          echo $$d; cd $$d; make all; cd -; \
+          echo $$d; cd $$d; $(MAKE) all; cd -; \
 	done
 
 install-www: js phox-js/files.js quest
@@ -93,6 +93,8 @@ check:
 	cd dnr/chapitre-4; $(MAKE) check
 
 depend:
+	cd tools; $(MAKE) phoxdep
+	cd lib; $(MAKE) depend
 	cd examples; $(MAKE) depend
 	cd tutorial/french; $(MAKE) depend
 	cd tutorial/english; $(MAKE) depend

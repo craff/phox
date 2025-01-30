@@ -8,7 +8,7 @@ SRCS =  prop.phx set.phx bin_rel.phx bool.phx nat_def.phx nat_ax.phx nat.phx \
 	product.phx sum.phx list.phx list_nat_ax.phx list_nat.phx \
 	quotient.phx rel_def.phx ac.phx
 
-all: depend $(SRCS:.phx=.phi)
+all: $(SRCS:.phx=.phi)
 
 .phx.phi:
 	$(PHOX) -c $<
