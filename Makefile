@@ -115,11 +115,10 @@ clean:
 	cd dnr/chapitre-3; $(MAKE) clean
 	cd dnr/chapitre-4; $(MAKE) clean
 	rm -rf phox-js
-	cd tools; $(MAKE) clean
+	cd tools; $(MAKE) clean # MUST BE LAST
 
 veryclean:
 	./tools/cleandir .
-	cd tools; $(MAKE) veryclean
 	cd src; $(MAKE) veryclean
 	cd lib; $(MAKE) veryclean
 	cd doc; $(MAKE) veryclean
@@ -132,8 +131,7 @@ veryclean:
 	cd dnr/chapitre-3; $(MAKE) veryclean
 	cd dnr/chapitre-4; $(MAKE) veryclean
 	rm -rf phox-js
-	cd tools; $(MAKE) veryclean
-
+	cd tools; $(MAKE) veryclean # MUST BE LAST
 
 distclean: veryclean
 
