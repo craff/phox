@@ -7,6 +7,7 @@ Cst b : term.
 def au_plus_deux = ∀x (x = a ∨ x = b).
 
 goal au_plus_deux → (inj f ↔ surj f).
+(*→*)
 intros.
 intros.
 intros.
@@ -67,4 +68,5 @@ elim H with x0.
 intro.
 intro.
 intro.
+(*→*)
 save th.

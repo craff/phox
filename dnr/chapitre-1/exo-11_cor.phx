@@ -2,6 +2,7 @@ Sort term.
 Cst R : term → prop.
 
 theorem numero2 ∃x∀y(R y → R x).
+(*→*)
 use ∃x R x ∨ ¬ ∃x R x.
 left G.
 next 2.
@@ -18,9 +19,11 @@ instance ?2 x.
 intro 2.
 axiom H0.
 elim excluded_middle.
+(*→*)
 save numero2.
 
 theorem numero3 ∃x∀y(((R y → R x)→ R x)→ R y).
+(*→*)
 use ∀x R x ∨ ¬ ∀x R x.
 elim G.
 intro 3.
@@ -39,11 +42,13 @@ elim H2.
 axiom H3.
 elim excluded_middle.
 elim excluded_middle.
+(*→*)
 save numero3.
 
 Cst f : term → term.
 
 theorem numero5 ∃x∀y (((R(f x) → R(f y)) → R x) → R y).
+(*→*)
 by_absurd.
 intro 3.
 rmh H0.
@@ -62,4 +67,5 @@ elim H5.
 intro.
 elim H4.
 axiom H6.
+(*→*)
 save numero5.

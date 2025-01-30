@@ -1,6 +1,7 @@
 Import PA.
 
 goal ∀F (F N0 ∧ F (S N0) ∧  ∀x (F x → F (S S x)) → ∀x F x).
+(*→*)
 intro.
 intro.
 intro.
@@ -19,4 +20,5 @@ axiom H3.
 elim H0.
 axiom H2.
 elim G.
+(*→*)
 save th.

@@ -11,6 +11,7 @@ V)) → (intervide U V) → (inclus A U) ∨ (inclus A V)).
 
 goal
   ∀A,B (connexe A → connexe B → ∃ x ((A x) ∧ (B x)) → connexe (union A B)).
+(*→*)
 intros.
 intros.
 prove inclus A (union U V).
@@ -58,4 +59,5 @@ elim H6.
 axiom H8.
 elim H7.
 axiom H8.
+(*→*)
 save th.

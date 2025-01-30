@@ -28,6 +28,7 @@ x) (f y) < e).
 def continue2 f = ∀ U ((ouvert U) → (ouvert (inverse f U))).
 
 lemma lem1 ∀f (continue1 f → continue2 f).
+(*→*)
 intros.
 intros.
 intros.
@@ -44,9 +45,11 @@ intros.
 elim H3.
 elim H5.
 axiom H6.
+(*→*)
 save lem1.
 
 lemma lem2 ∀f (continue2 f → ∀ A (connexe A → connexe (image f A))).
+(*→*)
 intros.
 intros.
 by_absurd.
@@ -86,11 +89,14 @@ intros.
 left H8.
 elim H7.
 elim H8.
+(*→*)
 save lem2.
 
 goal ∀f (continue1 f → ∀ A (connexe A → connexe (image f A))).
+(*→*)
 intro 2.
 elim lem2.
 elim lem1.
 axiom H.
+(*→*)
 save th.

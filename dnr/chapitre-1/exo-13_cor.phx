@@ -5,6 +5,7 @@ Cst T : term → term → prop.
 Cst S : term → prop.
 
 goal ∃x∀y(P x ∧(R y → T x y))→ ∀x,y(¬ P x ∨ ¬ S y ∨ ¬ T x y) → ∀x(¬ R x ∨ ¬ S x).
+(*→*)
 intro 3.
 by_absurd.
 rewrite_hyp H1 disjunction.demorgan.
@@ -26,4 +27,5 @@ elim H7.
 axiom G0.
 elim H5.
 axiom H1.
+(*→*)
 save th.

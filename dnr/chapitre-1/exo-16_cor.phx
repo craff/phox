@@ -6,6 +6,7 @@ def G = ∀x,y (S x → (R x y ↔ S y)).
 def H = ∃x S x → ∃x(S x ∧ ∀y (S y ↔ R x y)).
 
 goal F → (G ↔H).
+(*→*)
 intro 3.
 intro.
 elim H2.
@@ -56,4 +57,5 @@ axiom H2.
 elim H1.
 intro.
 axiom H2.
+(*→*)
 save th.

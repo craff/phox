@@ -58,9 +58,15 @@ phox-js/files.js: lib/*.phx examples/*.phx tutorial/*/*.phx
 	  echo '"]});' >>  phox-js/files.js; \
         done
 
-install-www: js phox-js/files.js
+quest:
+	for d in tutorial/* dnr/chapitre-*; do \
+          echo $$d; cd $$d; make all; cd -; \
+	done
+
+install-www: js phox-js/files.js quest
 	rsync -r phox-js/* phox-js/files.js $(WWW)/online/
-	rsync -r www/*.html www/pics www/*.js www/fonts $(WWW)/online/
+	rsync -r www/*.html www/pics www/*.js www/fonts tutorial \
+              examples dnr lib $(WWW)/online/
 	rsync _build/default/src/phox.bc.js $(WWW)/online/
 	rsync doc/doc.pdf doc/libdoc.pdf $(WWW)/
 

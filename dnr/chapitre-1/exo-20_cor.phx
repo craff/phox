@@ -10,7 +10,7 @@ goal
   ∀x,y,z (x ⩽ y → x ⩽ z → (y ⩽ z ∨ z ⩽ y)) →
   ∀x,y,a (R x a ∧ x ⩽ y → (R y a)) →
 ∀x,a,b (R x ((a o b) # (b o a))).
-
+(*→*)
 intro F1 F2 F3 F4.
 intro 3.
 elim F2 with [r].
@@ -37,4 +37,5 @@ elim F4 with H5 ∧ H7.
 intro.
 axiom H5.
 axiom H7.
+(*→*)
 save th.

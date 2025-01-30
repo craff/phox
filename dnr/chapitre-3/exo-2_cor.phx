@@ -23,6 +23,7 @@ claim lemme4 ∀y,a,b (plus a b = y →  ker b → f a = f y).
 claim lemme5 ∀A,B ∀a (A a → Plus A B a).
 
 goal ∀A,B ((inclus (Im A) (Im B)) ↔(inclus (Plus A ker) (Plus B ker))).
+(*→*)
 intro 6.
 elim H0.
 elim H1.
@@ -63,4 +64,5 @@ axiom H3.
 elim H.
 elim lemme5.
 axiom H0.
+(*→*)
 save th.

@@ -5,6 +5,7 @@ Cst c : prop.
 
 theorem numero4 ((a → b → c) →  c) → (((a → c → c) → ((b →
 c → c) → c)) → c).
+(*→*)
 intros.
 elim H.
 intros.
@@ -13,9 +14,11 @@ intros.
 trivial.
 intros.
 trivial.
+(*→*)
 save numero4.
 
 theorem numero5  (a → b ∧ c) ↔ (a → b) ∧ (a → c).
+(*→*)
 intro.
 intro 2.
 intro.
@@ -31,9 +34,11 @@ axiom H0.
 left H.
 elim H1.
 axiom H0.
+(*→*)
 save numero5.
 
 theorem numero8 (a ∧ b → c) ↔ (a → c) ∨ (b → c).
+(*→*)
 intro.
 intro.
 by_absurd.
@@ -52,9 +57,11 @@ left H0.
 left H.
 trivial.
 trivial.
+(*→*)
 save numero8.
 
 theorem numero9 (a ∧ b) ∨ c ↔ (a ∨ c) ∧ (b ∨ c).
+(*→*)
 intro.
 intro 2.
 left H.
@@ -76,9 +83,11 @@ left H0.
 trivial.
 intro r.
 trivial.
+(*→*)
 save numero9.
 
 theorem numero10 (a ∨ b)∧c↔(a∧c)∨(b∧c).
+(*→*)
 intros.
 intro.
 left H.
@@ -100,9 +109,11 @@ elim H.
 left H.
 elim H.
 elim H.
+(*→*)
 save numero10.
 
 theorem numero12 (a ∨ b)↔((a →b)→b).
+(*→*)
 intro.
 intro 2.
 elim H.
@@ -120,9 +131,11 @@ intro.
 elim H0.
 axiom H1.
 elim  excluded_middle.
+(*→*)
 save numero12.
 
 theorem numero14 (a ↔ b) ↔ (a ∨ b → a ∧ b).
+(*→*)
 intros.
 intros.
 left H0.
@@ -145,4 +158,5 @@ intros.
 elim H.
 intro r.
 axiom H0.
+(*→*)
 save numero14.

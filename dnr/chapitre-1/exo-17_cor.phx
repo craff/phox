@@ -9,6 +9,7 @@ theorem numero1
   ∀a ∃b ∀x (C b x  → A a x) ∧
   ∀e ∀a (B e a → D e a)
   → ∀e ∃a ∀x (C a x → D e x).
+(*→*)
 intro.
 lefts H.
 intro 1.
@@ -23,6 +24,7 @@ apply H3 with H4.
 apply H2 with G.
 apply H1 with G0.
 axiom G1.
+(*→*)
 save.
 
 
@@ -31,6 +33,7 @@ theorem numero2
   ∀a ∃b ∀x (B b x → D a x) ∧
   ∀e ∀a (C e a → A e a)
   → ∀e ∃a ∀x (C a x → D e x).
+(*→*)
 intro.
 lefts H.
 intro.
@@ -45,4 +48,5 @@ elim H2.
 elim H3.
 elim H1.
 axiom H4.
+(*→*)
 save.

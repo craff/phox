@@ -8,6 +8,7 @@ claim ASx0 ∀x A (S x) N0 = A x (S  N0).
 claim ASxSy ∀x,y A (S x) (S y) = A x (A (S x) y).
 
 goal ∀x,y (A x y > y).
+(*→*)
 intro.
 elim P0 with x.
 rewrite A0y.
@@ -33,8 +34,5 @@ rewrite H1 H2.
 intros.
 rewrite plus_assoc A5 A5'.
 intro.
+(*→*)
 save th.
-
-
-
-
