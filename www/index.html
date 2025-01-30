@@ -98,7 +98,7 @@
 	  position: relative;
 	  white-space: pre-wrap;
           padding-top: 0.3ex;
-          min-height: 1.5ex;
+          height: 1lh;
       }
       .editor div span {
           padding-top: 0.3ex;
@@ -134,11 +134,21 @@
 	  padding: 0;
 	  width: 100vw;
 	  height: 100vh;
-	  overflow: none;
+	  overflow: hidden;
+      }
+      dt,dd {
+          display: inline;
+      }
+      dd:after {
+          content: "\a";
+          white-space: pre;
       }
       #header {
 	  margin: auto;
           display: table-row;
+      }
+      .topright {
+          float: right;
       }
     </style>
   </head>
@@ -175,6 +185,35 @@
           Execute all commands
         </div>
       </div>
+      <div class="button">
+        <img src = "pics/Question.svg" alt="Help" onclick="">
+	<div class="help">
+      <h1>Help</h1>
+      <ul>
+	<li>Unicode characteres short cut:
+	  <dl>
+	    <dt>∀</dt><dd>\all\ ou \forall\</dd>
+	    <dt>∃</dt><dd>\exists\</dd>
+	    <dt>∧</dt><dd>\wedge\ ou \&\ ou \and\ ou \land\</dd>
+	    <dt>∨</dt><dd>\vee\ ou \or\ ou \lor\</dd>
+	    <dt>→</dt><dd>\to\ ou \->\</dd>
+	    <dt>¬</dt><dd>\not\ ou \neg\</dd>
+	    <dt>∪</dt><dd>\cup\ ou \union\</dd>
+	    <dt>∩</dt><dd>\cap\ ou \inter\</dd>
+	    <dt>⊂</dt><dd>\subset\</dd>
+	    <dt>∈</dt><dd>\in\</dd>
+	    <dt>∉</dt><dd>\notin\</dd>
+	    <dt>×</dt><dd>\times\ ou \*\</dd>
+	    <dt>≠</dt><dd>\neq\ ou \!=\</dd>
+	    <dt>≤</dt><dd>\leq\ ou \=\</dd>
+	    <dt>≥</dt><dd>\geq\ ou \>=\</dd>
+          </dl>
+        <li> <a href="/phox/doc.pdf" target="blank">The reference manual</a>
+        <li> <a href="/phox/libdoc.pdf" target="blank">Manual of the standard library</a> .
+	<li> <a href="/phox" target="blank">Main phox page</a>
+      </ul>
+      </div>
+    </div>
       <span style="margin-right:10px; margin-left: 10px">Select files:</span>
     </div>
     <div class="container math">

@@ -159,7 +159,7 @@ function treatOut(s, in_goal) {
 
     } else {
 	const out   = document.getElementById("output");
-	out.style.backgroundColor = "rgba(200,200,20à,255)";
+	out.style.backgroundColor = "rgba(200,200,200,255)";
 	if (in_goal) {
 	    goals.style.display = "block";
 	    out.style.display = "none";

@@ -76,17 +76,35 @@ function replace_syntax(s) {
         case "lor":
             res += "∨"; break;
         case "to":
-        case "->":
+	case "->":
             res += "→"; break;
+        case "not":
+        case "neg":
+            res += "¬"; break;
         case "cup":
         case "union":
             res += "∪"; break;
         case "cap":
         case "inter":
             res += "∩"; break;
+        case "subset":
+            res += "⊂"; break;
+        case "in":
+            res += "∈"; break;
+        case "notin":
+            res += "∉"; break;
         case "times":
         case "*":
             res += "×"; break;
+        case "!=":
+        case "neq":
+            res += "≠"; break;
+        case "<=":
+	case "leq":
+            res += "≤"; break;
+        case ">=":
+        case "geq":
+            res += "≥"; break;
         default:
             res += s.substring(index,end);
         }
@@ -97,10 +115,11 @@ function replace_syntax(s) {
 }
 
 // Syntax highlight for JS
-const phox = node => {
+const phox = (node,pos=null) => {
     function subst(s, dest) {
 	dest.innerHTML="";
 	let current = 0;
+	let diff = 0;
 	while (current < s.length) {
 	    let [index, end] = search_end(s,current,/\n/);
 	    const div = document.createElement("div");
@@ -114,7 +133,9 @@ const phox = node => {
 		start = XMLEscape(start);
 		start = start.replace(top_commands,"<strong>$1</strong>");
 		start = start.replace(proof_commands,"<em>$1</em>");
+		const old   = start.length;
 		start = replace_syntax(start);
+		if (pos && pos.col > current2) diff += old - start.length;
 		span.innerHTML = start;
 		div.appendChild(span);
 		current2 = end2;
@@ -122,12 +143,14 @@ const phox = node => {
 	    }
             if (nospan) {
 	        const span = document.createElement("span");
+		span.innerHTML = "<br>";
 	        span.appendChild(document.createTextNode(""));
 	        div.appendChild(span);
             }
 	    dest.appendChild(div);
 	    current=end;
 	}
+        if (pos) pos.col -= diff;
     }
 
     if (node && node.childNodes.length > 0 && node.childNodes[0].contentEditable == "false") {
@@ -142,7 +165,7 @@ const phox = node => {
 	    node.removeChild(elt);
 	}
 	const new_node = document.createElement("div");
-	const s0 = subst(s,new_node);
+	const diff = subst(s,new_node);
 	if (new_node.childNodes.length > 0) {
 	    while (elt = new_node.firstChild.firstChild) {
 		new_node.firstChild.removeChild(elt);
@@ -154,9 +177,11 @@ const phox = node => {
 	    node.parentNode.insertBefore(new_node, node.nextSibling);
 	    new_node.replaceWith(new_node.childNodes);
 	}
+	return diff;
     } else if (node && node.innerText && (node.innerText.length > 0)) {
-	const s0 = subst(node.innerText, node);
+	const diff = subst(node.innerText, node);
 	node.replaceWith(...node.childNodes);
+	return diff;
     }
 };
 
@@ -198,7 +223,7 @@ const editor = (el, highlight=phox, tab = '  ') => {
 	prefix.setEnd(range.endContainer, range.endOffset);
 	const col = prefix.toString().length;
         const atEof = prefix.endOffset == prefix.endContainer.textContent.length
-              && !getSpan(prefix.endContainer).nextSibling;
+              && getSpan(prefix.endContainer) && !getSpan(prefix.endContainer).nextSibling;
 	return {line: line, span:node.span, col: col, atEof: atEof}
     };
 
@@ -231,7 +256,7 @@ const editor = (el, highlight=phox, tab = '  ') => {
 
     const setCaret = (pos, parent = el) => {
 	line = el.children[pos.line];
-	setCaretOffset(pos.col, line, true);
+	if (line) setCaretOffset(pos.col, line, true);
     };
 
     const insertLine = (txt) => {
@@ -249,7 +274,7 @@ const editor = (el, highlight=phox, tab = '  ') => {
 
     const highlightAt = (pos) => {
 	const line = el.children[pos.line];
-	highlight(line);
+	highlight(line, pos);
     };
 
     const getContent= () =>  {
@@ -268,13 +293,13 @@ const editor = (el, highlight=phox, tab = '  ') => {
 	    range.deleteContents();
 	    range.insertNode(document.createTextNode(tab));
 	    e.preventDefault();
-	} else if (e.which == 13) {
+	} /*else if (e.which == 13) {
 	    const pos = caret();
             insertLine(pos.atEof?"\n\n":"\n");
 	    highlightAt({line: pos.line, col: 0, span:null});
             setCaret({line: pos.line+1, col: 0});
             e.preventDefault();
-	}
+	} */
 
     });
 
