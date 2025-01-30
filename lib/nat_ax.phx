@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2006/01/26 19:17:16 $ $Revision: 1.19 $ *)
 (*header 1999/03/19
 
 	title = "Natural numbers (2nd part)"
@@ -1201,7 +1200,7 @@ new_elim $⩽ raddo radd.lesseq.N.
 
 (**** Ordering and multiplication *)
 
-(*fact Introducing operation $* in a relation using $⩽ *)
+(*fact Introducing operation $× in a relation using $⩽ *)
 fact lesseq.lmul.N ∀x,y:N (y ≠ N0 → x ⩽ x × y).
 intros.
 elim -1 y case.N.
@@ -1250,7 +1249,7 @@ new_intro -i lesseq.rmul lesseq.rmul.N.
 (*note these three facts are addes as introduction rules *)
 (*endfact *)
 
-(*fact Eliminating operation $* in a relation using *⩽ *)
+(*fact Eliminating operation $× in a relation using *⩽ *)
 
 fact lesseq.lmul_left.N ∀y',y,x:N (x ≠ N0 → x × y ⩽ x × y' → y ⩽ y').
 intro 2.

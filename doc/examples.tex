@@ -6,36 +6,28 @@
 \section{How to read the examples.}
 
 We write examples using standard mathematical notation, as it will
-appear on the screen if you use the ProofGeneral interface under
-XEamcs. If you want to type formulas, we give the table of special
-symbols, with their ASCII syntax:
+appear on the screen. To type the mathematical symbols, you need
+to type their LaTeX equivalent under emacs, terminated by a trailing
+backslash (\\) on the web interface, sometimes with a shortcut.
 
 \begin{center}
-\begin{tabular}{|l|c|c|}
+\begin{tabular}{|l|c|c|c|}
 \hline
-& Symbol & ASCII \\
+& Symbol & type in Emacs & type in browser \\
 \hline
-Universal quantification & $\forall$ & \verb~/\~ \\
-Existential quantification & $\exists$ & \verb~\/~ \\
-Conjunction & $\land$ & \verb~&~ \\
-Disjunction & $\lor$ & \verb~or~ \\
-Less or equal & $\leq$ & \verb~<=~ \\
-Greater or equal & $\geq$ & \verb~>=~ \\
-Different & $\neq$ & \verb~!=~ \\
-Belong (in quantification) & $\forall x\in A$ & \verb~/\x:A~ \\
+Universal quantification & $\forall$ & \verb~\forall~ & \verb~\forall\~ \\
+Existential quantification & $\exists$ & \verb~\exits~ & \verb~\exits\~ \\
+Conjunction & $\land$ & \verb~\wedge~ & \verb~\&\~ or \verb~\and\~ \\
+Disjunction & $\lor$ & \verb~\wee~ & \verb~\or\~ \\
+Less or equal & $\leq$ & \verb~\leq~ & \verb~\<=\~ or \verb~\leq\~ \\
+Greater or equal & $\geq$ & \verb~\qeg~ &  \verb~\>=\~ or \verb~\qeg~ \\
+Different & $\neq$ & \verb~\neq~ & \verb~\!=\~ or \verb~\neq\~ \\
 \hline
 \end{tabular}
 \end{center}
 
 What you have to type to enter a formula, is exactly what is obtained
 when you replace each mathematical symbol by its ASCII equivalent.
-
-For instance, to type $\forall e{>}R0 \,\exists a{>}R0
-\,\forall y
-(\hbox{d}\,x\,y \leq a \rightarrow \hbox{d} (f x) (f y) \leq e)$,
-you just type
-
-\verb~/\e>R0 \/a>R0/\y (d x y <= a -> d (f x) (f y) <= e)~
 
 We assume you read the previous section ! Moreover, you should report to
 the appendix \ref{cmd} to get a detailed desciption of each command.
@@ -57,15 +49,15 @@ the possibilities of the system.
 
 \verb~Sort~ is the name of the command used to create new sorts, but
 you can also use it to give name to existing sorts.
- 
+
 \item We give a symbol for the distance and the real 0  (denoted by
 $R0$) as well as predicates for inequalities.                         \\
 \verb~>PhoX> Cst d : real -> real -> real.~                    \\
 \verb~>PhoX> Cst R0 : real.~                                   \\
-\verb~>PhoX> Cst Infix[5] x "<=" y : real -> real -> prop.~    \\
+\verb~>PhoX> Cst Infix[5] x "≤" y : real -> real -> prop.~    \\
 \verb~>PhoX> Cst Infix[5] x "<" y : real -> real -> prop.~     \\
 \verb~>PhoX> def Infix[5] x ">" y = y < x.~                    \\
-\verb~>PhoX> def Infix[5] x ">=" y = y <= x.~
+\verb~>PhoX> def Infix[5] x "≥" y = y <= x.~
 
 The command \verb~Cst~ introduces new constants of given sorts while
 \verb~def~ is used to give definitions. The commands to define
@@ -88,7 +80,7 @@ y) \leq e)$\verb~.~
 The command \verb~claim~ allows to introduce new axioms (or lemmas that
 you do not want to prove now. You can prove them later using the
 command \verb~prove_claim~). Beware that there may be a contradiction
-in your axioms! 
+in your axioms!
 
 \item We begin the proof using the command \verb~goal~: \\
 \verb~>PhoX> goal~ $\forall x,f (\hbox{continue1} \, f \, x \rightarrow \hbox{continue2} \, f \, x)$\verb~.~\\
@@ -106,13 +98,13 @@ in your axioms!
 An ``introduction'' for a given connective, is the natural way to
 establish the truth of that connective without using other fact
 or hypothesis. For instance, to prove $A \to B$, we assume $A$ and
-prove $B$. Here, PhoX did five introductions: 
+prove $B$. Here, PhoX did five introductions:
 \begin{itemize}
 \item one for $\forall x$ and one for $\forall f$,
 \item one for the implication $(\hbox{continue1} \, f \, x \rightarrow
-\hbox{continue2} f x)$, 
+\hbox{continue2} f x)$,
 \item one for the $\forall e$ inside the definition
-of $\hbox{continue2}$ 
+of $\hbox{continue2}$
 \item and finally, one for the hypothesis $e > R0$.
 \end{itemize}
 
@@ -128,7 +120,7 @@ H and H0 which will not be used anymore.\\
 
 The \verb~apply~ command is quite intuitive to use. But it is a complex
 command, performing unification (more precisely higher-order
-unification) to guess the value of some variables. 
+unification) to guess the value of some variables.
 Sometimes you do not get the result you expected and you need
 to add extra information in the proper order.
 
@@ -198,7 +190,7 @@ of the existential variable by typing \verb~instance ?1 a'~.
 \noindent A good exercise for the reader consists in understanding what these
                              commands do. The appendix \ref{cmd} should help you !
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "doc"
-%%% End: 
+%%% End:

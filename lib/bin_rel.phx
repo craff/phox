@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2006/02/24 17:01:52 $ $Revision: 1.7 $ *)
 (*header 1999/03/24
 
 	title = "Binary relations"
@@ -10,7 +9,7 @@ flag auto_lvl 1.
 
 (** Usual definitions on binary relations. *)
 
-def transitive D R = 
+def transitive D R =
   ∀a,b,c:D (R a b → R b c → R a c).
 
 def reflexive D R = ∀a:D  R a a.
@@ -42,12 +41,12 @@ def well.order D R = strict.order D R ∧ strict.total D R ∧ well.founded D R.
 
 (*fact Some properties of well founded relations. *)
 
-fact (* Any subset has an inf element *) inf.well_founded 
-∀D∀R (well.founded D R → 
-  ∀X (∃x:D X x → ∃x:D (X x ∧ ∀y:D (X y → ¬ R y x)))). 
+fact (* Any subset has an inf element *) inf.well_founded
+∀D∀R (well.founded D R →
+  ∀X (∃x:D X x → ∃x:D (X x ∧ ∀y:D (X y → ¬ R y x)))).
 intros.
-lefts H0 $∧ $∃. 
-prove X x → $0. 
+lefts H0 $∧ $∃.
+prove X x → $0.
 rmh H1.
 elim -4 H0 H.
 intros.
@@ -59,6 +58,6 @@ lefts H4 $∧ $∃.
 elim -3 H6 H2.
 trivial =G H1.
 save.
-(*endfact*) 
+(*endfact*)
 
 (* fin *)

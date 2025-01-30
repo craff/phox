@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2004/01/08 17:23:26 $ $Revision: 1.6 $ *)
 (*header 1999/02/04
 
 	title = "Sums"
@@ -38,8 +37,8 @@ claim (* inr is injective *) inr.injective.Sum ∀x,y (inr x = inr y → x = y).
 claim (* inl x is not inr y *) inl_not_inr.Sum   ∀x,y (inl x ≠ inr y).
 (*endaxiom *)
 new_elim -i -n $= inl_not_inr inl_not_inr.Sum.
-(*note 
-The last claim is added as invertible elimination rule. 
+(*note
+The last claim is added as invertible elimination rule.
 *)
 
 (*fact Introduction rules for sums *)
@@ -58,19 +57,19 @@ new_intro -c r intro_right.Sum.
 
 (*fact elimination rules for sums *)
 fact elim.Sum
- ∀X,A,B,z (∀x:A (z = inl x → X) → ∀y:B (z = inr y → X) → 
+ ∀X,A,B,z (∀x:A (z = inl x → X) → ∀y:B (z = inr y → X) →
 	Sum A B z → X).
 intros.
 elim -1 λc (z = c → X) H1.
 trivial.
 save.
 
-fact inl.injective_left.Sum ∀X,x,y ((x = y → X) → inl x = inl y → X). 
-trivial +inl.injective.Sum. 
+fact inl.injective_left.Sum ∀X,x,y ((x = y → X) → inl x = inl y → X).
+trivial +inl.injective.Sum.
 save.
 
-fact inr.injective_left.Sum ∀X,x,y ((x = y → X) → inr x = inr y → X). 
-trivial +inr.injective.Sum. 
+fact inr.injective_left.Sum ∀X,x,y ((x = y → X) → inr x = inr y → X).
+trivial +inr.injective.Sum.
 save.
 
 fact inr_not_inl.Sum ∀x,y (inr x ≠ inl y).
@@ -82,15 +81,15 @@ new_elim -i -n $= inl.injective inl.injective_left.Sum.
 new_elim -i -n $= inr.injective inr.injective_left.Sum.
 (*endfact *)
 
-(*note 
+(*note
 These four rules and  are added as invertible elimination rules. *)
 
 
 
 (** Matching *)
 
-(*texte 
- We define 
+(*texte
+ We define
 *)
 def caseP f g z r = ∀x (z = inl x → r = f x) ∧
 			 ∀y (z = inr y → r = g y).
@@ -115,7 +114,7 @@ description, we prove the following propositions.
 *)
 
 (*fact Characteristic properties of case *)
-fact (* match left part of the sum *) case.left.Sum 
+fact (* match left part of the sum *) case.left.Sum
   ∀f,g∀x case f g (inl x) = f x.
 intros.
 prove caseP f g (inl x) (case f g (inl x)).
@@ -128,7 +127,7 @@ from true.intro.
 trivial.
 save.
 
-fact (* match right part of the sum *) case.right.Sum 
+fact (* match right part of the sum *) case.right.Sum
   ∀f,g∀y case f g (inr y) = g y.
 intros.
 prove caseP f g (inr y) (case f g (inr y)).
@@ -146,7 +145,7 @@ new_equation case.right.Sum.
 
 close_def case.
 
-(*note 
+(*note
 we add these facts as rewriting rules and we close the definition
 of $case .
 *)
@@ -155,7 +154,7 @@ of $case .
 (*texte
 We also prove :
 *)
-fact (* case is well defined on sums *) case.total.Sum 
+fact (* case is well defined on sums *) case.total.Sum
 	∀A,B,C∀f:(A ⇒ C)∀g:(B ⇒ C)∀z:(Sum A B) C (case f g z).
 trivial.
 save.

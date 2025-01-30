@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2004/12/08 14:36:08 $ $Revision: 1.12 $ *)
 (*header 99/03/18
 	title = "Lists"
  	author = "Christophe Raffalli, Paul Roziere"
@@ -12,13 +11,13 @@ flag auto_lvl 1.
 (*** Definitions and axioms *)
 (*texte
 To define lists, we extend the language with one
-constant symbols $nil  and one binary function
-symbol [ x :: l ].
+constant symbols \[nil\]  and one binary function
+symbol \[ x :: l \].
 *)
 
 Sort list['a].
 Cst (* empty list *) nil : list['a].
-tex_syntax nil Math "\\[\\]".
+tex_syntax nil Math "\\emptyset".
 Cst (* cons *)  rInfix[4] x "::" y : 'a → list['a] → list['a].
 (* x :: y *)
 tex_syntax $:: rInfix[4] x ! "\\,\\, :: \\;\\;\\;\\;" ! y.

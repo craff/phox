@@ -1,4 +1,3 @@
-(* $State: Exp $ $Date: 2004/11/22 13:38:04 $ $Revision: 1.8 $ *)
 (*header 1998/09/08
 
 	title = "Products"
@@ -14,7 +13,7 @@ flag auto_lvl 3.
 
 (*texte
 To define the product of two predicates, we extend the language with one
-binary function symbol λ[ x, y λ] .
+binary function symbol \[ x, y \] .
 Then the product of two unary predicates is defined by the following predicate
 [ Product A B ]
 *)

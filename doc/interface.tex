@@ -1,63 +1,92 @@
-% $State: Exp $ $Date: 2002/03/21 20:57:31 $ $Revision: 1.5 $
-%; whizzy-master doc.tex
+\chapter{Installation}
 
-\chapter{Emacs and XEmacs interface.}\label{interface}
+\section{Opam installation.}
+
+NOTE: THE OPAM PACKAGE IS NOT YET UP TO DATE
+
+Phox is available as an opam package. So typically on a linux debian
+installation, the following should be enough:
+
+\begin{quote}
+\begin{verbatim}
+apt-get install opam
+
+opam install phox
+\end{verbatim}
+\end{quote}
+
+\section{Installation from source}
+
+Phox is available from github:
+
+\begin{quote}
+\url{https://github.com/craff/phox}
+\end{quote}
+
+If OCaml and dune are installed on your linux machine, the following should
+work:
+\begin{quote}
+\begin{verbatim}
+  git clone https://github.com/craff/phox.git
+  opam install dune js_of_ocaml num camlp5
+        #or equivalent if you don't use opam
+  cd phox
+  make
+  make install
+\end{verbatim}
+\end{quote}
+
+\section{Web interface}
+
+We plan a ``server version'' of phox that should make it possible to use
+the web interface with the local installation of phox, which is around 10
+times faster than phox compiled with \verb#js_of_ocaml#.
+
+\section{Emacs interface.}\label{interface}
 
 It is possible to use \AFD\ directly in a ``terminal''. But this is
 far from the best you can do. You can use the \AFD\ emacs mode developped by
 C. Raffalli and P. Roziere using D. Aspinall's ``Proof-General''.
 
-This interface works better with XEmacs 21.1 or later, but pre-releases 3.4 of
-Proof-General works reasonably well with gnu-emacs 21.
-
-You should also note that all it can be used under Windows (98 and
-XP have been successfully tested), using the win32 version of XEmacs and the specific
-windows version of \AFD.
-
 Proof-General is available from
 \begin{quote}
-\verb#http://www.proofgeneral.org/~proofgen#
+\url{https://proofgeneral.github.io}
 \end{quote}
 
-XEmacs (for Windows and Unix/Linux) is available from
-\begin{quote}
-\verb#http://www.xemacs.org#
-\end{quote}
+\subsection{Getting things to work.}
 
-\section{Getting things to work.}
-
-First you need to have XEmacs 21.1 or later installed. Then you need
+First you need to have Emacs installed. Then you need
 to get and install Proof-General version 3.3 or later. Remember where
 you installed  Proof-General.
 
+On debian, this can be done using
+\begin{quote}
+  \tt apt-get install emacs proof-general
+\end{quote}
+
 Then you need to add the following line to the configuration file of
-XEmacs\footnote{
-This configuration file is (under Unix/Linux) named {\tt .emacs} and
-located in your home directory. Recent version of XEmacs used files in
-a {\tt .xemacs} subdirectory of your home directory.
+Emacs\footnote{ This configuration file is (under Unix/Linux) named {\tt
+  .emacs} pr {\tt .emacs.d/init.el} and located in your home directory.
 
 Your system administrator can also add lines in a general startup
 file to make \AFD\ available to all users.}:
 \begin{verbatim}
-(load-file
-  "/usr/share/emacs/site-lisp/ProofGeneral/generic/proof-site.el")
+(setq load-path (cons "PATH-WHERE-PHOX-INSTALLED-EMACS-FILES" load-path))
+(require 'phox-mode)
 \end{verbatim}
 
-This line is valid if Proof-General is installed in
-\verb#/usr/share/emacs/site-lisp#. Adapt it to your own setup.
 If later \AFD\ fails to start, you can also add a line
 
 \begin{verbatim}
-(set-variable 'phox-prog-name
-  "/usr/local/bin/phox -pg")
+(set-variable 'phox-prog-name "PATH-TO-PHOX-EXECUTABLE -pg")
 \end{verbatim}
 
 The \verb#-pg# is essential when \AFD\ works with Proof-General.
 
 
-\section{Getting started.}
+\subsection{Getting started.}
 
-To start \AFD, you only need to open with XEmacs a file whose name ends by the
+To start \AFD, you only need to open with Emacs a file whose name ends by the
 extension \verb#.phx#. Try it, you should see a screen similar to the
 figure \ref{ecran}.
 
@@ -82,22 +111,39 @@ pointer moves above such symbol, you can see there ASCII equivalent.
 To use it, you simply type in the \AFD\ file and transmit command to
 the system using the navigation buttons. The command that have been
 transmitted are highlighted with a different background color and are
-locked (you can not edit them anymore). The main navigation button are:
+locked (you can not edit them anymore).
+
+You should have a Proof-General menu allowing to evaluate your file.
+The main navigation commands are:
 
 \begin{description}
-\item[Next] sends the next command to the system.
-\item[Undo] go back from one command.
-\item[Goto] enter (or undo) all the commands to move to a specific
+\item[Next-Step (Ctrl-c Ctrl-n] sends the next command to the system.
+\item[Undo-Step (Ctrl-c Ctrl-u] go back from one command.
+\item[Goto-Point (Ctrl-c Ctrl-ret] enter (or undo) all the commands to move to a specific
 position in the file.
-\item[Restart] restart \AFD\ (sometimes very useful, because
+\item[Restart Scripting] restart \AFD\ (sometimes very useful, because
 synchronisation between the \AFD\ system and XEmacs is lost. In this
 case you to Restart followed by Goto.
 \end{description}
 
-All these buttons are also associated to a menu and a keyboard
+All these menus are also associated with a keyboard
 equivalent (visible in the menu).
 
-\section{Tips.}
+\subsection{Mathematical symbols.}
+
+Under Emacs, the input method names ``TeX'' should be activated by
+default under phox mode. Therefore, you can type any mathematical symbol used
+by phox by typing its latex equivalent. For instance:
+
+\begin{itemize}
+  \item \verb#\forall# for $\forall$
+  \item \verb#\to# for $\to$
+  \item \verb#\wedge# for $\wedge$
+  \item \verb#\times# for $\times$
+  \item ...
+\end{itemize}
+
+\subsection{Tips.}
 
 Proof-General can only work with one active file at a time. The best
 is to use the Restart button when switching from one file to another,

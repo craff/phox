@@ -1,13 +1,13 @@
 % $State: Exp $ $Date: 2002/03/21 20:57:31 $ $Revision: 1.10 $
 %; whizzy-master doc.tex
- 
+
 \chapter{Introduction.}
 
 The ``\AFD{} Proof Checker'' is an implementation of higher order logic,
 inspired by Krivine's type system (see section \ref{motif}), and
 designed by Christophe Raffalli.
  \AFD{} is a Proof assistant based on High Order logic and it is
-eXtensible. 
+eXtensible.
 
 One of the principle of this proof assistant is to be as
 user friendly as possible and so to need a minimal learning time. The
@@ -41,13 +41,13 @@ difficult to reach all of them):
   types due to Ramsey \cite{Ra25}\footnote{which itself derives from the
     type system of Russell and Whitehead}. Feasability is probably much
   more a probleme of ``ergonomics'' than a probleme of logical strength.
-  
+
   Anyway it is always possible to represent any first order theory, you
   can add axioms and first order axiom's schematas are replaced by
   second order axioms. You can represent this way set theory ZF in
   \AFD\footnote{For now \AFD{} does not give the user any mechanical way to
     control that you use only first order instances of these schematas}.
-  
+
 
 \item The manipulation of the system should be as intuitive as possible. Thus,
 we shall try to have a simple syntax and a comprehensive way to build proofs
@@ -123,12 +123,17 @@ section~\ref{extraction}.  Extraction is possible for proofs using
 \item The web page of \AFD:
 
 \begin{quote}
-\verb#http://www.lama.univ-savoie.fr/~raffalli/phox.html#
+  \url{https://raffalli.eu/phox/}
 \end{quote}
 
-\item The documentation of the library (file \verb#doc/libdoc.dvi#).
- You can also look at the PhoX files in the \verb#lib# directory 
+\item Try PhoX online:
 
+\begin{quote}
+  \url{https://raffalli.eu/phox/online/}
+\end{quote}
+
+\item The documentation of the library (file \verb#doc/libdoc.pdf#).
+ You can also look at the PhoX files in the \verb#lib# directory
 
 \item An article relating a teaching experiment with PhoX
 \cite{RD01}. This article gives a short presentation of PhoX giving
@@ -137,14 +142,17 @@ one commented example and an appendix of the main commands. It is also
 
 It is available from the Internet in french and english:
 \begin{quote}
-\verb#ftp://www.lama.univ-savoie.fr/pub/users/RAFFALLI/Papers/arao-fr.ps.gz#
-\verb#ftp://www.lama.univ-savoie.fr/pub/users/RAFFALLI/Papers/arao-en.ps.gz#
+  \url{https://raffalli.eu/pdfs/arao-fr.pdf}
+
+  \url{https://raffalli.eu/pdfs/arao-en.pdf}
 \end{quote}
 
-\item The folder \verb#tutorial/french# : it contains tutorial. 
-It is only in french. Each tutorial comes with two files:
+\item The folder \verb#tutorial/french# : it contains tutorial.
+It is only in french. A folder \verb#tutorial/english# contains partial
+translation.
+Each tutorial comes with two files:
 \verb#xxx_quest.phx# and \verb#xxx_cor.phx#. In the first one there are
-questions: 
+questions:
 ``dots'' that you need to replace by the proper sequence of
 commands. The second one contains valid answer to all the questions.
 
@@ -157,17 +165,14 @@ There are three kinds of tutorials (see the ``README'' in
 \verb#sort_quest.phx#.
 \item Tutorial intended to learn standard mathematics:
 \verb#ideal_quest.phx#,
-               \verb#commutation_quest.phx#, \verb#topo_quest.phx#,
-               \verb#analyse_quest.phx# and \verb#group_quest.phx#.
-\item Tutorial intended to learn Elogic:
+\verb#commutation_quest.phx#, \verb#topo_quest.phx#,
+\verb#analyse_quest.phx# and \verb#group_quest.phx#.
+\item Tutorial intended to learn logic:
 \verb#tautologie_quest.phx# and \verb#minlog_quest.phx# (the latest
 tutorial is difficult).
 \end{itemize}
 
-We plan to translate these tutorials to english.
-
-
-\item The folder \verb#examples# and \verb#examples/mini# of the distribution : they contain a lot of
+\item The folder \verb#examples# of the distribution : they contain a lot of
 examples of proof development. Beware that a lot of these examples
 were develop for some older version of PhoX and could be improved
 using recent features.
@@ -181,9 +186,9 @@ using recent features.
 % Yet to be written ...
 
 
-        
 
-%%% Local Variables: 
+
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "doc"
-%%% End: 
+%%% End:

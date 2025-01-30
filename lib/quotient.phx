@@ -1,10 +1,9 @@
-(* $State: Exp $ $Date: 2004/11/22 13:38:04 $ $Revision: 1.10 $ *)
 (* Definition of quotient *)
 
 (*header
 	title = "Quotient"
 	author = "Christophe Raffalli"
-	institute = "Paris VII \\∧ Paris XII university"
+	institute = "Paris VII \\& Paris XII university"
 *)
 
 flag auto_lvl 1.
@@ -23,12 +22,12 @@ claim refl.Q  reflexive D R.
 claim sym.Q   symmetric D R.
 claim trans.Q transitive D R.
 
-def Q X = ∃x:D X x ∧ ∀x:X D x ∧ 
+def Q X = ∃x:D X x ∧ ∀x:X D x ∧
 	  ∀x,y:D (R x y → X x → X y) ∧
           ∀x,y (X x → X y → R x y).
-def class x y = D y ∧ R x y. 
+def class x y = D y ∧ R x y.
 
-proposition class.Q ∀x:D Q(class x). 
+proposition class.Q ∀x:D Q(class x).
 intros.
 intro.
 trivial +refl.Q.
@@ -76,13 +75,13 @@ trivial 8.
 save.
 
 new_intro -i equal equal.Q.
- 
+
 (** Compatible fonctions *)
 
 def Compatible f R = ∀x,y:D (R x y → f x = f y).
 def Lift f c z = ∀x:c z = f x.
 
-proposition lift.compatible.Q 
+proposition lift.compatible.Q
 	∀f(Compatible f R → ∀c:Q ∃!z Lift f c z).
 intros.
 left H0.
@@ -124,7 +123,7 @@ save.
 
 new_equation lift.prop.
 
-proposition class.eq.Q 
+proposition class.eq.Q
  ∀x:Q∃x':x x = class x'.
 trivial.
 save.
